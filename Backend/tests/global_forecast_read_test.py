@@ -1,12 +1,11 @@
 import numpy as np
 import pandas as pd
 import xarray
-
 from src.cams.global_forecast_read import extract_value
 
 
 def test_answer():
-    dataSet = xarray.DataArray(
+    dataset = xarray.DataArray(
         data=np.array([[[123]]]),
         dims=['time', 'latitude', 'longitude'],
         coords=dict(
@@ -16,4 +15,4 @@ def test_answer():
         )
     )
     city = {'name': 'London', 'latitude': 51.509865, 'longitude': -0.118092}
-    assert extract_value(dataSet, city) == [123]
+    assert extract_value(dataset, city) == [123]
