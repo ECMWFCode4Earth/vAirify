@@ -1,3 +1,5 @@
+import os
+
 import cdsapi
 from datetime import date, timedelta
 
@@ -18,8 +20,8 @@ def fetch_forecast_data(target_file: str) -> None:
     }
 
     print(f'Fetching data for model base date {model_base_date}, request body: {request_body}')
-
     c.retrieve(
         'cams-global-atmospheric-composition-forecasts',
         request_body,
         target_file)
+
