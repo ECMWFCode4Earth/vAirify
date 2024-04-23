@@ -138,6 +138,14 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+
 # pytype static type analyzer
 .pytype/
 
