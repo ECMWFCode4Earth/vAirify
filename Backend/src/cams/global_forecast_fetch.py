@@ -1,7 +1,6 @@
-import os
+from datetime import date, timedelta
 
 import cdsapi
-from datetime import date, timedelta
 
 
 def fetch_forecast_data(target_file: str) -> None:

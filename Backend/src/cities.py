@@ -5,5 +5,5 @@ cities = [
     # {'name': 'Karachi', 'latitude': 24.9, 'longitude': 67.0},
     # {'name': 'Sydney', 'latitude': -33.9, 'longitude': 151.2},
     # {'name': 'Busan', 'latitude': 35.1, 'longitude': 129.1},
-    {'name': 'Dhaka', 'latitude': 23.8, 'longitude': 90.4},
+    # {'name': 'Dhaka', 'latitude': 23.8, 'longitude': 90.4},
 ]
