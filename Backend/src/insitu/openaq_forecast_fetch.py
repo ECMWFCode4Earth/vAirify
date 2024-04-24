@@ -3,15 +3,13 @@ from time import sleep
 
 import requests
 
-from src.cities import cities
-
 date_from = "2024-03-10T00%3A00%3A00Z"
 date_to = "2024-03-17T21%3A53%3A00Z"
 sort = "desc"
 order_by = "datetime"
 
 
-def fetch_insitu_measurements():
+def fetch_insitu_measurements(cities):
     data = []
     for city in cities:
         sleep(1)
