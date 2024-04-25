@@ -1,4 +1,4 @@
-from src.cams.global_forecast_fetch import ForecastData
+from src.cams.forecast_dao import ForecastData
 
 
 def extract_value(data_array, city):

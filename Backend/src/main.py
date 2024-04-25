@@ -1,5 +1,5 @@
-from cams.global_forecast_fetch import fetch_forecast_data
-from cams.global_forecast_read import transform
+from cams.forecast_dao import fetch_forecast_data
+from cams.forecast_adapter import transform
 from cities import cities
 from database.database import insert_data_forecast
 from insitu.openaq_forecast_fetch import fetch_insitu_measurements

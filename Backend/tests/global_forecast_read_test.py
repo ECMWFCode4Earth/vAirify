@@ -1,6 +1,6 @@
 import xarray
 
-from src.cams.global_forecast_read import extract_value, extract
+from src.cams.forecast_adapter import extract_value, extract
 from tests.global_forecast_read_test_data import pm10, extract_result, testCities, data_set
 
 
