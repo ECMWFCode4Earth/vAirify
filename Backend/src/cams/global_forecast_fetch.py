@@ -1,26 +1,53 @@
-from datetime import date, timedelta
-
 import cdsapi
+from datetime import date, timedelta
+import xarray as xr
 
 
-def fetch_forecast_data(target_file: str) -> None:
-    c = cdsapi.Client()
-    model_base_date = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
-    request_body = {
+class ForecastData:
+    def __init__(self, single_level_data: xr.Dataset, multi_level_data: xr.Dataset):
+        self.single_level_data = single_level_data
+        self.multi_level_data = multi_level_data
+
+
+def get_base_request_body(model_base_date: str) -> dict:
+    return {
         'date': f'{model_base_date}/{model_base_date}',
         'type': 'forecast',
         'format': 'grib',
-        'variable': [
-            'particulate_matter_10um', 'particulate_matter_2.5um', 'total_column_nitrogen_dioxide',
-            'total_column_ozone', 'total_column_sulphur_dioxide'
-        ],
         'time': '00:00',
-        'leadtime_hour': ['24', '48', '72', '96', '120'],
+        'leadtime_hour': [
+            '24', '48', '72',
+            '96', '120',
+        ]
     }
 
-    print(f'Fetching data for model base date {model_base_date}, request body: {request_body}')
+
+def get_single_level_request_body(model_base_date: str) -> dict:
+    base_request = get_base_request_body(model_base_date)
+    base_request['variable'] = ['particulate_matter_10um', 'particulate_matter_2.5um']
+    return base_request
+
+
+def get_multi_level_request_body(model_base_date: str) -> dict:
+    base_request = get_base_request_body(model_base_date)
+    base_request['variable'] = ['nitrogen_dioxide', 'ozone', 'sulphur_dioxide']
+    base_request['model_level'] = '137'
+    return base_request
+
+
+def fetch_cams_data(request_body, file_name) -> xr.Dataset:
+    c = cdsapi.Client()
+    print(f'Loading data from CAMS to file {file_name}, request body: {request_body}')
     c.retrieve(
         'cams-global-atmospheric-composition-forecasts',
         request_body,
-        target_file)
+        file_name
+    )
+    return xr.open_dataset(file_name, decode_times=False, engine='cfgrib', backend_kwargs={'indexpath': ''})
 
+
+def fetch_forecast_data() -> ForecastData:
+    model_base_date = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+    single_level_data = fetch_cams_data(get_single_level_request_body(model_base_date), 'single_level.grib')
+    multi_level_data = fetch_cams_data(get_multi_level_request_body(model_base_date), 'multi_level.grib')
+    return ForecastData(single_level_data, multi_level_data)

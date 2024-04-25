@@ -1,17 +1,11 @@
-import os
-
 from cams.global_forecast_fetch import fetch_forecast_data
-from cams.global_forecast_read import extract
+from cams.global_forecast_read import transform
 from cities import cities
 from database.database import insert_data_forecast
 from insitu.openaq_forecast_fetch import fetch_insitu_measurements
 
-file_name = 'forecast_data.grib'
-
-
-if not os.path.isfile(file_name):
-    fetch_forecast_data(file_name)
-
-insert_data_forecast(extract(file_name, cities))
+extracted_forecast_data = fetch_forecast_data()
+transformed_forecast_data = transform(extracted_forecast_data, cities)
+insert_data_forecast(transformed_forecast_data)
 
 print(fetch_insitu_measurements(cities))
