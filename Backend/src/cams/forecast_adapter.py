@@ -1,4 +1,4 @@
-from src.cams.forecast_dao import ForecastData, ForecastDataType
+from .forecast_dao import ForecastData, ForecastDataType
 from decimal import Decimal
 from numpy import ndarray
 from xarray import DataArray

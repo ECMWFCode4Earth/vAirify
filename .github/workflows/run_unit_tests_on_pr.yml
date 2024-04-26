@@ -1,0 +1,28 @@
+name: pr-build
+
+on:
+  pull_request:
+    types: ['opened', 'reopened', 'synchronize']
+    branches:
+      - 'main'
+
+jobs:
+  run-unit-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          channels: conda-forge
+          environment-file: Backend/test_environment.yml
+          auto-activate-base: false
+          activate-environment: weather-etl
+
+      - name: Run unit tests
+        run: python -m pytest Backend/tests
