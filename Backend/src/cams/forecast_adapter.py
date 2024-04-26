@@ -1,4 +1,5 @@
 from src.cams.forecast_dao import ForecastData, ForecastDataType
+from decimal import Decimal
 from numpy import ndarray
 from xarray import DataArray
 
@@ -22,7 +23,7 @@ def transform(forecast_data: ForecastData, cities):
         for forecast_data_type in ForecastDataType:
             global_data = forecast_data.get_data(forecast_data_type)
             pollutant_values_kg_m3 = find_value_for_city(global_data, city).tolist()
-            pollutant_values_ug_m3 = [x * 10**9 for x in pollutant_values_kg_m3]
+            pollutant_values_ug_m3 = [float(Decimal(str(x)) * Decimal(10**9)) for x in pollutant_values_kg_m3]
             city_forecast_data_by_type[forecast_data_type] = pollutant_values_ug_m3
 
         for i in range(0, step_values.size):
