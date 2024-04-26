@@ -20,9 +20,9 @@ jobs:
         uses: conda-incubator/setup-miniconda@v3
         with:
           channels: conda-forge
-          environment-file: Backend/test_environment.yml
+          environment-file: air-quality-backend/conda/test_environment.yml
           auto-activate-base: false
           activate-environment: weather-etl
 
       - name: Run unit tests
-        run: python -m pytest Backend/tests
+        run: python -m pytest air-quality-backend/tests
