@@ -1,7 +1,8 @@
-from .forecast_dao import ForecastData, ForecastDataType
+from datetime import datetime
 from decimal import Decimal
 from numpy import ndarray
 from xarray import DataArray
+from .forecast_dao import ForecastData, ForecastDataType
 
 
 # Convert longitude values to range of 0 - 360
@@ -34,11 +35,13 @@ def transform(forecast_data: ForecastData, cities):
             city_forecast_data_by_type[forecast_data_type] = pollutant_values_ug_m3
 
         for i in range(0, step_values.size):
+            measurement_timestamp = time_value + (float(step_values[i]) * 60 * 60)
+            measurement_date = datetime.utcfromtimestamp(measurement_timestamp)
             formatted_dataset.append(
                 {
                     "city": city_name,
                     "city_location": {"type": "Point", "coordinates": [city["longitude"], city["latitude"]]},
-                    "measurement_date": time_value + (float(step_values[i]) * 60 * 60),
+                    "measurement_date": measurement_date,
                     "o3": city_forecast_data_by_type[ForecastDataType.OZONE][i],
                     "no2": city_forecast_data_by_type[ForecastDataType.NITROGEN_DIOXIDE][i],
                     "so2": city_forecast_data_by_type[ForecastDataType.SULPHUR_DIOXIDE][i],

@@ -80,7 +80,7 @@ def fetch_cams_data(request_body, file_name) -> xr.Dataset:
 
 
 def fetch_forecast_data() -> ForecastData:
-    model_base_date = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+    model_base_date = date.today().strftime('%Y-%m-%d')
     single_level_data = fetch_cams_data(get_single_level_request_body(model_base_date), 'single_level.grib')
     multi_level_data = fetch_cams_data(get_multi_level_request_body(model_base_date), 'multi_level.grib')
     return ForecastData(single_level_data, multi_level_data)

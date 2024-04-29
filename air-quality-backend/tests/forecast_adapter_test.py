@@ -1,6 +1,7 @@
+from datetime import datetime
+import pytest
 from src.etl.forecast.forecast_adapter import ForecastData, convert_longitude_east_range, find_value_for_city, transform
 from .mock_forecast_data import no2, single_level_data_set, multi_level_data_set, default_test_cities
-import pytest
 
 
 @pytest.mark.parametrize("longitude, expected", [
@@ -36,7 +37,7 @@ def test_transform_returns_formatted_data():
         {
             'city': 'Dublin',
             'city_location': {'coordinates': [0, -10], 'type': 'Point'},
-            'measurement_date': 1713830400.0,
+            'measurement_date': datetime(2024, 4, 23, 0, 0),
             'no2': 100,
             'o3': 300,
             'pm10': 900,
@@ -46,7 +47,7 @@ def test_transform_returns_formatted_data():
         {
             'city': 'Dublin',
             'city_location': {'coordinates': [0, -10], 'type': 'Point'},
-            'measurement_date': 1713916800.0,
+            'measurement_date': datetime(2024, 4, 24, 0, 0),
             'no2': 200,
             'o3': 400,
             'pm10': 1000,
@@ -56,7 +57,7 @@ def test_transform_returns_formatted_data():
         {
             'city': 'London',
             'city_location': {'coordinates': [10, 0], 'type': 'Point'},
-            'measurement_date': 1713830400.0,
+            'measurement_date': datetime(2024, 4, 23, 0, 0),
             'no2': 125,
             'o3': 325,
             'pm10': 925,
@@ -66,7 +67,7 @@ def test_transform_returns_formatted_data():
         {
             'city': 'London',
             'city_location': {'coordinates': [10, 0], 'type': 'Point'},
-            'measurement_date': 1713916800.0,
+            'measurement_date': datetime(2024, 4, 24, 0, 0),
             'no2': 225,
             'o3': 425,
             'pm10': 1225,
@@ -76,7 +77,7 @@ def test_transform_returns_formatted_data():
         {
             'city': 'Paris',
             'city_location': {'coordinates': [-10, 10], 'type': 'Point'},
-            'measurement_date': 1713830400.0,
+            'measurement_date': datetime(2024, 4, 23, 0, 0),
             'no2': 150,
             'o3': 350,
             'pm10': 950,
@@ -86,7 +87,7 @@ def test_transform_returns_formatted_data():
         {
             'city': 'Paris',
             'city_location': {'coordinates': [-10, 10], 'type': 'Point'},
-            'measurement_date': 1713916800.0,
+            'measurement_date': datetime(2024, 4, 24, 0, 0),
             'no2': 250,
             'o3': 450,
             'pm10': 1250,
