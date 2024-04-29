@@ -4,9 +4,16 @@ from numpy import ndarray
 from xarray import DataArray
 
 
-def find_value_for_city(data_array: DataArray, city) -> ndarray:
+# Convert longitude values to range of 0 - 360
+def convert_longitude_east_range(longitude_value: float) -> float:
+    if -180 <= longitude_value < 0:
+        return longitude_value + 360
+    return longitude_value
+
+
+def find_value_for_city(data_array: DataArray, latitude: float, longitude: float) -> ndarray:
     return data_array.sel(
-        indexers={'latitude': city["latitude"], 'longitude': city["longitude"]},
+        indexers={'latitude': latitude, 'longitude': convert_longitude_east_range(longitude)},
         method='nearest'
     ).values
 
@@ -22,7 +29,7 @@ def transform(forecast_data: ForecastData, cities):
 
         for forecast_data_type in ForecastDataType:
             global_data = forecast_data.get_data(forecast_data_type)
-            pollutant_values_kg_m3 = find_value_for_city(global_data, city).tolist()
+            pollutant_values_kg_m3 = find_value_for_city(global_data, city["latitude"], city["longitude"]).tolist()
             pollutant_values_ug_m3 = [float(Decimal(str(x)) * Decimal(10**9)) for x in pollutant_values_kg_m3]
             city_forecast_data_by_type[forecast_data_type] = pollutant_values_ug_m3
 
