@@ -13,7 +13,7 @@ Follow these [instructions](https://www.jetbrains.com/help/pycharm/conda-support
 `conda env update --name dev --file conda/environment.yml --prune`
 
 # Run all tests in tests folder
-`python -m pytest tests`
+`python -m pytest --cov=src tests`
 
 # CDS API access (CAMS)
 Create your .cdsapirc file as detailed [here](https://ads.atmosphere.copernicus.eu/api-how-to).

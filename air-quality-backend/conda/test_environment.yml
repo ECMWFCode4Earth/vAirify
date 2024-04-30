@@ -1,4 +1,4 @@
-name: weather-etl
+name: unit-test
 channels:
   - conda-forge
   - defaults
@@ -218,6 +218,8 @@ dependencies:
   - pip:
       - cads-api-client==0.10.0
       - cdsapi==0.7.0
+      - coverage==7.5.0
       - multiurl==0.3.1
+      - pytest-cov==5.0.0
       - python-dateutil==2.9.0.post0
 prefix: /usr/share/miniconda/envs/weather-etl

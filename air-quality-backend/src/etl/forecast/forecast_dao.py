@@ -1,48 +1,10 @@
 import cdsapi
-from datetime import date, timedelta
-from enum import Enum
+from datetime import date
 import xarray as xr
+from .forecast_data import ForecastData
 
 
-class ForecastDataType(Enum):
-    NITROGEN_DIOXIDE = 'no2'
-    OZONE = 'go3'
-    PARTICULATE_MATTER_2_5 = 'pm2p5'
-    PARTICULATE_MATTER_10 = 'pm10'
-    SULPHUR_DIOXIDE = 'so2'
-
-    def __eq__(self, other):
-        return other.name == self.name and other.value == self.value
-
-    def __hash__(self):
-        return hash(self.value)
-
-
-def _is_single_level(forecast_data_type: ForecastDataType) -> bool:
-    is_pm2_5 = forecast_data_type == ForecastDataType.PARTICULATE_MATTER_2_5
-    is_pm10 = forecast_data_type == ForecastDataType.PARTICULATE_MATTER_10
-    return is_pm10 or is_pm2_5
-
-
-class ForecastData:
-    def __init__(self, single_level_data: xr.Dataset, multi_level_data: xr.Dataset):
-        self.single_level_data = single_level_data
-        self.multi_level_data = multi_level_data
-
-    def get_data(self, forecast_data_type: ForecastDataType) -> xr.DataArray:
-        if _is_single_level(forecast_data_type):
-            return self.single_level_data[forecast_data_type.value]
-        else:
-            return self.multi_level_data[forecast_data_type.value]
-
-    def get_step_values(self):
-        return self.single_level_data['step'].values
-
-    def get_time_value(self) -> int:
-        return int(self.single_level_data['time'].values)
-
-
-def get_base_request_body(model_base_date: str) -> dict:
+def __get_base_request_body(model_base_date: str) -> dict:
     return {
         'date': f'{model_base_date}/{model_base_date}',
         'type': 'forecast',
@@ -56,13 +18,13 @@ def get_base_request_body(model_base_date: str) -> dict:
 
 
 def get_single_level_request_body(model_base_date: str) -> dict:
-    base_request = get_base_request_body(model_base_date)
+    base_request = __get_base_request_body(model_base_date)
     base_request['variable'] = ['particulate_matter_10um', 'particulate_matter_2.5um']
     return base_request
 
 
 def get_multi_level_request_body(model_base_date: str) -> dict:
-    base_request = get_base_request_body(model_base_date)
+    base_request = __get_base_request_body(model_base_date)
     base_request['variable'] = ['nitrogen_dioxide', 'ozone', 'sulphur_dioxide']
     base_request['model_level'] = '137'
     return base_request

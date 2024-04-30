@@ -7,7 +7,7 @@ on:
       - 'main'
 
 jobs:
-  run-unit-tests:
+  run-pr-checks:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -22,7 +22,13 @@ jobs:
           channels: conda-forge
           environment-file: air-quality-backend/conda/test_environment.yml
           auto-activate-base: false
-          activate-environment: weather-etl
+          activate-environment: unit-test
 
       - name: Run unit tests
-        run: python -m pytest air-quality-backend/tests
+        run: python -m pytest --cov=src --cov-report=xml:air-quality-backend/tests/coverage/test_report.xml air-quality-backend/tests
+        
+      - name: Code Coverage Report
+        uses: orgoro/coverage@v3.1
+        with:
+            coverageFile: air-quality-backend/tests/coverage/test_report.xml
+            token: ${{ secrets.GITHUB_TOKEN }}

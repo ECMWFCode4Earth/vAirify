@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from numpy import ndarray
 from xarray import DataArray
-from .forecast_dao import ForecastData, ForecastDataType
+from .forecast_data import ForecastData, ForecastDataType
 
 
 # Convert longitude values to range of 0 - 360

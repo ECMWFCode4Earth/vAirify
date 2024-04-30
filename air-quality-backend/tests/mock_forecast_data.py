@@ -19,10 +19,11 @@ def create_test_pollutant_data(steps, latitudes, longitudes, values) -> xarray.D
     return xarray.DataArray.from_series(series)
 
 
-no2 = create_test_pollutant_data(
-    steps=default_steps,
-    latitudes=default_latitudes,
-    longitudes=default_longitudes,
+def create_test_pollutant_data_with_defaults(values) -> xarray.DataArray:
+    return create_test_pollutant_data(default_steps, default_latitudes, default_longitudes, values)
+
+
+no2 = create_test_pollutant_data_with_defaults(
     values=[
         # -10      0     10
         0.0000001, None, None,    # 0
@@ -34,10 +35,7 @@ no2 = create_test_pollutant_data(
     ]
 )
 
-go3 = create_test_pollutant_data(
-    steps=default_steps,
-    latitudes=default_latitudes,
-    longitudes=default_longitudes,
+go3 = create_test_pollutant_data_with_defaults(
     values=[
         0.0000003, None, None,
         None, 0.000000325, None,
@@ -48,10 +46,7 @@ go3 = create_test_pollutant_data(
     ]
 )
 
-so2 = create_test_pollutant_data(
-    steps=default_steps,
-    latitudes=default_latitudes,
-    longitudes=default_longitudes,
+so2 = create_test_pollutant_data_with_defaults(
     values=[
         0.0000005, None, None,
         None, 0.000000525, None,
@@ -63,10 +58,7 @@ so2 = create_test_pollutant_data(
 )
 
 
-pm2p5 = create_test_pollutant_data(
-    steps=default_steps,
-    latitudes=default_latitudes,
-    longitudes=default_longitudes,
+pm2p5 = create_test_pollutant_data_with_defaults(
     values=[
         0.0000007, None, None,
         None, 0.000000725, None,
@@ -78,10 +70,7 @@ pm2p5 = create_test_pollutant_data(
 )
 
 
-pm10 = create_test_pollutant_data(
-    steps=default_steps,
-    latitudes=default_latitudes,
-    longitudes=default_longitudes,
+pm10 = create_test_pollutant_data_with_defaults(
     values=[
         0.0000009, None, None,
         None, 0.000000925, None,
