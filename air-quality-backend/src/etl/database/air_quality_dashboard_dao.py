@@ -1,9 +1,9 @@
 from pymongo.mongo_client import MongoClient
-
-uri = "mongodb+srv://bell-jones:wus04jxgpqMwGBi3@cluster0.ch5gkk4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+import os
 
 
 def insert_data_forecast(data):
+    uri = os.environ.get('MONGO_DB_URI')
     client = MongoClient(uri)
     collection = client['air_quality_dashboard_db']['forecast_data']
     try:

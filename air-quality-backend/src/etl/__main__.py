@@ -1,7 +1,9 @@
+from dotenv import load_dotenv
+from database.air_quality_dashboard_dao import insert_data_forecast
 from forecast.forecast_dao import fetch_forecast_data
 from forecast.forecast_adapter import transform
-from database.air_quality_dashboard_dao import insert_data_forecast
 from in_situ.openaq_dao import fetch_in_situ_measurements
+
 
 cities = [
     {'name': 'Dublin', 'latitude': 53.350140, 'longitude': -6.266155},
@@ -12,6 +14,8 @@ cities = [
     # {'name': 'Busan', 'latitude': 35.1, 'longitude': 129.1},
     # {'name': 'Dhaka', 'latitude': 23.8, 'longitude': 90.4},
 ]
+
+load_dotenv()
 
 print('Extracting pollutant forecast data')
 extracted_forecast_data = fetch_forecast_data()
