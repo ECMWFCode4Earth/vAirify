@@ -12,10 +12,15 @@ def convert_longitude_east_range(longitude_value: float) -> float:
     return longitude_value
 
 
-def find_value_for_city(data_array: DataArray, latitude: float, longitude: float) -> ndarray:
+def find_value_for_city(
+    data_array: DataArray, latitude: float, longitude: float
+) -> ndarray:
     return data_array.sel(
-        indexers={'latitude': latitude, 'longitude': convert_longitude_east_range(longitude)},
-        method='nearest'
+        indexers={
+            "latitude": latitude,
+            "longitude": convert_longitude_east_range(longitude),
+        },
+        method="nearest",
     ).values
 
 
@@ -30,8 +35,12 @@ def transform(forecast_data: ForecastData, cities):
 
         for forecast_data_type in ForecastDataType:
             global_data = forecast_data.get_data(forecast_data_type)
-            pollutant_values_kg_m3 = find_value_for_city(global_data, city["latitude"], city["longitude"]).tolist()
-            pollutant_values_ug_m3 = [float(Decimal(str(x)) * Decimal(10**9)) for x in pollutant_values_kg_m3]
+            pollutant_values_kg_m3 = find_value_for_city(
+                global_data, city["latitude"], city["longitude"]
+            ).tolist()
+            pollutant_values_ug_m3 = [
+                float(Decimal(str(x)) * Decimal(10**9)) for x in pollutant_values_kg_m3
+            ]
             city_forecast_data_by_type[forecast_data_type] = pollutant_values_ug_m3
 
         for i in range(0, step_values.size):
@@ -40,13 +49,24 @@ def transform(forecast_data: ForecastData, cities):
             formatted_dataset.append(
                 {
                     "city": city_name,
-                    "city_location": {"type": "Point", "coordinates": [city["longitude"], city["latitude"]]},
+                    "city_location": {
+                        "type": "Point",
+                        "coordinates": [city["longitude"], city["latitude"]],
+                    },
                     "measurement_date": measurement_date,
                     "o3": city_forecast_data_by_type[ForecastDataType.OZONE][i],
-                    "no2": city_forecast_data_by_type[ForecastDataType.NITROGEN_DIOXIDE][i],
-                    "so2": city_forecast_data_by_type[ForecastDataType.SULPHUR_DIOXIDE][i],
-                    "pm10": city_forecast_data_by_type[ForecastDataType.PARTICULATE_MATTER_10][i],
-                    "pm2_5": city_forecast_data_by_type[ForecastDataType.PARTICULATE_MATTER_2_5][i]
+                    "no2": city_forecast_data_by_type[
+                        ForecastDataType.NITROGEN_DIOXIDE
+                    ][i],
+                    "so2": city_forecast_data_by_type[ForecastDataType.SULPHUR_DIOXIDE][
+                        i
+                    ],
+                    "pm10": city_forecast_data_by_type[
+                        ForecastDataType.PARTICULATE_MATTER_10
+                    ][i],
+                    "pm2_5": city_forecast_data_by_type[
+                        ForecastDataType.PARTICULATE_MATTER_2_5
+                    ][i],
                 }
             )
 

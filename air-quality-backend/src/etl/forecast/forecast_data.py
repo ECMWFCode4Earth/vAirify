@@ -3,13 +3,15 @@ import xarray as xr
 
 
 class ForecastDataType(Enum):
-    NITROGEN_DIOXIDE = 'no2'
-    OZONE = 'go3'
-    PARTICULATE_MATTER_2_5 = 'pm2p5'
-    PARTICULATE_MATTER_10 = 'pm10'
-    SULPHUR_DIOXIDE = 'so2'
+    NITROGEN_DIOXIDE = "no2"
+    OZONE = "go3"
+    PARTICULATE_MATTER_2_5 = "pm2p5"
+    PARTICULATE_MATTER_10 = "pm10"
+    SULPHUR_DIOXIDE = "so2"
 
     def __eq__(self, other):
+        if other is None or not hasattr(other, "name") or not hasattr(other, "value"):
+            return False
         return other.name == self.name and other.value == self.value
 
     def __hash__(self):
@@ -34,7 +36,7 @@ class ForecastData:
             return self.multi_level_data[forecast_data_type.value]
 
     def get_step_values(self):
-        return self.single_level_data['step'].values
+        return self.single_level_data["step"].values
 
     def get_time_value(self) -> int:
-        return int(self.single_level_data['time'].values)
+        return int(self.single_level_data["time"].values)

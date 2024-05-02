@@ -55,6 +55,7 @@ dependencies:
   - exceptiongroup=1.2.0=pyhd8ed1ab_2
   - expat=2.5.0=h6a678d5_0
   - findlibs=0.0.5=pyhd8ed1ab_0
+  - flake8=7.0.0=pyhd8ed1ab_0
   - fmt=9.1.0=hdb19cb5_0
   - freeglut=3.2.2=hac7e632_2
   - freetype=2.12.1=h267a509_2
@@ -136,13 +137,14 @@ dependencies:
   - lz4-c=1.9.4=h6a678d5_0
   - lzo=2.10=hd590300_1001
   - markupsafe=2.1.5=py312h98912ed_0
+  - mccabe=0.7.0=pyhd8ed1ab_0
   - menuinst=2.0.2=py312h06a4308_0
   - msgpack-python=1.0.7=py312h8572e83_0
   - ncurses=6.4=h6a678d5_0
   - netcdf4=1.6.5=nompi_py312h26027e0_100
   - numpy=1.26.4=py312heda63a1_0
   - openjpeg=2.5.2=h488ebb8_0
-  - openssl=3.2.1=hd590300_1
+  - openssl=3.3.0=hd590300_0
   - orc=1.9.0=h208142c_3
   - packaging=23.2=py312h06a4308_0
   - pandas=2.2.2=py312hfb8ada1_0
@@ -157,8 +159,10 @@ dependencies:
   - pyarrow=13.0.0=py312h176e3d2_8_cpu
   - pyarrow-hotfix=0.6=pyhd8ed1ab_0
   - pybind11-abi=4=hd3eb1b0_1
+  - pycodestyle=2.11.1=pyhd8ed1ab_0
   - pycosat=0.6.6=py312h5eee18b_0
   - pycparser=2.21=pyhd3eb1b0_0
+  - pyflakes=3.2.0=pyhd8ed1ab_0
   - pymongo=4.6.3=py312h30efb56_0
   - pysocks=1.7.1=py312h06a4308_0
   - pytest=7.4.0=py312h06a4308_0
@@ -222,4 +226,4 @@ dependencies:
       - multiurl==0.3.1
       - pytest-cov==5.0.0
       - python-dateutil==2.9.0.post0
-prefix: /usr/share/miniconda/envs/weather-etl
+prefix: /usr/share/miniconda/envs/unit-test
