@@ -39,9 +39,11 @@ Create
 
 `New-Item -ItemType file -Name ".env"`
 
-Add in your MongoDB Connection string e.g.
+Add in the following environment variables e.g.
 ```
-MONGO_DB_URI=mongodb+srv://username:password@cluster0.ch5gkk4.mongodb.net/
+MONGO_DB_URI=mongodb+srv://<username:password>@cluster0.ch5gkk4.mongodb.net/
+MONGO_DB_NAME=air_quality_dashboard_db
+OPEN_AQ_API_KEY=<api_key>
 ```
 
 ### CDS API access (CAMS)

@@ -1,4 +1,5 @@
 import json
+import os
 import requests
 from time import sleep
 
@@ -18,6 +19,7 @@ def fetch_in_situ_measurements(cities):
 
 
 def call_openaq_api(coordinates):
+    api_key = os.environ.get("OPEN_AQ_API_KEY")
     url = (
         "https://api.openaq.org/v2/measurements?"
         + "date_from="
@@ -31,9 +33,7 @@ def call_openaq_api(coordinates):
         + "&order_by="
         + order_by
     )
-    headers = {
-        "X-API-Key": "3ed6b13c641d9a61eac7e6f8c75bfcd7fec2470000cc024687f6538773a87973"
-    }
+    headers = {"X-API-Key": api_key}
     return json.loads(requests.get(url, headers=headers).text)["results"]
 
 
