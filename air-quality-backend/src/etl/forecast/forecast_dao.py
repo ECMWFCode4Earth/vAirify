@@ -42,8 +42,9 @@ def fetch_cams_data(request_body, file_name) -> xr.Dataset:
     )
 
 
-def fetch_forecast_data() -> ForecastData:
-    model_base_date = date.today().strftime("%Y-%m-%d")
+def fetch_forecast_data(
+    model_base_date=date.today().strftime("%Y-%m-%d"),
+) -> ForecastData:
     single_level_data = fetch_cams_data(
         get_single_level_request_body(model_base_date), "single_level.grib"
     )

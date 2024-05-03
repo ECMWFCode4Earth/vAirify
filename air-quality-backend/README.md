@@ -8,7 +8,7 @@
 ### Run lint check
 `python -m flake8`
 
-### Run auto formatter
+### Run code formatter
 `python -m black src tests`
 
 ### Run all tests in tests folder
