@@ -162,3 +162,4 @@ cython_debug/
 **/*.grib
 **/*.nc
 **/coverage/*
+air-quality-backend/liquibase/liquibase.properties
