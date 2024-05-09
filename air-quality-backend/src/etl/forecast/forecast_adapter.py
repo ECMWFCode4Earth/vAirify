@@ -73,10 +73,10 @@ def transform(forecast_data: ForecastData, cities):
 
         for pollutant_type in PollutantType:
             global_data = forecast_data.get_data(pollutant_type)
-            city_forecast_data_by_type[pollutant_type] = (
-                _get_city_forecast_data_for_pollutant_type(
-                    global_data, city, pollutant_type
-                )
+            city_forecast_data_by_type[
+                pollutant_type
+            ] = _get_city_forecast_data_for_pollutant_type(
+                global_data, city, pollutant_type
             )
 
         for i in range(0, step_values.size):

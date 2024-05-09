@@ -21,3 +21,14 @@ def insert_data_forecast(data):
     print(
         f"{result.upserted_count} documents upserted, {result.modified_count} modified"
     )
+
+
+def insert_data_openaq(data):
+    uri = os.environ.get("MONGO_DB_URI")
+    db_name = os.environ.get("MONGO_DB_NAME")
+    client = MongoClient(uri)
+    collection = client[db_name]["in_situ_data"]
+    try:
+        collection.insert_many(data)
+    except Exception as exception:
+        raise exception

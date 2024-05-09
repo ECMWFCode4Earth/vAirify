@@ -1,41 +1,48 @@
-import json
 import os
-import requests
+from datetime import datetime, timedelta
 from time import sleep
 
+import requests
 
-date_from = "2024-03-10T00%3A00%3A00Z"
-date_to = "2024-03-17T21%3A53%3A00Z"
+url_base_string = (
+    "{}?date_from={}&date_to={}&limit={}&page={}"
+    "&offset={}&sort={}&coordinates={}&order_by={}&radius={}"
+)
+endpoint = "https://api.openaq.org/v2/measurements"
+date_from = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
+date_to = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+limit = "3000"
+page = "1"
+offset = "0"
 sort = "desc"
 order_by = "datetime"
+radius = "5000"
 
 
 def fetch_in_situ_measurements(cities):
     data = []
     for city in cities:
         sleep(1)
-        data.append(call_openaq_api(get_coords(city)))
+        data.append(call_openaq_api(format_coordinates(city)))
     return data
 
 
 def call_openaq_api(coordinates):
-    api_key = os.environ.get("OPEN_AQ_API_KEY")
-    url = (
-        "https://api.openaq.org/v2/measurements?"
-        + "date_from="
-        + date_from
-        + "&date_to="
-        + date_to
-        + "&sort="
-        + sort
-        + "&coordinates"
-        + coordinates
-        + "&order_by="
-        + order_by
+    url = url_base_string.format(
+        endpoint,
+        date_from,
+        date_to,
+        limit,
+        page,
+        offset,
+        sort,
+        coordinates,
+        order_by,
+        radius,
     )
-    headers = {"X-API-Key": api_key}
-    return json.loads(requests.get(url, headers=headers).text)["results"]
+    headers = {"X-API-Key": os.environ.get("OPEN_AQ_API_KEY")}
+    return requests.get(url, headers=headers).json()
 
 
-def get_coords(city):
-    return str(city["latitude"]) + "&" + str(city["longitude"])
+def format_coordinates(city):
+    return str(city["latitude"]) + "," + str(city["longitude"])
