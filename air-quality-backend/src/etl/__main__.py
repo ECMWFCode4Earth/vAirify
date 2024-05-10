@@ -1,11 +1,13 @@
 from datetime import datetime
-
 from dotenv import load_dotenv
-from database.air_quality_dashboard_dao import insert_data_forecast, insert_data_openaq
-from forecast.forecast_dao import fetch_forecast_data
-from forecast.forecast_adapter import transform
-from in_situ.openaq_dao import fetch_in_situ_measurements
-from in_situ.openaq_adapter import transform_in_situ_data
+from src.etl.database.air_quality_dashboard_dao import (
+    insert_data_forecast,
+    insert_data_openaq,
+)
+from src.etl.forecast.forecast_dao import fetch_forecast_data
+from src.etl.forecast.forecast_adapter import transform
+from src.etl.in_situ.openaq_dao import fetch_in_situ_measurements
+from src.etl.in_situ.openaq_adapter import transform_in_situ_data
 
 cities = [
     {"name": "Dublin", "latitude": 53.350140, "longitude": -6.266155},
@@ -17,24 +19,29 @@ cities = [
     {"name": "Dhaka", "latitude": 23.8, "longitude": 90.4},
 ]
 
-load_dotenv()
 
-print("Extracting pollutant forecast data")
-extracted_forecast_data = fetch_forecast_data(
-    model_base_date=datetime.now().strftime("%Y-%m-%d")
-)
+def main():
+    load_dotenv()
 
-print("Transforming forecast data")
-transformed_forecast_data = transform(extracted_forecast_data, cities)
+    print("Extracting pollutant forecast data")
+    extracted_forecast_data = fetch_forecast_data(
+        model_base_date=datetime.now().strftime("%Y-%m-%d")
+    )
 
-print("Persisting forecast data")
-insert_data_forecast(transformed_forecast_data)
+    print("Transforming forecast data")
+    transformed_forecast_data = transform(extracted_forecast_data, cities)
 
-print("Extracting in situ pollutant data")
-retrieved_in_situ_data = fetch_in_situ_measurements(cities)
-print(retrieved_in_situ_data)
-print("Transforming in situ data")
-transformed_in_situ_data = transform_in_situ_data(retrieved_in_situ_data, cities)
+    print("Persisting forecast data")
+    insert_data_forecast(transformed_forecast_data)
 
-print("Persisting in situ data")
-insert_data_openaq(transformed_in_situ_data)
+    print("Extracting in situ pollutant data")
+    retrieved_in_situ_data = fetch_in_situ_measurements(cities)
+    print("Transforming in situ data")
+    transformed_in_situ_data = transform_in_situ_data(retrieved_in_situ_data, cities)
+
+    print("Persisting in situ data")
+    insert_data_openaq(transformed_in_situ_data)
+
+
+if __name__ == "__main__":
+    main()
