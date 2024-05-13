@@ -31,16 +31,15 @@ def create_test_pollutant_data_with_defaults(values) -> xarray.DataArray:
 
 no2 = create_test_pollutant_data_with_defaults(
     values=[
-        # -10      0     10
         0.0000001,
         None,
-        None,  # 0
+        None,
         None,
         0.000000125,
-        None,  # 10
         None,
         None,
-        0.00000015,  # 350
+        None,
+        0.00000015,
         0.0000002,
         None,
         None,

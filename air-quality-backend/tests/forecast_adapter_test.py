@@ -2,7 +2,7 @@ from datetime import datetime
 import pytest
 from src.etl.forecast.forecast_adapter import (
     ForecastData,
-    convert_longitude_east_range,
+    convert_east_only_longitude_to_east_west,
     find_value_for_city,
     transform,
 )
@@ -18,17 +18,17 @@ from .mock_forecast_data import (
     "longitude, expected",
     [
         (0.0, 0.0),
+        (179.6, 179.6),
         (180.0, 180.0),
-        (181.0, 181.0),
-        (360.0, 360.0),
-        (-0.1, 359.9),
-        (-1.1, 358.9),
-        (-180.0, 180.0),
-        (-179.9, 180.1),
+        (180.4, -179.6),
+        (360.0, 0),
+        (359.6, -0.4),
+        (-0.1, -0.1),
+        (-180.0, -180.0),
     ],
 )
-def test_convert_longitude_east_range(longitude: float, expected: float):
-    assert convert_longitude_east_range(longitude) == expected
+def test__convert_longitude_east_range(longitude: float, expected: float):
+    assert convert_east_only_longitude_to_east_west(longitude) == expected
 
 
 @pytest.mark.parametrize(
@@ -42,12 +42,12 @@ def test_convert_longitude_east_range(longitude: float, expected: float):
         (-5.0, 5.0, [0.000000125, 0.000000225]),
     ],
 )
-def test_find_value_for_city(latitude: float, longitude: float, expected):
+def test__find_value_for_city(latitude: float, longitude: float, expected):
     result = find_value_for_city(no2, latitude, longitude)
     assert (result == expected).all()
 
 
-def test_transform_returns_formatted_data():
+def test__transform_returns_formatted_data():
     input_data = ForecastData(single_level_data_set, multi_level_data_set)
     expected = [
         {

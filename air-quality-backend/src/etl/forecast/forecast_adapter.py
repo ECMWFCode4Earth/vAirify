@@ -15,26 +15,39 @@ required_pollutant_data = [
 ]
 
 
-# Convert longitude values to range of 0 - 360
-def convert_longitude_east_range(longitude_value: float) -> float:
-    if -180 <= longitude_value < 0:
-        return longitude_value + 360
+def convert_east_only_longitude_to_east_west(longitude_value: float) -> float:
+    """
+    Convert longitude value from range of 0 - 360 to -180 - 180
+    """
+    if 180 < longitude_value <= 360:
+        return float(Decimal(str(longitude_value)) - Decimal("360"))
     return longitude_value
 
 
 def find_value_for_city(
     data_array: DataArray, latitude: float, longitude: float
 ) -> ndarray:
-    return data_array.sel(
+    converted_data = data_array.assign_coords(
+        longitude=list(
+            map(
+                lambda lon: convert_east_only_longitude_to_east_west(
+                    lon.values.flat[0]
+                ),
+                data_array.longitude,
+            )
+        )
+    )
+    converted_data = converted_data.sortby("longitude")
+    return converted_data.sel(
         indexers={
             "latitude": latitude,
-            "longitude": convert_longitude_east_range(longitude),
+            "longitude": longitude,
         },
         method="nearest",
     ).values
 
 
-def create_pollutant_dict(value: float, pollutant_type: PollutantType) -> dict:
+def _create_pollutant_dict(value: float, pollutant_type: PollutantType) -> dict:
     return {
         "aqi_level": aqi_calculator.get_pollutant_index_level(value, pollutant_type),
         "value": value,
@@ -94,7 +107,7 @@ def transform(forecast_data: ForecastData, cities):
 
             pollutant_data = {}
             for name, pollutant_type in required_pollutant_data:
-                pollutant_data[name] = create_pollutant_dict(
+                pollutant_data[name] = _create_pollutant_dict(
                     city_forecast_data_by_type[pollutant_type][
                         "pollutant_values_ug_m3"
                     ][i],
