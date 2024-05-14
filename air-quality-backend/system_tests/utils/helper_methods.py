@@ -3,7 +3,7 @@ import os
 import xarray
 from pymongo import MongoClient
 
-from src.etl.__main__ import main
+from scripts.run_forecast_etl import main
 from src.etl.forecast.forecast_adapter import convert_longitude_east_range
 
 

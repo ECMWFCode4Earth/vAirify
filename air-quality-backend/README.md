@@ -2,17 +2,14 @@
 
 ## Common Commands
 
-### Run main application
-`python src/etl/__main__.py`
-
 ### Run lint check
 `python -m flake8`
 
 ### Run code formatter
-`python -m black src tests`
+`python -m black src tests scripts`
 
 ### Run all tests in tests folder
-`python -m pytest --cov=src tests`
+`python -m pytest --cov=src --cov=scripts tests`
 
 ## Conda
 

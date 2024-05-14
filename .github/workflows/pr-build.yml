@@ -28,7 +28,7 @@ jobs:
         run: python -m flake8 --append-config air-quality-backend/.flake8 air-quality-backend
 
       - name: Run unit tests
-        run: python -m pytest --cov=src --cov-report=xml:air-quality-backend/tests/coverage/test_report.xml air-quality-backend/tests
+        run: python -m pytest --cov=src --cov=scripts --cov-report=xml:air-quality-backend/tests/coverage/test_report.xml air-quality-backend/tests
         
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1

@@ -61,3 +61,10 @@ def get_locations_by_type(location_type: str):
     for document in cursor:
         results.append(document)
     return results
+
+
+def delete_data_before(measurement_time: datetime):
+    collections = [get_collection("forecast_data"), get_collection("in_situ_data")]
+    for collection in collections:
+        result = collection.delete_many({"measurement_date": {"$lt": measurement_time}})
+        logging.info(f"Deleted {result.deleted_count} documents from {collection.name}")

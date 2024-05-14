@@ -1,11 +1,12 @@
+from copy import deepcopy
+from datetime import datetime, timezone
+import pytest
 from src.etl.in_situ.openaq_adapter import transform_in_situ_data
 from tests.mock_openaq_data import (
     openaq_dataset_multiple_locations,
     openaq_dataset_multiple_times,
     openaq_dataset_multiple_cities,
 )
-from copy import deepcopy
-import pytest
 
 
 @pytest.mark.parametrize(
@@ -20,7 +21,9 @@ import pytest
                         "type": "Point",
                     },
                     "city": "Dublin",
-                    "measurement_date": "2024-04-21T00:00:00+00:00",
+                    "measurement_date": datetime(
+                        2024, 4, 21, 0, 0, tzinfo=timezone.utc
+                    ),
                     "so2": 14.0,
                 }
             ],
@@ -38,7 +41,9 @@ import pytest
                         "type": "Point",
                     },
                     "city": "Dublin",
-                    "measurement_date": "2024-04-21T00:00:00+00:00",
+                    "measurement_date": datetime(
+                        2024, 4, 21, 0, 0, tzinfo=timezone.utc
+                    ),
                     "so2": 99.0,
                 }
             ],
@@ -63,7 +68,7 @@ def test_transform_in_situ_data_input_multiple_times_returns_sorted_data():
                 "type": "Point",
             },
             "city": "Dublin",
-            "measurement_date": "2024-04-21T00:00:00+00:00",
+            "measurement_date": datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc),
             "so2": 14.0,
         },
         {
@@ -72,7 +77,7 @@ def test_transform_in_situ_data_input_multiple_times_returns_sorted_data():
                 "type": "Point",
             },
             "city": "Dublin",
-            "measurement_date": "2024-04-21T01:00:00+00:00",
+            "measurement_date": datetime(2024, 4, 21, 1, 0, tzinfo=timezone.utc),
             "no2": 70.0,
             "so3": 44.0,
         },
@@ -82,7 +87,7 @@ def test_transform_in_situ_data_input_multiple_times_returns_sorted_data():
                 "type": "Point",
             },
             "city": "Dublin",
-            "measurement_date": "2024-04-21T02:00:00+00:00",
+            "measurement_date": datetime(2024, 4, 21, 2, 0, tzinfo=timezone.utc),
             "pm25": 889.0,
         },
     ]
@@ -97,7 +102,7 @@ def test_transform_in_situ_data_input_multiple_cities_returns_sorted_data():
                 "type": "Point",
             },
             "city": "Dublin",
-            "measurement_date": "2024-04-21T00:00:00+00:00",
+            "measurement_date": datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc),
             "pm25": 11.0,
             "so2": 14.0,
         },
@@ -107,7 +112,7 @@ def test_transform_in_situ_data_input_multiple_cities_returns_sorted_data():
                 "type": "Point",
             },
             "city": "London",
-            "measurement_date": "2024-04-21T00:00:00+00:00",
+            "measurement_date": datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc),
             "pm25": 53.0,
             "so2": 144.0,
         },

@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 from src.etl.in_situ.sort_in_situ import sort_by_distance_and_time
 
@@ -32,7 +33,9 @@ def create_document(measurement, city_name):
                 measurement["coordinates"]["latitude"],
             ],
         },
-        "measurement_date": measurement["date"]["utc"],
+        "measurement_date": datetime.strptime(
+            measurement["date"]["utc"], "%Y-%m-%dT%H:%M:%S%z"
+        ),
     }
 
 
