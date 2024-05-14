@@ -1,4 +1,5 @@
 from datetime import datetime
+from freezegun import freeze_time
 import pytest
 from src.etl.forecast.forecast_adapter import (
     ForecastData,
@@ -47,13 +48,16 @@ def test__find_value_for_city(latitude: float, longitude: float, expected):
     assert (result == expected).all()
 
 
+@freeze_time("2024-04-11")
 def test__transform_returns_formatted_data():
     input_data = ForecastData(single_level_data_set, multi_level_data_set)
+    created_time = datetime(2024, 4, 11, 0, 0)
     expected = [
         {
             "city": "Dublin",
             "city_location": {"coordinates": [0, -10], "type": "Point"},
             "measurement_date": datetime(2024, 4, 23, 0, 0),
+            "created_time": created_time,
             "overall_aqi_level": 6,
             "no2": {"aqi_level": 3, "value": 100},
             "o3": {"aqi_level": 5, "value": 300},
@@ -65,6 +69,7 @@ def test__transform_returns_formatted_data():
             "city": "Dublin",
             "city_location": {"coordinates": [0, -10], "type": "Point"},
             "measurement_date": datetime(2024, 4, 24, 0, 0),
+            "created_time": created_time,
             "overall_aqi_level": 6,
             "no2": {"aqi_level": 4, "value": 200},
             "o3": {"aqi_level": 6, "value": 400},
@@ -76,6 +81,7 @@ def test__transform_returns_formatted_data():
             "city": "London",
             "city_location": {"coordinates": [10, 0], "type": "Point"},
             "measurement_date": datetime(2024, 4, 23, 0, 0),
+            "created_time": created_time,
             "overall_aqi_level": 6,
             "no2": {"aqi_level": 4, "value": 125},
             "o3": {"aqi_level": 5, "value": 325},
@@ -87,6 +93,7 @@ def test__transform_returns_formatted_data():
             "city": "London",
             "city_location": {"coordinates": [10, 0], "type": "Point"},
             "measurement_date": datetime(2024, 4, 24, 0, 0),
+            "created_time": created_time,
             "overall_aqi_level": 6,
             "no2": {"aqi_level": 4, "value": 225},
             "o3": {"aqi_level": 6, "value": 425},
@@ -98,6 +105,7 @@ def test__transform_returns_formatted_data():
             "city": "Paris",
             "city_location": {"coordinates": [-10, 10], "type": "Point"},
             "measurement_date": datetime(2024, 4, 23, 0, 0),
+            "created_time": created_time,
             "overall_aqi_level": 6,
             "no2": {"aqi_level": 4, "value": 150},
             "o3": {"aqi_level": 5, "value": 350},
@@ -109,6 +117,7 @@ def test__transform_returns_formatted_data():
             "city": "Paris",
             "city_location": {"coordinates": [-10, 10], "type": "Point"},
             "measurement_date": datetime(2024, 4, 24, 0, 0),
+            "created_time": created_time,
             "overall_aqi_level": 6,
             "no2": {"aqi_level": 5, "value": 250},
             "o3": {"aqi_level": 6, "value": 450},

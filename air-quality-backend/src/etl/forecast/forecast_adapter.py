@@ -79,6 +79,7 @@ def transform(forecast_data: ForecastData, cities):
     step_values = forecast_data.get_step_values()
     time_value = forecast_data.get_time_value()
     formatted_dataset = []
+    created_time = datetime.utcnow()
 
     for city in cities:
         city_forecast_data_by_type = {}
@@ -121,6 +122,7 @@ def transform(forecast_data: ForecastData, cities):
                         "type": "Point",
                         "coordinates": [city["longitude"], city["latitude"]],
                     },
+                    "created_time": created_time,
                     "measurement_date": measurement_date,
                     "overall_aqi_level": overall_aqi_value,
                     **pollutant_data,
