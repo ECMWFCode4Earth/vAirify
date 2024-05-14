@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 import os
 import requests
 from urllib.parse import urlencode
@@ -34,7 +35,7 @@ def call_openaq_api(city, date_from: datetime, date_to: datetime) -> list:
     if response_json.get("results") is not None:
         return response_json["results"]
     else:
-        print(f"Response contained no results: {response_json}")
+        logging.warn(f"Response contained no results: {response_json}")
         return []
 
 

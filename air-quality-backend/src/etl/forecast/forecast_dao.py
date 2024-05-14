@@ -1,5 +1,6 @@
 import cdsapi
 from datetime import datetime
+import logging
 import xarray as xr
 from .forecast_data import ForecastData
 
@@ -35,7 +36,8 @@ def get_multi_level_request_body(model_base_date: str) -> dict:
 
 def fetch_cams_data(request_body, file_name) -> xr.Dataset:
     c = cdsapi.Client()
-    print(f"Loading data from CAMS to file {file_name}, request body: {request_body}")
+    logging.info(f"Loading data from CAMS to file {file_name}")
+    logging.debug(f"request body: {request_body}")
     c.retrieve("cams-global-atmospheric-composition-forecasts", request_body, file_name)
     return xr.open_dataset(
         file_name, decode_times=False, engine="cfgrib", backend_kwargs={"indexpath": ""}

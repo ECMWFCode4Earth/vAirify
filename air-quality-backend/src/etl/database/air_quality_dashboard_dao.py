@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 import os
 from pymongo import MongoClient, UpdateOne
 
@@ -40,7 +41,7 @@ def _upsert_measurement_data(collection_name, data):
         for doc in data
     ]
     result = collection.bulk_write(update_operations)
-    print(
+    logging.info(
         f"{result.upserted_count} documents upserted, {result.modified_count} modified"
     )
 

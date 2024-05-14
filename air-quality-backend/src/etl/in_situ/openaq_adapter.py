@@ -1,3 +1,4 @@
+import logging
 from src.etl.in_situ.sort_in_situ import sort_by_distance_and_time
 
 
@@ -16,7 +17,7 @@ def transform_in_situ_data(in_situ_data):
                 )
             )
         else:
-            print(f"No in situ measurements found for {city_name}")
+            logging.debug(f"No in situ measurements found for {city_name}")
 
     return formatted_dataset
 
@@ -60,7 +61,7 @@ def _sort(in_situ_data_for_city, city_name, input_lat, input_lon):
             # is missing all data and if it is we can just delete it.
             length_of_formatted_list = len(formatted_cities_measurement) - 1
             if len(formatted_cities_measurement[length_of_formatted_list].keys()) <= 3:
-                # print(formatted_cities_measurement[length_of_formatted_list])
+                # logging.debug(formatted_cities_measurement[length_of_formatted_list])
                 formatted_cities_measurement.pop(length_of_formatted_list)
             to_create_document = True
 
