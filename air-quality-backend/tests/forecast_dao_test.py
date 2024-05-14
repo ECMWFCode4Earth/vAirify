@@ -1,3 +1,4 @@
+from datetime import datetime
 import pytest
 from unittest.mock import call, patch
 from src.etl.forecast.forecast_dao import (
@@ -56,7 +57,7 @@ def test_fetch_forecast_data_returns_forecast_data(mocker, mock_open_dataset):
     mocker.patch("cdsapi.Client", return_value=mock_cdsapi_client)
     mock_open_dataset.side_effect = [single_level_data_set, multi_level_data_set]
 
-    forecast_data = fetch_forecast_data()
+    forecast_data = fetch_forecast_data(model_base_date=datetime.now())
 
     mock_open_dataset.assert_has_calls(
         [

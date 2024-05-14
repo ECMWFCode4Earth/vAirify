@@ -1,18 +1,18 @@
 from src.etl.in_situ.openaq_adapter import transform_in_situ_data
 from tests.mock_openaq_data import (
-    cities,
     openaq_dataset_multiple_locations,
     openaq_dataset_multiple_times,
     openaq_dataset_multiple_cities,
 )
+from copy import deepcopy
 import pytest
 
 
 @pytest.mark.parametrize(
-    "input_cities, expected",
+    "input_city, expected",
     [
         (
-            [{"name": "Dublin", "latitude": 53.350140, "longitude": -6.266155}],
+            {"name": "Dublin", "latitude": 53.350140, "longitude": -6.266155},
             [
                 {
                     "city_location": {
@@ -26,13 +26,11 @@ import pytest
             ],
         ),
         (
-            [
-                {
-                    "name": "Dublin",
-                    "latitude": 52.353888999745415,
-                    "longitude": -5.278056000074956,
-                }
-            ],
+            {
+                "name": "Dublin",
+                "latitude": 52.353888999745415,
+                "longitude": -5.278056000074956,
+            },
             [
                 {
                     "city_location": {
@@ -48,14 +46,16 @@ import pytest
     ],
 )
 def test_transform_in_situ_data_input_multiple_internal_locations_returns_sorted_data(
-    input_cities, expected
+    input_city, expected
 ):
-    result = transform_in_situ_data(openaq_dataset_multiple_locations, input_cities)
+    data = deepcopy(openaq_dataset_multiple_locations)
+    data[input_city["name"]]["city"] = input_city
+    result = transform_in_situ_data(data)
     assert result == expected
 
 
 def test_transform_in_situ_data_input_multiple_times_returns_sorted_data():
-    result = transform_in_situ_data(openaq_dataset_multiple_times, cities)
+    result = transform_in_situ_data(openaq_dataset_multiple_times)
     assert result == [
         {
             "city_location": {
@@ -89,7 +89,7 @@ def test_transform_in_situ_data_input_multiple_times_returns_sorted_data():
 
 
 def test_transform_in_situ_data_input_multiple_cities_returns_sorted_data():
-    result = transform_in_situ_data(openaq_dataset_multiple_cities, cities)
+    result = transform_in_situ_data(openaq_dataset_multiple_cities)
     assert result == [
         {
             "city_location": {

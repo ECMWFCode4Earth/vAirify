@@ -3,11 +3,17 @@ import os
 from pymongo import MongoClient, UpdateOne
 
 
-def insert_data_forecast(data):
+def get_collection(name: str):
     uri = os.environ.get("MONGO_DB_URI")
     db_name = os.environ.get("MONGO_DB_NAME")
     client = MongoClient(uri)
-    collection = client[db_name]["forecast_data"]
+    return client[db_name][name]
+
+
+def _upsert_measurement_data(collection_name, data):
+    if len(data) == 0:
+        return
+    collection = get_collection(collection_name)
     update_time = datetime.utcnow()
     update_operations = [
         UpdateOne(
@@ -23,12 +29,18 @@ def insert_data_forecast(data):
     )
 
 
+def insert_data_forecast(data):
+    _upsert_measurement_data("forecast_data", data)
+
+
 def insert_data_openaq(data):
-    uri = os.environ.get("MONGO_DB_URI")
-    db_name = os.environ.get("MONGO_DB_NAME")
-    client = MongoClient(uri)
-    collection = client[db_name]["in_situ_data"]
-    try:
-        collection.insert_many(data)
-    except Exception as exception:
-        raise exception
+    _upsert_measurement_data("in_situ_data", data)
+
+
+def get_locations_by_type(location_type: str):
+    collection = get_collection("locations")
+    cursor = collection.find({"type": location_type})
+    results = []
+    for document in cursor:
+        results.append(document)
+    return results

@@ -3,9 +3,9 @@ cities = [
     {"name": "London", "latitude": 51.509865, "longitude": -0.118092},
 ]
 
-openaq_dataset_multiple_locations = [
-    {
-        "results": [
+openaq_dataset_multiple_locations = {
+    "Dublin": {
+        "measurements": [
             {
                 "locationId": 4837,
                 "location": "Dublin 1",
@@ -48,13 +48,14 @@ openaq_dataset_multiple_locations = [
                 "entity": "Governmental Organization",
                 "sensorType": "reference grade",
             },
-        ]
+        ],
+        "city": cities[0],
     }
-]
+}
 
-openaq_dataset_multiple_times = [
-    {
-        "results": [
+openaq_dataset_multiple_times = {
+    "Dublin": {
+        "measurements": [
             {
                 "locationId": 4837,
                 "location": "Dublin Test",
@@ -139,12 +140,14 @@ openaq_dataset_multiple_times = [
                 "entity": "Governmental Organization",
                 "sensorType": "reference grade",
             },
-        ]
+        ],
+        "city": cities[0],
     }
-]
-openaq_dataset_multiple_cities = [
-    {
-        "results": [
+}
+
+openaq_dataset_multiple_cities = {
+    "Dublin": {
+        "measurements": [
             {
                 "locationId": 4837,
                 "location": "Dublin Test",
@@ -187,10 +190,11 @@ openaq_dataset_multiple_cities = [
                 "entity": "Governmental Organization",
                 "sensorType": "reference grade",
             },
-        ]
+        ],
+        "city": cities[0],
     },
-    {
-        "results": [
+    "London": {
+        "measurements": [
             {
                 "locationId": 4837,
                 "location": "London 1",
@@ -233,9 +237,10 @@ openaq_dataset_multiple_cities = [
                 "entity": "Governmental Organization",
                 "sensorType": "reference grade",
             },
-        ]
+        ],
+        "city": cities[1],
     },
-]
+}
 
 openaq_dataset_to_sort_distance = [
     {

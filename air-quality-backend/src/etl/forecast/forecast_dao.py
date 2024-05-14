@@ -1,5 +1,5 @@
 import cdsapi
-from datetime import date
+from datetime import datetime
 import xarray as xr
 from .forecast_data import ForecastData
 
@@ -43,12 +43,13 @@ def fetch_cams_data(request_body, file_name) -> xr.Dataset:
 
 
 def fetch_forecast_data(
-    model_base_date=date.today().strftime("%Y-%m-%d"),
+    model_base_date: datetime,
 ) -> ForecastData:
+    model_base_date_str = model_base_date.strftime("%Y-%m-%d")
     single_level_data = fetch_cams_data(
-        get_single_level_request_body(model_base_date), "single_level.grib"
+        get_single_level_request_body(model_base_date_str), "single_level.grib"
     )
     multi_level_data = fetch_cams_data(
-        get_multi_level_request_body(model_base_date), "multi_level.grib"
+        get_multi_level_request_body(model_base_date_str), "multi_level.grib"
     )
     return ForecastData(single_level_data, multi_level_data)

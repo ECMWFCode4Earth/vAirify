@@ -1,17 +1,22 @@
 from src.etl.in_situ.sort_in_situ import sort_by_distance_and_time
 
 
-def transform_in_situ_data(in_situ_data, cities):
+def transform_in_situ_data(in_situ_data):
     formatted_dataset = []
-    for i in range(0, len(in_situ_data)):
-        formatted_dataset.extend(
-            _sort(
-                in_situ_data[i]["results"],
-                cities[i]["name"],
-                cities[i]["latitude"],
-                cities[i]["longitude"],
+    for city_name, city_data in in_situ_data.items():
+        city = city_data["city"]
+        measurements = city_data["measurements"]
+        if len(measurements) > 0:
+            formatted_dataset.extend(
+                _sort(
+                    measurements,
+                    city_name,
+                    city["latitude"],
+                    city["longitude"],
+                )
             )
-        )
+        else:
+            print(f"No in situ measurements found for {city_name}")
 
     return formatted_dataset
 
