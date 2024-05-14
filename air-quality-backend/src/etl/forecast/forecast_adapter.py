@@ -79,7 +79,6 @@ def transform(forecast_data: ForecastData, cities):
     step_values = forecast_data.get_step_values()
     time_value = forecast_data.get_time_value()
     formatted_dataset = []
-    created_time = datetime.utcnow()
 
     for city in cities:
         city_forecast_data_by_type = {}
@@ -87,10 +86,10 @@ def transform(forecast_data: ForecastData, cities):
 
         for pollutant_type in PollutantType:
             global_data = forecast_data.get_data(pollutant_type)
-            city_forecast_data_by_type[
-                pollutant_type
-            ] = _get_city_forecast_data_for_pollutant_type(
-                global_data, city, pollutant_type
+            city_forecast_data_by_type[pollutant_type] = (
+                _get_city_forecast_data_for_pollutant_type(
+                    global_data, city, pollutant_type
+                )
             )
 
         for i in range(0, step_values.size):
@@ -122,7 +121,6 @@ def transform(forecast_data: ForecastData, cities):
                         "type": "Point",
                         "coordinates": [city["longitude"], city["latitude"]],
                     },
-                    "created_time": created_time,
                     "measurement_date": measurement_date,
                     "overall_aqi_level": overall_aqi_value,
                     **pollutant_data,

@@ -14,12 +14,28 @@ def _upsert_measurement_data(collection_name, data):
     if len(data) == 0:
         return
     collection = get_collection(collection_name)
-    update_time = datetime.utcnow()
+    now = datetime.utcnow()
     update_operations = [
-        UpdateOne(
-            {"city": doc["city"], "measurement_date": doc["measurement_date"]},
-            {"$set": {"last_modified_time": update_time, **doc}},
-            upsert=True,
+        (
+            UpdateOne(
+                {"city": doc["city"], "measurement_date": doc["measurement_date"]},
+                [
+                    {
+                        "$set": {
+                            "last_modified_time": now,
+                            "created_time": {
+                                "$cond": [
+                                    {"$not": ["$created_time"]},
+                                    now,
+                                    "$created_time",
+                                ]
+                            },
+                            **doc,
+                        }
+                    }
+                ],
+                upsert=True,
+            )
         )
         for doc in data
     ]
