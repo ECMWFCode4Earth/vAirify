@@ -22,9 +22,6 @@ steps = [
     "24",
 ]
 
-# 359.74852
-
-
 # provide longitude in: -180 to 180
 cams_city_search_details = {
     "name": "London",
