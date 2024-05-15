@@ -1,6 +1,31 @@
 from datetime import datetime
 import logging
+from src.etl.air_quality_index.calculator import get_pollutant_index_level, get_overall_aqi_level
+from src.etl.air_quality_index.pollutant_type import PollutantType
 from src.etl.in_situ.sort_in_situ import sort_by_distance_and_time
+
+required_pollutant_data = {
+    "o3": PollutantType.OZONE,
+    "no2": PollutantType.NITROGEN_DIOXIDE,
+    "so2": PollutantType.SULPHUR_DIOXIDE,
+    "pm10": PollutantType.PARTICULATE_MATTER_10,
+    "pm25": PollutantType.PARTICULATE_MATTER_2_5,
+}
+
+
+def _extract_pollutants(data):
+    output = []
+    for pollutant in required_pollutant_data.keys():
+        output.append(data[pollutant]["aqi_level"])
+    return output
+
+
+def _calculate_overall_aqi_value(formatted_dataset):
+    for i in range(0, len(formatted_dataset)):
+        # 3 being the amount of non measurement fields in the data dictionary
+        if 3 + len(required_pollutant_data.keys()) == len(formatted_dataset[i].keys()):
+            formatted_dataset[i]["overall_aqi_level"] = get_overall_aqi_level(_extract_pollutants(formatted_dataset[i]))
+    return formatted_dataset
 
 
 def transform_in_situ_data(in_situ_data):
@@ -20,10 +45,10 @@ def transform_in_situ_data(in_situ_data):
         else:
             logging.debug(f"No in situ measurements found for {city_name}")
 
-    return formatted_dataset
+    return _calculate_overall_aqi_value(formatted_dataset)
 
 
-def create_document(measurement, city_name):
+def _create_document(measurement, city_name):
     return {
         "city": city_name,
         "city_location": {
@@ -73,11 +98,17 @@ def _sort(in_situ_data_for_city, city_name, input_lat, input_lon):
             # and sorted_cities_measurement[i]["date"]["utc"] has changed.
             chosen_place = measurement_location
             current_time = measurement_date
-            formatted_cities_measurement.append(create_document(measurement, city_name))
+            formatted_cities_measurement.append(_create_document(measurement, city_name))
             to_create_document = False
 
-        if measurement["value"] != -1:
+        if measurement["value"] != -1 and measurement["parameter"] in required_pollutant_data.keys():
             formatted_cities_measurement[len(formatted_cities_measurement) - 1][
                 measurement["parameter"]
-            ] = measurement["value"]
+            ] = {
+                "aqi_level": get_pollutant_index_level(
+                    float(measurement["value"]),
+                    required_pollutant_data[measurement["parameter"]],
+                ),
+                "value": measurement["value"],
+            }
     return formatted_cities_measurement

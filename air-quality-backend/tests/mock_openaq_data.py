@@ -101,7 +101,7 @@ openaq_dataset_multiple_times = {
             {
                 "locationId": 4837,
                 "location": "Dublin Test",
-                "parameter": "so3",
+                "parameter": "so2",
                 "value": 44.0,
                 "date": {
                     "utc": "2024-04-21T01:00:00+00:00",
@@ -394,3 +394,116 @@ openaq_dataset_to_sort_time = [
         "sensorType": "reference grade",
     },
 ]
+
+openaq_dataset_all_pollutants = {
+    "Dublin": {
+        "measurements": [
+            {
+                "locationId": 4837,
+                "location": "Dublin 1",
+                "parameter": "pm25",
+                "value": 13.19,
+                "date": {
+                    "utc": "2024-04-21T00:00:00+00:00",
+                    "local": "2024-04-21T01:00:00+01:00",
+                },
+                "unit": "µg/m³",
+                "coordinates": {
+                    "latitude": 53.34187500024688,
+                    "longitude": -6.2140750004382745,
+                },
+                "country": "IE",
+                "city": None,
+                "isMobile": False,
+                "isAnalysis": None,
+                "entity": "Governmental Organization",
+                "sensorType": "reference grade",
+            },
+{
+                "locationId": 4837,
+                "location": "Dublin 1",
+                "parameter": "pm10",
+                "value": 22.87,
+                "date": {
+                    "utc": "2024-04-21T00:00:00+00:00",
+                    "local": "2024-04-21T01:00:00+01:00",
+                },
+                "unit": "µg/m³",
+                "coordinates": {
+                    "latitude": 53.34187500024688,
+                    "longitude": -6.2140750004382745,
+                },
+                "country": "IE",
+                "city": None,
+                "isMobile": False,
+                "isAnalysis": None,
+                "entity": "Governmental Organization",
+                "sensorType": "reference grade",
+            },
+{
+                "locationId": 4837,
+                "location": "Dublin 1",
+                "parameter": "so2",
+                "value": 0.0007099999999999999,
+                "date": {
+                    "utc": "2024-04-21T00:00:00+00:00",
+                    "local": "2024-04-21T01:00:00+01:00",
+                },
+                "unit": "µg/m³",
+                "coordinates": {
+                    "latitude": 53.34187500024688,
+                    "longitude": -6.2140750004382745,
+                },
+                "country": "IE",
+                "city": None,
+                "isMobile": False,
+                "isAnalysis": None,
+                "entity": "Governmental Organization",
+                "sensorType": "reference grade",
+            },
+{
+                "locationId": 4837,
+                "location": "Dublin 1",
+                "parameter": "o3",
+                "value": 0.00026000000000000003,
+                "date": {
+                    "utc": "2024-04-21T00:00:00+00:00",
+                    "local": "2024-04-21T01:00:00+01:00",
+                },
+                "unit": "µg/m³",
+                "coordinates": {
+                    "latitude": 53.34187500024688,
+                    "longitude": -6.2140750004382745,
+                },
+                "country": "IE",
+                "city": None,
+                "isMobile": False,
+                "isAnalysis": None,
+                "entity": "Governmental Organization",
+                "sensorType": "reference grade",
+            },
+{
+                "locationId": 4837,
+                "location": "Dublin 1",
+                "parameter": "no2",
+                "value": 0.021,
+                "date": {
+                    "utc": "2024-04-21T00:00:00+00:00",
+                    "local": "2024-04-21T01:00:00+01:00",
+                },
+                "unit": "µg/m³",
+                "coordinates": {
+                    "latitude": 53.34187500024688,
+                    "longitude": -6.2140750004382745,
+                },
+                "country": "IE",
+                "city": None,
+                "isMobile": False,
+                "isAnalysis": None,
+                "entity": "Governmental Organization",
+                "sensorType": "reference grade",
+            }
+        ],
+        "city": cities[0],
+    }
+}
