@@ -25,8 +25,10 @@ def _extract_pollutants(data):
 
 def _calculate_overall_aqi_value(formatted_dataset):
     for i in range(0, len(formatted_dataset)):
-        # 3 being the amount of non measurement fields in the data dictionary
-        if 3 + len(required_pollutant_data.keys()) == len(formatted_dataset[i].keys()):
+        if all(
+            item in formatted_dataset[i].keys()
+            for item in required_pollutant_data.keys()
+        ):
             formatted_dataset[i]["overall_aqi_level"] = get_overall_aqi_level(
                 _extract_pollutants(formatted_dataset[i])
             )
@@ -83,6 +85,8 @@ def _sort(in_situ_data_for_city, city_name, input_lat, input_lon):
         measurement = sorted_cities_measurement[i]
         measurement_location = measurement["location"]
         measurement_date = measurement["date"]["utc"]
+        measurement_value = measurement["value"]
+        measurement_parameter = measurement["parameter"]
 
         if measurement_location != chosen_place and i != 0:
             # Taking all data from first location
@@ -109,16 +113,16 @@ def _sort(in_situ_data_for_city, city_name, input_lat, input_lon):
             to_create_document = False
 
         if (
-            measurement["value"] != -1
-            and measurement["parameter"] in required_pollutant_data.keys()
+            measurement_value != -1
+            and measurement_parameter in required_pollutant_data.keys()
         ):
             formatted_cities_measurement[len(formatted_cities_measurement) - 1][
-                measurement["parameter"]
+                measurement_parameter
             ] = {
                 "aqi_level": get_pollutant_index_level(
-                    float(measurement["value"]),
-                    required_pollutant_data[measurement["parameter"]],
+                    measurement_value,
+                    required_pollutant_data[measurement_parameter],
                 ),
-                "value": measurement["value"],
+                "value": measurement_value,
             }
     return formatted_cities_measurement
