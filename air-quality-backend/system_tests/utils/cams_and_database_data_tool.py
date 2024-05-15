@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from src.etl.forecast.forecast_dao import fetch_cams_data
 from datetime import date, timedelta, datetime
 from scripts.run_forecast_etl import (
