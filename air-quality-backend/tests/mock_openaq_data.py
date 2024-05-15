@@ -419,7 +419,7 @@ openaq_dataset_all_pollutants = {
                 "entity": "Governmental Organization",
                 "sensorType": "reference grade",
             },
-{
+            {
                 "locationId": 4837,
                 "location": "Dublin 1",
                 "parameter": "pm10",
@@ -440,7 +440,7 @@ openaq_dataset_all_pollutants = {
                 "entity": "Governmental Organization",
                 "sensorType": "reference grade",
             },
-{
+            {
                 "locationId": 4837,
                 "location": "Dublin 1",
                 "parameter": "so2",
@@ -461,7 +461,7 @@ openaq_dataset_all_pollutants = {
                 "entity": "Governmental Organization",
                 "sensorType": "reference grade",
             },
-{
+            {
                 "locationId": 4837,
                 "location": "Dublin 1",
                 "parameter": "o3",
@@ -482,7 +482,7 @@ openaq_dataset_all_pollutants = {
                 "entity": "Governmental Organization",
                 "sensorType": "reference grade",
             },
-{
+            {
                 "locationId": 4837,
                 "location": "Dublin 1",
                 "parameter": "no2",
@@ -502,7 +502,7 @@ openaq_dataset_all_pollutants = {
                 "isAnalysis": None,
                 "entity": "Governmental Organization",
                 "sensorType": "reference grade",
-            }
+            },
         ],
         "city": cities[0],
     }
