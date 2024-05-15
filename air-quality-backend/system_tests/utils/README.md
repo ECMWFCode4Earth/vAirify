@@ -10,7 +10,6 @@
 
 ### cams_city_search_details
 * the search details to filter returned CAMS data by
-* eg `{"name": "London", "latitude": 51.6, "longitude": -0.4}`
 * the selected data will have the 'nearest' lat lon
 
 ### database_city_search_details

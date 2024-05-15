@@ -1,11 +1,14 @@
 from src.etl.forecast.forecast_dao import fetch_cams_data
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
+from scripts.run_forecast_etl import (
+    main as run_main_program_capture_forecast_in_database,
+)
 from system_tests.utils.helper_methods import (
     get_database_data,
-    get_cams_data,
-    run_main,
-    export_to_excel_by_level,
     delete_database_data,
+    export_cams_data_to_excel_by_level,
+    get_raw_cams_data,
+    longitude_calculator_for_cams_data,
 )
 from system_tests.utils.request_builder import RequestBuilder
 
@@ -14,15 +17,22 @@ today = date.today().strftime("%Y-%m-%d")  # YYYY-MM-DD
 yesterday = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")  # YYYY-MM-DD
 model_base_date = today
 
-
+# range 24 - 120, increments of 3 available
 steps = [
     "24",
 ]
-# cams_city_search_details = {"name": "Dhaka", "latitude": 23.8, "longitude": 90.4}
-# database_city_search_details = {"city": "Dhaka"}
 
-cams_city_search_details = {"name": "London", "latitude": 51.6, "longitude": -0.4}
-database_city_search_details = {"city": "London"}
+# provide longitude in: -180 to 180
+cams_city_search_details = {
+    "name": "London",
+    "latitude": 51.50853,
+    "longitude": longitude_calculator_for_cams_data(-0.12574, 0.4),
+}
+
+database_city_search_details = {
+    "measurement_date": datetime(2024, 5, 16, 0, 0),
+    "city": "London",
+}
 
 # Request bodies
 single_level_request = (
@@ -52,13 +62,13 @@ multi_level_dataset = fetch_cams_data(multi_level_request, "../multi_level.grib"
 
 delete_database_data("forecast_data")
 delete_database_data("in_situ_data")
-run_main()
-get_cams_data(
+run_main_program_capture_forecast_in_database()
+get_raw_cams_data(
     steps,
     single_level_dataset,
     cams_city_search_details["latitude"],
     cams_city_search_details["longitude"],
     multi_level_dataset,
 )
-export_to_excel_by_level(single_level_dataset, multi_level_dataset)
+export_cams_data_to_excel_by_level(single_level_dataset, multi_level_dataset)
 get_database_data(database_city_search_details)
