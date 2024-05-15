@@ -1,9 +1,8 @@
 import os
+from decimal import Decimal
 
 import xarray
 from pymongo import MongoClient
-
-from scripts.run_forecast_etl import main
 
 
 def get_dataset_from_coordinates_many_steps(
@@ -57,7 +56,7 @@ def print_cams_data(
     )
 
 
-def get_cams_data(
+def get_raw_cams_data(
     steps: list[str],
     single_level_dataset: xarray.Dataset,
     lat: float,
@@ -164,3 +163,12 @@ def export_to_excel_by_pollutant(
     export_data_array_to_excel(multi_level_dataset["no2"], "no2.xlsx")
     export_data_array_to_excel(multi_level_dataset["so2"], "so2.xlsx")
     export_data_array_to_excel(multi_level_dataset["go3"], "go3.xlsx")
+
+
+def longitude_calculator_for_cams_data(
+    longitude_value: float, data_increment_size: float
+):
+    if -180 < longitude_value <= 0 - (data_increment_size / 2):
+        return float(Decimal(str(longitude_value)) + Decimal("360"))
+    else:
+        return longitude_value
