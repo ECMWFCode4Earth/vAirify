@@ -6,18 +6,13 @@ from .forecast_data import ForecastData
 
 
 def __get_base_request_body(model_base_date: str) -> dict:
+    leadtime_hour = [str(i) for i in range(24, 121, 3)]
     return {
         "date": f"{model_base_date}/{model_base_date}",
         "type": "forecast",
         "format": "grib",
         "time": "00:00",
-        "leadtime_hour": [
-            "24",
-            "48",
-            "72",
-            "96",
-            "120",
-        ],
+        "leadtime_hour": leadtime_hour,
     }
 
 
@@ -37,7 +32,6 @@ def get_multi_level_request_body(model_base_date: str) -> dict:
 def fetch_cams_data(request_body, file_name) -> xr.Dataset:
     c = cdsapi.Client()
     logging.info(f"Loading data from CAMS to file {file_name}")
-    logging.debug(f"request body: {request_body}")
     c.retrieve("cams-global-atmospheric-composition-forecasts", request_body, file_name)
     return xr.open_dataset(
         file_name, decode_times=False, engine="cfgrib", backend_kwargs={"indexpath": ""}
