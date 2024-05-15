@@ -10,7 +10,8 @@
 
 ### cams_city_search_details
 * the search details to filter returned CAMS data by
-* eg `{"name": "London", "latitude": 51.6, "longitude": -0.4}`
+* longitude must be 0 - 360 to align with CAMS implementation
+* eg `{"name": "London", "latitude": 51.6, "longitude": 359.6}`
 * the selected data will have the 'nearest' lat lon
 
 ### database_city_search_details
