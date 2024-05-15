@@ -4,7 +4,6 @@ import xarray
 from pymongo import MongoClient
 
 from scripts.run_forecast_etl import main
-from src.etl.forecast.forecast_adapter import convert_longitude_east_range
 
 
 def get_dataset_from_coordinates_many_steps(
@@ -14,7 +13,7 @@ def get_dataset_from_coordinates_many_steps(
         indexers={
             "step": step,
             "latitude": latitude,
-            "longitude": convert_longitude_east_range(longitude),
+            "longitude": longitude,
         },
         method="nearest",
     )
@@ -26,7 +25,7 @@ def get_dataset_from_coordinates_single_step(
     return dataset.sel(
         indexers={
             "latitude": latitude,
-            "longitude": convert_longitude_east_range(longitude),
+            "longitude": longitude,
         },
         method="nearest",
     )
@@ -65,7 +64,11 @@ def get_cams_data(
     lon: float,
     multi_level_dataset: xarray.Dataset,
 ):
-    print("Fetching forecast data from CAMS...")
+    print(
+        "\nFetching forecast data from CAMS for latitude: {}, longitude: {}...".format(
+            lat, lon
+        )
+    )
 
     if len(steps) > 1:
         for step in steps:
@@ -135,11 +138,6 @@ def delete_database_data(collection_name: str):
     client.close()
 
 
-def run_main():
-    print("Running main...")
-    main()
-
-
 def export_dataset_to_excel(dataset: xarray.Dataset, filename: str):
     dataset.to_dataframe().to_excel(filename)
 
@@ -148,11 +146,12 @@ def export_data_array_to_excel(data_array: xarray.DataArray, filename: str):
     data_array.to_dataframe().to_excel(filename)
 
 
-def export_to_excel_by_level(
+def export_cams_data_to_excel_by_level(
     single_level_dataset: xarray.Dataset, multi_level_dataset: xarray.Dataset
 ):
-    print("\nExporting to Excel...")
+    print("\nExporting to Excel: Single level data...")
     export_dataset_to_excel(single_level_dataset, "AllSingleLevelData.xlsx")
+    print("\nExporting to Excel: Multi level data...")
     export_dataset_to_excel(multi_level_dataset, "AllMultiLevelData.xlsx")
 
 
