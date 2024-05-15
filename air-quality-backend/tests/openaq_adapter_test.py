@@ -6,6 +6,7 @@ from tests.mock_openaq_data import (
     openaq_dataset_multiple_locations,
     openaq_dataset_multiple_times,
     openaq_dataset_multiple_cities,
+    openaq_dataset_all_pollutants,
 )
 
 
@@ -24,7 +25,7 @@ from tests.mock_openaq_data import (
                     "measurement_date": datetime(
                         2024, 4, 21, 0, 0, tzinfo=timezone.utc
                     ),
-                    "so2": 14.0,
+                    "so2": {"aqi_level": 1, "value": 14.0},
                 }
             ],
         ),
@@ -44,7 +45,7 @@ from tests.mock_openaq_data import (
                     "measurement_date": datetime(
                         2024, 4, 21, 0, 0, tzinfo=timezone.utc
                     ),
-                    "so2": 99.0,
+                    "so2": {"aqi_level": 1, "value": 99.0},
                 }
             ],
         ),
@@ -69,7 +70,7 @@ def test_transform_in_situ_data_input_multiple_times_returns_sorted_data():
             },
             "city": "Dublin",
             "measurement_date": datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc),
-            "so2": 14.0,
+            "so2": {"aqi_level": 1, "value": 14.0},
         },
         {
             "city_location": {
@@ -78,8 +79,8 @@ def test_transform_in_situ_data_input_multiple_times_returns_sorted_data():
             },
             "city": "Dublin",
             "measurement_date": datetime(2024, 4, 21, 1, 0, tzinfo=timezone.utc),
-            "no2": 70.0,
-            "so3": 44.0,
+            "no2": {"aqi_level": 2, "value": 70.0},
+            "so2": {"aqi_level": 1, "value": 44.0},
         },
         {
             "city_location": {
@@ -88,7 +89,7 @@ def test_transform_in_situ_data_input_multiple_times_returns_sorted_data():
             },
             "city": "Dublin",
             "measurement_date": datetime(2024, 4, 21, 2, 0, tzinfo=timezone.utc),
-            "pm25": 889.0,
+            "pm25": {"aqi_level": 6, "value": 889.0},
         },
     ]
 
@@ -103,8 +104,8 @@ def test_transform_in_situ_data_input_multiple_cities_returns_sorted_data():
             },
             "city": "Dublin",
             "measurement_date": datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc),
-            "pm25": 11.0,
-            "so2": 14.0,
+            "pm25": {"aqi_level": 2, "value": 11.0},
+            "so2": {"aqi_level": 1, "value": 14.0},
         },
         {
             "city_location": {
@@ -113,7 +114,27 @@ def test_transform_in_situ_data_input_multiple_cities_returns_sorted_data():
             },
             "city": "London",
             "measurement_date": datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc),
-            "pm25": 53.0,
-            "so2": 144.0,
+            "pm25": {"aqi_level": 5, "value": 53.0},
+            "so2": {"aqi_level": 2, "value": 144.0},
+        },
+    ]
+
+
+def test_transform_in_situ_data_input_all_five_pollutants_returns_sorted_data():
+    result = transform_in_situ_data(openaq_dataset_all_pollutants)
+    assert result == [
+        {
+            "city_location": {
+                "coordinates": [-6.2140750004382745, 53.34187500024688],
+                "type": "Point",
+            },
+            "city": "Dublin",
+            "measurement_date": datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc),
+            "pm25": {"aqi_level": 2, "value": 13.19},
+            "pm10": {"aqi_level": 2, "value": 22.87},
+            "so2": {"aqi_level": 1, "value": 0.0007099999999999999},
+            "o3": {"aqi_level": 1, "value": 0.00026000000000000003},
+            "no2": {"aqi_level": 1, "value": 0.021},
+            "overall_aqi_level": 2,
         },
     ]
