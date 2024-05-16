@@ -1,4 +1,18 @@
 # Air Quality Backend
+## Run Fast API
+Create a new config in Pycharm by clicking the dropdown menu 
+
+![current_file_selector.png](docs/images/fast_api_instructions/current_file_selector.png)
+
+Edit configurations -> Then click the plus sign -> Then click python as shown bellow
+
+![select_python.png](docs/images/fast_api_instructions/select_python.png)
+
+Enter the details shown bellow, and set the working directory to the api folder in src
+
+![fast_api_config.png](docs/images/fast_api_instructions/fast_api_config.png)
+
+You can then run fast api using that configuration
 
 ## Common Commands
 
@@ -18,11 +32,16 @@ Follow the [installation instructions](https://docs.anaconda.com/free/miniconda/
 
 ### To create environment
 From within air-quality-backend
-
-`conda env create -f conda/environment.yml -n dev`
+#### Etl Dev Environment
+`conda env create -f conda/etl_environment.yml -n etl-dev`
+#### API Dev Environment
+`conda env create -f conda/api_environment.yml -n api-dev`
 
 ### To update
-`conda env update --name dev --file conda/environment.yml --prune`
+#### Etl Dev Environment
+`conda env update --name etl-dev --file conda/etl_environment.yml --prune`
+#### API Dev Environment
+`conda env update --name api-dev --file conda/api_environment.yml --prune`
 
 ### Point PyCharm to your environment
 Follow these [instructions](https://www.jetbrains.com/help/pycharm/conda-support-creating-conda-virtual-environment.html#conda-requirements).

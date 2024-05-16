@@ -1,7 +1,7 @@
 import pytest
 
 from src.etl.in_situ.sort_in_situ import sort_by_distance_and_time
-from tests.mock_openaq_data import (
+from tests.etl.in_situ.mock_openaq_data import (
     openaq_dataset_to_sort_distance,
     openaq_dataset_to_sort_time,
 )
