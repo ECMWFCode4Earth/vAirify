@@ -46,8 +46,6 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.etl == 'true' }}
     runs-on: ubuntu-latest
-    outputs:
-
     defaults:
       run:
         shell: bash -el {0}
