@@ -1,0 +1,2 @@
+# Pair all ipynb notebooks to py:percent text notebooks in current folder and subfolders
+formats = "ipynb,py:percent"
