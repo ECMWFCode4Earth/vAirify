@@ -1,18 +1,7 @@
 # Air Quality Backend
+
 ## Run Fast API
-Create a new config in Pycharm by clicking the dropdown menu 
-
-![current_file_selector.png](docs/images/fast_api_instructions/current_file_selector.png)
-
-Edit configurations -> Then click the plus sign -> Then click python as shown bellow
-
-![select_python.png](docs/images/fast_api_instructions/select_python.png)
-
-Enter the details shown bellow, and set the working directory to the api folder in src
-
-![fast_api_config.png](docs/images/fast_api_instructions/fast_api_config.png)
-
-You can then run fast api using that configuration
+Follow this tutorial: [here](docs/run_fast_api_tutorial.md)
 
 ## Common Commands
 
@@ -22,8 +11,11 @@ You can then run fast api using that configuration
 ### Run code formatter
 `python -m black src tests scripts`
 
-### Run all tests in tests folder
-`python -m pytest --cov=src --cov=scripts tests`
+### Run all tests in etl tests folder
+`python -m pytest --cov=src --cov=scripts tests/etl_tests`
+
+### Run all tests in api tests folder
+`python -m pytest --cov=src --cov=scripts tests/api_tests`
 
 ## Conda
 
