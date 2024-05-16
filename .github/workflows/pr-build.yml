@@ -20,7 +20,7 @@ jobs:
         uses: conda-incubator/setup-miniconda@v3
         with:
           channels: conda-forge
-          environment-file: air-quality-backend/conda/etl.yml
+          environment-file: air-quality-backend/conda/etl_environment.yml
           auto-activate-base: false
           activate-environment: etl
          
