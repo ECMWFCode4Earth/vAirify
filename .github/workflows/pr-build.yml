@@ -22,7 +22,7 @@ jobs:
           channels: conda-forge
           environment-file: air-quality-backend/conda/etl.yml
           auto-activate-base: false
-          activate-environment: unit-test
+          activate-environment: etl
          
       - name: Run lint check
         run: python -m flake8 --append-config air-quality-backend/.flake8 air-quality-backend
