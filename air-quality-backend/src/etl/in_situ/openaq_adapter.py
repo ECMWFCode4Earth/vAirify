@@ -25,13 +25,8 @@ def _extract_pollutants(data):
 
 def _calculate_overall_aqi_value(formatted_dataset):
     for data in formatted_dataset:
-        if all(
-            item in data.keys()
-            for item in required_pollutant_data.keys()
-        ):
-            data["overall_aqi_level"] = get_overall_aqi_level(
-                _extract_pollutants(data)
-            )
+        if all(item in data.keys() for item in required_pollutant_data.keys()):
+            data["overall_aqi_level"] = get_overall_aqi_level(_extract_pollutants(data))
     return formatted_dataset
 
 

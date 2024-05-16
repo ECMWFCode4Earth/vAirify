@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import logging
 from logging import config
-from src.etl.database.air_quality_dashboard_dao import (
+from src.database import (
     delete_data_before,
 )
 
