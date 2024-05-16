@@ -1,3 +1,4 @@
+name: etl
 channels:
   - conda-forge
   - defaults
