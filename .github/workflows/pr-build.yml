@@ -20,9 +20,9 @@ jobs:
       with:
         filters: |
           etl:
-            - 'src/etl/**'
+            - 'air-quality-backend/src/etl/**'
           api:
-            - 'src/api/**'
+            - 'air-quality-backend/src/api/**'
 
   run-lint:
     runs-on: ubuntu-latest
