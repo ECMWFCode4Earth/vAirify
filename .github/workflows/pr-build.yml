@@ -15,14 +15,14 @@ jobs:
       etl: ${{ steps.filter.outputs.etl }}
       api: ${{ steps.filter.outputs.api }}
     steps:
-      uses: dorny/paths-filter@v3.0.2  
-      id: filter
-      with:
-        filters: |
-          etl:
-            - 'air-quality-backend/src/etl/**'
-          api:
-            - 'air-quality-backend/src/api/**'
+    - uses: dorny/paths-filter@v3.0.2  
+    id: filter
+    with:
+      filters: |
+        etl:
+          - 'air-quality-backend/src/etl/**'
+        api:
+          - 'air-quality-backend/src/api/**'
   run-lint:
     runs-on: ubuntu-latest
     defaults:
