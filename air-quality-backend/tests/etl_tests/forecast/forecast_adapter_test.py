@@ -1,3 +1,4 @@
+from cerberus import Validator
 from datetime import datetime
 import pytest
 from src.etl.forecast.forecast_adapter import (
@@ -7,10 +8,10 @@ from src.etl.forecast.forecast_adapter import (
     transform,
 )
 from .mock_forecast_data import (
-    no2,
     single_level_data_set,
     multi_level_data_set,
     default_test_cities,
+    create_test_pollutant_data,
 )
 
 
@@ -34,87 +35,82 @@ def test__convert_longitude_east_range(longitude: float, expected: float):
 @pytest.mark.parametrize(
     "latitude, longitude, expected",
     [
-        (-10.0, 0.0, [0.0000001, 0.0000002]),
-        (0, 10.0, [0.000000125, 0.000000225]),
-        (10.0, -10.0, [0.00000015, 0.00000025]),
-        (-10.0, 4.0, [0.0000001, 0.0000002]),
-        (0.0, 5.0, [0.000000125, 0.000000225]),
-        (-5.0, 5.0, [0.000000125, 0.000000225]),
+        (-10.0, -90.0, [1]),
+        (0, 0.0, [4]),
+        (10.0, 90.0, [10]),
+        (-5.0, -45.0, [2.25]),
+        (5.0, 90.0, [9]),
+        (8.75, 60.0, [9]),
     ],
 )
 def test__find_value_for_city(latitude: float, longitude: float, expected):
-    result = find_value_for_city(no2, latitude, longitude)
+    #      -90  0  90
+    # -10    1  2   4
+    #   0    2  4   8
+    #  10    4  8  10
+    input_data = create_test_pollutant_data(
+        steps=[24],
+        latitudes=[-10, 0, 10],
+        longitudes=[0, 90, 270],
+        values=[2, 4, 1, 4, 8, 2, 8, 10, 4],
+    )
+    result = find_value_for_city(input_data, latitude, longitude)
     assert (result == expected).all()
 
 
-def test__transform_returns_formatted_data():
+@pytest.mark.parametrize(
+    "field, expected",
+    [
+        ("city", ["Dublin", "Dublin"]),
+        ("city_location", {"coordinates": [0, -10], "type": "Point"}),
+        (
+            "measurement_date",
+            [datetime(2024, 4, 23, 0, 0), datetime(2024, 4, 24, 0, 0)],
+        ),
+    ],
+)
+def test__transform__returns_correct_values(field, expected):
     input_data = ForecastData(single_level_data_set, multi_level_data_set)
-    expected = [
-        {
-            "city": "Dublin",
-            "city_location": {"coordinates": [0, -10], "type": "Point"},
-            "measurement_date": datetime(2024, 4, 23, 0, 0),
-            "overall_aqi_level": 6,
-            "no2": {"aqi_level": 3, "value": 100},
-            "o3": {"aqi_level": 5, "value": 300},
-            "pm10": {"aqi_level": 6, "value": 900},
-            "pm2_5": {"aqi_level": 6, "value": 700},
-            "so2": {"aqi_level": 4, "value": 500},
+    results = transform(input_data, default_test_cities[0:1])
+    if isinstance(expected, list):
+        assert list(map(lambda x: x[field], results)) == expected
+    else:
+        for data in results:
+            assert data[field] == expected
+
+
+def test__transform__returns_correctly_formatted_data():
+    input_data = ForecastData(single_level_data_set, multi_level_data_set)
+    expected_aqi_schema = {"type": "integer", "min": 1, "max": 6}
+    expected_pollutant_schema = {
+        "aqi_level": expected_aqi_schema,
+        "value": {"type": "float"},
+    }
+    expected_document_schema = {
+        "city": {"type": "string", "allowed": ["Dublin", "London", "Paris"]},
+        "city_location": {
+            "type": "dict",
+            "schema": {
+                "coordinates": {
+                    "type": "list",
+                    "minlength": 2,
+                    "maxlength": 2,
+                },
+                "type": {
+                    "type": "string",
+                    "allowed": ["Point"],
+                },
+            },
         },
-        {
-            "city": "Dublin",
-            "city_location": {"coordinates": [0, -10], "type": "Point"},
-            "measurement_date": datetime(2024, 4, 24, 0, 0),
-            "overall_aqi_level": 6,
-            "no2": {"aqi_level": 4, "value": 200},
-            "o3": {"aqi_level": 6, "value": 400},
-            "pm10": {"aqi_level": 6, "value": 1000},
-            "pm2_5": {"aqi_level": 6, "value": 800},
-            "so2": {"aqi_level": 5, "value": 600},
-        },
-        {
-            "city": "London",
-            "city_location": {"coordinates": [10, 0], "type": "Point"},
-            "measurement_date": datetime(2024, 4, 23, 0, 0),
-            "overall_aqi_level": 6,
-            "no2": {"aqi_level": 4, "value": 125},
-            "o3": {"aqi_level": 5, "value": 325},
-            "pm10": {"aqi_level": 6, "value": 925},
-            "pm2_5": {"aqi_level": 6, "value": 725},
-            "so2": {"aqi_level": 5, "value": 525},
-        },
-        {
-            "city": "London",
-            "city_location": {"coordinates": [10, 0], "type": "Point"},
-            "measurement_date": datetime(2024, 4, 24, 0, 0),
-            "overall_aqi_level": 6,
-            "no2": {"aqi_level": 4, "value": 225},
-            "o3": {"aqi_level": 6, "value": 425},
-            "pm10": {"aqi_level": 6, "value": 1225},
-            "pm2_5": {"aqi_level": 6, "value": 825},
-            "so2": {"aqi_level": 5, "value": 625},
-        },
-        {
-            "city": "Paris",
-            "city_location": {"coordinates": [-10, 10], "type": "Point"},
-            "measurement_date": datetime(2024, 4, 23, 0, 0),
-            "overall_aqi_level": 6,
-            "no2": {"aqi_level": 4, "value": 150},
-            "o3": {"aqi_level": 5, "value": 350},
-            "pm10": {"aqi_level": 6, "value": 950},
-            "pm2_5": {"aqi_level": 6, "value": 750},
-            "so2": {"aqi_level": 5, "value": 550},
-        },
-        {
-            "city": "Paris",
-            "city_location": {"coordinates": [-10, 10], "type": "Point"},
-            "measurement_date": datetime(2024, 4, 24, 0, 0),
-            "overall_aqi_level": 6,
-            "no2": {"aqi_level": 5, "value": 250},
-            "o3": {"aqi_level": 6, "value": 450},
-            "pm10": {"aqi_level": 6, "value": 1250},
-            "pm2_5": {"aqi_level": 6, "value": 850},
-            "so2": {"aqi_level": 5, "value": 650},
-        },
-    ]
-    assert transform(input_data, default_test_cities) == expected
+        "measurement_date": {"type": "datetime"},
+        "no2": {"type": "dict", "schema": expected_pollutant_schema},
+        "o3": {"type": "dict", "schema": expected_pollutant_schema},
+        "pm10": {"type": "dict", "schema": expected_pollutant_schema},
+        "pm2_5": {"type": "dict", "schema": expected_pollutant_schema},
+        "so2": {"type": "dict", "schema": expected_pollutant_schema},
+        "overall_aqi_level": expected_aqi_schema,
+    }
+    validator = Validator(expected_document_schema, require_all=True)
+    result = transform(input_data, default_test_cities)
+    for data in result:
+        assert validator(data) is True, f"{validator.errors}"

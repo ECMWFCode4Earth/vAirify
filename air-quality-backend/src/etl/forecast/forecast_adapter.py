@@ -38,12 +38,10 @@ def find_value_for_city(
         )
     )
     converted_data = converted_data.sortby("longitude")
-    return converted_data.sel(
-        indexers={
-            "latitude": latitude,
-            "longitude": longitude,
-        },
-        method="nearest",
+    return converted_data.interp(
+        latitude=latitude,
+        longitude=longitude,
+        method="linear",
     ).values
 
 

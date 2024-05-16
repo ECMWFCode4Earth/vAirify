@@ -221,6 +221,7 @@ dependencies:
   - zstd=1.5.5=hc292b87_0
   - pip:
       - cads-api-client==0.10.0
+      - cerberus==1.3.5
       - cdsapi==0.7.0
       - coverage==7.5.0
       - freezegun==1.5.1
