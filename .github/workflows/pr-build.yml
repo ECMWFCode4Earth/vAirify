@@ -14,6 +14,8 @@ jobs:
     outputs:
       etl: ${{ steps.filter.outputs.etl }}
       api: ${{ steps.filter.outputs.api }}
+      etl_tests: ${{ steps.filter.outputs.etl_tests }}
+      api_tests: ${{ steps.filter.outputs.api_tests }}
     steps:
     - uses: dorny/paths-filter@v3.0.2  
       id: filter
@@ -23,26 +25,10 @@ jobs:
             - 'air-quality-backend/src/etl/**'
           api:
             - 'air-quality-backend/src/api/**'
-
-  run-lint:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash -el {0}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup miniconda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          channels: conda-forge
-          environment-file: air-quality-backend/conda/linting_environment.yml
-          auto-activate-base: false
-          activate-environment: linting-env
-
-      - name: Run lint check
-        run: python -m flake8 --append-config air-quality-backend/.flake8 air-quality-backend
+          etl_tests:
+            - 'air-quality-backend/tests/etl_tests/**'
+          api_tests:
+            - 'air-quality-backend/tests/api_tests/**'
 
   etl:
     needs: changes
