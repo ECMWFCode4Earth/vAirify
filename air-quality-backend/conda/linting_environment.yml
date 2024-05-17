@@ -1,0 +1,7 @@
+name: linting-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - flake8=7.0.0
+  - python=3.11.9
