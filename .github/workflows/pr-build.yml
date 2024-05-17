@@ -14,8 +14,6 @@ jobs:
     outputs:
       etl: ${{ steps.filter.outputs.etl }}
       api: ${{ steps.filter.outputs.api }}
-      etl_tests: ${{ steps.filter.outputs.etl_tests }}
-      api_tests: ${{ steps.filter.outputs.api_tests }}
     steps:
     - uses: dorny/paths-filter@v3.0.2  
       id: filter
@@ -25,10 +23,6 @@ jobs:
             - 'air-quality-backend/src/etl/**'
           api:
             - 'air-quality-backend/src/api/**'
-          etl_tests:
-            - 'air-quality-backend/tests/etl_tests/**'
-          api_tests:
-            - 'air-quality-backend/tests/api_tests/**'
 
   run-lint:
     runs-on: ubuntu-latest
@@ -52,7 +46,7 @@ jobs:
 
   etl:
     needs: changes
-    if: ${{ needs.changes.outputs.etl == 'true'}}
+    if: ${{ needs.changes.outputs.etl == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -80,7 +74,7 @@ jobs:
 
   api:
     needs: changes
-    if: ${{ needs.changes.outputs.api == 'true'}}
+    if: ${{ needs.changes.outputs.api == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
