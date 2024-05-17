@@ -23,6 +23,10 @@ jobs:
             - 'air-quality-backend/src/etl/**'
           api:
             - 'air-quality-backend/src/api/**'
+          etl_tests:
+            - 'air-quality-backend/tests/etl_tests/**'
+          api_tests:
+            - 'air-quality-backend/tests/api_tests/**'
 
   run-lint:
     runs-on: ubuntu-latest
@@ -37,16 +41,16 @@ jobs:
         uses: conda-incubator/setup-miniconda@v3
         with:
           channels: conda-forge
-          environment-file: air-quality-backend/conda/test_environment.yml
+          environment-file: air-quality-backend/conda/linting_environment.yml
           auto-activate-base: false
-          activate-environment: unit-test
-         
+          activate-environment: linting-env
+
       - name: Run lint check
         run: python -m flake8 --append-config air-quality-backend/.flake8 air-quality-backend
 
   etl:
     needs: changes
-    if: ${{ needs.changes.outputs.etl == 'true' }}
+    if: ${{ needs.changes.outputs.etl == 'true'}}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -74,7 +78,7 @@ jobs:
 
   api:
     needs: changes
-    if: ${{ needs.changes.outputs.api == 'true' }}
+    if: ${{ needs.changes.outputs.api == 'true'}}
     runs-on: ubuntu-latest
     defaults:
       run:
