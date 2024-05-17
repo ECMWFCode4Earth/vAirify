@@ -2,10 +2,8 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import logging
 from logging import config
-from src.database import (
-    get_locations_by_type,
-    insert_data_openaq,
-)
+
+from src.database.air_quality_dashboard_dao import get_locations_by_type, insert_data_openaq
 from src.etl.in_situ.openaq_dao import fetch_in_situ_measurements
 from src.etl.in_situ.openaq_adapter import transform_in_situ_data
 

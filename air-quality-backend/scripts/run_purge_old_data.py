@@ -2,9 +2,8 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import logging
 from logging import config
-from src.database import (
-    delete_data_before,
-)
+
+from src.database.air_quality_dashboard_dao import delete_data_before
 
 config.fileConfig("../logging.ini")
 
