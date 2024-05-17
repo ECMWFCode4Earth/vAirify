@@ -50,7 +50,7 @@ jobs:
 
   etl-testing:
     needs: changes
-    if: ${{ needs.changes.outputs.etl == 'true' || needs.changes.outputs.etl_tests }}
+    if: ${{ needs.changes.outputs.etl == 'true' || needs.changes.outputs.etl_tests == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -78,7 +78,7 @@ jobs:
 
   api-testing:
     needs: changes
-    if: ${{ needs.changes.outputs.api == 'true' || needs.changes.outputs.api_tests }}
+    if: ${{ needs.changes.outputs.api == 'true' || needs.changes.outputs.api_tests == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
