@@ -3,7 +3,10 @@ from dotenv import load_dotenv
 import logging
 from logging import config
 
-from src.database.air_quality_dashboard_dao import get_locations_by_type, insert_data_forecast
+from src.database.air_quality_dashboard_dao import (
+    get_locations_by_type,
+    insert_data_forecast,
+)
 from src.etl.forecast.forecast_dao import fetch_forecast_data
 from src.etl.forecast.forecast_adapter import transform
 
