@@ -14,6 +14,8 @@ jobs:
     outputs:
       etl: ${{ steps.filter.outputs.etl }}
       api: ${{ steps.filter.outputs.api }}
+      etl_tests: ${{ steps.filter.outputs.etl_tests }}
+      api_tests: ${{ steps.filter.outputs.api_tests }}
     steps:
     - uses: dorny/paths-filter@v3.0.2  
       id: filter
