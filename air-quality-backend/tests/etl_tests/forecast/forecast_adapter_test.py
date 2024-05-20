@@ -15,8 +15,8 @@ from .mock_forecast_data import (
 @pytest.mark.parametrize(
     "field, expected",
     [
-        ("city", ["Dublin", "Dublin"]),
-        ("city_location", {"coordinates": [0, -10], "type": "Point"}),
+        ("name", ["Dublin", "Dublin"]),
+        ("location", {"coordinates": [0, -10], "type": "Point"}),
         (
             "measurement_date",
             [datetime(2024, 4, 23, 0, 0), datetime(2024, 4, 24, 0, 0)],
@@ -25,7 +25,7 @@ from .mock_forecast_data import (
 )
 def test__transform__returns_correct_values(field, expected):
     input_data = ForecastData(single_level_data_set, multi_level_data_set)
-    results = transform(input_data, default_test_cities[0:1])
+    results = transform(input_data, default_test_cities[0])
     if isinstance(expected, list):
         assert list(map(lambda x: x[field], results)) == expected
     else:
@@ -41,8 +41,9 @@ def test__transform__returns_correctly_formatted_data():
         "value": {"type": "float"},
     }
     expected_document_schema = {
-        "city": {"type": "string", "allowed": ["Dublin", "London", "Paris"]},
-        "city_location": {
+        "name": {"type": "string", "allowed": ["Dublin"]},
+        "location_type": {"type": "string", "allowed": ["city"]},
+        "location": {
             "type": "dict",
             "schema": {
                 "coordinates": {
@@ -65,6 +66,6 @@ def test__transform__returns_correctly_formatted_data():
         "overall_aqi_level": expected_aqi_schema,
     }
     validator = Validator(expected_document_schema, require_all=True)
-    result = transform(input_data, default_test_cities)
+    result = transform(input_data, default_test_cities[0])
     for data in result:
         assert validator(data) is True, f"{validator.errors}"
