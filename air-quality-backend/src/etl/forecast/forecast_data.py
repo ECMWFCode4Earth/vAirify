@@ -35,6 +35,9 @@ class ForecastData:
     def __init__(self, single_level_data: xr.Dataset, multi_level_data: xr.Dataset):
         self._single_level_data = convert_dataset(single_level_data)
         self._multi_level_data = convert_dataset(multi_level_data)
+        # Eager load datasets for quicker access
+        self._single_level_data.load()
+        self._multi_level_data.load()
 
     def _get_data_set(self, pollutant_type: PollutantType) -> xr.Dataset:
         if is_single_level(pollutant_type):
