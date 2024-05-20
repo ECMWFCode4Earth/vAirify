@@ -1,4 +1,5 @@
 import cdsapi
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 import logging
 import os
@@ -49,12 +50,18 @@ def fetch_forecast_data(
     model_base_time = "00"
     single_file_name = f"single_level_{model_base_date_str}_{model_base_time}.grib"
     multi_file_name = f"multi_level_{model_base_date_str}_{model_base_time}.grib"
-    single_level_data = fetch_cams_data(
-        get_single_level_request_body(model_base_date_str, model_base_time),
-        single_file_name,
-    )
-    multi_level_data = fetch_cams_data(
-        get_multi_level_request_body(model_base_date_str, model_base_time),
-        multi_file_name,
-    )
-    return ForecastData(single_level_data, multi_level_data)
+    task_params = [
+        (
+            get_single_level_request_body(model_base_date_str, model_base_time),
+            single_file_name,
+        ),
+        (
+            get_multi_level_request_body(model_base_date_str, model_base_time),
+            multi_file_name,
+        ),
+    ]
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        futures = [executor.submit(fetch_cams_data, *params) for params in task_params]
+        results = [future.result() for future in futures]
+
+    return ForecastData(results[0], results[1])
