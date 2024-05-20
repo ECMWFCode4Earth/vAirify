@@ -1,5 +1,5 @@
 import pandas as pd
-from src.database import get_collection
+from src.database.air_quality_dashboard_dao import get_collection
 
 df = pd.read_csv("CAMS_locations_V1.csv")
 df["type"] = "city"

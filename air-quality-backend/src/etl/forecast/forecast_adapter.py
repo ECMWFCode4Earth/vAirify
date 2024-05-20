@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
-from numpy import ndarray
-from xarray import DataArray
+import logging
+from typing import TypedDict
 from .forecast_data import ForecastData
 from src.etl.air_quality_index import calculator as aqi_calculator
 from src.etl.air_quality_index.pollutant_type import PollutantType
@@ -15,114 +15,88 @@ required_pollutant_data = [
 ]
 
 
-def convert_east_only_longitude_to_east_west(longitude_value: float) -> float:
-    """
-    Convert longitude value from range of 0 - 360 to -180 - 180
-    """
-    if 180 < longitude_value <= 360:
-        return float(Decimal(str(longitude_value)) - Decimal("360"))
-    return longitude_value
+class PollutantData(TypedDict):
+    values_ug_m3: list[float]
+    aqi_values: list[int]
 
 
-def find_value_for_city(
-    data_array: DataArray, latitude: float, longitude: float
-) -> ndarray:
-    converted_data = data_array.assign_coords(
-        longitude=list(
+def _get_pollutant_values_by_type(
+    forecast_data: ForecastData, city
+) -> dict[PollutantType:PollutantData]:
+    city_forecast_data_by_type: dict[PollutantType:PollutantData] = {}
+    for pollutant_type in PollutantType:
+        pollutant_forecast_values_for_city = (
+            forecast_data.get_pollutant_data_for_lat_long(
+                city["latitude"], city["longitude"], pollutant_type
+            )
+        )
+        pollutant_values_ug_m3 = [
+            float(Decimal(str(x)) * Decimal(10**9))
+            for x in pollutant_forecast_values_for_city
+        ]
+        city_forecast_data_by_type[pollutant_type] = {
+            "values_ug_m3": pollutant_values_ug_m3,
+            "aqi_values": list(
+                map(
+                    lambda x: aqi_calculator.get_pollutant_index_level(
+                        x, pollutant_type
+                    ),
+                    pollutant_values_ug_m3,
+                )
+            ),
+        }
+    return city_forecast_data_by_type
+
+
+def _get_overall_aqi_value_for_slice(
+    city_forecast_data_by_type: dict[PollutantType:PollutantData], index: int
+) -> int:
+    return aqi_calculator.get_overall_aqi_level(
+        list(
             map(
-                lambda lon: convert_east_only_longitude_to_east_west(
-                    lon.values.flat[0]
-                ),
-                data_array.longitude,
+                lambda x: x["aqi_values"][index],
+                city_forecast_data_by_type.values(),
             )
         )
     )
-    converted_data = converted_data.sortby("longitude")
-    return converted_data.interp(
-        latitude=latitude,
-        longitude=longitude,
-        method="linear",
-    ).values
-
-
-def _create_pollutant_dict(value: float, pollutant_type: PollutantType) -> dict:
-    return {
-        "aqi_level": aqi_calculator.get_pollutant_index_level(value, pollutant_type),
-        "value": value,
-    }
-
-
-def _get_city_forecast_data_for_pollutant_type(
-    global_data: DataArray, city, pollutant_type: PollutantType
-) -> dict:
-    pollutant_values_kg_m3 = find_value_for_city(
-        global_data, city["latitude"], city["longitude"]
-    ).tolist()
-    pollutant_values_ug_m3 = [
-        float(Decimal(str(x)) * Decimal(10**9)) for x in pollutant_values_kg_m3
-    ]
-
-    return {
-        "pollutant_values_ug_m3": pollutant_values_ug_m3,
-        "pollutant_aqi_values": list(
-            map(
-                lambda x: aqi_calculator.get_pollutant_index_level(x, pollutant_type),
-                pollutant_values_ug_m3,
-            )
-        ),
-    }
 
 
 def transform(forecast_data: ForecastData, cities):
-    step_values = forecast_data.get_step_values()
-    time_value = forecast_data.get_time_value()
+    valid_time_values = forecast_data.get_valid_time_values()
     formatted_dataset = []
 
     for city in cities:
-        city_forecast_data_by_type = {}
         city_name = city["name"]
+        logging.info(f"Processing city: {city_name}")
+        city_forecast_data_by_type = _get_pollutant_values_by_type(forecast_data, city)
 
-        for pollutant_type in PollutantType:
-            global_data = forecast_data.get_data(pollutant_type)
-            city_forecast_data_by_type[pollutant_type] = (
-                _get_city_forecast_data_for_pollutant_type(
-                    global_data, city, pollutant_type
-                )
-            )
-
-        for i in range(0, step_values.size):
-            measurement_timestamp = time_value + (float(step_values[i]) * 60 * 60)
+        for i in range(0, valid_time_values.size):
+            measurement_timestamp = valid_time_values[i]
             measurement_date = datetime.utcfromtimestamp(measurement_timestamp)
-
-            overall_aqi_value = aqi_calculator.get_overall_aqi_level(
-                list(
-                    map(
-                        lambda x: x["pollutant_aqi_values"][i],
-                        city_forecast_data_by_type.values(),
-                    )
-                )
+            overall_aqi_value = _get_overall_aqi_value_for_slice(
+                city_forecast_data_by_type, i
             )
 
             pollutant_data = {}
             for name, pollutant_type in required_pollutant_data:
-                pollutant_data[name] = _create_pollutant_dict(
-                    city_forecast_data_by_type[pollutant_type][
-                        "pollutant_values_ug_m3"
-                    ][i],
-                    pollutant_type,
-                )
-
-            formatted_dataset.append(
-                {
-                    "city": city_name,
-                    "city_location": {
-                        "type": "Point",
-                        "coordinates": [city["longitude"], city["latitude"]],
-                    },
-                    "measurement_date": measurement_date,
-                    "overall_aqi_level": overall_aqi_value,
-                    **pollutant_data,
+                city_forecast_data = city_forecast_data_by_type[pollutant_type]
+                pollutant_data[name] = {
+                    "aqi_level": city_forecast_data["aqi_values"][i],
+                    "value": city_forecast_data["values_ug_m3"][i],
                 }
-            )
+
+            document = {
+                "city": city_name,
+                "city_location": {
+                    "type": "Point",
+                    "coordinates": [city["longitude"], city["latitude"]],
+                },
+                "measurement_date": measurement_date,
+                "overall_aqi_level": overall_aqi_value,
+                **pollutant_data,
+            }
+
+            logging.debug(document)
+            formatted_dataset.append(document)
 
     return formatted_dataset

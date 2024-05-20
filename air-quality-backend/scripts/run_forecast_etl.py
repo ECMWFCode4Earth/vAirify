@@ -2,7 +2,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 import logging
 from logging import config
-from src.database import (
+from src.database.air_quality_dashboard_dao import (
     get_locations_by_type,
     insert_data_forecast,
 )

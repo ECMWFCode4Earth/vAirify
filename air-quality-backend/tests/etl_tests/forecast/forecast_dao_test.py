@@ -16,7 +16,7 @@ def mock_open_dataset():
 
 
 def test_get_single_level_request_body():
-    request = get_single_level_request_body("2024-04-29")
+    request = get_single_level_request_body("2024-04-29", "00")
     assert request == {
         "date": "2024-04-29/2024-04-29",
         "type": "forecast",
@@ -62,7 +62,7 @@ def test_get_single_level_request_body():
 
 
 def test_get_multi_level_request_body():
-    request = get_multi_level_request_body("2024-04-29")
+    request = get_multi_level_request_body("2024-04-29", "00")
     assert request == {
         "date": "2024-04-29/2024-04-29",
         "type": "forecast",
@@ -113,23 +113,24 @@ def test_fetch_forecast_data_returns_forecast_data(mocker, mock_open_dataset):
     mocker.patch("cdsapi.Client", return_value=mock_cdsapi_client)
     mock_open_dataset.side_effect = [single_level_data_set, multi_level_data_set]
 
-    forecast_data = fetch_forecast_data(model_base_date=datetime.now())
+    date = datetime.strptime("2024-05-20", "%Y-%m-%d")
+    forecast_data = fetch_forecast_data(model_base_date=date)
 
     mock_open_dataset.assert_has_calls(
         [
             call(
-                "single_level.grib",
+                "single_level_2024-05-20_00.grib",
                 decode_times=False,
                 engine="cfgrib",
                 backend_kwargs={"indexpath": ""},
             ),
             call(
-                "multi_level.grib",
+                "multi_level_2024-05-20_00.grib",
                 decode_times=False,
                 engine="cfgrib",
                 backend_kwargs={"indexpath": ""},
             ),
         ]
     )
-    assert forecast_data.single_level_data == single_level_data_set
-    assert forecast_data.multi_level_data == multi_level_data_set
+    assert forecast_data._single_level_data == single_level_data_set
+    assert forecast_data._multi_level_data == multi_level_data_set
