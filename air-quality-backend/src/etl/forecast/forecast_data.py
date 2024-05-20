@@ -49,7 +49,8 @@ class ForecastData:
         self, latitude: float, longitude: float, pollutant_type: PollutantType
     ) -> list[float]:
         """
-        Get forecasted air pollutant values (kgm3) for a given lat/long and pollutant using bilinear interpolation
+        Get forecasted air pollutant values (kgm3) for a given lat/long
+        and pollutant using bilinear interpolation
         :param latitude:
         :param longitude:
         :param pollutant_type:
