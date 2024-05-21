@@ -74,6 +74,7 @@ jobs:
             coverageFile: air-quality-backend/tests/coverage/etl_test_report.xml
             token: ${{ secrets.GITHUB_TOKEN }}
 
+
   api:
     needs: detect-change-scope
     if: ${{ needs.detect-change-scope.outputs.api == 'true' }}
@@ -101,4 +102,3 @@ jobs:
         with:
             coverageFile: air-quality-backend/tests/coverage/api_test_report.xml
             token: ${{ secrets.GITHUB_TOKEN }}
-        
