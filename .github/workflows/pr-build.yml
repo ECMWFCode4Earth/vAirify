@@ -68,13 +68,13 @@ jobs:
           activate-environment: etl-dev
          
       - name: Run etl unit tests
-        run: python -m pytest --cov=src --cov=scripts --cov-report=xml:air-quality-backend/tests/coverage/etl_test_report.xml air-quality-backend/tests/etl_tests
+        run: python -m pytest --cov=src --cov=scripts --cov-report=xml:air-quality-backend/tests/coverage/.coverage.etl.xml air-quality-backend/tests/etl_tests
 
       - name: Upload coverage
         uses: actions/upload-artifact@master
         with:
           name: etl_test_report
-          path: air-quality-backend/tests/coverage/etl_test_report.xml
+          path: air-quality-backend/tests/coverage/.coverage.etl.xml
 
   api:
     needs: detect-change-scope
@@ -96,13 +96,13 @@ jobs:
           activate-environment: api-dev
          
       - name: Run api unit tests
-        run: python -m pytest --cov=src --cov=scripts --cov-report=xml:air-quality-backend/tests/coverage/api_test_report.xml air-quality-backend/tests/api_tests
+        run: python -m pytest --cov=src --cov=scripts --cov-report=xml:air-quality-backend/tests/coverage/.coverage.api.xml air-quality-backend/tests/api_tests
       
       - name: Upload coverage
         uses: actions/upload-artifact@master
         with:
           name: api_test_report
-          path: air-quality-backend/tests/coverage/api_test_report.xml
+          path: air-quality-backend/tests/coverage/.coverage.api.xml
       
             
   combine-coverage:
@@ -127,18 +127,18 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: api_test_report
-          path: air-quality-backend/tests/coverage/api_test_report.xml
+          path: air-quality-backend/tests/coverage/.coverage.api.xml
 
       - uses: actions/download-artifact@master
         with:
           name: etl_test_report
-          path: air-quality-backend/tests/coverage/etl_test_report.xml
+          path: air-quality-backend/tests/coverage/.coverage.etl.xml
 
       - name: Code Coverage Combine Reports
-        run: python -m coverage combine air-quality-backend/tests/coverage
+        run: python -m coverage combine .coverage.xml air-quality-backend/tests/coverage/
 
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1
         with:
-            coverageFile: air-quality-backend/tests/coverage/api_test_report.xml
+            coverageFile: air-quality-backend/tests/coverage/.coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
