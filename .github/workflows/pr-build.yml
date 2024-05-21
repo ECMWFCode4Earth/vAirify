@@ -1,10 +1,14 @@
 name: pr-build
 
 on:
+  push:
+    branches:
+    - 'main'
   pull_request:
     types: ['opened', 'reopened', 'synchronize']
     branches:
       - 'main'
+   
 
 jobs:
   detect-change-scope:
@@ -17,7 +21,7 @@ jobs:
       etl_tests: ${{ steps.filter.outputs.etl_tests }}
       api_tests: ${{ steps.filter.outputs.api_tests }}
     steps:
-    - uses: dorny/paths-filter@v3.0.2  
+    - uses: dorny/paths-filter@v3.0.2
       id: filter
       with:
         filters: |
