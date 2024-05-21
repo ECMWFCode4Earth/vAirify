@@ -15,13 +15,13 @@ jobs:
       etl: ${{ steps.filter.outputs.etl }}
       api: ${{ steps.filter.outputs.api }}
     steps:
-      - uses: dorny/paths-filter@v3.0.2  
-        id: filter
-        with:
-          filters: |
-            etl:
-              - 'air-quality-backend/src/etl/**'
-              - 'air-quality-backend/tests/etl_tests/**'
-            api:
-              - 'air-quality-backend/src/api/**'
-              - 'air-quality-backend/tests/api_tests/**'
+    - uses: dorny/paths-filter@v3.0.2  
+      id: filter
+      with:
+        filters: |
+          etl:
+            - 'air-quality-backend/src/etl/**'
+            - 'air-quality-backend/tests/etl_tests/**'
+          api:
+            - 'air-quality-backend/src/api/**'
+            - 'air-quality-backend/tests/api_tests/**'
