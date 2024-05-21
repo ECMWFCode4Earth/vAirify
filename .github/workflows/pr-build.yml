@@ -135,7 +135,7 @@ jobs:
           path: air-quality-backend/tests/coverage/etl_test_report.xml
 
       - name: Code Coverage Combine Reports
-        run: python -m coverage combine air-quality-backend/tests/coverage/
+        run: python -m coverage combine air-quality-backend/tests/coverage
 
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1
