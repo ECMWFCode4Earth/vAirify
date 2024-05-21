@@ -106,7 +106,7 @@ jobs:
       
             
   combine-coverage:
-    needs: detect-change-scope
+    needs: [detect-change-scope, etl, api]
     if: ${{ needs.detect-change-scope.outputs.etl == 'true' && needs.detect-change-scope.outputs.api == 'true' }}
     runs-on: ubuntu-latest
     defaults:
