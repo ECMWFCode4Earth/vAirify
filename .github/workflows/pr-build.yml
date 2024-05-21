@@ -135,10 +135,10 @@ jobs:
           path: air-quality-backend/tests/coverage/.coverage.etl.xml
 
       - name: Code Coverage Combine Reports
-        run: python -m coverage combine air-quality-backend/tests/coverage/ --data-file=coverage
+        run: python -m coverage combine air-quality-backend/tests/coverage/
 
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1
         with:
-            coverageFile: air-quality-backend/tests/coverage/coverage.xml
+            coverageFile: air-quality-backend/tests/coverage/.coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
