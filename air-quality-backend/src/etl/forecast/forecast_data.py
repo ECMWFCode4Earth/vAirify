@@ -12,10 +12,6 @@ def convert_east_only_longitude_to_east_west(longitude_value: float) -> float:
     return longitude_value
 
 
-def convert_kg_to_ug(x: float):
-    return float(Decimal(str(x)) * Decimal(10**9))
-
-
 def convert_dataset(dataset: xr.Dataset) -> xr.Dataset:
     converted_data = dataset.assign_coords(
         longitude=list(
