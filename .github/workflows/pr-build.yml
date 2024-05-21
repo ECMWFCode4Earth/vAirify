@@ -127,12 +127,12 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: api_test_report
-          path: air-quality-backend/tests/coverage/.coverage.api.xml
+          path: air-quality-backend/tests/coverage/
 
       - uses: actions/download-artifact@master
         with:
           name: etl_test_report
-          path: air-quality-backend/tests/coverage/.coverage.etl.xml
+          path: air-quality-backend/tests/coverage/
 
       - name: Code Coverage Combine Reports
         run: python -m coverage combine air-quality-backend/tests/coverage/
