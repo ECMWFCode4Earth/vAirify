@@ -93,6 +93,7 @@ def transform(forecast_data: ForecastData, location: AirQualityLocation) -> list
             "forecast_valid_time": measurement_date,
             "forecast_range": int(step_values[i]),
             "overall_aqi_level": overall_aqi_value,
+            "source": "cams-production",
             **pollutant_data,
         }
 
