@@ -1,13 +1,11 @@
 name: pr-build
 
 on:
-  push:
   pull_request:
     types: ['opened', 'reopened', 'synchronize']
     branches:
     - 'main'
    
-
 jobs:
   detect-change-scope:
     runs-on: ubuntu-latest
