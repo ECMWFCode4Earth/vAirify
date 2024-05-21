@@ -70,11 +70,11 @@ jobs:
       - name: Run etl unit tests
         run: python -m pytest --cov=src --cov=scripts --cov-report=xml:air-quality-backend/tests/coverage/etl_test_report.xml air-quality-backend/tests/etl_tests
 
-      - name: Code Coverage Report
-        uses: orgoro/coverage@v3.1
+      - name: Upload coverage
+        uses: actions/upload-artifact@master
         with:
-            coverageFile: air-quality-backend/tests/coverage/etl_test_report.xml
-            token: ${{ secrets.GITHUB_TOKEN }}
+          name: etl_test_report
+          path: air-quality-backend/tests/coverage/etl_test_report.xml
 
   api:
     needs: detect-change-scope
@@ -97,12 +97,13 @@ jobs:
          
       - name: Run api unit tests
         run: python -m pytest --cov=src --cov=scripts --cov-report=xml:air-quality-backend/tests/coverage/api_test_report.xml air-quality-backend/tests/api_tests
-
-      - name: Code Coverage Report
-        uses: orgoro/coverage@v3.1
+      
+      - name: Upload coverage
+        uses: actions/upload-artifact@master
         with:
-            coverageFile: air-quality-backend/tests/coverage/api_test_report.xml
-            token: ${{ secrets.GITHUB_TOKEN }}
+          name: api_test_report
+          path: air-quality-backend/tests/coverage/api_test_report.xml
+      
             
   combine-coverage:
     needs: detect-change-scope
@@ -123,5 +124,21 @@ jobs:
           auto-activate-base: false
           activate-environment: api-dev
 
+      - uses: actions/download-artifact@master
+        with:
+          name: api_test_report
+          path: air-quality-backend/tests/coverage/api_test_report.xml
+
+      - uses: actions/download-artifact@master
+        with:
+          name: etl_test_report
+          path: air-quality-backend/tests/coverage/etl_test_report.xml
+
       - name: Code Coverage Combine Reports
         run: python -m coverage combine air-quality-backend/tests/coverage/
+
+      - name: Code Coverage Report
+        uses: orgoro/coverage@v3.1
+        with:
+            coverageFile: air-quality-backend/tests/coverage/api_test_report.xml
+            token: ${{ secrets.GITHUB_TOKEN }}
