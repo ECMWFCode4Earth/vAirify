@@ -2,6 +2,7 @@ from datetime import datetime
 import logging
 import os
 from pymongo import MongoClient, UpdateOne
+from .location import AirQualityLocation
 
 
 def get_collection(name: str):
@@ -19,7 +20,7 @@ def _upsert_measurement_data(collection_name, data):
     update_operations = [
         (
             UpdateOne(
-                {"city": doc["city"], "measurement_date": doc["measurement_date"]},
+                {"name": doc["name"], "measurement_date": doc["measurement_date"]},
                 [
                     {
                         "$set": {
@@ -54,7 +55,7 @@ def insert_data_openaq(data):
     _upsert_measurement_data("in_situ_data", data)
 
 
-def get_locations_by_type(location_type: str):
+def get_locations_by_type(location_type: str) -> list[AirQualityLocation]:
     collection = get_collection("locations")
     cursor = collection.find({"type": location_type})
     results = []

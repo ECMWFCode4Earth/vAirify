@@ -7,6 +7,7 @@ default_steps = [24, 48]
 default_latitudes = [-10, 0, 10]
 default_longitudes = [0, 10, 350]
 default_time = 1713744000
+default_valid_time = [default_time + (x * 60 * 60) for x in default_steps]
 default_test_cities = [
     create_test_city("Dublin", -10, 0),
     create_test_city("London", 0, 10),
@@ -149,11 +150,11 @@ pm10 = create_test_pollutant_data_with_defaults(
 
 
 single_level_data_set = xarray.Dataset(
-    coords=dict(time=default_time, step=default_steps),
+    coords=dict(time=default_time, step=default_steps, valid_time=default_valid_time),
     data_vars=dict(pm2p5=pm2p5, pm10=pm10),
 )
 
 multi_level_data_set = xarray.Dataset(
-    coords=dict(time=default_time, step=default_steps),
+    coords=dict(time=default_time, step=default_steps, valid_time=default_valid_time),
     data_vars=dict(no2=no2, go3=go3, so2=so2),
 )

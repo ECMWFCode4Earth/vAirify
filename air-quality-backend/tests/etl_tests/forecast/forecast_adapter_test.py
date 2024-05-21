@@ -3,66 +3,20 @@ from datetime import datetime
 import pytest
 from src.etl.forecast.forecast_adapter import (
     ForecastData,
-    convert_east_only_longitude_to_east_west,
-    find_value_for_city,
     transform,
 )
 from .mock_forecast_data import (
     single_level_data_set,
     multi_level_data_set,
     default_test_cities,
-    create_test_pollutant_data,
 )
-
-
-@pytest.mark.parametrize(
-    "longitude, expected",
-    [
-        (0.0, 0.0),
-        (179.6, 179.6),
-        (180.0, 180.0),
-        (180.4, -179.6),
-        (360.0, 0),
-        (359.6, -0.4),
-        (-0.1, -0.1),
-        (-180.0, -180.0),
-    ],
-)
-def test__convert_longitude_east_range(longitude: float, expected: float):
-    assert convert_east_only_longitude_to_east_west(longitude) == expected
-
-
-@pytest.mark.parametrize(
-    "latitude, longitude, expected",
-    [
-        (-10.0, -90.0, [1]),
-        (0, 0.0, [4]),
-        (10.0, 90.0, [10]),
-        (-5.0, -45.0, [2.25]),
-        (5.0, 90.0, [9]),
-        (8.75, 60.0, [9]),
-    ],
-)
-def test__find_value_for_city(latitude: float, longitude: float, expected):
-    #      -90  0  90
-    # -10    1  2   4
-    #   0    2  4   8
-    #  10    4  8  10
-    input_data = create_test_pollutant_data(
-        steps=[24],
-        latitudes=[-10, 0, 10],
-        longitudes=[0, 90, 270],
-        values=[2, 4, 1, 4, 8, 2, 8, 10, 4],
-    )
-    result = find_value_for_city(input_data, latitude, longitude)
-    assert (result == expected).all()
 
 
 @pytest.mark.parametrize(
     "field, expected",
     [
-        ("city", ["Dublin", "Dublin"]),
-        ("city_location", {"coordinates": [0, -10], "type": "Point"}),
+        ("name", ["Dublin", "Dublin"]),
+        ("location", {"coordinates": [0, -10], "type": "Point"}),
         (
             "measurement_date",
             [datetime(2024, 4, 23, 0, 0), datetime(2024, 4, 24, 0, 0)],
@@ -71,7 +25,7 @@ def test__find_value_for_city(latitude: float, longitude: float, expected):
 )
 def test__transform__returns_correct_values(field, expected):
     input_data = ForecastData(single_level_data_set, multi_level_data_set)
-    results = transform(input_data, default_test_cities[0:1])
+    results = transform(input_data, default_test_cities[0])
     if isinstance(expected, list):
         assert list(map(lambda x: x[field], results)) == expected
     else:
@@ -87,8 +41,9 @@ def test__transform__returns_correctly_formatted_data():
         "value": {"type": "float"},
     }
     expected_document_schema = {
-        "city": {"type": "string", "allowed": ["Dublin", "London", "Paris"]},
-        "city_location": {
+        "name": {"type": "string", "allowed": ["Dublin"]},
+        "location_type": {"type": "string", "allowed": ["city"]},
+        "location": {
             "type": "dict",
             "schema": {
                 "coordinates": {
@@ -111,6 +66,6 @@ def test__transform__returns_correctly_formatted_data():
         "overall_aqi_level": expected_aqi_schema,
     }
     validator = Validator(expected_document_schema, require_all=True)
-    result = transform(input_data, default_test_cities)
+    result = transform(input_data, default_test_cities[0])
     for data in result:
         assert validator(data) is True, f"{validator.errors}"
