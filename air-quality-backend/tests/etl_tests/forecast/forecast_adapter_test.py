@@ -9,6 +9,7 @@ from .mock_forecast_data import (
     single_level_data_set,
     multi_level_data_set,
     default_test_cities,
+    default_time,
 )
 
 
@@ -21,6 +22,7 @@ from .mock_forecast_data import (
             "measurement_date",
             [datetime(2024, 4, 23, 0, 0), datetime(2024, 4, 24, 0, 0)],
         ),
+        ("forecast_base_time", datetime.utcfromtimestamp(default_time)),
     ],
 )
 def test__transform__returns_correct_values(field, expected):
@@ -58,6 +60,7 @@ def test__transform__returns_correctly_formatted_data():
             },
         },
         "measurement_date": {"type": "datetime"},
+        "forecast_base_time": {"type": "datetime"},
         "no2": {"type": "dict", "schema": expected_pollutant_schema},
         "o3": {"type": "dict", "schema": expected_pollutant_schema},
         "pm10": {"type": "dict", "schema": expected_pollutant_schema},
