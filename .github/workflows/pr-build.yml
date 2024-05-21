@@ -9,6 +9,9 @@ on:
 jobs:
   detect-change-scope:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
     permissions:
         pull-requests: read
     outputs:
