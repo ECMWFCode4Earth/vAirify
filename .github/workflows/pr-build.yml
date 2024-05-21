@@ -17,6 +17,8 @@ jobs:
       etl: ${{ steps.filter.outputs.etl }}
       api: ${{ steps.filter.outputs.api }}
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
     - uses: dorny/paths-filter@v3.0.2
       id: filter
       with:
