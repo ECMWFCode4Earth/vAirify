@@ -23,6 +23,7 @@ from .mock_forecast_data import (
             [datetime(2024, 4, 23, 0, 0), datetime(2024, 4, 24, 0, 0)],
         ),
         ("forecast_base_time", datetime.utcfromtimestamp(default_time)),
+        ("forecast_range", [24, 48]),
     ],
 )
 def test__transform__returns_correct_values(field, expected):
@@ -61,6 +62,7 @@ def test__transform__returns_correctly_formatted_data():
         },
         "forecast_valid_time": {"type": "datetime"},
         "forecast_base_time": {"type": "datetime"},
+        "forecast_range": {"type": "integer"},
         "no2": {"type": "dict", "schema": expected_pollutant_schema},
         "o3": {"type": "dict", "schema": expected_pollutant_schema},
         "pm10": {"type": "dict", "schema": expected_pollutant_schema},
