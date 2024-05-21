@@ -7,13 +7,15 @@ on:
       - 'main'
 
 jobs:
-  detect-change-scope:
+  changes:
     runs-on: ubuntu-latest
     permissions:
         pull-requests: read
     outputs:
       etl: ${{ steps.filter.outputs.etl }}
       api: ${{ steps.filter.outputs.api }}
+      etl_tests: ${{ steps.filter.outputs.etl_tests }}
+      api_tests: ${{ steps.filter.outputs.api_tests }}
     steps:
     - uses: dorny/paths-filter@v3.0.2  
       id: filter
@@ -21,9 +23,11 @@ jobs:
         filters: |
           etl:
             - 'air-quality-backend/src/etl/**'
-            - 'air-quality-backend/tests/etl_tests/**'
           api:
             - 'air-quality-backend/src/api/**'
+          etl_tests:
+            - 'air-quality-backend/tests/etl_tests/**'
+          api_tests:
             - 'air-quality-backend/tests/api_tests/**'
 
   run-lint:
@@ -47,8 +51,8 @@ jobs:
         run: python -m flake8 --append-config air-quality-backend/.flake8 air-quality-backend
 
   etl:
-    needs: detect-change-scope
-    if: ${{ needs.detect-change-scope.outputs.etl == 'true' }}
+    needs: changes
+    if: ${{ needs.changes.outputs.etl == 'true' || needs.changes.outputs.etl_tests == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -73,10 +77,10 @@ jobs:
         with:
             coverageFile: air-quality-backend/tests/coverage/etl_test_report.xml
             token: ${{ secrets.GITHUB_TOKEN }}
- 
+
   api:
-    needs: detect-change-scope
-    if: ${{ needs.detect-change-scope.outputs.api == 'true' }}
+    needs: changes
+    if: ${{ needs.changes.outputs.api == 'true' || needs.changes.outputs.api_tests == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
