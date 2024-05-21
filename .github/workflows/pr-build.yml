@@ -101,3 +101,4 @@ jobs:
         with:
             coverageFile: air-quality-backend/tests/coverage/api_test_report.xml
             token: ${{ secrets.GITHUB_TOKEN }}
+        
