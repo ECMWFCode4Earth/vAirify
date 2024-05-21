@@ -43,7 +43,7 @@ jobs:
           channels: conda-forge
           environment-file: air-quality-backend/conda/utility_environment.yml
           auto-activate-base: false
-          activate-environment: linting-env
+          activate-environment: utility-env
          
       - name: Run lint check
         run: python -m flake8 --append-config air-quality-backend/.flake8 air-quality-backend
