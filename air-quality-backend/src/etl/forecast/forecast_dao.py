@@ -7,7 +7,7 @@ from .forecast_data import ForecastData
 
 
 def __get_base_request_body(model_base_date: str, model_base_time: str) -> dict:
-    leadtime_hour = [str(i) for i in range(24, 121, 3)]
+    leadtime_hour = [str(i) for i in range(0, 121, 3)]
     return {
         "date": f"{model_base_date}/{model_base_date}",
         "type": "forecast",
