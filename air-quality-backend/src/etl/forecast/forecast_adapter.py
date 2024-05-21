@@ -89,7 +89,7 @@ def transform(forecast_data: ForecastData, location: AirQualityLocation) -> list
                 "coordinates": [location["longitude"], location["latitude"]],
             },
             "forecast_base_time": model_base_time,
-            "measurement_date": measurement_date,
+            "forecast_valid_time": measurement_date,
             "overall_aqi_level": overall_aqi_value,
             **pollutant_data,
         }
