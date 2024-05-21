@@ -7,7 +7,7 @@ on:
       - 'main'
 
 jobs:
-  changes:
+  detect-change-scope:
     runs-on: ubuntu-latest
     permissions:
         pull-requests: read
@@ -51,7 +51,7 @@ jobs:
         run: python -m flake8 --append-config air-quality-backend/.flake8 air-quality-backend
 
   etl:
-    needs: changes
+    needs: detect-change-scope
     if: ${{ needs.changes.outputs.etl == 'true' || needs.changes.outputs.etl_tests == 'true' }}
     runs-on: ubuntu-latest
     defaults:
@@ -79,8 +79,8 @@ jobs:
             token: ${{ secrets.GITHUB_TOKEN }}
 
   api:
-    needs: changes
-    if: ${{ needs.changes.outputs.api == 'true' || needs.changes.outputs.api_tests == 'true' }}
+    needs: detect-change-scope
+    if: ${{ needs.detect-change-scope.outputs.api == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
