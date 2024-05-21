@@ -52,7 +52,7 @@ jobs:
 
   etl:
     needs: detect-change-scope
-    if: ${{ needs.changes.outputs.etl == 'true' || needs.changes.outputs.etl_tests == 'true' }}
+    if: ${{ needs.detect-change-scope.outputs.etl == 'true' || needs.detect-change-scope.outputs.etl_tests == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
