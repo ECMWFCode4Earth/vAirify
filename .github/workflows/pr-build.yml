@@ -143,17 +143,11 @@ jobs:
       - name: Code Coverage Combine Reports
         run: python -m coverage combine .coverage*
 
-      - name: print dr Before Convert to report
-        run: ls
-
       - name: Convert to report 
         run: coverage xml
-
-      - name: print dr After Convert to report
-        run: ls
 
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1
         with:
-            coverageFile: .coverage.xml
+            coverageFile: coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
