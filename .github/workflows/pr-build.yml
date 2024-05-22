@@ -99,7 +99,7 @@ jobs:
           activate-environment: api-dev
          
       - name: Run api unit tests
-        run: python -m pytest --cov=src/api --cov=scripts air-quality-backend/tests/api_tests
+        run: python -m pytest --cov=src/api air-quality-backend/tests/api_tests
 
       - name: Rename coverage file
         run: mv .coverage .coverage.api
