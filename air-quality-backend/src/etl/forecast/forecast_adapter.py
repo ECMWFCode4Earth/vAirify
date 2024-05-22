@@ -61,6 +61,8 @@ def _get_overall_aqi_value_for_slice(
 
 def transform(forecast_data: ForecastData, location: AirQualityLocation) -> list:
     valid_time_values = forecast_data.get_valid_time_values()
+    step_values = forecast_data.get_step_values()
+    model_base_time = datetime.utcfromtimestamp(forecast_data.get_time_value())
     pollutant_forecast_for_location = []
     location_name = location["name"]
     location_type = location["type"]
@@ -87,8 +89,11 @@ def transform(forecast_data: ForecastData, location: AirQualityLocation) -> list
                 "type": "Point",
                 "coordinates": [location["longitude"], location["latitude"]],
             },
-            "measurement_date": measurement_date,
+            "forecast_base_time": model_base_time,
+            "forecast_valid_time": measurement_date,
+            "forecast_range": int(step_values[i]),
             "overall_aqi_level": overall_aqi_value,
+            "source": "cams-production",
             **pollutant_data,
         }
 

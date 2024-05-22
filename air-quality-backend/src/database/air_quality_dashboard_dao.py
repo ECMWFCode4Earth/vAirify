@@ -20,7 +20,10 @@ def _upsert_measurement_data(collection_name, data):
     update_operations = [
         (
             UpdateOne(
-                {"name": doc["name"], "measurement_date": doc["measurement_date"]},
+                {
+                    "name": doc["name"],
+                    "forecast_valid_time": doc["forecast_valid_time"],
+                },
                 [
                     {
                         "$set": {
@@ -65,7 +68,11 @@ def get_locations_by_type(location_type: str) -> list[AirQualityLocation]:
 
 
 def delete_data_before(measurement_time: datetime):
-    collections = [get_collection("forecast_data"), get_collection("in_situ_data")]
-    for collection in collections:
-        result = collection.delete_many({"measurement_date": {"$lt": measurement_time}})
-        logging.info(f"Deleted {result.deleted_count} documents from {collection.name}")
+    result = get_collection("forecast_data").delete_many(
+        {"forecast_valid_time": {"$lt": measurement_time}}
+    )
+    logging.info(f"Deleted {result.deleted_count} documents from forecast_data")
+    result = get_collection("in_situ_data").delete_many(
+        {"measurement_date": {"$lt": measurement_time}}
+    )
+    logging.info(f"Deleted {result.deleted_count} documents from in_situ_data")
