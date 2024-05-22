@@ -154,8 +154,8 @@ jobs:
         run: ls -la
 
       - name: cat
-        run: cat .coverage.api/.coverage.api
-        
+        run: cat .coverage.api
+
       - name: Convert to report 
         run: coverage xml
 
