@@ -94,11 +94,12 @@ def fetch_forecast_data(
     rho = p_ml / (287.0 * results[1]["t"])
     for result in results:
         for variable in result.variables:
-            if result[variable].units == "kg kg**-1":
-                result[variable].data *= rho
+            if result[variable].attrs.get('units') == "kg kg**-1":
+                result[variable] *= rho  # Directly modify the DataArray
                 result[variable].attrs['units'] = "kg m**-3"
-                logging.debug(f"Updated Variable: {variable}, from units: kg kg**-1 to units: {result[variable].units}.")
-    results[0].drop_vars(["sp"])
-    results[1].drop_vars(["t"])
+                logging.debug(f"Updated Variable: {variable}, from units: 'kg kg**-1' to 'kg m**-3'.")
+                
+    results[0] = results[0].drop_vars(["sp"])
+    results[1] = results[1].drop_vars(["t"])
 
     return ForecastData(*results)
