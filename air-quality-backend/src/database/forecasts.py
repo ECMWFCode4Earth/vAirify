@@ -4,7 +4,17 @@ from .mongo_db_operations import get_collection, upsert_data
 
 
 def insert_data(data):
-    upsert_data("forecast_data", ["name", "forecast_valid_time"], data)
+    upsert_data(
+        "forecast_data",
+        [
+            "forecast_base_time",
+            "forecast_valid_time",
+            "location_type",
+            "name",
+            "source",
+        ],
+        data,
+    )
 
 
 def delete_data_before(forecast_valid_time: datetime):
