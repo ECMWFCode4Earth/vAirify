@@ -71,7 +71,7 @@ jobs:
         run: python -m pytest --cov=src --cov=scripts air-quality-backend/tests/etl_tests
         
       - name: Rename coverage file
-        run: .coverage .coverage.etl
+        run: mv .coverage .coverage.etl
 
       - name: Upload coverage
         uses: actions/upload-artifact@master
