@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 from itertools import chain
 import logging
 from logging import config
+import sys
+sys.path.append("../")
 from src.database.air_quality_dashboard_dao import (
     get_locations_by_type,
     insert_data_forecast,
