@@ -133,14 +133,18 @@ jobs:
           auto-activate-base: false
           activate-environment: api-dev
 
-      - uses: actions/download-artifact@master
-        with:
-          name: api_test_report
-          path: .coverage.etl
-
-      - uses: actions/download-artifact@master
+      - name: download etl coverage
+        if: needs.etl.result != 'skipped'
+        uses: actions/download-artifact@master
         with:
           name: etl_test_report
+          path: .coverage.etl
+
+      - name: download api coverage
+        if: needs.api.result != 'skipped'
+        uses: actions/download-artifact@master
+        with:
+          name: api_test_report
           path: .coverage.api
 
       - name: Code Coverage Combine Reports
