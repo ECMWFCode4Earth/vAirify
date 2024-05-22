@@ -102,13 +102,13 @@ jobs:
         run: python -m pytest --cov=air-quality-backend/tests --cov=scripts air-quality-backend/tests/api_tests
 
       - name: Rename coverage file
-        run: mv air-quality-backend/tests/.coverage.coverage .coverage.api.coverage
+        run: mv air-quality-backend/tests/.coverage .coverage.api
         
       - name: Upload coverage
         uses: actions/upload-artifact@master
         with:
           name: api_test_report
-          path: air-quality-backend/tests/.coverage.api.coverage
+          path: air-quality-backend/tests/.coverage.api
       
             
   combine-coverage:
@@ -133,12 +133,12 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: api_test_report
-          path: air-quality-backend/tests/.coverage.api.coverage
+          path: air-quality-backend/tests/.coverage.api
 
       - uses: actions/download-artifact@master
         with:
           name: etl_test_report
-          path: air-quality-backend/tests/.coverage.api.coverage
+          path: air-quality-backend/tests/.coverage.api
 
       - name: print dr
         run: ls air-quality-backend/tests/
