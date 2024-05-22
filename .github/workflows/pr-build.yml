@@ -122,6 +122,9 @@ jobs:
       run:
         shell: bash -el {0}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
       - name: Setup miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
