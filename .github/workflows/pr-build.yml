@@ -141,7 +141,7 @@ jobs:
           path: air-quality-backend/tests/.coverage.api.coverage
 
       - name: print dr
-        run: ls air-quality-backend/tests/coverage
+        run: ls air-quality-backend/tests/
 
       - name: Code Coverage Combine Reports
         run: python -m coverage combine air-quality-backend/tests/.coverage*
