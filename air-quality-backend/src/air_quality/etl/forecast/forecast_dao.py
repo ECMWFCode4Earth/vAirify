@@ -95,7 +95,8 @@ def fetch_forecast_data(
 
     # convert the mass mixing ratios to mass concentrations
     # get pressure on model level 137 from surface pressure
-    # https://confluence.ecmwf.int/display/CKB/ERA5%3A+compute+pressure+and+geopotential+on+model+levels%2C+geopotential+height+and+geometric+height
+    # https://confluence.ecmwf.int/display/CKB/ERA5%3A+compute+pressure+and+geopotential
+    # +on+model+levels%2C+geopotential+height+and+geometric+height
     p_half_above = 0 + 0.997630 * results[0]["sp"]
     p_half_below = 0 + 1.0 * results[0]["sp"]
     p_ml = (p_half_above + p_half_below) / 2
