@@ -1,6 +1,6 @@
 from decimal import Decimal
 import xarray as xr
-from src.etl.air_quality_index.pollutant_type import PollutantType, is_single_level
+from etl.air_quality_index.pollutant_type import PollutantType, is_single_level
 
 
 def convert_east_only_longitude_to_east_west(longitude_value: float) -> float:

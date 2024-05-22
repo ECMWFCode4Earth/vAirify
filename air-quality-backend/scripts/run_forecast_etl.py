@@ -3,12 +3,12 @@ from dotenv import load_dotenv
 from itertools import chain
 import logging
 from logging import config
-from src.database.locations import get_locations_by_type
-from src.database.forecasts import insert_data
-from src.etl.forecast.forecast_dao import fetch_forecast_data
-from src.etl.forecast.forecast_adapter import transform
+from database.locations import get_locations_by_type
+from database.forecasts import insert_data
+from etl.forecast.forecast_dao import fetch_forecast_data
+from etl.forecast.forecast_adapter import transform
 
-config.fileConfig("../logging.ini")
+config.fileConfig("./logging.ini")
 
 
 def main():

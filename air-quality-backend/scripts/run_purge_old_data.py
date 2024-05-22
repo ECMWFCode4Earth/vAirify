@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import logging
 from logging import config
-from src.database.forecasts import delete_data_before as delete_forecast_data
-from src.database.in_situ import delete_data_before as delete_in_situ_data
+from database.forecasts import delete_data_before as delete_forecast_data
+from database.in_situ import delete_data_before as delete_in_situ_data
 
 config.fileConfig("../logging.ini")
 

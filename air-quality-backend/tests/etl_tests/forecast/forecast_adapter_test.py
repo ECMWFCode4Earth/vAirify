@@ -1,7 +1,7 @@
 from cerberus import Validator
 from datetime import datetime
 import pytest
-from src.etl.forecast.forecast_adapter import (
+from etl.forecast.forecast_adapter import (
     ForecastData,
     transform,
 )

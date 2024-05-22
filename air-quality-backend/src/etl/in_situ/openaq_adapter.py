@@ -1,11 +1,11 @@
 from datetime import datetime
 import logging
-from src.etl.air_quality_index.calculator import (
+from etl.air_quality_index.calculator import (
     get_pollutant_index_level,
     get_overall_aqi_level,
 )
-from src.etl.air_quality_index.pollutant_type import PollutantType
-from src.etl.in_situ.sort_in_situ import sort_by_distance_and_time
+from etl.air_quality_index.pollutant_type import PollutantType
+from etl.in_situ.sort_in_situ import sort_by_distance_and_time
 
 required_pollutant_data = {
     "o3": PollutantType.OZONE,

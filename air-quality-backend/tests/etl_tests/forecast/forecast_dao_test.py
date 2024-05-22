@@ -1,7 +1,7 @@
 from freezegun import freeze_time
 import pytest
 from unittest.mock import call, patch
-from src.etl.forecast.forecast_dao import (
+from etl.forecast.forecast_dao import (
     CamsModelDateTime,
     fetch_forecast_data,
     get_latest_cam_model_date_time,
