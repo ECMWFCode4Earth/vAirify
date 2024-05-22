@@ -115,7 +115,7 @@ jobs:
     needs: [etl, api]
     if: |
       always() &&
-      (needs.etl.result == 'success' || needs.etl.result == 'skipped')
+      (needs.etl.result == 'success' || needs.etl.result == 'skipped') &&
       (needs.api.result == 'success' || needs.api.result == 'skipped')
     runs-on: ubuntu-latest
     defaults:
