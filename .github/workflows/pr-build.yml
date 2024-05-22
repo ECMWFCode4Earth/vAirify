@@ -147,8 +147,11 @@ jobs:
           name: api_test_report
           path: coverage_reports
 
+      - name: print coverage report
+        run: ls -la coverage_reports
+
       - name: Code Coverage Combine Reports
-        run: python -m coverage combine coverage_reports/.coverage*
+        run: python -m coverage --keep combine coverage_reports/.coverage*
 
       - name: print coverage report
         run: ls -la
