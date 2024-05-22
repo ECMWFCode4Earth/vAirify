@@ -147,12 +147,6 @@ jobs:
           name: api_test_report
           path: coverage_reports
 
-      - name: print coverage report
-        run: ls -la
-
-      - name: print coverage report
-        run: ls -la coverage_reports
-
       - name: Code Coverage Combine Reports
         run: python -m coverage combine -a --keep coverage_reports/
 
@@ -163,7 +157,7 @@ jobs:
         run: ls -la coverage_reports
 
       - name: Convert to report 
-        run: coverage xml
+        run: coverage xml --include coverage_reports/.coverage.api,coverage_reports/.coverage.etl
 
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1
