@@ -26,13 +26,13 @@ def __get_base_request_body(model_date_time: CamsModelDateTime) -> dict:
 
 def get_single_level_request_body(model_date_time: CamsModelDateTime) -> dict:
     base_request = __get_base_request_body(model_date_time)
-    base_request["variable"] = ["particulate_matter_10um", "particulate_matter_2.5um"]
+    base_request["variable"] = ["particulate_matter_10um", "particulate_matter_2.5um", "surface_pressure"]
     return base_request
 
 
 def get_multi_level_request_body(model_date_time: CamsModelDateTime) -> dict:
     base_request = __get_base_request_body(model_date_time)
-    base_request["variable"] = ["nitrogen_dioxide", "ozone", "sulphur_dioxide"]
+    base_request["variable"] = ["nitrogen_dioxide", "ozone", "sulphur_dioxide", "temperature"]
     base_request["model_level"] = "137"
     return base_request
 
