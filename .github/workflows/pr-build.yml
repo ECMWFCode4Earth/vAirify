@@ -129,7 +129,7 @@ jobs:
         uses: conda-incubator/setup-miniconda@v3
         with:
           channels: conda-forge
-          environment-file: air-quality-backend/conda/api_environment.yml
+          environment-file: air-quality-backend/conda/utility_environment.yml
           auto-activate-base: false
           activate-environment: utility-env
 
