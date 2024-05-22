@@ -108,7 +108,7 @@ def fetch_forecast_data(
                 result[variable] *= rho
                 result[variable].attrs["units"] = "kg m**-3"
                 logging.debug(
-                    f"Updated Variable: {variable}, from units: 'kg kg**-1' to 'kg m**-3'."
+                    f"Updated: {variable}, from units: 'kg kg**-1' to 'kg m**-3'."
                 )
 
     results[0] = results[0].drop_vars(["sp"])

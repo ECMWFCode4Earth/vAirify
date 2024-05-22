@@ -124,7 +124,6 @@ t = create_test_pollutant_data_with_defaults(
 )
 
 
-
 pm2p5 = create_test_pollutant_data_with_defaults(
     values=[
         0.0000007,
@@ -194,7 +193,6 @@ sp = create_test_pollutant_data_with_defaults(
         0.00000145,
     ]
 )
-
 
 
 single_level_data_set = xarray.Dataset(
