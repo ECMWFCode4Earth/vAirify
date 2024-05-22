@@ -101,9 +101,6 @@ jobs:
       - name: Run api unit tests
         run: python -m pytest --cov=src/api --cov=scripts air-quality-backend/tests/api_tests
 
-      - name: print coverage report
-        run: ls
-
       - name: Rename coverage file
         run: mv .coverage .coverage.api
         
@@ -155,6 +152,9 @@ jobs:
 
       - name: Convert to report 
         run: coverage xml
+        
+      - name: print coverage report
+        run: ls
 
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1
