@@ -148,6 +148,9 @@ jobs:
           path: coverage_reports
 
       - name: print coverage report
+        run: ls -la
+
+      - name: print coverage report
         run: ls -la coverage_reports
 
       - name: Code Coverage Combine Reports
