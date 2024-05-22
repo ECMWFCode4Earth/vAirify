@@ -151,8 +151,11 @@ jobs:
         run: python -m coverage combine .coverage*
 
       - name: print coverage report
-        run: ls
+        run: ls -la
 
+      - name: cat
+        run: cat .coverage.api/.coverage.api
+        
       - name: Convert to report 
         run: coverage xml
 
