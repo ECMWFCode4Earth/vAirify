@@ -68,7 +68,7 @@ jobs:
           activate-environment: etl-dev
 
       - name: Run etl unit tests
-        run: python -m pytest --cov=src/etl --cov=scripts --cov-report= air-quality-backend/tests/etl_tests
+        run: python -m pytest --cov=air-quality-backend/src/etl --cov=scripts --cov-report= air-quality-backend/tests/etl_tests
         
       - name: Rename coverage file
         run: mv .coverage .coverage.etl
@@ -99,7 +99,7 @@ jobs:
           activate-environment: api-dev
          
       - name: Run api unit tests
-        run: python -m pytest --cov=src/api --cov-report= air-quality-backend/tests/api_tests
+        run: python -m pytest --cov=air-quality-backend/src/api --cov-report= air-quality-backend/tests/api_tests
 
       - name: Rename coverage file
         run: mv .coverage .coverage.api
@@ -148,16 +148,10 @@ jobs:
           path: coverage_reports
 
       - name: Code Coverage Combine Reports
-        run: python -m coverage combine -a --keep coverage_reports/
-
-      - name: print coverage report
-        run: ls -la
-
-      - name: print coverage report
-        run: ls -la coverage_reports
+        run: python -m coverage combine --keep coverage_reports/
 
       - name: Convert to report 
-        run: coverage xml --include coverage_reports/.coverage.api,coverage_reports/.coverage.etl
+        run: coverage xml
 
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1
