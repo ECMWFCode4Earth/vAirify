@@ -122,12 +122,14 @@ jobs:
       run:
         shell: bash -el {0}
     steps:
-
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
       - name: Setup miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
           channels: conda-forge
-          environment-file: air-quality-backend/conda/utility_environment.yml
+          environment-file: air-quality-backend/conda/api_environment.yml
           auto-activate-base: false
           activate-environment: utility-env
 
