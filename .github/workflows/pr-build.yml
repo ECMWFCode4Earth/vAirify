@@ -68,7 +68,7 @@ jobs:
           activate-environment: etl-dev
 
       - name: Run etl unit tests
-        run: python -m pytest --cov=src/etl --cov=scripts air-quality-backend/tests/etl_tests
+        run: python -m pytest --cov=src/etl --cov=scripts --cov-report= air-quality-backend/tests/etl_tests
         
       - name: Rename coverage file
         run: mv .coverage .coverage.etl
@@ -99,7 +99,7 @@ jobs:
           activate-environment: api-dev
          
       - name: Run api unit tests
-        run: python -m pytest --cov=src/api air-quality-backend/tests/api_tests
+        run: python -m pytest --cov=src/api --cov-report= air-quality-backend/tests/api_tests
 
       - name: Rename coverage file
         run: mv .coverage .coverage.api
