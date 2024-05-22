@@ -151,7 +151,7 @@ jobs:
         run: ls -la coverage_reports
 
       - name: Code Coverage Combine Reports
-        run: python -m coverage --keep combine coverage_reports/.coverage*
+        run: python -m coverage combine --keep coverage_reports/
 
       - name: print coverage report
         run: ls -la
