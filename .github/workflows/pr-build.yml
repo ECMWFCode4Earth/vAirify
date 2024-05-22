@@ -150,11 +150,11 @@ jobs:
       - name: Code Coverage Combine Reports
         run: python -m coverage combine .coverage*
 
-      - name: Convert to report 
-        run: coverage xml
-        
       - name: print coverage report
         run: ls
+
+      - name: Convert to report 
+        run: coverage xml
 
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1
