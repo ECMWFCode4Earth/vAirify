@@ -7,7 +7,7 @@ from urllib.parse import urlencode
 
 base_url = "https://api.openaq.org/v2/measurements"
 
-# test
+
 def fetch_in_situ_measurements(cities, date_from: datetime, date_to: datetime):
     in_situ_data_by_city = {}
     for city in cities:
