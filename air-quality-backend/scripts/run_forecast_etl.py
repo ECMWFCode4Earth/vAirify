@@ -1,5 +1,4 @@
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
 from dotenv import load_dotenv
 from itertools import chain
 import logging
@@ -20,10 +19,8 @@ def main():
     cities = get_locations_by_type("city")
     logging.info(f"Finding data for {cities.__len__()} cities")
 
-    today = datetime.now()
-
     logging.info("Extracting pollutant forecast data")
-    extracted_forecast_data = fetch_forecast_data(model_base_date=today)
+    extracted_forecast_data = fetch_forecast_data()
 
     logging.info("Transforming forecast data")
     with ThreadPoolExecutor(max_workers=10) as executor:
