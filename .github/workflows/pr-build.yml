@@ -135,7 +135,7 @@ jobs:
           path: /home/runner/work/vAirify/vAirify/air-quality-backend/tests/coverage/.coverage.api.xml/.coverage.etl.xml
 
       - name: print dr
-        run: ls -la air-quality-backend/tests/coverage/
+        run: ls
 
       - name: Code Coverage Combine Reports
         run: python -m coverage combine air-quality-backend/tests/coverage/
