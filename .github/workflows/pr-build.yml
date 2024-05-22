@@ -140,17 +140,20 @@ jobs:
           name: etl_test_report
           path: .coverage.api
 
-      - name: print dr
-        run: ls air-quality-backend/tests/
-
       - name: Code Coverage Combine Reports
         run: python -m coverage combine .coverage*
 
-      - name: Convert to report
+      - name: print dr Before Convert to report
+        run: ls
+
+      - name: Convert to report 
         run: coverage xml
+
+      - name: print dr After Convert to report
+        run: ls
 
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1
         with:
-            coverageFile: air-quality-backend/tests/coverage/.coverage.xml
+            coverageFile: .coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
