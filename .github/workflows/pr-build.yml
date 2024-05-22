@@ -138,23 +138,23 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: etl_test_report
-          path: .coverage.etl
+          path: coverage_reports
 
       - name: download api coverage
         if: needs.api.result != 'skipped'
         uses: actions/download-artifact@master
         with:
           name: api_test_report
-          path: .coverage.api
+          path: coverage_reports
 
       - name: Code Coverage Combine Reports
-        run: python -m coverage combine .coverage*
+        run: python -m coverage combine coverage_reports/.coverage*
 
       - name: print coverage report
         run: ls -la
 
-      - name: cat
-        run: cat .coverage
+      - name: print coverage report
+        run: ls -la coverage_reports
 
       - name: Convert to report 
         run: coverage xml
