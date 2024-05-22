@@ -1,10 +1,12 @@
-from datetime import datetime
+from freezegun import freeze_time
 import pytest
 from unittest.mock import call, patch
 from src.etl.forecast.forecast_dao import (
-    get_single_level_request_body,
-    get_multi_level_request_body,
+    CamsModelDateTime,
     fetch_forecast_data,
+    get_latest_cam_model_date_time,
+    get_multi_level_request_body,
+    get_single_level_request_body,
 )
 from .mock_forecast_data import single_level_data_set, multi_level_data_set
 
@@ -15,14 +17,22 @@ def mock_open_dataset():
         yield mock_open
 
 
-def test_get_single_level_request_body():
-    request = get_single_level_request_body("2024-04-29", "00")
+def test__get_single_level_request_body():
+    request = get_single_level_request_body(CamsModelDateTime("2024-04-29", "00"))
     assert request == {
         "date": "2024-04-29/2024-04-29",
         "type": "forecast",
         "format": "grib",
         "time": "00:00",
         "leadtime_hour": [
+            "0",
+            "3",
+            "6",
+            "9",
+            "12",
+            "15",
+            "18",
+            "21",
             "24",
             "27",
             "30",
@@ -61,14 +71,22 @@ def test_get_single_level_request_body():
     }
 
 
-def test_get_multi_level_request_body():
-    request = get_multi_level_request_body("2024-04-29", "00")
+def test__get_multi_level_request_body():
+    request = get_multi_level_request_body(CamsModelDateTime("2024-04-29", "00"))
     assert request == {
         "date": "2024-04-29/2024-04-29",
         "type": "forecast",
         "format": "grib",
         "time": "00:00",
         "leadtime_hour": [
+            "0",
+            "3",
+            "6",
+            "9",
+            "12",
+            "15",
+            "18",
+            "21",
             "24",
             "27",
             "30",
@@ -108,13 +126,30 @@ def test_get_multi_level_request_body():
     }
 
 
+@pytest.mark.parametrize(
+    "date_time, expected",
+    [
+        ("2024-05-22 00:00:00", CamsModelDateTime("2024-05-21", "12")),
+        ("2024-05-22 09:59:59", CamsModelDateTime("2024-05-21", "12")),
+        ("2024-05-22 10:00:00", CamsModelDateTime("2024-05-22", "00")),
+        ("2024-05-22 21:59:59", CamsModelDateTime("2024-05-22", "00")),
+        ("2024-05-22 22:00:00", CamsModelDateTime("2024-05-22", "12")),
+        ("2024-05-22 23:59:59", CamsModelDateTime("2024-05-22", "12")),
+    ],
+)
+def test__get_latest_cam_model_date_time(date_time: str, expected: CamsModelDateTime):
+    with freeze_time(date_time):
+        result = get_latest_cam_model_date_time()
+        assert result.date == expected.date
+        assert result.time == expected.time
+
+
 def test_fetch_forecast_data_returns_forecast_data(mocker, mock_open_dataset):
     mock_cdsapi_client = mocker.Mock()
     mocker.patch("cdsapi.Client", return_value=mock_cdsapi_client)
     mock_open_dataset.side_effect = [single_level_data_set, multi_level_data_set]
 
-    date = datetime.strptime("2024-05-20", "%Y-%m-%d")
-    forecast_data = fetch_forecast_data(model_base_date=date)
+    forecast_data = fetch_forecast_data(CamsModelDateTime("2024-05-20", "00"))
 
     mock_open_dataset.assert_has_calls(
         [
