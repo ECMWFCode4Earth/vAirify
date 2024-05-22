@@ -112,8 +112,11 @@ jobs:
       
             
   combine-coverage:
-    needs: [detect-change-scope, etl, api]
-    if: ${{ needs.detect-change-scope.outputs.etl == 'true' && needs.detect-change-scope.outputs.api == 'true' }}
+    needs: [etl, api]
+    if: |
+      always() &&
+      (needs.etl.result == 'success' || needs.etl.result == 'skipped')
+      (needs.api.result == 'success' || needs.api.result == 'skipped')
     runs-on: ubuntu-latest
     defaults:
       run:
