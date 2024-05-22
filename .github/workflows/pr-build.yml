@@ -71,13 +71,13 @@ jobs:
         run: python -m pytest --cov=src --cov=scripts air-quality-backend/tests/etl_tests
         
       - name: Rename coverage file
-        run: mv air-quality-backend/.coverage.coverage .coverage.etl.coverage
+        run: .coverage .coverage.etl
 
       - name: Upload coverage
         uses: actions/upload-artifact@master
         with:
           name: etl_test_report
-          path: air-quality-backend/tests/.coverage.etl.coverage
+          path: .coverage.etl
 
   api:
     needs: detect-change-scope
@@ -108,7 +108,7 @@ jobs:
         uses: actions/upload-artifact@master
         with:
           name: api_test_report
-          path: air-quality-backend/tests/.coverage.api
+          path: .coverage.api
       
             
   combine-coverage:
@@ -133,15 +133,15 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: api_test_report
-          path: air-quality-backend/tests/.coverage.api
+          path: .coverage.etl
 
       - uses: actions/download-artifact@master
         with:
           name: etl_test_report
-          path: air-quality-backend/tests/.coverage.api
+          path: .coverage.api
 
       - name: print dr
         run: ls air-quality-backend/tests/
 
       - name: Code Coverage Combine Reports
-        run: python -m coverage combine air-quality-backend/tests/.coverage*
+        run: python -m coverage combine .coverage*
