@@ -102,7 +102,7 @@ jobs:
         run: python -m pytest --cov=tests --cov=scripts air-quality-backend/tests/api_tests
 
       - name: Rename coverage file
-        run: mv air-quality-backend/.coverage .coverage.api
+        run: mv .coverage .coverage.api
         
       - name: Upload coverage
         uses: actions/upload-artifact@master
