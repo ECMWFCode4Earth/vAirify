@@ -3,10 +3,8 @@ from dotenv import load_dotenv
 from itertools import chain
 import logging
 from logging import config
-from src.database.air_quality_dashboard_dao import (
-    get_locations_by_type,
-    insert_data_forecast,
-)
+from src.database.locations import get_locations_by_type
+from src.database.forecasts import insert_data
 from src.etl.forecast.forecast_dao import fetch_forecast_data
 from src.etl.forecast.forecast_adapter import transform
 
@@ -31,7 +29,7 @@ def main():
     transformed_forecast_data = list(chain.from_iterable(results))
 
     logging.info("Persisting forecast data")
-    insert_data_forecast(transformed_forecast_data)
+    insert_data(transformed_forecast_data)
 
 
 if __name__ == "__main__":

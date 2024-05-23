@@ -3,7 +3,7 @@ from decimal import Decimal
 import logging
 from typing import TypedDict
 from .forecast_data import ForecastData
-from src.database.location import AirQualityLocation
+from src.database.locations import AirQualityLocation
 from src.etl.air_quality_index import calculator as aqi_calculator
 from src.etl.air_quality_index.pollutant_type import PollutantType
 
