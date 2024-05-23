@@ -1,9 +1,0 @@
-name: bootstrap
-channels:
-  - conda-forge
-  - nodefaults
-dependencies:
-  - poetry=1.8
-  - pip
-  - python=3.11.9
-  - setuptools

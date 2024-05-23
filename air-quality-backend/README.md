@@ -6,7 +6,7 @@ Please follow [Local Development Setup](#local-development-setup) instructions i
 
 ### Update Conda environment
 
-`conda env update --name air-quality-dev --file conda/etl_environment.yml --prune`
+`conda env update --name air-quality-dev --file conda/environment.yml --prune`
 
 ### Run lint check
 `python -m flake8`
@@ -30,7 +30,7 @@ Follow the [installation instructions](https://docs.anaconda.com/free/miniconda/
 #### Create Conda environment
 From within air-quality-backend:
 
-`conda env create -f conda/etl_environment.yml -n air-quality-dev`
+`conda env create -f conda/environment.yml -n air-quality-dev`
 
 #### Activate Conda environment - CLI
 `conda activate air-quality-dev`
@@ -69,5 +69,3 @@ Once you receive your key, place it in your **.env** file
 - Select your conda env as the python interpreter
 - Check 'On save'
 - Press Apply
-
-

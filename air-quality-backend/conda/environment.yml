@@ -1,4 +1,4 @@
-name: etl
+name: air-quality-backend
 channels:
   - conda-forge
   - nodefaults
