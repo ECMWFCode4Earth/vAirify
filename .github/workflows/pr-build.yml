@@ -51,7 +51,7 @@ jobs:
         working-directory: ./air-quality-backend
         
       - name: Run lint check
-        run: python -m flake8 --append-config .flake8 air-quality-backend
+        run: python -m flake8 --append-config .flake8
         working-directory: ./air-quality-backend
         
       - name: Run etl unit tests
