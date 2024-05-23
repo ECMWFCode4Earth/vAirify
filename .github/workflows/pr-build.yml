@@ -46,28 +46,30 @@ jobs:
           auto-activate-base: false
           activate-environment: pr-env
 
-      - name: Change directory
-        run: cd air-quality-backend
-
       - name: Get Dependencies
         run: poetry install
+        working-directory: ./air-quality-backend
         
       - name: Run lint check
-        run: python -m flake8 --append-config .flake8
+        run: python -m flake8 --append-config .flake8 air-quality-backend
+        working-directory: ./air-quality-backend
         
       - name: Run etl unit tests
         run: python -m pytest --cov=src/air_quality/etl --cov=scripts --cov-append tests/etl_tests
         if: ${{ needs.detect-change-scope.outputs.etl == 'true' }}
+        working-directory: ./air-quality-backend
 
       - name: Run api unit tests
         run: python -m pytest --cov=src/air_quality/api --cov-append tests/api_tests
         if: ${{ needs.detect-change-scope.outputs.api == 'true' }}
+        working-directory: ./air-quality-backend
 
       - name: Convert to report 
         run: coverage xml
+        working-directory: ./air-quality-backend
 
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1
         with:
-            coverageFile: coverage.xml
+            coverageFile: ./air-quality-backend/coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
