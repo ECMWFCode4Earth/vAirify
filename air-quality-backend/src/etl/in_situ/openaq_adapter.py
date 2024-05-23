@@ -50,7 +50,6 @@ def transform_in_situ_data(in_situ_data):
     return _calculate_overall_aqi_value(formatted_dataset)
 
 
-#    "entity", "sensorType" group this stuff into its own object (called meta data)
 def _create_document(measurement, city_name):
     return {
         "city": city_name,
@@ -65,7 +64,7 @@ def _create_document(measurement, city_name):
         "measurement_date": datetime.strptime(
             measurement["date"]["utc"], "%Y-%m-%dT%H:%M:%S%z"
         ),
-        "meta_data": {
+        "metadata": {
             "entity": measurement["entity"],
             "sensorType": measurement["sensorType"],
         },
