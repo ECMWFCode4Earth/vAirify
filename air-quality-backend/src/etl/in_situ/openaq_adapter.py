@@ -50,6 +50,7 @@ def transform_in_situ_data(in_situ_data):
     return _calculate_overall_aqi_value(formatted_dataset)
 
 
+#    "entity", "sensorType" group this stuff into its own object (called meta data)
 def _create_document(measurement, city_name):
     return {
         "city": city_name,
@@ -64,6 +65,10 @@ def _create_document(measurement, city_name):
         "measurement_date": datetime.strptime(
             measurement["date"]["utc"], "%Y-%m-%dT%H:%M:%S%z"
         ),
+        "meta_data": {
+            "entity": measurement["entity"],
+            "sensorType": measurement["sensorType"],
+        },
     }
 
 
@@ -109,8 +114,8 @@ def _sort(in_situ_data_for_city, city_name, input_lat, input_lon):
             to_create_document = False
 
         if (
-                measurement_value != -1
-                and measurement_parameter in required_pollutant_data.keys()
+            measurement_value != -1
+            and measurement_parameter in required_pollutant_data.keys()
         ):
             formatted_cities_measurement[len(formatted_cities_measurement) - 1][
                 measurement_parameter

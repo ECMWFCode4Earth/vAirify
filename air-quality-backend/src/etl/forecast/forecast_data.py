@@ -53,11 +53,15 @@ class ForecastData:
         :return: values for pollutant at lat/long
         """
         dataset = self._get_data_set(pollutant_type)
-        return dataset[pollutant_type.value].interp(
-            latitude=latitude,
-            longitude=longitude,
-            method="linear",
-        ).values.tolist()
+        return (
+            dataset[pollutant_type.value]
+            .interp(
+                latitude=latitude,
+                longitude=longitude,
+                method="linear",
+            )
+            .values.tolist()
+        )
 
     def get_step_values(self):
         return self._single_level_data["step"].values
