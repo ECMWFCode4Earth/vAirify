@@ -1,8 +1,8 @@
 from copy import deepcopy
 from datetime import datetime, timezone
 import pytest
-from src.etl.in_situ.openaq_adapter import transform_in_situ_data
-from tests.etl_tests.in_situ.mock_openaq_data import (
+from air_quality.etl.in_situ.openaq_adapter import transform_in_situ_data
+from .mock_openaq_data import (
     openaq_dataset_multiple_locations,
     openaq_dataset_multiple_times,
     openaq_dataset_multiple_cities,

@@ -1,5 +1,8 @@
 import pytest
-from src.etl.air_quality_index.pollutant_type import PollutantType, is_single_level
+from air_quality.etl.air_quality_index.pollutant_type import (
+    PollutantType,
+    is_single_level,
+)
 
 
 @pytest.mark.parametrize(
