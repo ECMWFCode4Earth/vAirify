@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "etl"
+name = "air_quality"
 version = "0.1.0"
 description = ""
 authors = ["weather-machinists"]
@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 cads-api-client = "^1.0.3"
 cdsapi = "^0.7.0"
+fastapi = "^0.111.0"
 flake8 = "^7.0.0"
 multiurl = "^0.3.1"
 python = "~3.11.9"

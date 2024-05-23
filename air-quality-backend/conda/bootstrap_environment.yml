@@ -1,0 +1,6 @@
+name: bootstrap
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - poetry=1.8

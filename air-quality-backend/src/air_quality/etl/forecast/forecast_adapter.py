@@ -3,9 +3,9 @@ from decimal import Decimal
 import logging
 from typing import TypedDict
 from .forecast_data import ForecastData
-from database.locations import AirQualityLocation
-from etl.air_quality_index import calculator as aqi_calculator
-from etl.air_quality_index.pollutant_type import PollutantType
+from air_quality.database.locations import AirQualityLocation
+from air_quality.etl.air_quality_index import calculator as aqi_calculator
+from air_quality.etl.air_quality_index.pollutant_type import PollutantType
 
 required_pollutant_data = [
     ("o3", PollutantType.OZONE),
