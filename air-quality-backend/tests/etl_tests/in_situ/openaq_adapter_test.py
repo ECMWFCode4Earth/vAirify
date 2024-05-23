@@ -26,7 +26,7 @@ from tests.etl_tests.in_situ.mock_openaq_data import (
                     "measurement_date": datetime(
                         2024, 4, 21, 0, 0, tzinfo=timezone.utc
                     ),
-                    "meta_data": {
+                    "metadata": {
                         "entity": "Governmental Organization",
                         "sensorType": "reference grade",
                     },
@@ -51,7 +51,7 @@ from tests.etl_tests.in_situ.mock_openaq_data import (
                     "measurement_date": datetime(
                         2024, 4, 21, 0, 0, tzinfo=timezone.utc
                     ),
-                    "meta_data": {
+                    "metadata": {
                         "entity": "Governmental Organization",
                         "sensorType": "reference grade",
                     },
@@ -81,7 +81,7 @@ def test_transform_in_situ_data_input_multiple_times_returns_sorted_data():
                 "type": "Point",
             },
             "measurement_date": datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc),
-            "meta_data": {
+            "metadata": {
                 "entity": "Governmental Organization",
                 "sensorType": "reference grade",
             },
@@ -95,7 +95,7 @@ def test_transform_in_situ_data_input_multiple_times_returns_sorted_data():
                 "type": "Point",
             },
             "measurement_date": datetime(2024, 4, 21, 1, 0, tzinfo=timezone.utc),
-            "meta_data": {
+            "metadata": {
                 "entity": "Governmental Organization",
                 "sensorType": "reference grade",
             },
@@ -110,7 +110,7 @@ def test_transform_in_situ_data_input_multiple_times_returns_sorted_data():
                 "type": "Point",
             },
             "measurement_date": datetime(2024, 4, 21, 2, 0, tzinfo=timezone.utc),
-            "meta_data": {
+            "metadata": {
                 "entity": "Governmental Organization",
                 "sensorType": "reference grade",
             },
@@ -130,7 +130,7 @@ def test_transform_in_situ_data_input_multiple_cities_returns_sorted_data():
                 "type": "Point",
             },
             "measurement_date": datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc),
-            "meta_data": {
+            "metadata": {
                 "entity": "Governmental Organization",
                 "sensorType": "reference grade",
             },
@@ -145,7 +145,7 @@ def test_transform_in_situ_data_input_multiple_cities_returns_sorted_data():
                 "type": "Point",
             },
             "measurement_date": datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc),
-            "meta_data": {
+            "metadata": {
                 "entity": "Governmental Organization",
                 "sensorType": "reference grade",
             },
@@ -166,7 +166,7 @@ def test_transform_in_situ_data_input_all_five_pollutants_returns_sorted_data():
                 "type": "Point",
             },
             "measurement_date": datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc),
-            "meta_data": {
+            "metadata": {
                 "entity": "Governmental Organization",
                 "sensorType": "reference grade",
             },
