@@ -53,6 +53,7 @@ def transform_in_situ_data(in_situ_data):
 def _create_document(measurement, city_name):
     return {
         "city": city_name,
+        "api_source": "OpenAQ",
         "city_location": {
             "type": "Point",
             "coordinates": [
@@ -108,8 +109,8 @@ def _sort(in_situ_data_for_city, city_name, input_lat, input_lon):
             to_create_document = False
 
         if (
-            measurement_value != -1
-            and measurement_parameter in required_pollutant_data.keys()
+                measurement_value != -1
+                and measurement_parameter in required_pollutant_data.keys()
         ):
             formatted_cities_measurement[len(formatted_cities_measurement) - 1][
                 measurement_parameter
