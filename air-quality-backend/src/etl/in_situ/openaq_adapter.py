@@ -53,6 +53,7 @@ def transform_in_situ_data(in_situ_data):
 def _create_document(measurement, city_name):
     return {
         "city": city_name,
+        "api_source": "OpenAQ",
         "city_location": {
             "type": "Point",
             "coordinates": [
@@ -63,6 +64,10 @@ def _create_document(measurement, city_name):
         "measurement_date": datetime.strptime(
             measurement["date"]["utc"], "%Y-%m-%dT%H:%M:%S%z"
         ),
+        "metadata": {
+            "entity": measurement["entity"],
+            "sensorType": measurement["sensorType"],
+        },
     }
 
 
