@@ -1,6 +1,9 @@
 from decimal import Decimal
 import xarray as xr
-from src.etl.air_quality_index.pollutant_type import PollutantType, is_single_level
+from air_quality.etl.air_quality_index.pollutant_type import (
+    PollutantType,
+    is_single_level,
+)
 
 
 def convert_east_only_longitude_to_east_west(longitude_value: float) -> float:
@@ -53,11 +56,15 @@ class ForecastData:
         :return: values for pollutant at lat/long
         """
         dataset = self._get_data_set(pollutant_type)
-        return dataset[pollutant_type.value].interp(
-            latitude=latitude,
-            longitude=longitude,
-            method="linear",
-        ).values.tolist()
+        return (
+            dataset[pollutant_type.value]
+            .interp(
+                latitude=latitude,
+                longitude=longitude,
+                method="linear",
+            )
+            .values.tolist()
+        )
 
     def get_step_values(self):
         return self._single_level_data["step"].values

@@ -1,11 +1,11 @@
 from datetime import datetime
 import logging
-from src.etl.air_quality_index.calculator import (
+from air_quality.etl.air_quality_index.calculator import (
     get_pollutant_index_level,
     get_overall_aqi_level,
 )
-from src.etl.air_quality_index.pollutant_type import PollutantType
-from src.etl.in_situ.sort_in_situ import sort_by_distance_and_time
+from air_quality.etl.air_quality_index.pollutant_type import PollutantType
+from air_quality.etl.in_situ.sort_in_situ import sort_by_distance_and_time
 
 required_pollutant_data = {
     "o3": PollutantType.OZONE,
@@ -53,6 +53,7 @@ def transform_in_situ_data(in_situ_data):
 def _create_document(measurement, city_name):
     return {
         "city": city_name,
+        "api_source": "OpenAQ",
         "city_location": {
             "type": "Point",
             "coordinates": [
@@ -63,6 +64,10 @@ def _create_document(measurement, city_name):
         "measurement_date": datetime.strptime(
             measurement["date"]["utc"], "%Y-%m-%dT%H:%M:%S%z"
         ),
+        "metadata": {
+            "entity": measurement["entity"],
+            "sensorType": measurement["sensorType"],
+        },
     }
 
 

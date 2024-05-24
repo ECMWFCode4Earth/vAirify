@@ -26,13 +26,22 @@ def __get_base_request_body(model_date_time: CamsModelDateTime) -> dict:
 
 def get_single_level_request_body(model_date_time: CamsModelDateTime) -> dict:
     base_request = __get_base_request_body(model_date_time)
-    base_request["variable"] = ["particulate_matter_10um", "particulate_matter_2.5um"]
+    base_request["variable"] = [
+        "particulate_matter_10um",
+        "particulate_matter_2.5um",
+        "surface_pressure",
+    ]
     return base_request
 
 
 def get_multi_level_request_body(model_date_time: CamsModelDateTime) -> dict:
     base_request = __get_base_request_body(model_date_time)
-    base_request["variable"] = ["nitrogen_dioxide", "ozone", "sulphur_dioxide"]
+    base_request["variable"] = [
+        "nitrogen_dioxide",
+        "ozone",
+        "sulphur_dioxide",
+        "temperature",
+    ]
     base_request["model_level"] = "137"
     return base_request
 
@@ -83,4 +92,26 @@ def fetch_forecast_data(
         ),
     ]
     results = [fetch_cams_data(*params) for params in task_params]
+
+    # convert the mass mixing ratios to mass concentrations
+    # get pressure on model level 137 from surface pressure
+    # https://confluence.ecmwf.int/display/CKB/ERA5%3A+compute+pressure+and+geopotential
+    # +on+model+levels%2C+geopotential+height+and+geometric+height
+    p_half_above = 0 + 0.997630 * results[0]["sp"]
+    p_half_below = 0 + 1.0 * results[0]["sp"]
+    p_ml = (p_half_above + p_half_below) / 2
+    # surface density: rho = p_ml / (R * T)
+    rho = p_ml / (287.0 * results[1]["t"])
+    for result in results:
+        for variable in result.variables:
+            if result[variable].attrs.get("units") == "kg kg**-1":
+                result[variable] *= rho
+                result[variable].attrs["units"] = "kg m**-3"
+                logging.debug(
+                    f"Updated: {variable}, from units: 'kg kg**-1' to 'kg m**-3'."
+                )
+
+    results[0] = results[0].drop_vars(["sp"])
+    results[1] = results[1].drop_vars(["t"])
+
     return ForecastData(*results)

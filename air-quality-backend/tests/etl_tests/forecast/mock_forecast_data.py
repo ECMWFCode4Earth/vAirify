@@ -100,6 +100,29 @@ so2 = create_test_pollutant_data_with_defaults(
     ]
 )
 
+t = create_test_pollutant_data_with_defaults(
+    values=[
+        0.0000011,
+        None,
+        None,
+        None,
+        0.000001125,
+        None,
+        None,
+        None,
+        0.00000115,
+        0.0000012,
+        None,
+        None,
+        None,
+        0.000001625,
+        None,
+        None,
+        None,
+        0.00000125,
+    ]
+)
+
 
 pm2p5 = create_test_pollutant_data_with_defaults(
     values=[
@@ -148,13 +171,36 @@ pm10 = create_test_pollutant_data_with_defaults(
     ]
 )
 
+sp = create_test_pollutant_data_with_defaults(
+    values=[
+        0.0000013,
+        None,
+        None,
+        None,
+        0.000001325,
+        None,
+        None,
+        None,
+        0.00000135,
+        0.0000012,
+        None,
+        None,
+        None,
+        0.000001425,
+        None,
+        None,
+        None,
+        0.00000145,
+    ]
+)
+
 
 single_level_data_set = xarray.Dataset(
     coords=dict(time=default_time, step=default_steps, valid_time=default_valid_time),
-    data_vars=dict(pm2p5=pm2p5, pm10=pm10),
+    data_vars=dict(pm2p5=pm2p5, pm10=pm10, sp=sp),
 )
 
 multi_level_data_set = xarray.Dataset(
     coords=dict(time=default_time, step=default_steps, valid_time=default_valid_time),
-    data_vars=dict(no2=no2, go3=go3, so2=so2),
+    data_vars=dict(no2=no2, go3=go3, so2=so2, t=t),
 )

@@ -2,12 +2,12 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import logging
 from logging import config
-from src.database.locations import get_locations_by_type
-from src.database.in_situ import insert_data
-from src.etl.in_situ.openaq_dao import fetch_in_situ_measurements
-from src.etl.in_situ.openaq_adapter import transform_in_situ_data
+from air_quality.database.locations import get_locations_by_type
+from air_quality.database.in_situ import insert_data
+from air_quality.etl.in_situ.openaq_dao import fetch_in_situ_measurements
+from air_quality.etl.in_situ.openaq_adapter import transform_in_situ_data
 
-config.fileConfig("../logging.ini")
+config.fileConfig("./logging.ini")
 
 
 def main():

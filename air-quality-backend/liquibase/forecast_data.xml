@@ -12,7 +12,7 @@
     <mongodb:createCollection collectionName="forecast_data"/>
     <mongodb:createIndex collectionName="forecast_data">
       <mongodb:keys>
-        { forecast_base_time: 1, forecast_valid_time: 1, location_type: 1, name: 1, source: 1 }
+        { forecast_valid_time: 1, forecast_base_time: 1, location_type: 1, name: 1, source: 1 }
       </mongodb:keys>
       <mongodb:options>
         {unique: true, name: "uniq_forecast_idx"}

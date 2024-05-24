@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from src.api.main import app
+from air_quality.api.main import app
 
 client = TestClient(app)
 
