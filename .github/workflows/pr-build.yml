@@ -23,10 +23,10 @@ jobs:
         filters: |
           etl:
             - 'air-quality-backend/src/air_quality/etl/**'
-            - 'air-quality-backend/tests/etl_tests/**'
+            - 'air-quality-backend/tests/etl/**'
           api:
             - 'air-quality-backend/src/air_quality/api/**'
-            - 'air-quality-backend/tests/api_tests/**'
+            - 'air-quality-backend/tests/api/**'
 
   pr-checks:
     needs: detect-change-scope
@@ -55,12 +55,12 @@ jobs:
         working-directory: ./air-quality-backend
         
       - name: Run etl unit tests
-        run: python -m pytest --cov=src/air_quality/etl --cov=scripts --cov-report= --cov-append tests/etl_tests
+        run: python -m pytest --cov=src/air_quality/etl --cov=scripts --cov-report= --cov-append tests/etl
         if: ${{ needs.detect-change-scope.outputs.etl == 'true' }}
         working-directory: ./air-quality-backend
 
       - name: Run api unit tests
-        run: python -m pytest --cov=src/air_quality/api --cov-report= --cov-append tests/api_tests
+        run: python -m pytest --cov=src/air_quality/api --cov-report= --cov-append tests/api
         if: ${{ needs.detect-change-scope.outputs.api == 'true' }}
         working-directory: ./air-quality-backend
 
