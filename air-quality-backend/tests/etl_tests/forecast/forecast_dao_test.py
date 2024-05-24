@@ -67,7 +67,11 @@ def test__get_single_level_request_body():
             "117",
             "120",
         ],
-        "variable": ["particulate_matter_10um", "particulate_matter_2.5um"],
+        "variable": [
+            "particulate_matter_10um",
+            "particulate_matter_2.5um",
+            "surface_pressure",
+        ],
     }
 
 
@@ -121,7 +125,7 @@ def test__get_multi_level_request_body():
             "117",
             "120",
         ],
-        "variable": ["nitrogen_dioxide", "ozone", "sulphur_dioxide"],
+        "variable": ["nitrogen_dioxide", "ozone", "sulphur_dioxide", "temperature"],
         "model_level": "137",
     }
 
