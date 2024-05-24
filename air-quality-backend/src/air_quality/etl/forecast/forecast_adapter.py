@@ -77,7 +77,7 @@ def transform(forecast_data: ForecastData, location: AirQualityLocation) -> list
         pollutant_data = {}
         for name, pollutant_type in required_pollutant_data:
             forecast_data = forecast_data_by_type[pollutant_type]
-            pollutant_data[name] = {
+            pollutant_data[pollutant_type.value] = {
                 "aqi_level": forecast_data["aqi_values"][i],
                 "value": forecast_data["values_ug_m3"][i],
             }

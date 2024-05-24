@@ -1,11 +1,7 @@
 from datetime import datetime
+from functools import reduce
 import logging
-from air_quality.etl.air_quality_index.calculator import (
-    get_pollutant_index_level,
-    get_overall_aqi_level,
-)
 from air_quality.etl.air_quality_index.pollutant_type import PollutantType
-from air_quality.etl.in_situ.sort_in_situ import sort_by_distance_and_time
 
 required_pollutant_data = {
     "o3": PollutantType.OZONE,
@@ -16,113 +12,63 @@ required_pollutant_data = {
 }
 
 
-def _extract_pollutants(data):
-    output = []
-    for pollutant in required_pollutant_data.keys():
-        output.append(data[pollutant]["aqi_level"])
-    return output
+def measurement_value_is_positive(measurement):
+    return measurement["value"] > 0
 
 
-def _calculate_overall_aqi_value(formatted_dataset):
-    for data in formatted_dataset:
-        if all(item in data.keys() for item in required_pollutant_data.keys()):
-            data["overall_aqi_level"] = get_overall_aqi_level(_extract_pollutants(data))
-    return formatted_dataset
-
-
-def transform_in_situ_data(in_situ_data):
-    formatted_dataset = []
-    for city_name, city_data in in_situ_data.items():
-        city = city_data["city"]
-        measurements = city_data["measurements"]
-        if len(measurements) > 0:
-            formatted_dataset.extend(
-                _sort(
-                    measurements,
-                    city_name,
-                    city["latitude"],
-                    city["longitude"],
-                )
-            )
-        else:
-            logging.debug(f"No in situ measurements found for {city_name}")
-
-    return _calculate_overall_aqi_value(formatted_dataset)
-
-
-def _create_document(measurement, city_name):
+def _create_document(measurement, city_name, location_type):
     return {
-        "city": city_name,
         "api_source": "OpenAQ",
-        "city_location": {
+        "measurement_date": datetime.strptime(
+            measurement["date"]["utc"], "%Y-%m-%dT%H:%M:%S%z"
+        ),
+        "city": city_name,
+        "location_type": location_type,
+        "location_name": measurement["location"],
+        "location": {
             "type": "Point",
             "coordinates": [
                 measurement["coordinates"]["longitude"],
                 measurement["coordinates"]["latitude"],
             ],
         },
-        "measurement_date": datetime.strptime(
-            measurement["date"]["utc"], "%Y-%m-%dT%H:%M:%S%z"
-        ),
         "metadata": {
             "entity": measurement["entity"],
-            "sensorType": measurement["sensorType"],
+            "sensor_type": measurement["sensorType"],
         },
     }
 
 
-def _sort(in_situ_data_for_city, city_name, input_lat, input_lon):
-    formatted_cities_measurement = []
-    sorted_cities_measurement = sort_by_distance_and_time(
-        in_situ_data_for_city, input_lat, input_lon
-    )
+def combine_measurement(state, measurement):
+    key = f"{measurement['location']}_{measurement['date']['utc']}"
+    results = state["results"]
+    if key not in results:
+        results[key] = _create_document(
+            measurement, state["city"], state["location_type"]
+        )
+    measurement_value = measurement["value"]
+    measurement_parameter = measurement["parameter"]
+    measurement_parameter_key = required_pollutant_data[measurement_parameter]
+    results[key][measurement_parameter_key.value] = measurement_value
+    return state
 
-    chosen_place = ""
-    current_time = ""
-    to_create_document = True
 
-    for i in range(0, len(sorted_cities_measurement)):
-        measurement = sorted_cities_measurement[i]
-        measurement_location = measurement["location"]
-        measurement_date = measurement["date"]["utc"]
-        measurement_value = measurement["value"]
-        measurement_parameter = measurement["parameter"]
-
-        if measurement_location != chosen_place and i != 0:
-            # Taking all data from first location
-            # when the location changes, we have all data and can end.
-            return formatted_cities_measurement
-
-        elif measurement_date != current_time and i != 0:
-            # if time of measurement changes then we check if the created doc
-            # is missing all data and if it is we can just delete it.
-            length_of_formatted_list = len(formatted_cities_measurement) - 1
-            if len(formatted_cities_measurement[length_of_formatted_list].keys()) <= 3:
-                # logging.debug(formatted_cities_measurement[length_of_formatted_list])
-                formatted_cities_measurement.pop(length_of_formatted_list)
-            to_create_document = True
-
-        if to_create_document:
-            # Creates database document if the time in current_time
-            # and sorted_cities_measurement[i]["date"]["utc"] has changed.
-            chosen_place = measurement_location
-            current_time = measurement_date
-            formatted_cities_measurement.append(
-                _create_document(measurement, city_name)
+def transform_in_situ_data(in_situ_data):
+    formatted_dataset = []
+    for city_name, city_data in in_situ_data.items():
+        city = city_data["city"]
+        measurements_for_city = city_data["measurements"]
+        if len(measurements_for_city) > 0:
+            filtered_measurements = filter(
+                measurement_value_is_positive, measurements_for_city
             )
-            to_create_document = False
+            grouped_measurements = reduce(
+                combine_measurement,
+                filtered_measurements,
+                {"city": city["name"], "location_type": city["type"], "results": {}},
+            )["results"]
+            formatted_dataset.extend(list(grouped_measurements.values()))
+        else:
+            logging.info(f"No in situ measurements found for {city_name}")
 
-        if (
-            measurement_value != -1
-            and measurement_parameter in required_pollutant_data.keys()
-        ):
-            formatted_cities_measurement[len(formatted_cities_measurement) - 1][
-                measurement_parameter
-            ] = {
-                "aqi_level": get_pollutant_index_level(
-                    measurement_value,
-                    required_pollutant_data[measurement_parameter],
-                ),
-                "value": measurement_value,
-            }
-    return formatted_cities_measurement
+    return formatted_dataset
