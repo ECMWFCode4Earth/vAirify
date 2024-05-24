@@ -4,7 +4,7 @@ from .mongo_db_operations import get_collection, upsert_data
 
 
 def insert_data(data):
-    upsert_data("in_situ_data", ["measurement_date", "city"], data)
+    upsert_data("in_situ_data", ["measurement_date", "name", "location_name"], data)
 
 
 def delete_data_before(measurement_date: datetime):

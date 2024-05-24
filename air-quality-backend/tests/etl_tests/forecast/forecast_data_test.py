@@ -49,11 +49,27 @@ def test__get_pollutant_data_for_lat_long(latitude: float, longitude: float, exp
         longitudes=[0, 90, 270],
         values=[2, 4, 1, 4, 8, 2, 8, 10, 4],
     )
-    dataset = xarray.Dataset(
-        coords=dict(step=[24]),
-        data_vars=dict(no2=input_data),
+    sp = create_test_pollutant_data(
+        steps=[24],
+        latitudes=[-10, 0, 10],
+        longitudes=[0, 90, 270],
+        values=[1, 1, 1, 1, 1, 1, 1, 1, 1],
     )
-    forecast_data = ForecastData(dataset, dataset)
+    t = create_test_pollutant_data(
+        steps=[24],
+        latitudes=[-10, 0, 10],
+        longitudes=[0, 90, 270],
+        values=[1, 1, 1, 1, 1, 1, 1, 1, 1],
+    )
+    single_level = xarray.Dataset(
+        coords=dict(step=[24]),
+        data_vars=dict(pm2p5=input_data, sp=sp),
+    )
+    multi_level = xarray.Dataset(
+        coords=dict(step=[24]),
+        data_vars=dict(no2=input_data, t=t),
+    )
+    forecast_data = ForecastData(single_level, multi_level)
     result = forecast_data.get_pollutant_data_for_lat_long(
         latitude, longitude, PollutantType.NITROGEN_DIOXIDE
     )

@@ -31,11 +31,12 @@ def call_openaq_api(city, date_from: datetime, date_to: datetime) -> list:
     }
     url = base_url + "?" + urlencode(query_params, doseq=True)
     headers = {"X-API-Key": os.environ.get("OPEN_AQ_API_KEY")}
+    logging.debug(f"Calling OpenAQ: {url}")
     response_json = requests.get(url, headers=headers).json()
     if response_json.get("results") is not None:
         return response_json["results"]
     else:
-        logging.warn(f"Response contained no results: {response_json}")
+        logging.warning(f"Response contained no results: {response_json}")
         return []
 
 

@@ -12,18 +12,10 @@
     <mongodb:createCollection collectionName="in_situ_data"/>
     <mongodb:createIndex collectionName="in_situ_data">
       <mongodb:keys>
-        { measurement_date: 1, city: 1}
+        { measurement_date: 1, name: 1, location_name: 1 }
       </mongodb:keys>
       <mongodb:options>
-        {unique: true, name: "measurement_date_1_city_1"}
-      </mongodb:options>
-    </mongodb:createIndex>
-    <mongodb:createIndex collectionName="in_situ_data">
-      <mongodb:keys>
-        { city_location: "2dsphere" }
-      </mongodb:keys>
-      <mongodb:options>
-        { name: "city_location_2dsphere" }
+        {unique: true, name: "uniq_in_situ_idx"}
       </mongodb:options>
     </mongodb:createIndex>
   </changeSet>
