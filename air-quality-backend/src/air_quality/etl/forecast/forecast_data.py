@@ -42,7 +42,7 @@ def convert_mmr_to_mass_concentration(
     return single_level_data, multi_level_data
 
 
-def convert_dataset(dataset: xr.Dataset) -> xr.Dataset:
+def convert_longitude(dataset: xr.Dataset) -> xr.Dataset:
     converted_data = dataset.assign_coords(
         longitude=list(
             map(
@@ -71,8 +71,8 @@ class ForecastData:
         single, multi = convert_mmr_to_mass_concentration(
             single_level_data, multi_level_data
         )
-        self._single_level_data = convert_dataset(single)
-        self._multi_level_data = convert_dataset(multi)
+        self._single_level_data = convert_longitude(single)
+        self._multi_level_data = convert_longitude(multi)
         # Eager load datasets for quicker access
         self._single_level_data.load()
         self._multi_level_data.load()
