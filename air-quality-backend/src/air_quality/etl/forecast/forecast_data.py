@@ -30,6 +30,15 @@ def convert_dataset(dataset: xr.Dataset) -> xr.Dataset:
     return converted_data
 
 
+pollutant_data_map = {
+    PollutantType.OZONE: "go3",
+    PollutantType.NITROGEN_DIOXIDE: "no2",
+    PollutantType.SULPHUR_DIOXIDE: "so2",
+    PollutantType.PARTICULATE_MATTER_10: "pm10",
+    PollutantType.PARTICULATE_MATTER_2_5: "pm2p5",
+}
+
+
 class ForecastData:
     def __init__(self, single_level_data: xr.Dataset, multi_level_data: xr.Dataset):
         self._single_level_data = convert_dataset(single_level_data)
@@ -57,7 +66,7 @@ class ForecastData:
         """
         dataset = self._get_data_set(pollutant_type)
         return (
-            dataset[pollutant_type.value]
+            dataset[pollutant_data_map[pollutant_type]]
             .interp(
                 latitude=latitude,
                 longitude=longitude,

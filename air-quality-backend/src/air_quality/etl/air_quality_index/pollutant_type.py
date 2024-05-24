@@ -3,8 +3,8 @@ from enum import Enum
 
 class PollutantType(Enum):
     NITROGEN_DIOXIDE = "no2"
-    OZONE = "go3"
-    PARTICULATE_MATTER_2_5 = "pm2p5"
+    OZONE = "o3"
+    PARTICULATE_MATTER_2_5 = "pm2_5"
     PARTICULATE_MATTER_10 = "pm10"
     SULPHUR_DIOXIDE = "so2"
 

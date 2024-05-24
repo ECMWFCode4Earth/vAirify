@@ -7,14 +7,6 @@ from air_quality.database.locations import AirQualityLocation
 from air_quality.etl.air_quality_index import calculator as aqi_calculator
 from air_quality.etl.air_quality_index.pollutant_type import PollutantType
 
-required_pollutant_data = [
-    ("o3", PollutantType.OZONE),
-    ("no2", PollutantType.NITROGEN_DIOXIDE),
-    ("so2", PollutantType.SULPHUR_DIOXIDE),
-    ("pm10", PollutantType.PARTICULATE_MATTER_10),
-    ("pm2_5", PollutantType.PARTICULATE_MATTER_2_5),
-]
-
 
 class PollutantData(TypedDict):
     values_ug_m3: list[float]
@@ -75,7 +67,7 @@ def transform(forecast_data: ForecastData, location: AirQualityLocation) -> list
         overall_aqi_value = _get_overall_aqi_value_for_slice(forecast_data_by_type, i)
 
         pollutant_data = {}
-        for name, pollutant_type in required_pollutant_data:
+        for pollutant_type in PollutantType:
             forecast_data = forecast_data_by_type[pollutant_type]
             pollutant_data[pollutant_type.value] = {
                 "aqi_level": forecast_data["aqi_values"][i],

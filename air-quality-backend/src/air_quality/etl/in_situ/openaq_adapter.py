@@ -22,7 +22,7 @@ def _create_document(measurement, city_name, location_type):
         "measurement_date": datetime.strptime(
             measurement["date"]["utc"], "%Y-%m-%dT%H:%M:%S%z"
         ),
-        "city": city_name,
+        "name": city_name,
         "location_type": location_type,
         "location_name": measurement["location"],
         "location": {
