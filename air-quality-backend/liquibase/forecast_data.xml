@@ -18,13 +18,5 @@
         {unique: true, name: "uniq_forecast_idx"}
       </mongodb:options>
     </mongodb:createIndex>
-    <mongodb:createIndex collectionName="forecast_data">
-      <mongodb:keys>
-        { location: "2dsphere" }
-      </mongodb:keys>
-      <mongodb:options>
-        { name: "location_2dsphere" }
-      </mongodb:options>
-    </mongodb:createIndex>
   </changeSet>
 </databaseChangeLog>
