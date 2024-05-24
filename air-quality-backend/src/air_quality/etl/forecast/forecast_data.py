@@ -1,4 +1,5 @@
 from decimal import Decimal
+import logging
 import xarray as xr
 from air_quality.etl.air_quality_index.pollutant_type import (
     PollutantType,
@@ -13,6 +14,32 @@ def convert_east_only_longitude_to_east_west(longitude_value: float) -> float:
     if 180 < longitude_value <= 360:
         return float(Decimal(str(longitude_value)) - Decimal("360"))
     return longitude_value
+
+
+def convert_mmr_to_mass_concentration(
+    single_level_data: xr.Dataset, multi_level_data: xr.Dataset
+):
+    # convert the mass mixing ratios to mass concentrations
+    # get pressure on model level 137 from surface pressure
+    # https://confluence.ecmwf.int/display/CKB/ERA5%3A+compute+pressure+and+geopotential
+    # +on+model+levels%2C+geopotential+height+and+geometric+height
+    p_half_above = 0 + 0.997630 * single_level_data["sp"]
+    p_half_below = 0 + 1.0 * single_level_data["sp"]
+    p_ml = (p_half_above + p_half_below) / 2
+    # surface density: rho = p_ml / (R * T)
+    rho = p_ml / (287.0 * multi_level_data["t"])
+    for result in [single_level_data, multi_level_data]:
+        for variable in result.variables:
+            if result[variable].attrs.get("units") == "kg kg**-1":
+                result[variable] *= rho
+                result[variable].attrs["units"] = "kg m**-3"
+                logging.debug(
+                    f"Updated: {variable}, from units: 'kg kg**-1' to 'kg m**-3'."
+                )
+
+    single_level_data = single_level_data.drop_vars(["sp"])
+    multi_level_data = multi_level_data.drop_vars(["t"])
+    return single_level_data, multi_level_data
 
 
 def convert_dataset(dataset: xr.Dataset) -> xr.Dataset:
@@ -41,8 +68,11 @@ pollutant_data_map = {
 
 class ForecastData:
     def __init__(self, single_level_data: xr.Dataset, multi_level_data: xr.Dataset):
-        self._single_level_data = convert_dataset(single_level_data)
-        self._multi_level_data = convert_dataset(multi_level_data)
+        single, multi = convert_mmr_to_mass_concentration(
+            single_level_data, multi_level_data
+        )
+        self._single_level_data = convert_dataset(single)
+        self._multi_level_data = convert_dataset(multi)
         # Eager load datasets for quicker access
         self._single_level_data.load()
         self._multi_level_data.load()
