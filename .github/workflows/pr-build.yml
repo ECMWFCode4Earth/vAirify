@@ -53,6 +53,10 @@ jobs:
       - name: Run lint check
         run: python -m flake8 --append-config .flake8
         working-directory: ./air-quality-backend
+
+      - name: Run database unit tests
+        run: python -m pytest --cov=src/air_quality/database --cov-report= --cov-append tests/database
+        working-directory: ./air-quality-backend
         
       - name: Run etl unit tests
         run: python -m pytest --cov=src/air_quality/etl --cov=scripts --cov-report= --cov-append tests/etl
@@ -66,12 +70,10 @@ jobs:
 
       - name: Convert to report 
         run: coverage xml
-        if: ${{ needs.detect-change-scope.outputs.etl == 'true' || needs.detect-change-scope.outputs.api == 'true' }}
         working-directory: ./air-quality-backend
 
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1
-        if: ${{ needs.detect-change-scope.outputs.etl == 'true' || needs.detect-change-scope.outputs.api == 'true' }}
         with:
             coverageFile: ./air-quality-backend/coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
