@@ -13,7 +13,10 @@ def mock_collection():
 
 @freeze_time("2024-05-24")
 def test__insert_new_data(mock_collection):
-    with patch('air_quality.database.mongo_db_operations.get_collection', return_value=mock_collection):
+    with patch(
+        "air_quality.database.mongo_db_operations.get_collection",
+        return_value=mock_collection,
+    ):
         date = datetime.now()
         in_situ_1 = {
             "measurement_date": date,
@@ -34,7 +37,9 @@ def test__insert_new_data(mock_collection):
 
 
 def test__delete_data_before(mock_collection):
-    with patch('air_quality.database.in_situ.get_collection', return_value=mock_collection):
+    with patch(
+        "air_quality.database.in_situ.get_collection", return_value=mock_collection
+    ):
         in_situ = {
             "name": "location1",
             "location_name": "API",

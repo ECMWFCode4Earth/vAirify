@@ -13,7 +13,10 @@ def mock_collection():
 
 @freeze_time("2024-05-24")
 def test__insert_new_data(mock_collection):
-    with patch('air_quality.database.mongo_db_operations.get_collection', return_value=mock_collection):
+    with patch(
+        "air_quality.database.mongo_db_operations.get_collection",
+        return_value=mock_collection,
+    ):
         date = datetime.now()
         forecast_1 = {
             "forecast_base_time": date,
@@ -37,7 +40,9 @@ def test__insert_new_data(mock_collection):
 
 
 def test__delete_data_before(mock_collection):
-    with patch('air_quality.database.forecasts.get_collection', return_value=mock_collection):
+    with patch(
+        "air_quality.database.forecasts.get_collection", return_value=mock_collection
+    ):
         forecast = {
             "forecast_base_time": datetime.now(),
             "location_type": "city",
