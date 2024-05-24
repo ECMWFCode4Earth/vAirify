@@ -53,7 +53,7 @@ def combine_measurement(state, measurement):
     return state
 
 
-def transform_in_situ_data(in_situ_data):
+def transform(in_situ_data):
     formatted_dataset = []
     for city_name, city_data in in_situ_data.items():
         city = city_data["city"]
