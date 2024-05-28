@@ -20,26 +20,27 @@ def upsert_data(collection_name: str, keys: list[str], data):
     update_operations = [
         UpdateOne(
             {key: doc[key] for key in keys},
-            [
-                {
-                    "$set": {
-                        "last_modified_time": now,
-                        "created_time": {
-                            "$cond": [
-                                {"$not": ["$created_time"]},
-                                now,
-                                "$created_time",
-                            ]
-                        },
-                        **doc,
-                    }
+            {
+                "$set": {
+                    "last_modified_time": now,
+                    **doc,
                 }
-            ],
+            },
             upsert=True,
         )
         for doc in data
     ]
     result = collection.bulk_write(update_operations)
+    inserted = result.upserted_ids.values()
+    if len(inserted) > 0:
+        id_operations = [
+            UpdateOne(
+                {"_id": doc_id},
+                {"$set": {"created_time": now}},
+            )
+            for doc_id in inserted
+        ]
+        collection.bulk_write(id_operations)
     logging.info(
         f"{result.upserted_count} documents upserted, {result.modified_count} modified"
     )
