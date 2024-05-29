@@ -16,20 +16,34 @@ from .mock_forecast_data import (
 @pytest.mark.parametrize(
     "field, expected",
     [
-        ("name", ["Dublin", "Dublin"]),
-        ("location", {"coordinates": [0, -10], "type": "Point"}),
+        ("name", ["Dublin", "Dublin", "London", "London"]),
+        (
+            "location",
+            [
+                {"coordinates": [0, -10], "type": "Point"},
+                {"coordinates": [0, -10], "type": "Point"},
+                {"coordinates": [10, 0], "type": "Point"},
+                {"coordinates": [10, 0], "type": "Point"},
+            ],
+        ),
         (
             "forecast_valid_time",
-            [datetime(2024, 4, 23, 0, 0), datetime(2024, 4, 24, 0, 0)],
+            [
+                datetime(2024, 4, 23, 0, 0),
+                datetime(2024, 4, 24, 0, 0),
+                datetime(2024, 4, 23, 0, 0),
+                datetime(2024, 4, 24, 0, 0),
+            ],
         ),
         ("forecast_base_time", datetime.utcfromtimestamp(default_time)),
-        ("forecast_range", [24, 48]),
+        ("forecast_range", [24, 48, 24, 48]),
         ("source", "cams-production"),
     ],
 )
 def test__transform__returns_correct_values(field, expected):
     input_data = ForecastData(single_level_data_set, multi_level_data_set)
-    results = transform(input_data, default_test_cities[0:1])
+    dublin_and_london = default_test_cities[0:2]
+    results = transform(input_data, dublin_and_london)
     if isinstance(expected, list):
         assert list(map(lambda x: x[field], results)) == expected
     else:

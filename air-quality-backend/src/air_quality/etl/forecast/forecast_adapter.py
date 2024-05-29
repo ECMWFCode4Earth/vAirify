@@ -57,7 +57,6 @@ def transform(forecast_data: ForecastData, locations: list[AirQualityLocation]) 
     pollutant_data_with_location = forecast_data.get_pollutant_data_for_locations(
         locations, list(PollutantType)
     )
-    logging.debug(f"Pollutant data with location: {len(pollutant_data_with_location)}")
 
     valid_time_values = forecast_data.get_valid_time_values()
     step_values = forecast_data.get_step_values()
