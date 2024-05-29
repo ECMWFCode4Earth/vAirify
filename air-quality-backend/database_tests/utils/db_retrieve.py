@@ -7,18 +7,29 @@ db = client['air_quality_dashboard_db_max']
 collection = db['forecast_data']
 documents = collection.find()
 # our query
-query = {"name": "Vancouver"}
+query = {}
 document_query = collection.find(query)
 
 # what we allow
 allowed_aqi_indexes = {1, 2, 3, 4, 5, 6}
 overall_aqi_value_key = "overall_aqi_level"
+location_type_key = "location_type"
+allowed_location_type = "city"
 
 for documents in document_query:
-    print(documents)
+    # print(documents)
 
+    # only allowing certain values inside overall_aqi_level
     if overall_aqi_value_key in documents:
         value = documents[overall_aqi_value_key]
         assert value in allowed_aqi_indexes, "1 - 6 is allowed as a value here"
     else:
-        raise KeyError(f"Document is missing key!")
+        raise KeyError(f"A document is missing the overall_aqi_level key!")
+
+    # location_type only allowing city as a value
+
+    if location_type_key in documents:
+        value = documents[location_type_key]
+        assert value in allowed_location_type, "Only City is allowed as a location type"
+    else:
+        raise KeyError(f" A document is missing location_type key!")
