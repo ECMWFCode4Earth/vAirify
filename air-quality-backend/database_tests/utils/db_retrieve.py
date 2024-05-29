@@ -10,14 +10,13 @@ documents = collection.find()
 query = {}
 document_query = collection.find(query)
 
-# what we allow
+# keys and allowed values
 allowed_aqi_indexes = {1, 2, 3, 4, 5, 6}
 overall_aqi_value_key = "overall_aqi_level"
 location_type_key = "location_type"
 allowed_location_type = "city"
 
 for documents in document_query:
-    # print(documents)
 
     # only allowing certain values inside overall_aqi_level
     if overall_aqi_value_key in documents:
@@ -33,3 +32,4 @@ for documents in document_query:
         assert value in allowed_location_type, "Only City is allowed as a location type"
     else:
         raise KeyError(f" A document is missing location_type key!")
+
