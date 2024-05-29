@@ -2,6 +2,7 @@ import os
 from decimal import Decimal
 
 import xarray
+from pandas import read_csv
 from pymongo import MongoClient
 
 
@@ -100,25 +101,27 @@ def get_raw_cams_data(
         )
 
 
-def get_database_data(query: dict):
+def get_database_data(query: dict, collection_name: str, exclude: dict):
     uri = os.environ.get("MONGO_DB_URI")
     db_name = os.environ.get("MONGO_DB_NAME")
     client = MongoClient(uri)
-    collection = client[db_name]["forecast_data"]
-    exclude = {"_id": 0, "city_location": 0, "last_modified_time": 0}
+    collection = client[db_name][collection_name]
     cursor = collection.find(query, exclude)
-
-    print("\nFetching forecast data from Mongo DB database: {}\n".format(db_name))
-    for doc in cursor:
-        formatted_doc = (
-            f"Measurement date: {doc['measurement_date']}\n"
-            f"no2: {doc['no2']}\n"
-            f"go3: {doc['o3']}\n"
-            f"pm10: {doc['pm10']}\n"
-            f"pm2p5: {doc['pm2_5']}\n"
-            f"so2: {doc['so2']}"
-        )
-        print("{}\n".format(formatted_doc))
+    for document in cursor:
+        document_as_dictionary = {
+            "name": document["name"],
+            "created_time": document["created_time"],
+            "last_modified_time": document["last_modified_time"],
+            "forecast_base_time": document["forecast_base_time"],
+            "forecast_range": document["forecast_range"],
+            "forecast_valid_time": document["forecast_valid_time"],
+            "o3_value": document["o3"]["value"],
+            "so2_value": document["so2"]["value"],
+            "no2_value": document["no2"]["value"],
+            "pm10_value": document["pm10"]["value"],
+            "pm2_5_value": document["pm2_5"]["value"],
+        }
+        print(document_as_dictionary)
     client.close()
 
 
@@ -172,3 +175,31 @@ def longitude_calculator_for_cams_data(
         return float(Decimal(str(longitude_value)) + Decimal("360"))
     else:
         return longitude_value
+
+
+def get_location_name_from_locations_dict(countries_list: list[dict], location_id: str):
+    for entry in countries_list:
+        if entry["id"] == location_id:
+            return entry["city"]
+
+
+def convert_cams_locations_file_to_dict(cams_locations_file_name: str) -> list[dict]:
+    dataframe = read_csv(cams_locations_file_name)
+    to_include = ["id", "city"]
+    streamlined_dataframe = dataframe[to_include]
+    return streamlined_dataframe.to_dict("records")
+
+
+def get_ecmwf_forecast_to_dict_for_countries(
+    ecmwf_forecast_file_name: str,
+) -> list[dict]:
+    ecmwf_countries_dict = convert_cams_locations_file_to_dict("CAMS_locations_V1.csv")
+
+    list_of_records = read_csv(ecmwf_forecast_file_name).to_dict("records")
+    for record in list_of_records:
+        location_id = record["location_id"]
+        record["location_name"] = get_location_name_from_locations_dict(
+            ecmwf_countries_dict, location_id
+        )
+    print(list_of_records)
+    return list_of_records
