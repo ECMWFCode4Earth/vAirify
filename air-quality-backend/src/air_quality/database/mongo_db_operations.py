@@ -14,6 +14,7 @@ def get_collection(name: str):
 def upsert_data(collection_name: str, keys: list[str], data):
     if len(data) == 0:
         return
+    logging.info(f"Persisting {len(data)} documents")
     collection = get_collection(collection_name)
     now = datetime.utcnow()
 

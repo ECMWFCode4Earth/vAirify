@@ -8,9 +8,7 @@ base_url = "https://api.waqi.info/feed"
 
 
 def fetch_in_situ_measurement(lat: float, long: float):
-    query_params = {
-        "token": os.environ.get("AQI_CN_API_TOKEN")
-    }
+    query_params = {"token": os.environ.get("AQI_CN_API_TOKEN")}
     url = f"{base_url}/geo:{lat};{long}?{urlencode(query_params, doseq=True)}"
     logging.info(f"Calling aqicn geo feed: {url}")
     response_json = requests.get(url).json()
