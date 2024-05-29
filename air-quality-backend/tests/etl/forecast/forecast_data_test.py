@@ -38,7 +38,7 @@ def test__convert_longitude_east_range(longitude: float, expected: float):
         (8.75, 60.0, [9]),
     ],
 )
-def test__get_pollutant_data_for_lat_long(latitude: float, longitude: float, expected):
+def test__get_pollutant_data_for_locations(latitude: float, longitude: float, expected):
     #      -90  0  90
     # -10    1  2   4
     #   0    2  4   8
@@ -70,7 +70,14 @@ def test__get_pollutant_data_for_lat_long(latitude: float, longitude: float, exp
         data_vars=dict(no2=input_data, t=t),
     )
     forecast_data = ForecastData(single_level, multi_level)
-    result = forecast_data.get_pollutant_data_for_lat_long(
-        latitude, longitude, PollutantType.NITROGEN_DIOXIDE
+    location = {
+        "name": "test",
+        "type": "test",
+        "latitude": latitude,
+        "longitude": longitude,
+    }
+    result = forecast_data.get_pollutant_data_for_locations(
+        [location],
+        [PollutantType.NITROGEN_DIOXIDE],
     )
-    assert result == expected
+    assert result == [(location, {PollutantType.NITROGEN_DIOXIDE: expected})]

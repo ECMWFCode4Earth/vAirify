@@ -1,6 +1,4 @@
-from concurrent.futures import ThreadPoolExecutor
 from dotenv import load_dotenv
-from itertools import chain
 import logging
 from logging import config
 from air_quality.database.locations import get_locations_by_type
@@ -21,12 +19,7 @@ def main():
     extracted_forecast_data = fetch_forecast_data()
 
     logging.info("Transforming forecast data")
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        futures = [
-            executor.submit(transform, extracted_forecast_data, city) for city in cities
-        ]
-        results = [future.result() for future in futures]
-    transformed_forecast_data = list(chain.from_iterable(results))
+    transformed_forecast_data = transform(extracted_forecast_data, cities)
 
     logging.info("Persisting forecast data")
     insert_data(transformed_forecast_data)

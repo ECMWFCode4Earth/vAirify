@@ -29,7 +29,7 @@ from .mock_forecast_data import (
 )
 def test__transform__returns_correct_values(field, expected):
     input_data = ForecastData(single_level_data_set, multi_level_data_set)
-    results = transform(input_data, default_test_cities[0])
+    results = transform(input_data, default_test_cities[0:1])
     if isinstance(expected, list):
         assert list(map(lambda x: x[field], results)) == expected
     else:
@@ -73,6 +73,6 @@ def test__transform__returns_correctly_formatted_data():
         "source": {"type": "string", "allowed": ["cams-production"]},
     }
     validator = Validator(expected_document_schema, require_all=True)
-    result = transform(input_data, default_test_cities[0])
+    result = transform(input_data, default_test_cities[0:1])
     for data in result:
         assert validator(data) is True, f"{validator.errors}"
