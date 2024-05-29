@@ -103,7 +103,8 @@ class ForecastData:
         interpolated_data_by_pollutant_type = {}
         for pollutant_type in pollutant_types:
             dataset = self._get_data_set(pollutant_type)
-            # Interpolation is called n times, where n = len(pollutant_types) irrespective of len(locations)
+            # Interpolation is called n times, where n = len(pollutant_types),
+            # irrespective of len(locations)
             interpolated_data = dataset[pollutant_data_map[pollutant_type]].interp(
                 latitude=xr.DataArray(latitudes, dims="points"),
                 longitude=xr.DataArray(longitudes, dims="points"),
