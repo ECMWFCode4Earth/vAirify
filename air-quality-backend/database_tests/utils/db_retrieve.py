@@ -10,7 +10,7 @@ documents = collection.find()
 query = {}
 document_query = collection.find(query)
 
-# keys and allowed values
+# Keys and allowed values
 allowed_aqi_indexes = {1, 2, 3, 4, 5, 6}
 overall_aqi_value_key = "overall_aqi_level"
 location_type_key = "location_type"
