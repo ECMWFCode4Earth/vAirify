@@ -12,16 +12,13 @@ document_query = collection.find(query)
 
 # what we allow
 allowed_aqi_indexes = {1, 2, 3, 4, 5, 6}
-overall_aqi_value_key = "overall_aqi_value"
+overall_aqi_value_key = "overall_aqi_level"
 
 for documents in document_query:
     print(documents)
 
     if overall_aqi_value_key in documents:
         value = documents[overall_aqi_value_key]
-        assert value in allowed_aqi_indexes, "Only 1 , 2 , 3, 4, 5, 6 allowed !"
+        assert value in allowed_aqi_indexes, "1 - 6 is allowed as a value here"
     else:
         raise KeyError(f"Document is missing key!")
-    # assert "name" in documents, "Key is missing! What the heck! Fix it!"
-    # assert "overall_aqi_level", "bruh"
-    #
