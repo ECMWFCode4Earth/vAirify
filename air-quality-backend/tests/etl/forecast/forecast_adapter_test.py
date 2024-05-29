@@ -1,5 +1,5 @@
 from cerberus import Validator
-from datetime import datetime
+from datetime import datetime, timezone
 import pytest
 from air_quality.etl.forecast.forecast_adapter import (
     ForecastData,
@@ -35,7 +35,7 @@ from .mock_forecast_data import (
                 datetime(2024, 4, 24, 0, 0),
             ],
         ),
-        ("forecast_base_time", datetime.utcfromtimestamp(default_time)),
+        ("forecast_base_time", datetime.fromtimestamp(default_time, timezone.utc)),
         ("forecast_range", [24, 48, 24, 48]),
         ("source", "cams-production"),
     ],

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 import logging
 from typing import TypedDict
@@ -60,7 +60,9 @@ def transform(forecast_data: ForecastData, locations: list[AirQualityLocation]) 
 
     valid_time_values = forecast_data.get_valid_time_values()
     step_values = forecast_data.get_step_values()
-    model_base_time = datetime.utcfromtimestamp(forecast_data.get_time_value())
+    model_base_time = datetime.fromtimestamp(
+        forecast_data.get_time_value(), timezone.utc
+    )
     pollutant_forecast_for_location = []
 
     for location, data_by_pollutant in pollutant_data_with_location:
@@ -74,7 +76,9 @@ def transform(forecast_data: ForecastData, locations: list[AirQualityLocation]) 
 
         for i in range(0, step_values.size):
             measurement_timestamp = valid_time_values[i]
-            measurement_date = datetime.utcfromtimestamp(measurement_timestamp)
+            measurement_date = datetime.fromtimestamp(
+                measurement_timestamp, timezone.utc
+            )
             overall_aqi_value = _get_overall_aqi_value_for_step(
                 forecast_data_by_type, i
             )
