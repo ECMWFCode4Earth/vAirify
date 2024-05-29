@@ -29,10 +29,10 @@ from .mock_forecast_data import (
         (
             "forecast_valid_time",
             [
-                datetime(2024, 4, 23, 0, 0),
-                datetime(2024, 4, 24, 0, 0),
-                datetime(2024, 4, 23, 0, 0),
-                datetime(2024, 4, 24, 0, 0),
+                datetime(2024, 4, 23, 0, 0, tzinfo=timezone.utc),
+                datetime(2024, 4, 24, 0, 0, tzinfo=timezone.utc),
+                datetime(2024, 4, 23, 0, 0, tzinfo=timezone.utc),
+                datetime(2024, 4, 24, 0, 0, tzinfo=timezone.utc),
             ],
         ),
         ("forecast_base_time", datetime.fromtimestamp(default_time, timezone.utc)),
