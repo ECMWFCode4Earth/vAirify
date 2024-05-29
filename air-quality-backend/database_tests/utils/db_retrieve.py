@@ -9,6 +9,7 @@ documents = collection.find()
 # our query
 query = {}
 document_query = collection.find(query)
+doc_count = collection.count_documents({})
 
 # Keys and allowed values
 allowed_aqi_indexes = {1, 2, 3, 4, 5, 6}
@@ -33,3 +34,11 @@ for documents in document_query:
     else:
         raise KeyError(f" A document is missing location_type key!")
 
+    # print(f'Assertion completed on {doc_count} documents.')
+
+
+def collection_document_count():
+    print(doc_count)
+
+if __name__ == "__main__":
+    collection_document_count()
