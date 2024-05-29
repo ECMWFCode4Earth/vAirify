@@ -107,8 +107,10 @@ def get_database_data(query: dict, collection_name: str, exclude: dict):
     client = MongoClient(uri)
     collection = client[db_name][collection_name]
     cursor = collection.find(query, exclude)
+    database_dictionary_list = []
+
     for document in cursor:
-        document_as_dictionary = {
+        document_as_dict = {
             "name": document["name"],
             "created_time": document["created_time"],
             "last_modified_time": document["last_modified_time"],
@@ -121,8 +123,9 @@ def get_database_data(query: dict, collection_name: str, exclude: dict):
             "pm10_value": document["pm10"]["value"],
             "pm2_5_value": document["pm2_5"]["value"],
         }
-        print(document_as_dictionary)
+        database_dictionary_list.append(document_as_dict)
     client.close()
+    return database_dictionary_list
 
 
 def delete_database_data(collection_name: str):
@@ -192,14 +195,13 @@ def convert_cams_locations_file_to_dict(cams_locations_file_name: str) -> list[d
 
 def get_ecmwf_forecast_to_dict_for_countries(
     ecmwf_forecast_file_name: str,
-) -> list[dict]:
+):
     ecmwf_countries_dict = convert_cams_locations_file_to_dict("CAMS_locations_V1.csv")
-
     list_of_records = read_csv(ecmwf_forecast_file_name).to_dict("records")
+
     for record in list_of_records:
         location_id = record["location_id"]
         record["location_name"] = get_location_name_from_locations_dict(
             ecmwf_countries_dict, location_id
         )
-    print(list_of_records)
     return list_of_records
