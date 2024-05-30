@@ -13,8 +13,6 @@ jobs:
         pull-requests: read
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
-      etl: ${{ steps.filter.outputs.etl }}
-      api: ${{ steps.filter.outputs.api }}
       ui:  ${{ steps.filter.outputs.ui }}
     steps:
     - name: Checkout code
@@ -25,12 +23,6 @@ jobs:
         filters: |
           backend:
             - 'air-quality-backend/**'
-          etl:
-            - 'air-quality-backend/src/air_quality/etl/**'
-            - 'air-quality-backend/tests/etl/**'
-          api:
-            - 'air-quality-backend/src/air_quality/api/**'
-            - 'air-quality-backend/tests/api/**'
           ui:
             - 'air-quality-ui/**'
 
