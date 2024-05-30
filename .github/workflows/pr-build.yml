@@ -109,3 +109,7 @@ jobs:
       - name: Run lint check
         run: npm run lint
         working-directory: 'air-quality-ui'
+
+      - name: Run tests
+        run: npm run test
+        working-directory: 'air-quality-ui'
