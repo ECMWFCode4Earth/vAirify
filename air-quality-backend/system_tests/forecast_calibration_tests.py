@@ -7,6 +7,7 @@ from system_tests.utils.helper_methods import (
     get_ecmwf_forecast_to_dict_for_countries,
     get_database_data,
     get_database_record_by_key_with_datetime,
+    get_database_record_for_city_and_valid_time,
 )
 
 # Test parameters
@@ -22,14 +23,13 @@ ecmwf_all = get_ecmwf_forecast_to_dict_for_countries(ecmwf_forecast_file_path)
 ecmwf_vancouver_subset = []
 ecmwf_vancouver_valid_time_subset = []
 
-for entry in ecmwf_all:
-    if entry.get("location_name") == test_city:
-        ecmwf_vancouver_subset.append(entry)
-        if entry.get("valid_time") == test_forecast_valid_time.strftime(
-            "%Y-%m-%dT%H:%M"
-        ):
-            ecmwf_vancouver_valid_time_subset.append(entry)
-
+get_database_record_for_city_and_valid_time(
+    ecmwf_all,
+    test_city,
+    ecmwf_vancouver_subset,
+    test_forecast_valid_time,
+    ecmwf_vancouver_valid_time_subset,
+)
 
 database_vancouver_subset = get_database_data(
     {

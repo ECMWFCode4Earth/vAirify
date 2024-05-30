@@ -219,12 +219,16 @@ def get_database_record_by_key_with_datetime(
     return None
 
 
-def get_ecmwf_record_by_key_with_string(
-    forecast: list[dict], key: str, value: str, forecast_subset: list[dict]
-):
-    for entry in forecast:
-        print(entry)
-        if entry.get(key) == value:
-            forecast_subset.append(entry)
-        return forecast_subset
-    return None
+def get_database_record_for_city_and_valid_time(
+    ecmwf_forecast: list[dict],
+    test_city: str,
+    city_subset_list: list[dict],
+    test_valid_time: datetime,
+    city_and_valid_time_subset_list: list[dict],
+) -> list[dict]:
+    for entry in ecmwf_forecast:
+        if entry.get("location_name") == test_city:
+            city_subset_list.append(entry)
+            if entry.get("valid_time") == test_valid_time.strftime("%Y-%m-%dT%H:%M"):
+                city_and_valid_time_subset_list.append(entry)
+    return city_and_valid_time_subset_list
