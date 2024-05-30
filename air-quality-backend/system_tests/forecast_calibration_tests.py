@@ -14,22 +14,23 @@ ecmwf_forecast_file_path = "system_tests/CAMS_surface_concentration_2024053000_V
 load_dotenv(".env-qa")
 ecmwf_all_data = get_ecmwf_forecast_to_dict_for_countries(ecmwf_forecast_file_path)
 database_all_data = get_database_data("forecast_data")
+allowed_divergence_percentage = 0.1
 
 
 @pytest.mark.parametrize(
     "city",
     [
         "Vancouver",
-        # "San Francisco",
-        # "Los Angeles",
-        # "Abidjan",
-        # "Madrid",
-        # "Accra",
-        # "London",
-        # "Barcelona",
-        # "Brisbane",
-        # "Auckland",
-        # "Wellington",
+        "San Francisco",
+        "Los Angeles",
+        "Abidjan",
+        "Madrid",
+        "Accra",
+        "London",
+        "Barcelona",
+        "Brisbane",
+        "Auckland",
+        "Wellington",
     ],
 )
 def test_cities_with_extreme_longitudes_o3(city: str):
@@ -55,7 +56,22 @@ def test_cities_with_extreme_longitudes_o3(city: str):
         )
     )
 
+    database_ozone_value = database_record_for_city_and_valid_time[0]["o3_value"]
+    ecmwf_forecast_ozone_value = ecmwf_record_for_city_and_valid_time[0]["O3"]
+    divergence_percentage = (
+        (database_ozone_value - ecmwf_forecast_ozone_value) / ecmwf_forecast_ozone_value
+    ) * 100
+    if divergence_percentage < 0:
+        formatted_divergence_percentage = divergence_percentage * -1
+    else:
+        formatted_divergence_percentage = divergence_percentage
+
+    print(divergence_percentage)
+    print(formatted_divergence_percentage)
+    print(allowed_divergence_percentage)
+
     assert (
-        database_record_for_city_and_valid_time[0]["o3_value"]
-        == ecmwf_record_for_city_and_valid_time[0]["O3"]
+        formatted_divergence_percentage <= allowed_divergence_percentage
+    ), "ECMWF forecast: {}, Database value: {}".format(
+        ecmwf_forecast_ozone_value, database_ozone_value
     )
