@@ -12,8 +12,10 @@ jobs:
     permissions:
         pull-requests: read
     outputs:
+      backend: ${{ steps.filter.outputs.backend }}
       etl: ${{ steps.filter.outputs.etl }}
       api: ${{ steps.filter.outputs.api }}
+      ui:  ${{ steps.filter.outputs.ui }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -21,15 +23,20 @@ jobs:
       id: filter
       with:
         filters: |
+          backend:
+            - 'air-quality-backend/**'
           etl:
             - 'air-quality-backend/src/air_quality/etl/**'
             - 'air-quality-backend/tests/etl/**'
           api:
             - 'air-quality-backend/src/air_quality/api/**'
             - 'air-quality-backend/tests/api/**'
+          ui:
+            - 'air-quality-ui/**'
 
-  pr-checks:
+  pr-checks-backend:
     needs: detect-change-scope
+    if: ${{ needs.detect-change-scope.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -77,3 +84,25 @@ jobs:
         with:
             coverageFile: ./air-quality-backend/coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
+
+  pr-checks-ui:
+    runs-on: ubuntu-latest
+    needs: detect-change-scope
+    if: ${{ needs.detect-change-scope.outputs.ui == 'true' }}
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: 'air-quality-ui'
+          sparse-checkout-cone-mode: false
+      
+      - name: Install
+        run: npm ci
+        working-directory: 'air-quality-ui'
+
+      - name: Run lint check
+        run: npm run lint
+        working-directory: 'air-quality-ui'
