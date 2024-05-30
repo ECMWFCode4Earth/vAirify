@@ -9,6 +9,12 @@ from system_tests.utils.helper_methods import (
     get_database_data,
 )
 
+# Test setup
+ecmwf_forecast_file_path = "system_tests/CAMS_surface_concentration_2024053000_V1.csv"
+load_dotenv(".env-qa")
+ecmwf_all_data = get_ecmwf_forecast_to_dict_for_countries(ecmwf_forecast_file_path)
+database_all_data = get_database_data("forecast_data")
+
 
 @pytest.mark.parametrize(
     "city",
@@ -28,17 +34,9 @@ from system_tests.utils.helper_methods import (
 )
 def test_cities_with_extreme_longitudes_o3(city: str):
     # Test parameters
-    ecmwf_forecast_file_path = (
-        "system_tests/CAMS_surface_concentration_2024053000_V1.csv"
-    )
     test_city = city
     test_forecast_base_time = datetime.datetime(2024, 5, 30, 00, 00, 00)
     test_forecast_valid_time = datetime.datetime(2024, 5, 30, 3, 00, 00)
-
-    # Test setup
-    load_dotenv(".env-qa")
-    ecmwf_all_data = get_ecmwf_forecast_to_dict_for_countries(ecmwf_forecast_file_path)
-    database_all_data = get_database_data("forecast_data")
 
     ecmwf_record_for_city_and_valid_time = list(
         filter(
@@ -57,7 +55,6 @@ def test_cities_with_extreme_longitudes_o3(city: str):
         )
     )
 
-    pprint.pprint(database_record_for_city_and_valid_time)
 
     assert (
         database_record_for_city_and_valid_time[0]["o3_value"]
