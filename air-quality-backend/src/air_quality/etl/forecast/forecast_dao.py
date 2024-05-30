@@ -41,7 +41,6 @@ def get_multi_level_request_body(model_date_time: CamsModelDateTime) -> dict:
         "ozone",
         "sulphur_dioxide",
         "temperature",
-        "specific_humidity",
     ]
     base_request["model_level"] = "137"
     return base_request
