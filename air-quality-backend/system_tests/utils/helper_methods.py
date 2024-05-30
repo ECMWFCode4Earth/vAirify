@@ -208,3 +208,16 @@ def get_ecmwf_forecast_to_dict_for_countries(
             ecmwf_countries_dict, location_id
         )
     return list_of_records
+
+
+def calculate_database_divergence_from_ecmwf_forecast_values(
+    database_ozone_value: float, ecmwf_forecast_ozone_value: float
+) -> float:
+    divergence_percentage = (
+        (database_ozone_value - ecmwf_forecast_ozone_value) / ecmwf_forecast_ozone_value
+    ) * 100
+    if divergence_percentage < 0:
+        formatted_divergence_percentage = divergence_percentage * -1
+    else:
+        formatted_divergence_percentage = divergence_percentage
+    return formatted_divergence_percentage

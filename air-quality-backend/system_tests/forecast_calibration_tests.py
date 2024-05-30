@@ -1,5 +1,4 @@
 import datetime
-import pprint
 
 import pytest
 from dotenv import load_dotenv
@@ -7,6 +6,7 @@ from dotenv import load_dotenv
 from system_tests.utils.helper_methods import (
     get_ecmwf_forecast_to_dict_for_countries,
     get_database_data,
+    calculate_database_divergence_from_ecmwf_forecast_values,
 )
 
 # Test setup
@@ -58,20 +58,12 @@ def test_cities_with_extreme_longitudes_o3(city: str):
 
     database_ozone_value = database_record_for_city_and_valid_time[0]["o3_value"]
     ecmwf_forecast_ozone_value = ecmwf_record_for_city_and_valid_time[0]["O3"]
-    divergence_percentage = (
-        (database_ozone_value - ecmwf_forecast_ozone_value) / ecmwf_forecast_ozone_value
-    ) * 100
-    if divergence_percentage < 0:
-        formatted_divergence_percentage = divergence_percentage * -1
-    else:
-        formatted_divergence_percentage = divergence_percentage
 
-    print(divergence_percentage)
-    print(formatted_divergence_percentage)
-    print(allowed_divergence_percentage)
-
+    divergence_percentage = calculate_database_divergence_from_ecmwf_forecast_values(
+        database_ozone_value, ecmwf_forecast_ozone_value
+    )
     assert (
-        formatted_divergence_percentage <= allowed_divergence_percentage
+        divergence_percentage <= allowed_divergence_percentage
     ), "ECMWF forecast: {}, Database value: {}".format(
         ecmwf_forecast_ozone_value, database_ozone_value
     )
