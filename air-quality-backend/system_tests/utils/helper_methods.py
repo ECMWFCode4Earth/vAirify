@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from decimal import Decimal
 
 import xarray
@@ -196,7 +197,9 @@ def convert_cams_locations_file_to_dict(cams_locations_file_name: str) -> list[d
 def get_ecmwf_forecast_to_dict_for_countries(
     ecmwf_forecast_file_name: str,
 ):
-    ecmwf_countries_dict = convert_cams_locations_file_to_dict("CAMS_locations_V1.csv")
+    ecmwf_countries_dict = convert_cams_locations_file_to_dict(
+        "system_tests/CAMS_locations_V1.csv"
+    )
     list_of_records = read_csv(ecmwf_forecast_file_name).to_dict("records")
 
     for record in list_of_records:
@@ -205,3 +208,23 @@ def get_ecmwf_forecast_to_dict_for_countries(
             ecmwf_countries_dict, location_id
         )
     return list_of_records
+
+
+def get_database_record_by_key_with_datetime(
+    forecast: list[dict], key: str, value: datetime
+):
+    for entry in forecast:
+        if entry.get(key) == value:
+            return entry
+    return None
+
+
+def get_ecmwf_record_by_key_with_string(
+    forecast: list[dict], key: str, value: str, forecast_subset: list[dict]
+):
+    for entry in forecast:
+        print(entry)
+        if entry.get(key) == value:
+            forecast_subset.append(entry)
+        return forecast_subset
+    return None
