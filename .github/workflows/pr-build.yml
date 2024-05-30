@@ -87,6 +87,9 @@ jobs:
         with:
             coverageFile: ./air-quality-backend/coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
+            thresholdAll: 0.6
+            thresholdModified: 0.9
+            thresholdNew: 1
 
   pr-checks-ui:
     runs-on: ubuntu-latest

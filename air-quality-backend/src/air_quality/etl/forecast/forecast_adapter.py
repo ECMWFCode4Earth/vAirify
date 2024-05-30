@@ -15,7 +15,7 @@ class PollutantData(TypedDict):
 
 def _convert_pollutant_values(pollutant_type: PollutantType, raw_values: list[float]):
     """
-    Convert pollutant values to appropriate units and add aqi_values
+    Convert pollutant values to appropriate units and add aqi_value
     :param pollutant_type:
     :param raw_values:
     :return:
