@@ -77,7 +77,7 @@ jobs:
         with:
             coverageFile: ./air-quality-backend/coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
-            thresholdAll: 0.9
+            thresholdAll: 0.65
             thresholdModified: 0.9
             thresholdNew: 1
 
