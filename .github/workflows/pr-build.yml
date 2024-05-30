@@ -44,6 +44,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          sparse-checkout: 'air-quality-backend'
+          sparse-checkout-cone-mode: false
 
       - name: Setup miniconda
         uses: conda-incubator/setup-miniconda@v3
