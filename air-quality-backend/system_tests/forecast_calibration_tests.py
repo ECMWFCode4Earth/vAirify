@@ -55,7 +55,6 @@ def test_cities_with_extreme_longitudes_o3(city: str):
         )
     )
 
-
     assert (
         database_record_for_city_and_valid_time[0]["o3_value"]
         == ecmwf_record_for_city_and_valid_time[0]["O3"]
