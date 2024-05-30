@@ -219,16 +219,49 @@ def get_database_record_by_key_with_datetime(
     return None
 
 
-def get_database_record_for_city_and_valid_time(
+def get_ecmwf_record_for_city_and_valid_time(
     ecmwf_forecast: list[dict],
     test_city: str,
     city_subset_list: list[dict],
-    test_valid_time: datetime,
+    test_forecast_valid_time: datetime,
     city_and_valid_time_subset_list: list[dict],
 ) -> list[dict]:
     for entry in ecmwf_forecast:
         if entry.get("location_name") == test_city:
             city_subset_list.append(entry)
-            if entry.get("valid_time") == test_valid_time.strftime("%Y-%m-%dT%H:%M"):
+            if entry.get("valid_time") == test_forecast_valid_time.strftime(
+                "%Y-%m-%dT%H:%M"
+            ):
                 city_and_valid_time_subset_list.append(entry)
     return city_and_valid_time_subset_list
+
+
+def get_database_record_for_city_and_valid_time(
+    test_city: str,
+    test_forecast_base_time: datetime,
+    test_forecast_valid_time: datetime,
+):
+    database_vancouver_subset = get_database_data(
+        {
+            "$and": [
+                {"name": test_city},
+                {"forecast_base_time": test_forecast_base_time},
+            ]
+        },
+        "forecast_data",
+        {
+            "_id": 0,
+            "location_type": 0,
+            "source": 0,
+            "location": 0,
+            "overall_aqi_level:": 0,
+        },
+    )
+
+    database_vancouver_valid_time_subset = get_database_record_by_key_with_datetime(
+        database_vancouver_subset,
+        "forecast_valid_time",
+        test_forecast_valid_time,
+    )
+
+    return database_vancouver_valid_time_subset
