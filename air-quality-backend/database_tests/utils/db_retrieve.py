@@ -1,44 +1,36 @@
-from pymongo import MongoClient
+import json
+import pprint
+from database_tests.utils.db_helpers import get_database_data
+from database_tests.utils.db_helpers import main_fetch
 
-# uri connection string here
-client = MongoClient("mongodb+srv://mnyamunda:CVbP4nSZWfDtEAzT@cluster0.ch5gkk4.mongodb.net/")
-# what database we are using
-db = client['air_quality_dashboard_db_max']
-collection = db['forecast_data']
-documents = collection.find()
-# our query
-query = {}
-document_query = collection.find(query)
-doc_count = collection.count_documents({})
-
-# Keys and allowed values
 allowed_aqi_indexes = {1, 2, 3, 4, 5, 6}
 overall_aqi_value_key = "overall_aqi_level"
 location_type_key = "location_type"
 allowed_location_type = "city"
-
-for documents in document_query:
-
-    # only allowing certain values inside overall_aqi_level
-    if overall_aqi_value_key in documents:
-        value = documents[overall_aqi_value_key]
-        assert value in allowed_aqi_indexes, "1 - 6 is allowed as a value here"
-    else:
-        raise KeyError(f"A document is missing the overall_aqi_level key!")
-
-    # location_type only allowing city as a value
-
-    if location_type_key in documents:
-        value = documents[location_type_key]
-        assert value in allowed_location_type, "Only City is allowed as a location type"
-    else:
-        raise KeyError(f" A document is missing location_type key!")
-
-    # print(f'Assertion completed on {doc_count} documents.')
+individual_pollutant_aqi = "no2:aqi_level"
 
 
-def collection_document_count():
-    print(doc_count)
+def test_overall_aqi_level_is_between_1_and_6():
+    import os
+    os.environ["MONGO_DB_URI"] = "mongodb+srv://mnyamunda:CVbP4nSZWfDtEAzT@cluster0.ch5gkk4.mongodb.net/"
+    os.environ["MONGO_DB_NAME"] = "air_quality_dashboard_db_max"
+
+    query = {}
+    collection_name = "forecast_data"
+
+    dict_result = get_database_data(query, collection_name)
+    pprint.pprint(dict_result)
+
+    for document in dict_result:
+        overall_aqi_level = document["overall_aqi_level"]
+        assert 1 <= overall_aqi_level <= 6, f"overall_aqi_level {overall_aqi_level} is out of range"
+
+
+def dict_print():
+    dict_stuff = main_fetch()
+
+    print(dict_stuff)
+
 
 if __name__ == "__main__":
-    collection_document_count()
+    dict_print()
