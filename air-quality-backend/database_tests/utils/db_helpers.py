@@ -3,10 +3,12 @@ import pprint
 
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, OperationFailure
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def get_database_data(query: dict, collection_name: str):
-
     uri = os.environ.get("MONGO_DB_URI")
     db_name = os.environ.get("MONGO_DB_NAME")
 
@@ -53,7 +55,6 @@ def get_database_data(query: dict, collection_name: str):
 
 
 def main_fetch():
-
     query = {}  # must be dict type?
     collection_name = 'forecast_data'  # access collection variable
     result = get_database_data(query, collection_name)

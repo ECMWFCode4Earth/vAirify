@@ -1,24 +1,17 @@
-import json
-import pprint
 from database_tests.utils.db_helpers import get_database_data
-from database_tests.utils.db_helpers import main_fetch
+from dotenv import load_dotenv
+import os
 
-allowed_aqi_indexes = {1, 2, 3, 4, 5, 6}
-overall_aqi_value_key = "overall_aqi_level"
-location_type_key = "location_type"
-allowed_location_type = "city"
+load_dotenv()
+
+os.environ["MONGO_DB_URI"] = "mongodb+srv://mnyamunda:CVbP4nSZWfDtEAzT@cluster0.ch5gkk4.mongodb.net/"
+os.environ["MONGO_DB_NAME"] = "air_quality_dashboard_db_max"
+collection_name = "forecast_data"
 
 
 def test_aqi_levels_are_between_1_and_6():
-    import os
-    os.environ["MONGO_DB_URI"] = "mongodb+srv://mnyamunda:CVbP4nSZWfDtEAzT@cluster0.ch5gkk4.mongodb.net/"
-    os.environ["MONGO_DB_NAME"] = "air_quality_dashboard_db_max"
-
     query = {}
-    collection_name = "forecast_data"
-
     dict_result = get_database_data(query, collection_name)
-
     pollutant_keys = ["no2_aqi_level", "so2_aqi_level", "o3_aqi_level", "pm10_aqi_level", "pm2_5_aqi_level"]
 
     for document in dict_result:
@@ -30,11 +23,13 @@ def test_aqi_levels_are_between_1_and_6():
             assert 1 <= document[key] <= 6, f"{key} {document[key]} is out of range"
 
 
-def dict_print():
-    dict_stuff = main_fetch()
+def test_overall_aqi_level_is_highest_value_of_pollutant_aqi_levels():
+    query = {}
+    dict_result = get_database_data(query, collection_name)
+    pollutant_keys = ["no2_aqi_level", "so2_aqi_level", "o3_aqi_level", "pm10_aqi_level", "pm2_5_aqi_level"]
 
-    print(dict_stuff)
-
-
-if __name__ == "__main__":
-    dict_print()
+    for document in dict_result:
+        highest_aqi = max(document[key] for key in pollutant_keys)
+        assert document["overall_aqi_level"] == highest_aqi, (
+            f"overall_aqi_level {document['overall_aqi_level']} is not equal to the highest AQI level {highest_aqi}"
+        )
