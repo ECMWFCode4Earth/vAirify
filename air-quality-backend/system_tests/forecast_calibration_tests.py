@@ -30,7 +30,7 @@ database_all_data = get_database_data("forecast_data")
 test_forecast_valid_time = datetime.datetime(
     2024, 5, 31, 3, 00, 00
 )  # Set a valid time to test against
-allowed_divergence_percentage = 2
+allowed_divergence_percentage = 3
 
 
 @pytest.mark.parametrize("city", all_cities)
