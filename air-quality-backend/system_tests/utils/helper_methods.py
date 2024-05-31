@@ -1,8 +1,6 @@
 import os
-from datetime import datetime
-from decimal import Decimal
-
 import xarray
+from decimal import Decimal
 from pandas import read_csv
 from pymongo import MongoClient
 
@@ -188,7 +186,7 @@ def get_location_name_from_locations_dict(countries_list: list[dict], location_i
 
 
 def convert_cams_locations_file_to_dict(cams_locations_file_name: str) -> list[dict]:
-    dataframe = read_csv(cams_locations_file_name)
+    dataframe = read_csv(cams_locations_file_name, encoding="utf-8")
     to_include = ["id", "city"]
     streamlined_dataframe = dataframe[to_include]
     return streamlined_dataframe.to_dict("records")
