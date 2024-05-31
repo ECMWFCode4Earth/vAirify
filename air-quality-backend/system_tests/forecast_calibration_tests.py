@@ -9,7 +9,6 @@ from system_tests.utils.helper_methods import (
     calculate_database_divergence_from_ecmwf_forecast_values,
 )
 
-
 # Test setup
 ecmwf_forecast_file_path = "system_tests/CAMS_surface_concentration_2024053000_V1.csv"
 load_dotenv(".env-qa")
@@ -58,7 +57,7 @@ def test_compare_ecmwf_o3_with_database_o3(city: str):
 
 
 @pytest.mark.parametrize("city", all_cities)
-def test_compare_ecmwf_o3_with_database_no2(city: str):
+def test_compare_ecmwf_no2_with_database_no2(city: str):
     # Test parameters
     test_city = city
 
@@ -93,7 +92,7 @@ def test_compare_ecmwf_o3_with_database_no2(city: str):
 
 
 @pytest.mark.parametrize("city", all_cities)
-def test_compare_ecmwf_o3_with_database_pm10(city: str):
+def test_compare_ecmwf_pm10_with_database_pm10(city: str):
     # Test parameters
     test_city = city
 
@@ -128,7 +127,7 @@ def test_compare_ecmwf_o3_with_database_pm10(city: str):
 
 
 @pytest.mark.parametrize("city", all_cities)
-def test_compare_ecmwf_o3_with_database_pm2_5(city: str):
+def test_compare_ecmwf_pm2_5_with_database_pm2_5(city: str):
     # Test parameters
     test_city = city
 
