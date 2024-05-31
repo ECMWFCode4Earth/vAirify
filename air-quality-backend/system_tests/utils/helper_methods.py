@@ -193,11 +193,10 @@ def convert_cams_locations_file_to_dict(cams_locations_file_name: str) -> list[d
 
 
 def get_ecmwf_forecast_to_dict_for_countries(
+    cams_locations_file_name: str,
     ecmwf_forecast_file_name: str,
 ):
-    ecmwf_countries_dict = convert_cams_locations_file_to_dict(
-        "system_tests/CAMS_locations_V1.csv"
-    )
+    ecmwf_countries_dict = convert_cams_locations_file_to_dict(cams_locations_file_name)
     list_of_records = read_csv(ecmwf_forecast_file_name).to_dict("records")
 
     for record in list_of_records:
