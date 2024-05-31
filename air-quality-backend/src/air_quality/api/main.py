@@ -26,11 +26,11 @@ async def get_forecast_data(
         )
     except ValueError:
         raise HTTPException(
-            422, "Incorrect data format, should be %Y-%m-%dT%H:%M:%S.%f%z"
+            400, "Incorrect data format, should be %Y-%m-%dT%H:%M:%S.%f%z"
         )
 
     if location_type not in location_types:
-        raise HTTPException(422, "Incorrect location type")
+        raise HTTPException(400, "Incorrect location type")
 
     return get_forecast_data_from_database(
         valid_date_from, valid_date_to, location_type, forecast_base_time, location_name
