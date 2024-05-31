@@ -29,33 +29,15 @@ def get_forecast_data_from_database(
     valid_date_from, valid_date_to, location_type, forecast_base_time, location_name
 ):
     collection = get_collection("forecast_data")
-    if location_name is None:
-        return map_forecast(
-            list(
-                collection.find(
-                    {
-                        "location_type": location_type,
-                        "forecast_base_time": forecast_base_time,
-                        "forecast_valid_time": {
-                            "$gte": valid_date_from,
-                            "$lt": valid_date_to,
-                        },
-                    }
-                )
-            )
-        )
-    return map_forecast(
-        list(
-            collection.find(
-                {
-                    "name": location_name,
-                    "location_type": location_type,
-                    "forecast_base_time": forecast_base_time,
-                    "forecast_valid_time": {
-                        "$gte": valid_date_from,
-                        "$lt": valid_date_to,
-                    },
-                }
-            )
-        )
-    )
+    query = {
+        "location_type": location_type,
+        "forecast_base_time": forecast_base_time,
+        "forecast_valid_time": {
+            "$gte": valid_date_from,
+            "$lt": valid_date_to,
+        },
+    }
+    if location_name is not None:
+        query["name"] = location_name
+    return map_forecast(list(collection.find(query)))
+
