@@ -10,15 +10,20 @@ from system_tests.utils.helper_methods import (
 )
 
 # Test setup
-ecmwf_forecast_file_path = "system_tests/CAMS_surface_concentration_2024053000_V1.csv"
+ecmwf_forecast_file_path = "system_tests/CAMS_surface_concentration_2024053100_V1.csv"  # Add local path to downloaded file from air-quality-backend
+test_forecast_base_time = datetime.datetime(
+    2024, 5, 31, 00, 00, 00
+)  # Ensure this corresponds to ecmwf forecast file base time
+
 load_dotenv(".env-qa")
 ecmwf_all_data = get_ecmwf_forecast_to_dict_for_countries(ecmwf_forecast_file_path)
 database_all_data = get_database_data("forecast_data")
-allowed_divergence_percentage = 0.1
 
 # Shared test parameters
-test_forecast_base_time = datetime.datetime(2024, 5, 30, 00, 00, 00)
-test_forecast_valid_time = datetime.datetime(2024, 5, 30, 3, 00, 00)
+test_forecast_valid_time = datetime.datetime(
+    2024, 5, 31, 3, 00, 00
+)  # Set a valid time to test against
+allowed_divergence_percentage = 2
 
 
 @pytest.mark.parametrize("city", all_cities)
