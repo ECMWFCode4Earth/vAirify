@@ -1,13 +1,14 @@
 import datetime
-
 import pytest
 from dotenv import load_dotenv
 
+from system_tests.cities_data import all_cities
 from system_tests.utils.helper_methods import (
     get_ecmwf_forecast_to_dict_for_countries,
     get_database_data,
     calculate_database_divergence_from_ecmwf_forecast_values,
 )
+
 
 # Test setup
 ecmwf_forecast_file_path = "system_tests/CAMS_surface_concentration_2024053000_V1.csv"
@@ -21,23 +22,8 @@ test_forecast_base_time = datetime.datetime(2024, 5, 30, 00, 00, 00)
 test_forecast_valid_time = datetime.datetime(2024, 5, 30, 3, 00, 00)
 
 
-@pytest.mark.parametrize(
-    "city",
-    [
-        "Vancouver",
-        "San Francisco",
-        "Los Angeles",
-        "Abidjan",
-        "Madrid",
-        "Accra",
-        "London",
-        "Barcelona",
-        "Brisbane",
-        "Auckland",
-        "Wellington",
-    ],
-)
-def test_cities_with_extreme_longitudes_o3(city: str):
+@pytest.mark.parametrize("city", all_cities)
+def test_compare_ecmwf_o3_with_database_o3(city: str):
     # Test parameters
     test_city = city
 
@@ -66,28 +52,13 @@ def test_cities_with_extreme_longitudes_o3(city: str):
     )
     assert (
         divergence_percentage <= allowed_divergence_percentage
-    ), "ECMWF forecast: {}, Database value: {}".format(
-        ecmwf_forecast_o3_value, database_o3_value
+    ), "ECMWF forecast: {}, Database value: {}, Divergence: {}%".format(
+        ecmwf_forecast_o3_value, database_o3_value, divergence_percentage
     )
 
 
-@pytest.mark.parametrize(
-    "city",
-    [
-        "Vancouver",
-        "San Francisco",
-        "Los Angeles",
-        "Abidjan",
-        "Madrid",
-        "Accra",
-        "London",
-        "Barcelona",
-        "Brisbane",
-        "Auckland",
-        "Wellington",
-    ],
-)
-def test_cities_with_extreme_longitudes_no2(city: str):
+@pytest.mark.parametrize("city", all_cities)
+def test_compare_ecmwf_o3_with_database_no2(city: str):
     # Test parameters
     test_city = city
 
@@ -116,28 +87,13 @@ def test_cities_with_extreme_longitudes_no2(city: str):
     )
     assert (
         divergence_percentage <= allowed_divergence_percentage
-    ), "ECMWF forecast: {}, Database value: {}".format(
-        ecmwf_forecast_no2_value, database_no2_value
+    ), "ECMWF forecast: {}, Database value: {}, Divergence: {}%".format(
+        ecmwf_forecast_no2_value, database_no2_value, divergence_percentage
     )
 
 
-@pytest.mark.parametrize(
-    "city",
-    [
-        "Vancouver",
-        "San Francisco",
-        "Los Angeles",
-        "Abidjan",
-        "Madrid",
-        "Accra",
-        "London",
-        "Barcelona",
-        "Brisbane",
-        "Auckland",
-        "Wellington",
-    ],
-)
-def test_cities_with_extreme_longitudes_pm10(city: str):
+@pytest.mark.parametrize("city", all_cities)
+def test_compare_ecmwf_o3_with_database_pm10(city: str):
     # Test parameters
     test_city = city
 
@@ -166,28 +122,13 @@ def test_cities_with_extreme_longitudes_pm10(city: str):
     )
     assert (
         divergence_percentage <= allowed_divergence_percentage
-    ), "ECMWF forecast: {}, Database value: {}".format(
-        ecmwf_forecast_pm10_value, database_pm10_value
+    ), "ECMWF forecast: {}, Database value: {}, Divergence: {}%".format(
+        ecmwf_forecast_pm10_value, database_pm10_value, divergence_percentage
     )
 
 
-@pytest.mark.parametrize(
-    "city",
-    [
-        "Vancouver",
-        "San Francisco",
-        "Los Angeles",
-        "Abidjan",
-        "Madrid",
-        "Accra",
-        "London",
-        "Barcelona",
-        "Brisbane",
-        "Auckland",
-        "Wellington",
-    ],
-)
-def test_cities_with_extreme_longitudes_pm2_5(city: str):
+@pytest.mark.parametrize("city", all_cities)
+def test_compare_ecmwf_o3_with_database_pm2_5(city: str):
     # Test parameters
     test_city = city
 
@@ -216,6 +157,6 @@ def test_cities_with_extreme_longitudes_pm2_5(city: str):
     )
     assert (
         divergence_percentage <= allowed_divergence_percentage
-    ), "ECMWF forecast: {}, Database value: {}".format(
-        ecmwf_forecast_pm2_5_value, database_pm2_5_value
+    ), "ECMWF forecast: {}, Database value: {}, Divergence: {}% ".format(
+        ecmwf_forecast_pm2_5_value, database_pm2_5_value, divergence_percentage
     )
