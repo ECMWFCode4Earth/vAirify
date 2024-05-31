@@ -12,8 +12,8 @@ jobs:
     permissions:
         pull-requests: read
     outputs:
-      etl: ${{ steps.filter.outputs.etl }}
-      api: ${{ steps.filter.outputs.api }}
+      backend: ${{ steps.filter.outputs.backend }}
+      ui:  ${{ steps.filter.outputs.ui }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -21,15 +21,14 @@ jobs:
       id: filter
       with:
         filters: |
-          etl:
-            - 'air-quality-backend/src/air_quality/etl/**'
-            - 'air-quality-backend/tests/etl/**'
-          api:
-            - 'air-quality-backend/src/air_quality/api/**'
-            - 'air-quality-backend/tests/api/**'
+          backend:
+            - 'air-quality-backend/**'
+          ui:
+            - 'air-quality-ui/**'
 
-  pr-checks:
+  pr-checks-backend:
     needs: detect-change-scope
+    if: ${{ needs.detect-change-scope.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -37,6 +36,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          sparse-checkout: 'air-quality-backend'
+          sparse-checkout-cone-mode: false
 
       - name: Setup miniconda
         uses: conda-incubator/setup-miniconda@v3
@@ -54,18 +56,8 @@ jobs:
         run: python -m flake8 --append-config .flake8
         working-directory: ./air-quality-backend
 
-      - name: Run database unit tests
-        run: python -m pytest --cov=src/air_quality/database --cov-report= --cov-append tests/database
-        working-directory: ./air-quality-backend
-        
-      - name: Run etl unit tests
-        run: python -m pytest --cov=src/air_quality/etl --cov=scripts --cov-report= --cov-append tests/etl
-        if: ${{ needs.detect-change-scope.outputs.etl == 'true' }}
-        working-directory: ./air-quality-backend
-
-      - name: Run api unit tests
-        run: python -m pytest --cov=src/air_quality/api --cov-report= --cov-append tests/api
-        if: ${{ needs.detect-change-scope.outputs.api == 'true' }}
+      - name: Run unit tests
+        run: python -m pytest --cov=src/air_quality --cov=scripts --cov-report= tests
         working-directory: ./air-quality-backend
 
       - name: Convert to report 
@@ -77,3 +69,36 @@ jobs:
         with:
             coverageFile: ./air-quality-backend/coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
+            thresholdAll: 0.65
+            thresholdModified: 0.9
+            thresholdNew: 1
+
+  pr-checks-ui:
+    runs-on: ubuntu-latest
+    needs: detect-change-scope
+    if: ${{ needs.detect-change-scope.outputs.ui == 'true' }}
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: 'air-quality-ui'
+          sparse-checkout-cone-mode: false
+      
+      - name: Install
+        run: npm ci
+        working-directory: 'air-quality-ui'
+
+      - name: Run lint check
+        run: npm run lint
+        working-directory: 'air-quality-ui'
+
+      - name: Run tests with coverage
+        uses: ArtiomTr/jest-coverage-report-action@v2.0-rc.6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          working-directory: 'air-quality-ui'
+          threshold: 90
+          test-script: npm run test:ci

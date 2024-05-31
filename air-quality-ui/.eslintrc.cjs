@@ -1,37 +1,30 @@
-{
-  // Specify the environments
-  "env": {
-    "browser": true,
-    "node": true,
-    "es2021": true
-  },
-  // Specify the parser options
-  "parserOptions": {
-    "ecmaVersion": "latest",
-    "sourceType": "module",
-    "ecmaFeatures": {
-      "jsx": true
-    }
-  },
-  // Specify the extends
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:import/recommended",
-    "plugin:import/typescript",
-    "plugin:prettier/recommended"
+module.exports = {
+  root: true,
+  env: { browser: true, es2020: true },
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:react-hooks/recommended',
+    'plugin:import/recommended',
+    'plugin:import/typescript',
+    'plugin:prettier/recommended'
   ],
-  // Specify the plugins
-  "plugins": [
-    "prettier",
-    "import"
+  ignorePatterns: ['dist', '.eslintrc.cjs'],
+  parser: '@typescript-eslint/parser',
+  plugins: [
+    'react-refresh',
+    'prettier',
+    'import'
   ],
-  "overrides": [],
-  "rules": {
-    "prettier/prettier": [
+  rules: {
+    'react-refresh/only-export-components': [
+      'warn',
+      { allowConstantExport: true },
+    ],
+    'prettier/prettier': [
       "error",
       {
-        "semi": true,
+        "semi": false,
         "tabWidth": 2,
         "singleQuote": true,
         "bracketSameLine": false
@@ -66,5 +59,5 @@
         }
       }
     ]
-  }
+  },
 }
