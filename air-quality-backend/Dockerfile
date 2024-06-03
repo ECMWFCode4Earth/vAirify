@@ -1,0 +1,13 @@
+FROM continuumio/miniconda3
+
+COPY .cdsapirc /root/.cdsapirc
+
+WORKDIR /usr/src/app
+COPY ./ ./
+RUN conda env create -f conda/environment.yml
+
+SHELL ["conda", "run", "-n", "air-quality-backend", "/bin/bash", "-c"]
+
+RUN poetry install
+
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "air-quality-backend", "python", "scripts/run_forecast_etl.py"]
