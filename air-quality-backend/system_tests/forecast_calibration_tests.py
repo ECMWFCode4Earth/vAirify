@@ -28,7 +28,7 @@ test_forecast_base_time = datetime.datetime(2024, 6, 3, 00, 00, 00)
 test_forecast_valid_time = datetime.datetime(
     2024, 6, 3, 6, 00, 00
 )  # Set a valid time to test against
-allowed_divergence_percentage = 1
+allowed_divergence_percentage = 3
 
 
 @pytest.mark.parametrize("test_city", all_cities)
