@@ -22,7 +22,7 @@ def main():
 
     logging.info("Extracting in situ pollutant data")
     in_situ_measurements_by_city = fetch_in_situ_measurements(
-        cities, date_from=today - timedelta(days=1), date_to=today
+        cities, date_from=today - timedelta(days=5), date_to=today - timedelta(days=4)
     )
 
     logging.info("Transforming in situ data")
