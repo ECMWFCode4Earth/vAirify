@@ -1,6 +1,7 @@
 from datetime import datetime
 from functools import reduce
 import logging
+from air_quality.database.locations import AirQualityLocationType
 from air_quality.etl.air_quality_index.pollutant_type import PollutantType
 
 required_pollutant_data = {
@@ -16,7 +17,9 @@ def measurement_value_is_positive(measurement):
     return measurement["value"] > 0
 
 
-def _create_document(measurement, city_name, location_type):
+def _create_document(
+    measurement, city_name: str, location_type: AirQualityLocationType
+):
     return {
         "api_source": "OpenAQ",
         "measurement_date": datetime.strptime(

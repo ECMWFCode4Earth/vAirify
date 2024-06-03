@@ -68,7 +68,7 @@ def transform(forecast_data: ForecastData, locations: list[AirQualityLocation]) 
     for location, data_by_pollutant in pollutant_data_with_location:
         location_name = location["name"]
         location_type = location["type"]
-        logging.debug(f"Processing location: {location_name} ({location['type']})")
+        logging.debug(f"Processing location: {location_name} ({location_type})")
         forecast_data_by_type = {
             pollutant_type: _convert_pollutant_values(pollutant_type, data)
             for pollutant_type, data in data_by_pollutant.items()
