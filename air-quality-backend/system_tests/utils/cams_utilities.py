@@ -270,3 +270,38 @@ def get_pollutant_value(
                 return first_record["pm2_5_value"]
     else:
         raise ValueError("Invalid source name for forecast")
+
+
+def get_forecast_percentage_divergence(
+    test_city: str,
+    test_forecast_valid_time: datetime,
+    ecmwf_all_data: list[dict],
+    test_forecast_base_time: datetime,
+    database_all_data: list[dict[str]],
+    pollutant: str,
+) -> float:
+    ecmwf_record_for_city_and_valid_time = get_ecmwf_record_for_city_and_valid_time(
+        test_city, test_forecast_valid_time, ecmwf_all_data
+    )
+
+    database_record_for_city_and_valid_time = (
+        get_database_record_for_city_and_valid_time(
+            test_forecast_base_time,
+            test_city,
+            test_forecast_valid_time,
+            database_all_data,
+        )
+    )
+
+    ecmwf_forecast_pollutant_value = get_pollutant_value(
+        pollutant,
+        "ecmwf_forecast",
+        ecmwf_record_for_city_and_valid_time,
+    )
+    database_pollutant_value = get_pollutant_value(
+        pollutant, "database_forecast", database_record_for_city_and_valid_time
+    )
+
+    return calculate_database_divergence_from_ecmwf_forecast_values(
+        database_pollutant_value, ecmwf_forecast_pollutant_value
+    )
