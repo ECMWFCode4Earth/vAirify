@@ -39,6 +39,15 @@ def _create_document(measurement, city_name, location_type):
     }
 
 
+def _create_measurement_value(measurement):
+    return {
+        "value": measurement['value'],
+        "unit": measurement['unit'],
+        "original_value": measurement['value'],
+        "original_unit": measurement['unit']
+    }
+
+
 def combine_measurement(state, measurement):
     key = f"{measurement['location']}_{measurement['date']['utc']}"
     results = state["results"]
@@ -46,7 +55,7 @@ def combine_measurement(state, measurement):
         results[key] = _create_document(
             measurement, state["city"], state["location_type"]
         )
-    measurement_value = measurement["value"]
+    measurement_value = _create_measurement_value(measurement)
     measurement_parameter = measurement["parameter"]
     measurement_parameter_key = required_pollutant_data[measurement_parameter]
     results[key][measurement_parameter_key.value] = measurement_value
