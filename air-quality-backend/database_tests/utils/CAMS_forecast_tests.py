@@ -1,11 +1,8 @@
 from database_tests.utils.db_helpers import get_database_data
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
-os.environ["MONGO_DB_URI"] = "mongodb+srv://mnyamunda:CVbP4nSZWfDtEAzT@cluster0.ch5gkk4.mongodb.net/"
-os.environ["MONGO_DB_NAME"] = "air_quality_dashboard_db_max"
 collection_name = "forecast_data"
 
 
@@ -32,4 +29,14 @@ def test_overall_aqi_level_is_highest_value_of_pollutant_aqi_levels():
         highest_aqi = max(document[key] for key in pollutant_keys)
         assert document["overall_aqi_level"] == highest_aqi, (
             f"overall_aqi_level {document['overall_aqi_level']} is not equal to the highest AQI level {highest_aqi}"
+        )
+
+
+def test_that_each_document_has_location_type_city():
+    query = {}
+    dict_result = get_database_data(query, collection_name)
+
+    for document in dict_result:
+        assert document["location_type"] == "city", (
+            f"location_type '{document['location_type']}' is not a city!"
         )

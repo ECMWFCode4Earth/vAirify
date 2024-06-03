@@ -1,11 +1,7 @@
 import os
 import pprint
-
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, OperationFailure
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 def get_database_data(query: dict, collection_name: str):
@@ -30,6 +26,7 @@ def get_database_data(query: dict, collection_name: str):
                 "forecast_range": document["forecast_range"],
                 "forecast_valid_time": document["forecast_valid_time"],
                 "overall_aqi_level": document["overall_aqi_level"],
+                "location_type": document["location_type"],
                 "o3_value": document["o3"]["value"],
                 "so2_value": document["so2"]["value"],
                 "no2_value": document["no2"]["value"],
@@ -54,13 +51,14 @@ def get_database_data(query: dict, collection_name: str):
     return database_dictionary_list
 
 
-def main_fetch():
-    query = {}  # must be dict type?
-    collection_name = 'forecast_data'  # access collection variable
+# Method to check the dictionary contents
+def dict_view():
+    query = {}
+    collection_name = 'forecast_data'
     result = get_database_data(query, collection_name)
 
     pprint.pprint(result)
 
 
 if __name__ == "__main__":
-    main_fetch()
+    dict_view()
