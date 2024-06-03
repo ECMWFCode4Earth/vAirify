@@ -1,4 +1,4 @@
-from database_tests.utils.db_helpers import get_database_data
+from system_tests.utils.cams_utilities import get_database_data
 from dotenv import load_dotenv
 
 load_dotenv()
