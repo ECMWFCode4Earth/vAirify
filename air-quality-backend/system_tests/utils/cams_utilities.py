@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+
 import xarray
 from decimal import Decimal
 from pandas import read_csv
@@ -218,3 +220,53 @@ def calculate_database_divergence_from_ecmwf_forecast_values(
     else:
         formatted_divergence_percentage = divergence_percentage
     return formatted_divergence_percentage
+
+
+def get_ecmwf_record_for_city_and_valid_time(
+    test_city: str, test_forecast_valid_time: datetime, ecmwf_all_data: list[dict]
+) -> list[dict]:
+    return list(
+        filter(
+            lambda x: x["location_name"] == test_city
+            and x["valid_time"] == test_forecast_valid_time.strftime("%Y-%m-%dT%H:%M"),
+            ecmwf_all_data,
+        )
+    )
+
+
+def get_database_record_for_city_and_valid_time(
+    test_forecast_base_time: datetime,
+    test_city: str,
+    test_forecast_valid_time: datetime,
+    database_all_data: list[dict[str]],
+) -> list[dict]:
+    return list(
+        filter(
+            lambda x: x["forecast_base_time"] == test_forecast_base_time
+            and x["name"] == test_city
+            and x["forecast_valid_time"] == test_forecast_valid_time,
+            database_all_data,
+        )
+    )
+
+
+def get_pollutant_value(
+    pollutant: str, source_name: str, list_of_records_from_source: list[dict]
+):
+    first_record = list_of_records_from_source[0]
+    pollutant_name_upper_case = pollutant.upper()
+
+    if source_name.lower() == "ecmwf_forecast":
+        return first_record[pollutant_name_upper_case]
+    elif source_name.lower() == "database_forecast":
+        match pollutant_name_upper_case:
+            case "O3":
+                return first_record["o3_value"]
+            case "NO2":
+                return first_record["no2_value"]
+            case "PM10":
+                return first_record["pm10_value"]
+            case "PM2.5":
+                return first_record["pm2_5_value"]
+    else:
+        raise ValueError("Invalid source name for forecast")

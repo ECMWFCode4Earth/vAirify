@@ -3,19 +3,18 @@ import pytest
 from dotenv import load_dotenv
 
 from system_tests.cities_data import all_cities
-from system_tests.utils.helper_methods import (
+from system_tests.utils.cams_utilities import (
     get_ecmwf_forecast_to_dict_for_countries,
     get_database_data,
     calculate_database_divergence_from_ecmwf_forecast_values,
+    get_ecmwf_record_for_city_and_valid_time,
+    get_database_record_for_city_and_valid_time,
+    get_pollutant_value,
 )
 
 # Test setup
-ecmwf_forecast_file_path = (
-    ""  # Add local path to ECMWF forecast file from air-quality-backend
-)
-ecmwf_locations_file_path = (
-    ""  # Add local path to ECMWF locations file from air-quality-backend
-)
+ecmwf_forecast_file_path = "system_tests/CAMS_surface_concentration_2024053100_V1.csv"  # Add local path to downloaded file from air-quality-backend
+ecmwf_locations_file_path = "system_tests/CAMS_locations_V1.csv"
 test_forecast_base_time = datetime.datetime(
     2024, 5, 31, 00, 00, 00
 )  # Ensure this corresponds to ecmwf forecast file base time
@@ -30,37 +29,37 @@ database_all_data = get_database_data("forecast_data")
 test_forecast_valid_time = datetime.datetime(
     2024, 5, 31, 3, 00, 00
 )  # Set a valid time to test against
-allowed_divergence_percentage = 3
+allowed_divergence_percentage = 2
 
 
-@pytest.mark.parametrize("city", all_cities)
-def test_compare_ecmwf_o3_with_database_o3(city: str):
-    # Test parameters
-    test_city = city
-
-    ecmwf_record_for_city_and_valid_time = list(
-        filter(
-            lambda x: x["location_name"] == test_city
-            and x["valid_time"] == test_forecast_valid_time.strftime("%Y-%m-%dT%H:%M"),
-            ecmwf_all_data,
-        )
+@pytest.mark.parametrize("test_city", all_cities)
+def test_compare_ecmwf_o3_with_database_o3(test_city: str):
+    ecmwf_record_for_city_and_valid_time = get_ecmwf_record_for_city_and_valid_time(
+        test_city, test_forecast_valid_time, ecmwf_all_data
     )
 
-    database_record_for_city_and_valid_time = list(
-        filter(
-            lambda x: x["forecast_base_time"] == test_forecast_base_time
-            and x["name"] == test_city
-            and x["forecast_valid_time"] == test_forecast_valid_time,
+    database_record_for_city_and_valid_time = (
+        get_database_record_for_city_and_valid_time(
+            test_forecast_base_time,
+            test_city,
+            test_forecast_valid_time,
             database_all_data,
         )
     )
 
-    database_o3_value = database_record_for_city_and_valid_time[0]["o3_value"]
-    ecmwf_forecast_o3_value = ecmwf_record_for_city_and_valid_time[0]["O3"]
+    ecmwf_forecast_o3_value = get_pollutant_value(
+        "o3",
+        "ecmwf_forecast",
+        ecmwf_record_for_city_and_valid_time,
+    )
+    database_o3_value = get_pollutant_value(
+        "o3", "database_forecast", database_record_for_city_and_valid_time
+    )
 
     divergence_percentage = calculate_database_divergence_from_ecmwf_forecast_values(
         database_o3_value, ecmwf_forecast_o3_value
     )
+
     assert (
         divergence_percentage <= allowed_divergence_percentage
     ), "ECMWF forecast: {}, Database value: {}, Divergence: {}%".format(
@@ -68,34 +67,34 @@ def test_compare_ecmwf_o3_with_database_o3(city: str):
     )
 
 
-@pytest.mark.parametrize("city", all_cities)
-def test_compare_ecmwf_no2_with_database_no2(city: str):
-    # Test parameters
-    test_city = city
-
-    ecmwf_record_for_city_and_valid_time = list(
-        filter(
-            lambda x: x["location_name"] == test_city
-            and x["valid_time"] == test_forecast_valid_time.strftime("%Y-%m-%dT%H:%M"),
-            ecmwf_all_data,
-        )
+@pytest.mark.parametrize("test_city", all_cities)
+def test_compare_ecmwf_no2_with_database_no2(test_city: str):
+    ecmwf_record_for_city_and_valid_time = get_ecmwf_record_for_city_and_valid_time(
+        test_city, test_forecast_valid_time, ecmwf_all_data
     )
 
-    database_record_for_city_and_valid_time = list(
-        filter(
-            lambda x: x["forecast_base_time"] == test_forecast_base_time
-            and x["name"] == test_city
-            and x["forecast_valid_time"] == test_forecast_valid_time,
+    database_record_for_city_and_valid_time = (
+        get_database_record_for_city_and_valid_time(
+            test_forecast_base_time,
+            test_city,
+            test_forecast_valid_time,
             database_all_data,
         )
     )
 
-    database_no2_value = database_record_for_city_and_valid_time[0]["no2_value"]
-    ecmwf_forecast_no2_value = ecmwf_record_for_city_and_valid_time[0]["NO2"]
+    ecmwf_forecast_no2_value = get_pollutant_value(
+        "no2",
+        "ecmwf_forecast",
+        ecmwf_record_for_city_and_valid_time,
+    )
+    database_no2_value = get_pollutant_value(
+        "no2", "database_forecast", database_record_for_city_and_valid_time
+    )
 
     divergence_percentage = calculate_database_divergence_from_ecmwf_forecast_values(
         database_no2_value, ecmwf_forecast_no2_value
     )
+
     assert (
         divergence_percentage <= allowed_divergence_percentage
     ), "ECMWF forecast: {}, Database value: {}, Divergence: {}%".format(
@@ -103,34 +102,34 @@ def test_compare_ecmwf_no2_with_database_no2(city: str):
     )
 
 
-@pytest.mark.parametrize("city", all_cities)
-def test_compare_ecmwf_pm10_with_database_pm10(city: str):
-    # Test parameters
-    test_city = city
-
-    ecmwf_record_for_city_and_valid_time = list(
-        filter(
-            lambda x: x["location_name"] == test_city
-            and x["valid_time"] == test_forecast_valid_time.strftime("%Y-%m-%dT%H:%M"),
-            ecmwf_all_data,
-        )
+@pytest.mark.parametrize("test_city", all_cities)
+def test_compare_ecmwf_pm10_with_database_pm10(test_city: str):
+    ecmwf_record_for_city_and_valid_time = get_ecmwf_record_for_city_and_valid_time(
+        test_city, test_forecast_valid_time, ecmwf_all_data
     )
 
-    database_record_for_city_and_valid_time = list(
-        filter(
-            lambda x: x["forecast_base_time"] == test_forecast_base_time
-            and x["name"] == test_city
-            and x["forecast_valid_time"] == test_forecast_valid_time,
+    database_record_for_city_and_valid_time = (
+        get_database_record_for_city_and_valid_time(
+            test_forecast_base_time,
+            test_city,
+            test_forecast_valid_time,
             database_all_data,
         )
     )
 
-    database_pm10_value = database_record_for_city_and_valid_time[0]["pm10_value"]
-    ecmwf_forecast_pm10_value = ecmwf_record_for_city_and_valid_time[0]["PM10"]
+    ecmwf_forecast_pm10_value = get_pollutant_value(
+        "pm10",
+        "ecmwf_forecast",
+        ecmwf_record_for_city_and_valid_time,
+    )
+    database_pm10_value = get_pollutant_value(
+        "pm10", "database_forecast", database_record_for_city_and_valid_time
+    )
 
     divergence_percentage = calculate_database_divergence_from_ecmwf_forecast_values(
         database_pm10_value, ecmwf_forecast_pm10_value
     )
+
     assert (
         divergence_percentage <= allowed_divergence_percentage
     ), "ECMWF forecast: {}, Database value: {}, Divergence: {}%".format(
@@ -138,34 +137,34 @@ def test_compare_ecmwf_pm10_with_database_pm10(city: str):
     )
 
 
-@pytest.mark.parametrize("city", all_cities)
-def test_compare_ecmwf_pm2_5_with_database_pm2_5(city: str):
-    # Test parameters
-    test_city = city
-
-    ecmwf_record_for_city_and_valid_time = list(
-        filter(
-            lambda x: x["location_name"] == test_city
-            and x["valid_time"] == test_forecast_valid_time.strftime("%Y-%m-%dT%H:%M"),
-            ecmwf_all_data,
-        )
+@pytest.mark.parametrize("test_city", all_cities)
+def test_compare_ecmwf_pm2_5_with_database_pm2_5(test_city: str):
+    ecmwf_record_for_city_and_valid_time = get_ecmwf_record_for_city_and_valid_time(
+        test_city, test_forecast_valid_time, ecmwf_all_data
     )
 
-    database_record_for_city_and_valid_time = list(
-        filter(
-            lambda x: x["forecast_base_time"] == test_forecast_base_time
-            and x["name"] == test_city
-            and x["forecast_valid_time"] == test_forecast_valid_time,
+    database_record_for_city_and_valid_time = (
+        get_database_record_for_city_and_valid_time(
+            test_forecast_base_time,
+            test_city,
+            test_forecast_valid_time,
             database_all_data,
         )
     )
 
-    database_pm2_5_value = database_record_for_city_and_valid_time[0]["pm2_5_value"]
-    ecmwf_forecast_pm2_5_value = ecmwf_record_for_city_and_valid_time[0]["PM2.5"]
+    ecmwf_forecast_pm2_5_value = get_pollutant_value(
+        "pm2.5",
+        "ecmwf_forecast",
+        ecmwf_record_for_city_and_valid_time,
+    )
+    database_pm2_5_value = get_pollutant_value(
+        "pm2.5", "database_forecast", database_record_for_city_and_valid_time
+    )
 
     divergence_percentage = calculate_database_divergence_from_ecmwf_forecast_values(
         database_pm2_5_value, ecmwf_forecast_pm2_5_value
     )
+
     assert (
         divergence_percentage <= allowed_divergence_percentage
     ), "ECMWF forecast: {}, Database value: {}, Divergence: {}% ".format(
