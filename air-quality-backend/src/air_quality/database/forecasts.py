@@ -26,7 +26,11 @@ def delete_data_before(forecast_valid_time: datetime):
 
 
 def get_forecast_data_from_database(
-    valid_date_from, valid_date_to, location_type, forecast_base_time, location_name
+    valid_date_from: datetime,
+    valid_date_to: datetime,
+    location_type: str,
+    forecast_base_time: datetime,
+    location_name: str,
 ):
     collection = get_collection("forecast_data")
     query = {

@@ -7,7 +7,7 @@ import pytest
 from unittest.mock import patch
 from air_quality.database.forecasts import insert_data, delete_data_before
 
-from src.air_quality.database.forecasts import get_forecast_data_from_database
+from air_quality.database.forecasts import get_forecast_data_from_database
 from tests.database.forecast_database_test_data import forecast_from_database
 
 
@@ -72,7 +72,7 @@ def test__delete_data_before(mock_collection):
 
 def test_get_forecast_from_database_no_location_location_name(mock_collection):
     with patch(
-        "src.air_quality.database.forecasts.get_collection",
+        "air_quality.database.forecasts.get_collection",
         return_value=mock_collection,
     ):
         mock_collection.insert_many(forecast_from_database)
@@ -127,7 +127,7 @@ def test_get_forecast_from_database_no_location_location_name(mock_collection):
 
 def test_get_forecast_from_database_with_location_location_name(mock_collection):
     with patch(
-        "src.air_quality.database.forecasts.get_collection",
+        "air_quality.database.forecasts.get_collection",
         return_value=mock_collection,
     ):
         mock_collection.insert_many(forecast_from_database)
