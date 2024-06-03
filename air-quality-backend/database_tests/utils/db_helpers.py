@@ -53,7 +53,7 @@ def get_database_data(query: dict, collection_name: str):
 
 # Method to check the dictionary contents
 def dict_view():
-    query = {}
+    query = {"name": "Vancouver"}
     collection_name = 'forecast_data'
     result = get_database_data(query, collection_name)
 
