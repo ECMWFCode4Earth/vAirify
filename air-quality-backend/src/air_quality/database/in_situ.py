@@ -53,7 +53,7 @@ def find_by_criteria(
     criteria = {
         "measurement_date": {
             "$gte": measurement_date_from,
-            "$lt": measurement_date_to,
+            "$lte": measurement_date_to,
         },
         "location_type": location_type.value,
     }
