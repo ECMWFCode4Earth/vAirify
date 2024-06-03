@@ -2,7 +2,7 @@ from datetime import datetime
 from functools import reduce
 import logging
 from air_quality.database.locations import AirQualityLocationType
-from air_quality.etl.air_quality_index.pollutant_type import PollutantType
+from air_quality.aqi.pollutant_type import PollutantType
 
 required_pollutant_data = {
     "o3": PollutantType.OZONE,

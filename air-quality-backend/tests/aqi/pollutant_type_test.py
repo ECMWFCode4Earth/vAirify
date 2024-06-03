@@ -1,5 +1,5 @@
 import pytest
-from air_quality.etl.air_quality_index.pollutant_type import (
+from air_quality.aqi.pollutant_type import (
     PollutantType,
     is_single_level,
 )

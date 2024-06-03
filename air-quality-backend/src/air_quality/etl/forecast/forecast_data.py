@@ -2,7 +2,7 @@ from decimal import Decimal
 import logging
 import xarray as xr
 from air_quality.database.locations import AirQualityLocation
-from air_quality.etl.air_quality_index.pollutant_type import (
+from air_quality.aqi.pollutant_type import (
     PollutantType,
     is_single_level,
 )

@@ -4,8 +4,8 @@ import logging
 from typing import TypedDict
 from .forecast_data import ForecastData
 from air_quality.database.locations import AirQualityLocation
-from air_quality.etl.air_quality_index import calculator as aqi_calculator
-from air_quality.etl.air_quality_index.pollutant_type import PollutantType
+from air_quality.aqi import calculator as aqi_calculator
+from air_quality.aqi.pollutant_type import PollutantType
 
 
 class PollutantData(TypedDict):

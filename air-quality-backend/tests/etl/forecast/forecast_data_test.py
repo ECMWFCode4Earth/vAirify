@@ -1,6 +1,6 @@
 import pytest
 import xarray
-from air_quality.etl.air_quality_index.pollutant_type import PollutantType
+from air_quality.aqi.pollutant_type import PollutantType
 from air_quality.etl.forecast.forecast_data import (
     convert_east_only_longitude_to_east_west,
     ForecastData,
