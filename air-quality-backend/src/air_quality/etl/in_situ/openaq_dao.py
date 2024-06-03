@@ -17,8 +17,9 @@ def fetch_in_situ_measurements(cities, date_from: datetime, date_to: datetime):
 
 
 def call_openaq_api(city, date_from: datetime, date_to: datetime) -> list:
+    limit = 3000
     query_params = {
-        "limit": "3000",
+        "limit": limit,
         "page": "1",
         "offset": "0",
         "sort": "desc",
@@ -28,15 +29,21 @@ def call_openaq_api(city, date_from: datetime, date_to: datetime) -> list:
         "date_from": date_from.strftime("%Y-%m-%dT%H:%M:%S"),
         "coordinates": format_coordinates(city),
         "parameter": ["o3", "no2", "pm10", "so2", "pm25"],
+        "unit": "µg/m³",
     }
     url = base_url + "?" + urlencode(query_params, doseq=True)
     headers = {"X-API-Key": os.environ.get("OPEN_AQ_API_KEY")}
     logging.debug(f"Calling OpenAQ: {url}")
     response_json = requests.get(url, headers=headers).json()
-    if response_json.get("results") is not None:
-        return response_json["results"]
+    results = response_json.get("results")
+    if results is not None:
+        if len(results) > limit:
+            logging.warning(f"More results were present for: {city['name']}")
+        return results
     else:
-        logging.warning(f"Response contained no results: {response_json}")
+        logging.warning(
+            f"Response for {city['name']} contained no results: {response_json}"
+        )
         return []
 
 

@@ -1,6 +1,7 @@
 from decimal import Decimal
 import logging
 import xarray as xr
+from air_quality.database.locations import AirQualityLocation
 from air_quality.etl.air_quality_index.pollutant_type import (
     PollutantType,
     is_single_level,
@@ -83,27 +84,47 @@ class ForecastData:
         else:
             return self._multi_level_data
 
-    def get_pollutant_data_for_lat_long(
-        self, latitude: float, longitude: float, pollutant_type: PollutantType
-    ) -> list[float]:
+    def get_pollutant_data_for_locations(
+        self, locations: list[AirQualityLocation], pollutant_types: list[PollutantType]
+    ) -> list[tuple[AirQualityLocation, dict[PollutantType : list[float]]]]:
         """
-        Get forecasted air pollutant values (kgm3) for a given lat/long
-        and pollutant using bilinear interpolation
-        :param latitude:
-        :param longitude:
-        :param pollutant_type:
+        Get forecasted air pollutant values for given locations
+        and pollutants using bilinear interpolation
+        :param locations:
+        :param pollutant_types:
         :return: values for pollutant at lat/long
         """
-        dataset = self._get_data_set(pollutant_type)
-        return (
-            dataset[pollutant_data_map[pollutant_type]]
-            .interp(
-                latitude=latitude,
-                longitude=longitude,
+        latitudes = []
+        longitudes = []
+        for location in locations:
+            latitudes.append(location["latitude"])
+            longitudes.append(location["longitude"])
+
+        interpolated_data_by_pollutant_type = {}
+        for pollutant_type in pollutant_types:
+            dataset = self._get_data_set(pollutant_type)
+            # Interpolation is called n times, where n = len(pollutant_types),
+            # irrespective of len(locations)
+            interpolated_data = dataset[pollutant_data_map[pollutant_type]].interp(
+                latitude=xr.DataArray(latitudes, dims="points"),
+                longitude=xr.DataArray(longitudes, dims="points"),
                 method="linear",
             )
-            .values.tolist()
-        )
+            interpolated_data_by_pollutant_type[pollutant_type] = interpolated_data
+
+        location_pollutant_tuples = []
+        for i, location in enumerate(locations):
+            location_pollutant_data = {}
+            for (
+                pollutant_type,
+                interpolated_data,
+            ) in interpolated_data_by_pollutant_type.items():
+                pollutant_forecast_values = interpolated_data.isel(points=i)
+                location_pollutant_data[pollutant_type] = (
+                    pollutant_forecast_values.values.tolist()
+                )
+            location_pollutant_tuples.append((location, location_pollutant_data))
+        return location_pollutant_tuples
 
     def get_step_values(self):
         return self._single_level_data["step"].values

@@ -1,6 +1,6 @@
 Playwright Basic Image assertion tests
 
-1. CD to Frontend
+1. CD to air-quality-ui
 2. Run "npx playwright test"
 3. These may fail at first depending on if there are predetermined pngs in the codebase.
 

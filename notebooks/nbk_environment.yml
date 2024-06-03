@@ -5,7 +5,9 @@ channels:
 dependencies:
   - black=24.4.2
   - cartopy=0.23.0
+  - cfgrib=0.9.12.0
   - dask=2024.4.2
+  - geopandas=0.14.4
   - jupyterlab=4.2.0
   - jupytext=1.16.2
   - netcdf4=1.6.5
