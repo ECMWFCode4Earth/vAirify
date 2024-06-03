@@ -1,7 +1,5 @@
 FROM continuumio/miniconda3
 
-COPY .cdsapirc /root/.cdsapirc
-
 WORKDIR /usr/src/app
 COPY ./ ./
 RUN conda env create -f conda/environment.yml
