@@ -7,8 +7,7 @@ collection_name = "forecast_data"
 
 
 def test_overall_aqi_level_is_between_1_and_6():
-    query = {}
-    dict_result = get_database_data(query, collection_name)
+    dict_result = get_database_data({}, collection_name)
 
     for document in dict_result:
         overall_aqi_level = document["overall_aqi_level"]
@@ -16,8 +15,8 @@ def test_overall_aqi_level_is_between_1_and_6():
 
 
 def test_individual_aqi_levels_are_between_1_and_6():
-    query = {"name": "Vancouver"}
-    dict_result = get_database_data(query, collection_name)
+
+    dict_result = get_database_data({}, collection_name)
     pollutant_keys = ["no2_aqi_level", "so2_aqi_level", "o3_aqi_level",
                       "pm10_aqi_level", "pm2_5_aqi_level"]
     for document in dict_result:
@@ -26,8 +25,7 @@ def test_individual_aqi_levels_are_between_1_and_6():
 
 
 def test_overall_aqi_level_is_highest_value_of_pollutant_aqi_levels():
-    query = {}
-    dict_result = get_database_data(query, collection_name)
+    dict_result = get_database_data({}, collection_name)
     pollutant_keys = ["no2_aqi_level", "so2_aqi_level",
                       "o3_aqi_level", "pm10_aqi_level", "pm2_5_aqi_level"]
 
