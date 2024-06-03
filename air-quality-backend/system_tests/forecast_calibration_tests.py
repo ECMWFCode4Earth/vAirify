@@ -13,19 +13,18 @@ from system_tests.utils.cams_utilities import (
 )
 
 # Test setup
-ecmwf_forecast_file_path = "system_tests/CAMS_surface_concentration_2024053100_V1.csv"  # Add local path to downloaded file from air-quality-backend
-ecmwf_locations_file_path = "system_tests/CAMS_locations_V1.csv"
-test_forecast_base_time = datetime.datetime(
-    2024, 5, 31, 00, 00, 00
-)  # Ensure this corresponds to ecmwf forecast file base time
-
 load_dotenv(".env-qa")
+
+ecmwf_forecast_file_path = "system_tests/CAMS_surface_concentration_2024053100_V1.csv"
+ecmwf_locations_file_path = "system_tests/CAMS_locations_V1.csv"
+
 ecmwf_all_data = get_ecmwf_forecast_to_dict_for_countries(
     ecmwf_locations_file_path, ecmwf_forecast_file_path
 )
 database_all_data = get_database_data("forecast_data")
 
 # Shared test parameters
+test_forecast_base_time = datetime.datetime(2024, 5, 31, 00, 00, 00)
 test_forecast_valid_time = datetime.datetime(
     2024, 5, 31, 3, 00, 00
 )  # Set a valid time to test against
