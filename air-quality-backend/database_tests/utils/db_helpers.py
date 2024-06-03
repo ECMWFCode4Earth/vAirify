@@ -9,7 +9,7 @@ def get_database_data(query: dict, collection_name: str):
     db_name = os.environ.get("MONGO_DB_NAME")
 
     if not uri or not db_name:
-        raise ValueError("Environment variables MONGO_DB_URI and MONGO_DB_NAME must be set")
+        raise ValueError("MONGO_DB_URI and MONGO_DB_NAME must be set!")
 
     try:
         client = MongoClient(uri)
