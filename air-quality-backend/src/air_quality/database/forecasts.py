@@ -40,4 +40,3 @@ def get_forecast_data_from_database(
     if location_name is not None:
         query["name"] = location_name
     return map_forecast(list(collection.find(query)))
-
