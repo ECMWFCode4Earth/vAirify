@@ -7,7 +7,7 @@ from pymongo import MongoClient, UpdateOne
 def get_collection(name: str):
     uri = os.environ.get("MONGO_DB_URI")
     db_name = os.environ.get("MONGO_DB_NAME")
-    client = MongoClient(uri)
+    client = MongoClient(uri, tz_aware=True)
     return client[db_name][name]
 
 
