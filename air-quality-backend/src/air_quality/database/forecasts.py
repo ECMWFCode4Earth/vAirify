@@ -1,7 +1,6 @@
 from datetime import datetime
 import logging
 from .mongo_db_operations import get_collection, upsert_data
-from ..api.mappers.forecast_mapper import map_forecast
 
 
 def insert_data(data):
@@ -43,4 +42,4 @@ def get_forecast_data_from_database(
     }
     if location_name is not None:
         query["name"] = location_name
-    return map_forecast(list(collection.find(query)))
+    return list(collection.find(query))

@@ -145,7 +145,8 @@ def test_get_forecast_data_with_city_name(mock_collection):
                             "ctx": {"error": "invalid date separator, expected `-`"},
                             "input": "2023A00.000+00:00",
                             "loc": ["query", "valid_date_from"],
-                            "msg": "Input should be a valid datetime or date, invalid date "
+                            "msg": "Input should be a valid datetime or date, "
+                            "invalid date "
                             "separator, expected `-`",
                             "type": "datetime_from_date_parsing",
                         }
@@ -167,8 +168,8 @@ def test_get_forecast_data_with_city_name(mock_collection):
                             "ctx": {"error": "input is too short"},
                             "input": "20200�0",
                             "loc": ["query", "valid_date_to"],
-                            "msg": "Input should be a valid datetime or date, input is too "
-                            "short",
+                            "msg": "Input should be a valid datetime or date, input is "
+                            "too short",
                             "type": "datetime_from_date_parsing",
                         }
                     ]
