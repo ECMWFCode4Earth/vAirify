@@ -1,10 +1,11 @@
-from bson import ObjectId
-from datetime import datetime
 import logging
-from typing import TypedDict
-from .mongo_db_operations import get_collection, upsert_data, GeoJSONPoint
-from air_quality.database.locations import AirQualityLocationType
+from datetime import datetime
+from typing import TypedDict, NotRequired
 
+from bson import ObjectId
+
+from air_quality.database.locations import AirQualityLocationType
+from .mongo_db_operations import get_collection, upsert_data, GeoJSONPoint
 
 collection_name = "in_situ_data"
 
@@ -25,11 +26,11 @@ class InSituMeasurement(TypedDict):
     location: GeoJSONPoint
     location_type: AirQualityLocationType
     metadata: InSituMetadata
-    no2: float
-    o3: float
-    pm2_5: float
-    pm10: float
-    so2: float
+    no2: NotRequired[float]
+    o3: NotRequired[float]
+    pm2_5: NotRequired[float]
+    pm10: NotRequired[float]
+    so2: NotRequired[float]
 
 
 def insert_data(data):

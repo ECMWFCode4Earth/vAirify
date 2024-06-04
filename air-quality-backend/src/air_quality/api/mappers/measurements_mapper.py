@@ -1,6 +1,7 @@
 from datetime import UTC
-from air_quality.aqi.pollutant_type import PollutantType
+
 from air_quality.api.types import MeasurementDto
+from air_quality.aqi.pollutant_type import PollutantType
 from air_quality.database.in_situ import InSituMeasurement
 
 
