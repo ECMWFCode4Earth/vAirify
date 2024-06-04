@@ -1,10 +1,11 @@
 from datetime import datetime
+from unittest.mock import patch
+
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import patch, ANY
+
 from air_quality.api.main import app
 from air_quality.database.locations import AirQualityLocationType
-
 
 client = TestClient(app)
 
@@ -53,7 +54,8 @@ request_defaults = {
                 **request_defaults,
                 "date_from": "2024-06-01T",
             },
-            "Input should be a valid datetime or date, unexpected extra characters at the end of the input",
+            "Input should be a valid datetime or date, "
+            + "unexpected extra characters at the end of the input",
         ),
         # date_to invalid
         (
@@ -62,7 +64,8 @@ request_defaults = {
                 **request_defaults,
                 "date_to": "2024-06-01T",
             },
-            "Input should be a valid datetime or date, unexpected extra characters at the end of the input",
+            "Input should be a valid datetime or date, "
+            + "unexpected extra characters at the end of the input",
         ),
         # location_type invalid
         (
