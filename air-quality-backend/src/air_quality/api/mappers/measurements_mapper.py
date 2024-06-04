@@ -6,18 +6,18 @@ from air_quality.database.in_situ import InSituMeasurement
 
 def database_to_api_result(measurement: InSituMeasurement) -> MeasurementDto:
     return {
-        "measurementDate": measurement["measurement_date"].astimezone(UTC),
-        "locationType": measurement["location_type"],
-        "locationName": measurement["name"],
+        "measurement_date": measurement["measurement_date"].astimezone(UTC),
+        "location_type": measurement["location_type"],
+        "location_name": measurement["name"],
         **{
             pollutant_type.value: measurement[pollutant_type.value]
             for pollutant_type in PollutantType
             if pollutant_type.value in measurement
         },
-        "apiSource": measurement["api_source"],
+        "api_source": measurement["api_source"],
         "entity": measurement["metadata"]["entity"],
-        "sensorType": measurement["metadata"]["sensor_type"],
-        "siteName": measurement["location_name"],
+        "sensor_type": measurement["metadata"]["sensor_type"],
+        "site_name": measurement["location_name"],
     }
 
 
