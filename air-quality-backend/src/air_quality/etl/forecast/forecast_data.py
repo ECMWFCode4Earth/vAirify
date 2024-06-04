@@ -84,6 +84,17 @@ class ForecastData:
         else:
             return self._multi_level_data
 
+    def get_details_for_lat_long(self, latitude: int, longitude: int, time):
+        single = self._single_level_data
+        multi = self._multi_level_data
+
+        single_forecast = single.sel(latitude=latitude, longitude=longitude,  method="nearest")
+
+        return {
+            "surface_pressure": 11,
+            "temperature": 9
+        }
+
     def get_pollutant_data_for_locations(
         self, locations: list[AirQualityLocation], pollutant_types: list[PollutantType]
     ) -> list[tuple[AirQualityLocation, dict[PollutantType : list[float]]]]:

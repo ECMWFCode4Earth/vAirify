@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from air_quality.etl.forecast.forecast_dao import fetch_forecast_data, CAMS_FORECAST_INTERVAL_HOURS, \
     CAMS_UPDATE_INTERVAL_HOURS
 from air_quality.etl.in_situ.openaq_dao import fetch_in_situ_measurements
-from air_quality.etl.in_situ.openaq_adapter import transform
+from air_quality.etl.in_situ.openaq_adapter import transform_city, convert_units
 
 
 def retrieve_openaq_in_situ_data(cities, end_date: datetime, period_hours):
@@ -24,6 +24,10 @@ def retrieve_openaq_in_situ_data(cities, end_date: datetime, period_hours):
     extracted_forecast_data = fetch_forecast_data(start_date, no_of_forecasts)
 
     logging.info("Transforming in situ data")
-    transformed_in_situ_data = transform(in_situ_measurements_by_city)
+    transformed_in_situ_data = []
+    for city_name, city_data in in_situ_measurements_by_city.items():
+        transformed_city_data = transform_city(city_name, city_data)
+        transformed_city_data = convert_units(transformed_city_data, extracted_forecast_data)
+        transformed_in_situ_data.extend(transformed_city_data)
 
     return transformed_in_situ_data

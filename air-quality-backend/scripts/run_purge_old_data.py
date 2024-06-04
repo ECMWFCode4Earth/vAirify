@@ -12,7 +12,7 @@ def main():
     load_dotenv()
 
 #TODO - Undo
-    previous = datetime.now() - timedelta(days=2)
+    previous = datetime.now()
 
     logging.info(f"Purging data earlier than {previous}")
     #delete_forecast_data(ten_days_previous)

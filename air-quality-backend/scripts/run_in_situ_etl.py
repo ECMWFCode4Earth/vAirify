@@ -19,7 +19,7 @@ def main():
     logging.info(f"Finding data for {cities.__len__()} cities")
 
     hours_to_query = 12
-    end_date = datetime.now()
+    end_date = datetime.now()-timedelta(days=4)
 
     logging.info("Retrieving Open AQ in situ data")
     open_aq_data = retrieve_openaq_in_situ_data(cities, end_date, hours_to_query)
