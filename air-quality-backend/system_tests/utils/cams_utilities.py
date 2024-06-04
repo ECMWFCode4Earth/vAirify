@@ -9,7 +9,7 @@ from pymongo.errors import ConnectionFailure, OperationFailure
 
 
 def get_dataset_from_coordinates_many_steps(
-        dataset: xarray.Dataset, step: str, latitude: float, longitude: float
+    dataset: xarray.Dataset, step: str, latitude: float, longitude: float
 ) -> xarray.Dataset:
     return dataset.sel(
         indexers={
@@ -22,7 +22,7 @@ def get_dataset_from_coordinates_many_steps(
 
 
 def get_dataset_from_coordinates_single_step(
-        dataset: xarray.Dataset, latitude: float, longitude: float
+    dataset: xarray.Dataset, latitude: float, longitude: float
 ) -> xarray.Dataset:
     return dataset.sel(
         indexers={
@@ -34,12 +34,12 @@ def get_dataset_from_coordinates_single_step(
 
 
 def convert_kg_to_ug(pollutant_value_kg: float) -> float:
-    return float(pollutant_value_kg) * float(10 ** 9)
+    return float(pollutant_value_kg) * float(10**9)
 
 
 def print_cams_data(
-        single_level_dataset_from_coordinates: xarray.Dataset,
-        multi_level_dataset_from_coordinates: xarray.Dataset,
+    single_level_dataset_from_coordinates: xarray.Dataset,
+    multi_level_dataset_from_coordinates: xarray.Dataset,
 ):
     pm2p5 = single_level_dataset_from_coordinates["pm2p5"].values
     pm10 = single_level_dataset_from_coordinates["pm10"].values
@@ -60,11 +60,11 @@ def print_cams_data(
 
 
 def get_raw_cams_data(
-        steps: list[str],
-        single_level_dataset: xarray.Dataset,
-        lat: float,
-        lon: float,
-        multi_level_dataset: xarray.Dataset,
+    steps: list[str],
+    single_level_dataset: xarray.Dataset,
+    lat: float,
+    lon: float,
+    multi_level_dataset: xarray.Dataset,
 ):
     print(
         "\nFetching forecast data from CAMS for latitude: {}, longitude: {}...".format(
@@ -174,7 +174,7 @@ def export_data_array_to_excel(data_array: xarray.DataArray, filename: str):
 
 
 def export_cams_data_to_excel_by_level(
-        single_level_dataset: xarray.Dataset, multi_level_dataset: xarray.Dataset
+    single_level_dataset: xarray.Dataset, multi_level_dataset: xarray.Dataset
 ):
     print("\nExporting to Excel: Single level data...")
     export_dataset_to_excel(single_level_dataset, "AllSingleLevelData.xlsx")
@@ -183,7 +183,7 @@ def export_cams_data_to_excel_by_level(
 
 
 def export_to_excel_by_pollutant(
-        single_level_dataset: xarray.Dataset, multi_level_dataset: xarray.Dataset
+    single_level_dataset: xarray.Dataset, multi_level_dataset: xarray.Dataset
 ):
     print("\nExporting to Excel...")
     export_data_array_to_excel(single_level_dataset["pm10"], "pm10.xlsx")
@@ -194,7 +194,7 @@ def export_to_excel_by_pollutant(
 
 
 def longitude_calculator_for_cams_data(
-        longitude_value: float, data_increment_size: float
+    longitude_value: float, data_increment_size: float
 ):
     if -180 < longitude_value <= 0 - (data_increment_size / 2):
         return float(Decimal(str(longitude_value)) + Decimal("360"))
@@ -216,8 +216,8 @@ def convert_cams_locations_file_to_dict(cams_locations_file_name: str) -> list[d
 
 
 def get_ecmwf_forecast_to_dict_for_countries(
-        cams_locations_file_name: str,
-        ecmwf_forecast_file_name: str,
+    cams_locations_file_name: str,
+    ecmwf_forecast_file_name: str,
 ):
     ecmwf_countries_dict = convert_cams_locations_file_to_dict(cams_locations_file_name)
     list_of_records = read_csv(ecmwf_forecast_file_name).to_dict("records")
@@ -231,11 +231,11 @@ def get_ecmwf_forecast_to_dict_for_countries(
 
 
 def calculate_database_divergence_from_ecmwf_forecast_values(
-        database_ozone_value: float, ecmwf_forecast_ozone_value: float
+    database_ozone_value: float, ecmwf_forecast_ozone_value: float
 ) -> float:
     divergence_percentage = (
-                                    (database_ozone_value - ecmwf_forecast_ozone_value) / ecmwf_forecast_ozone_value
-                            ) * 100
+        (database_ozone_value - ecmwf_forecast_ozone_value) / ecmwf_forecast_ozone_value
+    ) * 100
     if divergence_percentage < 0:
         formatted_divergence_percentage = divergence_percentage * -1
     else:
@@ -244,35 +244,35 @@ def calculate_database_divergence_from_ecmwf_forecast_values(
 
 
 def get_ecmwf_record_for_city_and_valid_time(
-        test_city: str, test_forecast_valid_time: datetime, ecmwf_all_data: list[dict]
+    test_city: str, test_forecast_valid_time: datetime, ecmwf_all_data: list[dict]
 ) -> list[dict]:
     return list(
         filter(
             lambda x: x["location_name"] == test_city
-                      and x["valid_time"] == test_forecast_valid_time.strftime("%Y-%m-%dT%H:%M"),
+            and x["valid_time"] == test_forecast_valid_time.strftime("%Y-%m-%dT%H:%M"),
             ecmwf_all_data,
         )
     )
 
 
 def get_database_record_for_city_and_valid_time(
-        test_forecast_base_time: datetime,
-        test_city: str,
-        test_forecast_valid_time: datetime,
-        database_all_data: list[dict[str]],
+    test_forecast_base_time: datetime,
+    test_city: str,
+    test_forecast_valid_time: datetime,
+    database_all_data: list[dict[str]],
 ) -> list[dict]:
     return list(
         filter(
             lambda x: x["forecast_base_time"] == test_forecast_base_time
-                      and x["name"] == test_city
-                      and x["forecast_valid_time"] == test_forecast_valid_time,
+            and x["name"] == test_city
+            and x["forecast_valid_time"] == test_forecast_valid_time,
             database_all_data,
         )
     )
 
 
 def get_pollutant_value(
-        pollutant: str, source_name: str, list_of_records_from_source: list[dict]
+    pollutant: str, source_name: str, list_of_records_from_source: list[dict]
 ):
     first_record = list_of_records_from_source[0]
     pollutant_name_upper_case = pollutant.upper()
@@ -294,12 +294,12 @@ def get_pollutant_value(
 
 
 def get_forecast_percentage_divergence(
-        test_city: str,
-        test_forecast_valid_time: datetime,
-        ecmwf_all_data: list[dict],
-        test_forecast_base_time: datetime,
-        database_all_data: list[dict[str]],
-        pollutant: str,
+    test_city: str,
+    test_forecast_valid_time: datetime,
+    ecmwf_all_data: list[dict],
+    test_forecast_base_time: datetime,
+    database_all_data: list[dict[str]],
+    pollutant: str,
 ) -> float:
     ecmwf_record_for_city_and_valid_time = get_ecmwf_record_for_city_and_valid_time(
         test_city, test_forecast_valid_time, ecmwf_all_data
