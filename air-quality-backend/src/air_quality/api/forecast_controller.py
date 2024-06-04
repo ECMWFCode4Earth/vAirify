@@ -9,7 +9,7 @@ from air_quality.database.locations import AirQualityLocationType
 router = APIRouter()
 
 
-@router.get("/air-pollutant-forecast")
+@router.get("/air-pollutant/forecast")
 async def get_forecast_data(
     location_type: AirQualityLocationType,
     valid_date_from: datetime,

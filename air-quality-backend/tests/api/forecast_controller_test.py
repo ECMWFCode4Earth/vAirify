@@ -25,7 +25,7 @@ def test_get_forecast_data_no_city_name(mock_collection):
         location_type = "city"
         forecast_base_time = "2024-05-27T12%3A00%3A00.000%2B00%3A00"
         response = client.get(
-            "/air-pollutant-forecast?valid_date_from="
+            "/air-pollutant/forecast?valid_date_from="
             + valid_date_from
             + "&valid_date_to="
             + valid_date_to
@@ -88,7 +88,7 @@ def test_get_forecast_data_with_city_name(mock_collection):
         forecast_base_time = "2024-05-27T12%3A00%3A00.000%2B00%3A00"
         name = "London"
         response = client.get(
-            "/air-pollutant-forecast?valid_date_from="
+            "/air-pollutant/forecast?valid_date_from="
             + valid_date_from
             + "&valid_date_to="
             + valid_date_to
@@ -204,7 +204,7 @@ def test_get_forecast_data_incorrect_input_date(
     valid_date_from, valid_date_to, location_type, forecast_base_time, name, expected
 ):
     response = client.get(
-        "/air-pollutant-forecast?valid_date_from="
+        "/air-pollutant/forecast?valid_date_from="
         + valid_date_from
         + "&valid_date_to="
         + valid_date_to
@@ -225,7 +225,7 @@ def test_get_forecast_data_no_valid_date_from():
     forecast_base_time = "2024-05-27T12%3A00%3A00.000%2B00%3A00"
     name = "Abu%20Dhabi"
     response = client.get(
-        "/air-pollutant-forecast?"
+        "/air-pollutant/forecast?"
         "&valid_date_to="
         + valid_date_to
         + "&location_type="
@@ -254,7 +254,7 @@ def test_get_forecast_data_no_valid_date_to():
     forecast_base_time = "2024-05-27T12%3A00%3A00.000%2B00%3A00"
     name = "Abu%20Dhabi"
     response = client.get(
-        "/air-pollutant-forecast?valid_date_from="
+        "/air-pollutant/forecast?valid_date_from="
         + valid_date_from
         + "&location_type="
         + location_type
@@ -282,7 +282,7 @@ def test_get_forecast_data_no_forecast_base_time():
     location_type = "city"
     name = "Abu%20Dhabi"
     response = client.get(
-        "/air-pollutant-forecast?valid_date_from="
+        "/air-pollutant/forecast?valid_date_from="
         + valid_date_from
         + "&valid_date_to="
         + valid_date_to
@@ -311,7 +311,7 @@ def test_get_forecast_data_incorrect_location_type():
     forecast_base_time = "2024-05-27T12%3A00%3A00.000%2B00%3A00"
     name = "Abu%20Dhabi"
     response = client.get(
-        "/air-pollutant-forecast?valid_date_from="
+        "/air-pollutant/forecast?valid_date_from="
         + valid_date_from
         + "&valid_date_to="
         + valid_date_to
@@ -342,7 +342,7 @@ def test_get_forecast_data_no_location_type():
     forecast_base_time = "2024-05-27T12%3A00%3A00.000%2B00%3A00"
     name = "Abu%20Dhabi"
     response = client.get(
-        "/air-pollutant-forecast?valid_date_from="
+        "/air-pollutant/forecast?valid_date_from="
         + valid_date_from
         + "&valid_date_to="
         + valid_date_to
