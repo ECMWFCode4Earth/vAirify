@@ -57,7 +57,7 @@ jobs:
         working-directory: ./air-quality-backend
 
       - name: Run unit tests
-        run: python -m pytest --cov=src/air_quality --cov=scripts --cov-report= tests
+        run: python -m pytest --cov=src/air_quality --cov-report= tests
         working-directory: ./air-quality-backend
 
       - name: Convert to report 
