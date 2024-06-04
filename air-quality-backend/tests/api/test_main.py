@@ -322,8 +322,18 @@ def test_get_forecast_data_incorrect_location_type():
         + "&location_name="
         + name
     )
-    assert response.status_code == 400
-    assert response.json() == {"detail": "Incorrect location type"}
+    assert response.status_code == 422
+    assert response.json() == {
+        "detail": [
+            {
+                "type": "enum",
+                "loc": ["query", "location_type"],
+                "msg": "Input should be 'city'",
+                "input": "not a city",
+                "ctx": {"expected": "'city'"},
+            }
+        ]
+    }
 
 
 def test_get_forecast_data_no_location_type():
