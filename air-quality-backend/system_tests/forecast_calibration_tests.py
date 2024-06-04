@@ -18,7 +18,7 @@ ecmwf_locations_file_path = ""  # Path to ECMWF locations file from air-quality-
 ecmwf_all_data = get_ecmwf_forecast_to_dict_for_countries(
     ecmwf_locations_file_path, ecmwf_forecast_file_path
 )
-database_all_data = get_database_data("forecast_data")
+database_all_data = get_database_data({}, "forecast_data")
 
 # Shared test parameters
 test_forecast_base_time = datetime.datetime(2024, 6, 3, 00, 00, 00)
