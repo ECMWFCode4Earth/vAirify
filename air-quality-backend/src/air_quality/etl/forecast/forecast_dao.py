@@ -8,9 +8,12 @@ from .forecast_data import ForecastData
 CAMS_FORECAST_INTERVAL_HOURS = 3
 CAMS_UPDATE_INTERVAL_HOURS = 12
 
+
 class CamsRequestDetails:
 
-    def __init__(self, base_forecast_datetime: datetime, no_of_forecast_times: int = 41):
+    def __init__(
+        self, base_forecast_datetime: datetime, no_of_forecast_times: int = 41
+    ):
         self.base_forecast_datetime = base_forecast_datetime
         self.no_of_forecast_times = no_of_forecast_times
 
@@ -79,12 +82,13 @@ def align_to_cams_publish_time(model_date_time: datetime) -> datetime:
     else:
         model_date_time -= timedelta(days=1)
         hour = 12
-    return datetime(model_date_time.year, model_date_time.month, model_date_time.day, hour)
+    return datetime(
+        model_date_time.year, model_date_time.month, model_date_time.day, hour
+    )
 
 
 def fetch_forecast_data(
-    base_datetime: datetime = datetime.now(),
-    no_of_forecast_times: int = 41
+    base_datetime: datetime = datetime.now(), no_of_forecast_times: int = 41
 ) -> ForecastData:
 
     base_datetime = align_to_cams_publish_time(base_datetime)
@@ -92,8 +96,14 @@ def fetch_forecast_data(
     file_ident = f"{no_of_forecast_times}_from_{base_datetime.strftime('%Y-%m-%d_%H')}"
 
     task_params = [
-        (get_single_level_request_body(request_details), f"single_level_{file_ident}.grib"),
-        (get_multi_level_request_body(request_details), f"multi_level_{file_ident}.grib"),
+        (
+            get_single_level_request_body(request_details),
+            f"single_level_{file_ident}.grib",
+        ),
+        (
+            get_multi_level_request_body(request_details),
+            f"multi_level_{file_ident}.grib",
+        ),
     ]
     results = [fetch_cams_data(*params) for params in task_params]
     return ForecastData(*results)

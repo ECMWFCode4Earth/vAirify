@@ -25,5 +25,6 @@ def main():
     logging.info("Persisting open AQ in situ data")
     insert_data(open_aq_data)
 
+
 if __name__ == "__main__":
     main()

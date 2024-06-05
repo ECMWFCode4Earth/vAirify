@@ -24,7 +24,11 @@ def is_single_level(pollutant_type: PollutantType) -> bool:
 
 
 def pollutants_with_molecular_weight():
-    return [PollutantType.NITROGEN_DIOXIDE, PollutantType.SULPHUR_DIOXIDE, PollutantType.OZONE]
+    return [
+        PollutantType.NITROGEN_DIOXIDE,
+        PollutantType.SULPHUR_DIOXIDE,
+        PollutantType.OZONE,
+    ]
 
 
 def get_molecular_weight(pollutant_type: PollutantType):
@@ -35,4 +39,10 @@ def get_molecular_weight(pollutant_type: PollutantType):
             return 64.07
         case PollutantType.OZONE:
             return 48
-        case _: raise Exception(f"Unable to retrieve molecular weight for pollutant '{pollutant_type.value}'")
+        case _:
+            raise (
+                Exception(
+                    f"Unable to retrieve molecular weight for pollutant "
+                    f"'{pollutant_type.value}'"
+                )
+            )

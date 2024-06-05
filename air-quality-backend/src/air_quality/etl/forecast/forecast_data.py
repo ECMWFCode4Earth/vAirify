@@ -134,14 +134,22 @@ class ForecastData:
     def get_time_value(self) -> int:
         return int(self._single_level_data["time"].values)
 
-    def get_surface_pressure(self, latitude: int, longitude: int, forecast_datetime: datetime):
+    def get_surface_pressure(
+        self, latitude: int, longitude: int, forecast_datetime: datetime
+    ):
         since_epoch = forecast_datetime.timestamp()
         single = self._single_level_data.set_index(step=["valid_time"])
-        single_point = single.sel(latitude=latitude, longitude=longitude, step=since_epoch, method="nearest")
+        single_point = single.sel(
+            latitude=latitude, longitude=longitude, step=since_epoch, method="nearest"
+        )
         return single_point["sp"].item()
 
-    def get_temperature(self, latitude: int, longitude: int, forecast_datetime: datetime):
+    def get_temperature(
+        self, latitude: int, longitude: int, forecast_datetime: datetime
+    ):
         since_epoch = forecast_datetime.timestamp()
         multi = self._multi_level_data.set_index(step=["valid_time"])
-        multi_point = multi.sel(latitude=latitude, longitude=longitude, step=since_epoch, method="nearest")
+        multi_point = multi.sel(
+            latitude=latitude, longitude=longitude, step=since_epoch, method="nearest"
+        )
         return multi_point["t"].item()
