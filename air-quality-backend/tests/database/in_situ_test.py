@@ -3,7 +3,12 @@ from freezegun import freeze_time
 import mongomock
 import pytest
 from unittest.mock import patch
-from air_quality.database.in_situ import insert_data, delete_data_before
+from air_quality.database.in_situ import (
+    find_by_criteria,
+    insert_data,
+    delete_data_before,
+)
+from air_quality.database.locations import AirQualityLocationType
 
 
 @pytest.fixture
@@ -57,3 +62,100 @@ def test__delete_data_before(mock_collection):
 
         results = list(mock_collection.find({}))
         assert len(results) == 2
+
+
+@pytest.mark.parametrize(
+    "params, expected_names",
+    [
+        (
+            {
+                "measurement_date_from": datetime(2024, 5, 1, 5, 0),
+                "measurement_date_to": datetime(2024, 5, 1, 11, 0),
+                "location_type": AirQualityLocationType.CITY,
+            },
+            ["London", "Paris"],
+        ),
+        (
+            {
+                "measurement_date_from": datetime(2024, 5, 1, 5, 0),
+                "measurement_date_to": datetime(2024, 5, 1, 10, 59),
+                "location_type": AirQualityLocationType.CITY,
+            },
+            ["London"],
+        ),
+        (
+            {
+                "measurement_date_from": datetime(2024, 4, 1, 4, 0),
+                "measurement_date_to": datetime(2024, 4, 1, 10, 59),
+                "location_type": AirQualityLocationType.CITY,
+            },
+            [],
+        ),
+        (
+            {
+                "measurement_date_from": datetime(2024, 5, 1, 5, 0),
+                "measurement_date_to": datetime(2024, 5, 1, 11, 0),
+                "location_type": AirQualityLocationType.CITY,
+                "locations": ["London", "Paris"],
+            },
+            ["London", "Paris"],
+        ),
+        (
+            {
+                "measurement_date_from": datetime(2024, 5, 1, 5, 0),
+                "measurement_date_to": datetime(2024, 5, 1, 11, 0),
+                "location_type": AirQualityLocationType.CITY,
+                "locations": ["London"],
+            },
+            ["London"],
+        ),
+        (
+            {
+                "measurement_date_from": datetime(2024, 5, 1, 5, 0),
+                "measurement_date_to": datetime(2024, 5, 1, 11, 0),
+                "location_type": AirQualityLocationType.CITY,
+                "locations": ["London"],
+                "api_source": "test_api",
+            },
+            ["London"],
+        ),
+        (
+            {
+                "measurement_date_from": datetime(2024, 5, 1, 5, 0),
+                "measurement_date_to": datetime(2024, 5, 1, 11, 0),
+                "location_type": AirQualityLocationType.CITY,
+                "locations": ["London"],
+                "api_source": "real_api",
+            },
+            [],
+        ),
+    ],
+)
+def test__find_by_criteria(params, expected_names, mock_collection):
+    with patch(
+        "air_quality.database.in_situ.get_collection", return_value=mock_collection
+    ):
+        in_situ = {
+            "o3": 123,
+            "location_type": "city",
+            "location_name": "test",
+            "api_source": "test_api",
+        }
+        mock_collection.insert_many(
+            [
+                {
+                    **in_situ,
+                    "measurement_date": datetime(2024, 5, 1, 5, 0),
+                    "name": "London",
+                },
+                {
+                    **in_situ,
+                    "measurement_date": datetime(2024, 5, 1, 11, 0),
+                    "name": "Paris",
+                },
+            ]
+        )
+
+        assert (
+            list(map(lambda x: x["name"], find_by_criteria(**params))) == expected_names
+        )

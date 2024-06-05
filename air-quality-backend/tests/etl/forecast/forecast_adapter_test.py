@@ -1,11 +1,14 @@
-from cerberus import Validator
 from datetime import datetime, timezone
+
 import pytest
+from cerberus import Validator
+
+from air_quality.database.locations import AirQualityLocationType
 from air_quality.etl.forecast.forecast_adapter import (
     ForecastData,
     transform,
 )
-from .mock_forecast_data import (
+from tests.util.mock_forecast_data import (
     single_level_data_set,
     multi_level_data_set,
     default_test_cities,
@@ -60,7 +63,7 @@ def test__transform__returns_correctly_formatted_data():
     }
     expected_document_schema = {
         "name": {"type": "string"},
-        "location_type": {"type": "string", "allowed": ["city"]},
+        "location_type": {"allowed": [AirQualityLocationType.CITY]},
         "location": {
             "type": "dict",
             "schema": {

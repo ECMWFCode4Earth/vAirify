@@ -1,11 +1,12 @@
 import pytest
 import xarray
-from air_quality.etl.air_quality_index.pollutant_type import PollutantType
+
+from air_quality.aqi.pollutant_type import PollutantType
 from air_quality.etl.forecast.forecast_data import (
     convert_east_only_longitude_to_east_west,
     ForecastData,
 )
-from .mock_forecast_data import (
+from tests.util.mock_forecast_data import (
     create_test_pollutant_data,
 )
 

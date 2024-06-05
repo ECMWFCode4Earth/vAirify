@@ -4,8 +4,8 @@ import logging
 from typing import TypedDict
 from .forecast_data import ForecastData
 from air_quality.database.locations import AirQualityLocation
-from air_quality.etl.air_quality_index import calculator as aqi_calculator
-from air_quality.etl.air_quality_index.pollutant_type import PollutantType
+from air_quality.aqi import calculator as aqi_calculator
+from air_quality.aqi.pollutant_type import PollutantType
 
 
 class PollutantData(TypedDict):
@@ -68,7 +68,7 @@ def transform(forecast_data: ForecastData, locations: list[AirQualityLocation]) 
     for location, data_by_pollutant in pollutant_data_with_location:
         location_name = location["name"]
         location_type = location["type"]
-        logging.debug(f"Processing location: {location_name} ({location['type']})")
+        logging.debug(f"Processing location: {location_name} ({location_type})")
         forecast_data_by_type = {
             pollutant_type: _convert_pollutant_values(pollutant_type, data)
             for pollutant_type, data in data_by_pollutant.items()

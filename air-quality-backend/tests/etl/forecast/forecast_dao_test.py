@@ -1,6 +1,8 @@
-from freezegun import freeze_time
-import pytest
 from unittest.mock import call, patch
+
+import pytest
+from freezegun import freeze_time
+
 from air_quality.etl.forecast.forecast_dao import (
     CamsModelDateTime,
     fetch_forecast_data,
@@ -8,7 +10,7 @@ from air_quality.etl.forecast.forecast_dao import (
     get_multi_level_request_body,
     get_single_level_request_body,
 )
-from .mock_forecast_data import single_level_data_set, multi_level_data_set
+from tests.util.mock_forecast_data import single_level_data_set, multi_level_data_set
 
 
 @pytest.fixture

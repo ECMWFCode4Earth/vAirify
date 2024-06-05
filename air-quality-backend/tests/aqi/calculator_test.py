@@ -1,6 +1,6 @@
 import pytest
-from air_quality.etl.air_quality_index.pollutant_type import PollutantType
-from air_quality.etl.air_quality_index.calculator import (
+from air_quality.aqi.pollutant_type import PollutantType
+from air_quality.aqi.calculator import (
     get_overall_aqi_level,
     get_pollutant_index_level,
 )
