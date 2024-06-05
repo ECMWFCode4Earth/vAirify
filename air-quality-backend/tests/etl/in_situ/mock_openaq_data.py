@@ -20,10 +20,3 @@ def create_measurement(location_tuple, time, parameter, value):
         "entity": "Governmental Organization",
         "sensorType": "reference grade",
     }
-
-
-def create_transform_input(city_measurements: list[tuple]):
-    return {
-        city["name"]: {"measurements": measurements, "city": city}
-        for city, measurements in city_measurements
-    }

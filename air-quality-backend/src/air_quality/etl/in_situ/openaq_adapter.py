@@ -67,7 +67,7 @@ def combine_measurement(state, measurement):
     return state
 
 
-def transform_city(city_name, city_data):
+def transform_city(city_data):
     formatted_dataset = []
     city = city_data["city"]
     measurements_for_city = city_data["measurements"]
@@ -82,7 +82,7 @@ def transform_city(city_name, city_data):
         )["results"]
         formatted_dataset.extend(list(grouped_measurements.values()))
     else:
-        logging.info(f"No in situ measurements found for {city_name}")
+        logging.info(f"No in situ measurements found for {city['name']}")
 
     return formatted_dataset
 
