@@ -8,7 +8,7 @@ from air_quality.etl.forecast.forecast_adapter import (
     ForecastData,
     transform,
 )
-from .mock_forecast_data import (
+from tests.util.mock_forecast_data import (
     single_level_data_set,
     multi_level_data_set,
     default_test_cities,
