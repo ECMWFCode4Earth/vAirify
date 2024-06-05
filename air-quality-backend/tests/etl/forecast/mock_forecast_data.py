@@ -1,6 +1,6 @@
 import pandas as pd
 import xarray
-from tests.etl.test_util import create_test_city
+from tests.util.mock_location import create_test_city
 
 default_steps = [24, 48]
 default_latitudes = [-10, 0, 10]
