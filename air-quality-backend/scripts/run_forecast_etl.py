@@ -18,8 +18,13 @@ def main():
     logging.info(f"Finding data for {cities.__len__()} cities")
 
     logging.info("Extracting pollutant forecast data")
-    if os.environ.get("FORECAST_BASE_DATE") is not None and os.environ.get("FORECAST_BASE_TIME") is not None:
-        model_base_time = CamsModelDateTime(os.environ.get("FORECAST_BASE_DATE"), os.environ.get("FORECAST_BASE_TIME"))
+    if (
+        os.environ.get("FORECAST_BASE_DATE") is not None
+        and os.environ.get("FORECAST_BASE_TIME") is not None
+    ):
+        model_base_time = CamsModelDateTime(
+            os.environ.get("FORECAST_BASE_DATE"), os.environ.get("FORECAST_BASE_TIME")
+        )
 
     extracted_forecast_data = fetch_forecast_data(model_base_time)
 
