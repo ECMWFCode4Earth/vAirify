@@ -82,12 +82,18 @@ Once you receive your key, place it in your **.env** file
 #### Locally
 You can build the docker image with the following... 
 ```
-    docker build . -t <image_name>
+    docker build . -t <image_name> -f <dockerfile>
+
+    e.g. 
+    docker build . -t forecast_etl -f Dockerfile.forecast
 ```
 
 To run the docker image (from the base air-quality-backend directory)
 ```
-    docker run --env-file .env <image_name>
+    docker run --env-file <environment_file> <image_name>
+
+    e.g.
+    docker run --env_file .env forecast_etl
 ```
 
 n.b.
