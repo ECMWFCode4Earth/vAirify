@@ -1,7 +1,8 @@
 from datetime import datetime
 from functools import reduce
 import logging
-from air_quality.etl.air_quality_index.pollutant_type import PollutantType
+from air_quality.etl.air_quality_index.pollutant_type import PollutantType, pollutants_with_molecular_weight
+from air_quality.etl.common.unit_converter import convert_ppm_to_mgm3
 from air_quality.etl.forecast.forecast_data import ForecastData
 
 required_pollutant_data = {
@@ -85,19 +86,26 @@ def transform_city(city_name, city_data):
 
 def convert_units(city_data, forecast_data: ForecastData):
     for in_situ_station in city_data:
-        for pollutant in PollutantType:
+        long = in_situ_station["location"]["coordinates"][0]
+        lat = in_situ_station["location"]["coordinates"][1]
+        measurement_date = in_situ_station["measurement_date"]
+
+        surface_pressure = forecast_data.get_surface_pressure(lat, long, measurement_date)
+        temperature = forecast_data.get_temperature(lat, long, measurement_date)
+
+        in_situ_station["metadata"]["estimated_surface_pressure_pa"] = surface_pressure
+        in_situ_station["metadata"]["estimated_temperature_k"] = temperature
+
+        for pollutant in pollutants_with_molecular_weight():
             if pollutant.value in in_situ_station and in_situ_station[pollutant.value]["original_unit"] == "ppm":
-                in_situ_station[pollutant.value]["unit"] = "µg/m³"
                 original_value = in_situ_station[pollutant.value]["value"]
 
-                lat = in_situ_station["location"]["coordinates"][0]
-                long = in_situ_station["location"]["coordinates"][1]
-                time = in_situ_station["measurement_date"]
-                details = forecast_data.get_details_for_lat_long(lat, long, time)
+                in_situ_station[pollutant.value]["value"] = convert_ppm_to_mgm3(
+                    original_value,
+                    pollutant,
+                    surface_pressure,
+                    temperature)
 
-                in_situ_station[pollutant.value]["value"] = convert_ppm_to_mgm3(original_value, pollutant, forecast_data)
+                in_situ_station[pollutant.value]["unit"] = "µg/m³"
 
     return city_data
-
-def convert_ppm_to_mgm3(ppm_value, pollutantType: PollutantType, forecast_data):
-    return ppm_value * 10

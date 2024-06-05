@@ -1,3 +1,4 @@
+import datetime
 from decimal import Decimal
 import logging
 import xarray as xr
@@ -38,8 +39,6 @@ def convert_mmr_to_mass_concentration(
                     f"Updated: {variable}, from units: 'kg kg**-1' to 'kg m**-3'."
                 )
 
-    single_level_data = single_level_data.drop_vars(["sp"])
-    multi_level_data = multi_level_data.drop_vars(["t"])
     return single_level_data, multi_level_data
 
 
@@ -83,17 +82,6 @@ class ForecastData:
             return self._single_level_data
         else:
             return self._multi_level_data
-
-    def get_details_for_lat_long(self, latitude: int, longitude: int, time):
-        single = self._single_level_data
-        multi = self._multi_level_data
-
-        single_forecast = single.sel(latitude=latitude, longitude=longitude,  method="nearest")
-
-        return {
-            "surface_pressure": 11,
-            "temperature": 9
-        }
 
     def get_pollutant_data_for_locations(
         self, locations: list[AirQualityLocation], pollutant_types: list[PollutantType]
@@ -145,3 +133,15 @@ class ForecastData:
 
     def get_time_value(self) -> int:
         return int(self._single_level_data["time"].values)
+
+    def get_surface_pressure(self, latitude: int, longitude: int, forecast_datetime: datetime):
+        since_epoch = forecast_datetime.timestamp()
+        single = self._single_level_data.set_index(step=["valid_time"])
+        single_point = single.sel(latitude=latitude, longitude=longitude, step=since_epoch, method="nearest")
+        return single_point["sp"].item()
+
+    def get_temperature(self, latitude: int, longitude: int, forecast_datetime: datetime):
+        since_epoch = forecast_datetime.timestamp()
+        multi = self._multi_level_data.set_index(step=["valid_time"])
+        multi_point = multi.sel(latitude=latitude, longitude=longitude, step=since_epoch, method="nearest")
+        return multi_point["t"].item()

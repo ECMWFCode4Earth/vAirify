@@ -11,12 +11,11 @@ config.fileConfig("./logging.ini")
 def main():
     load_dotenv()
 
-#TODO - Undo
-    previous = datetime.now()
+    ten_days_previous = datetime.now() - timedelta(days=10)
 
-    logging.info(f"Purging data earlier than {previous}")
-    #delete_forecast_data(ten_days_previous)
-    delete_in_situ_data(previous)
+    logging.info(f"Purging data earlier than {ten_days_previous}")
+    delete_forecast_data(ten_days_previous)
+    delete_in_situ_data(ten_days_previous)
 
 
 if __name__ == "__main__":
