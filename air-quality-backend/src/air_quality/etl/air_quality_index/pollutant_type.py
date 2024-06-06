@@ -41,7 +41,7 @@ def get_molecular_weight(pollutant_type: PollutantType):
             return 48
         case _:
             raise (
-                Exception(
+                ValueError(
                     f"Unable to retrieve molecular weight for pollutant "
                     f"'{pollutant_type.value}'"
                 )
