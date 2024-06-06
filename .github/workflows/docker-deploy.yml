@@ -1,0 +1,35 @@
+name: Deploy
+on:
+  [workflow_dispatch]
+
+jobs:
+  deploy:
+    name: deploy image
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - name: install ssh keys
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ vars.SSH_HOST }} > ~/.ssh/known_hosts
+      - name: create .env
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} "cd /usr/config && \\
+            echo MONGO_DB_URI=${{ secrets.MONGO_URI }} | sudo tee .env && \\
+            echo MONGO_DB_NAME=${{ secrets.MONGO_DB_NAME }} | sudo tee -a .env && \\
+            echo OPEN_AQ_API_KEY=${{ secrets.OPENAQ_KEY }} | sudo tee -a .env && \\
+            echo CDSAPI_URL=${{ secrets.CDSAPI_URL }} | sudo tee -a .env && \\
+            echo CDSAPI_KEY=${{ secrets.CDSAPI_KEY }} | sudo tee -a .env && \\
+            exit"
+      - name: activate docker
+        run: |  
+          ssh ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} "cd /usr/config && \\
+            sudo docker pull ghcr.io/${{ github.repository }}/etl:latest && \\
+            sudo docker run --env-file .env ghcr.io/${{ github.repository }}/etl:latest && \\
+            exit"
+      - name: clean up
+        run: |
+          rm -rf ~/.ssh
+
