@@ -1,10 +1,11 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 
-import GlobalSummary from './GlobalSummary'
-import SingleCity from './SingleCity'
 import './index.css'
+import GlobalSummary from './components/global summary/GlobalSummary'
+import SingleCity from './components/single city/SingleCity'
 
 const router = createBrowserRouter([
   {
@@ -12,13 +13,18 @@ const router = createBrowserRouter([
     element: <GlobalSummary />,
   },
   {
-    path: '/city/:name',
+    path: '/city/:city',
     element: <SingleCity />,
   },
 ])
 
+const queryClient = new QueryClient()
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>,
+  <QueryClientProvider client={queryClient}>
+    <React.StrictMode>
+      <RouterProvider router={router} />
+    </React.StrictMode>
+    ,
+  </QueryClientProvider>,
 )

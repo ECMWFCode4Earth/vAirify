@@ -2,12 +2,22 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from air_quality.api.mappers.forecast_mapper import map_forecast
 from air_quality.database.forecasts import get_forecast_data_from_database
 
 app = FastAPI()
 
+origins = ["http://localhost:5173"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 location_types = ["city"]
 
 
