@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Literal
 
 
 class PollutantType(Enum):
@@ -15,6 +16,10 @@ class PollutantType(Enum):
 
     def __hash__(self):
         return hash(self.value)
+
+    def literal(self) -> Literal["no2", "o3", "pm2_5", "pm10", "so2"]:
+        # Allows usage of enum for keys in TypedDict
+        return self.value
 
 
 def is_single_level(pollutant_type: PollutantType) -> bool:

@@ -1,11 +1,15 @@
-from datetime import datetime
-from fastapi import Query, APIRouter
 import logging as log
+from datetime import datetime
 from typing import List
-from air_quality.api.mappers.measurements_mapper import map_measurements
-from air_quality.database.in_situ import find_by_criteria
-from air_quality.database.locations import AirQualityLocationType
 
+from fastapi import Query, APIRouter
+
+from air_quality.api.mappers.measurements_mapper import (
+    map_measurements,
+    map_summarized_measurements,
+)
+from air_quality.database.in_situ import get_averaged, find_by_criteria
+from air_quality.database.locations import AirQualityLocationType
 
 router = APIRouter()
 
@@ -27,3 +31,21 @@ async def get_measurements(
 
     log.info(f"Responding with {len(db_results)} results")
     return map_measurements(db_results)
+
+
+@router.get("/air-pollutant/measurements/summary")
+async def get_measurements_summary(
+    measurement_base_time: datetime,
+    measurement_time_range: int,
+    location_type: AirQualityLocationType,
+):
+    log.info(
+        "Fetching measurements aggregated around {} (+/- {}) for {}".format(
+            measurement_base_time, measurement_time_range, location_type
+        )
+    )
+    averaged_measurements = get_averaged(
+        measurement_base_time, measurement_time_range, location_type
+    )
+    log.info(f"Found results for {len(averaged_measurements)} locations")
+    return map_summarized_measurements(averaged_measurements)

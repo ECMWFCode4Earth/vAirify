@@ -1,17 +1,19 @@
 from datetime import UTC
+from typing import Literal
 
-from air_quality.api.types import MeasurementDto
+from air_quality.api.types import MeasurementDto, MeasurementSummaryDto
+from air_quality.aqi.calculator import get_pollutant_index_level, get_overall_aqi_level
 from air_quality.aqi.pollutant_type import PollutantType
-from air_quality.database.in_situ import InSituMeasurement
+from air_quality.database.in_situ import InSituMeasurement, InSituAveragedMeasurement
 
 
-def database_to_api_result(measurement: InSituMeasurement) -> MeasurementDto:
+def map_measurement(measurement: InSituMeasurement) -> MeasurementDto:
     return {
         "measurement_date": measurement["measurement_date"].astimezone(UTC),
         "location_type": measurement["location_type"],
         "location_name": measurement["name"],
         **{
-            pollutant_type.value: measurement[pollutant_type.value]
+            pollutant_type.value: measurement[pollutant_type.literal()]
             for pollutant_type in PollutantType
             if pollutant_type.value in measurement
         },
@@ -23,4 +25,47 @@ def database_to_api_result(measurement: InSituMeasurement) -> MeasurementDto:
 
 
 def map_measurements(measurements: list[InSituMeasurement]) -> list[MeasurementDto]:
-    return list(map(database_to_api_result, measurements))
+    return list(map(map_measurement, measurements))
+
+
+def map_summarized_measurement(
+    measurement: InSituAveragedMeasurement,
+) -> MeasurementSummaryDto:
+    pollutant_data = {}
+    average_data: list[tuple[Literal["mean", "median"], list[int]]] = [
+        ("mean", []),
+        ("median", []),
+    ]
+    for pollutant_type in PollutantType:
+        pollutant_value = pollutant_type.literal()
+        for avg_type, aqi_values in average_data:
+            avg_value = measurement[pollutant_value][avg_type]
+            if avg_value is not None:
+                aqi = get_pollutant_index_level(
+                    avg_value,
+                    pollutant_type,
+                )
+                if pollutant_value not in pollutant_data:
+                    pollutant_data[pollutant_value] = {}
+                pollutant_data[pollutant_value][avg_type] = {
+                    "aqi_level": aqi,
+                    "value": avg_value,
+                }
+                aqi_values.append(aqi)
+
+    return {
+        "measurement_base_time": measurement["measurement_base_time"],
+        "location_type": measurement["location_type"],
+        "location_name": measurement["name"],
+        "overall_aqi_level": {
+            avg_type: get_overall_aqi_level(aqi_values)
+            for avg_type, aqi_values in average_data
+        },
+        **pollutant_data,
+    }
+
+
+def map_summarized_measurements(
+    averages: list[InSituAveragedMeasurement],
+) -> list[MeasurementSummaryDto]:
+    return list(map(map_summarized_measurement, averages))
