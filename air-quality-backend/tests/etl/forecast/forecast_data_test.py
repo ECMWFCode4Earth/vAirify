@@ -107,8 +107,8 @@ def test__get_surface_pressure__retrieves_correctly():
     timestamp_to_search = default_time + (25 * 60 * 60)
     time_to_search = datetime.datetime.fromtimestamp(timestamp_to_search)
 
-    # This should find the pressure value lat = 0, long = 10, time = +24
-    result = forecast_data.get_surface_pressure(1, 9, time_to_search)
+    # This should find the pressure value long = 10, lat = 0, time = +24
+    result = forecast_data.get_surface_pressure(9, 1, time_to_search)
 
     assert result == 0.000001325
 
@@ -122,7 +122,7 @@ def test__get_temperature__retrieves_correctly():
     timestamp_to_search = default_time + (25 * 60 * 60)
     time_to_search = datetime.datetime.fromtimestamp(timestamp_to_search)
 
-    # This should find the temperature lat = 0, long = 10, time = +24
-    result = forecast_data.get_temperature(1, 9, time_to_search)
+    # This should find the temperature long = 10, lat = 0, time = +24
+    result = forecast_data.get_temperature(9, 1, time_to_search)
 
     assert result == 0.000001125

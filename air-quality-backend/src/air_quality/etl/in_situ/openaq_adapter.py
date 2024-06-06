@@ -94,9 +94,9 @@ def enrich_with_forecast_data(city_data, forecast_data: ForecastData):
         measurement_date = in_situ_reading["measurement_date"]
 
         surface_pressure = forecast_data.get_surface_pressure(
-            lat, long, measurement_date
+            long, lat, measurement_date
         )
-        temperature = forecast_data.get_temperature(lat, long, measurement_date)
+        temperature = forecast_data.get_temperature(long, lat, measurement_date)
 
         in_situ_reading["metadata"]["estimated_surface_pressure_pa"] = surface_pressure
         in_situ_reading["metadata"]["estimated_temperature_k"] = temperature
@@ -106,7 +106,7 @@ def enrich_with_forecast_data(city_data, forecast_data: ForecastData):
                 pollutant.value in in_situ_reading
                 and in_situ_reading[pollutant.value]["original_unit"] == "ppm"
             ):
-                original_value = in_situ_reading[pollutant.value]["value"]
+                original_value = in_situ_reading[pollutant.value]["original_value"]
 
                 in_situ_reading[pollutant.value]["value"] = convert_ppm_to_mgm3(
                     original_value, pollutant, surface_pressure, temperature
