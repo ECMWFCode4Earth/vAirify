@@ -34,10 +34,10 @@ def retrieve_openaq_in_situ_data(cities, end_date: datetime, period_hours):
     transformed_in_situ_data = []
     for city_name, city_data in in_situ_measurements_by_city.items():
         transformed_city_data = transform_city(city_data)
-        transformed_city_data = enrich_with_forecast_data(
+        enriched_city_data = enrich_with_forecast_data(
             transformed_city_data, extracted_forecast_data
         )
-        transformed_in_situ_data.extend(transformed_city_data)
+        transformed_in_situ_data.extend(enriched_city_data)
 
     logging.info("Transforming in situ data complete")
     return transformed_in_situ_data

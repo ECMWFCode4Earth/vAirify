@@ -1,4 +1,4 @@
-import pytest, unittest
+import pytest
 from air_quality.etl.air_quality_index.pollutant_type import (
     PollutantType,
     is_single_level,
@@ -60,7 +60,7 @@ def test_get_molecular_weight_valid(pollutant_type: PollutantType, expected: flo
         PollutantType.PARTICULATE_MATTER_10,
     ],
 )
-def test_get_molecular_weight_valid(pollutant_type: PollutantType):
+def test_get_molecular_weight_invalid(pollutant_type: PollutantType):
     with pytest.raises(ValueError):
         get_molecular_weight(pollutant_type)
 
