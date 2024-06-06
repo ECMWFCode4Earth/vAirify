@@ -18,6 +18,7 @@ def main():
     logging.info(f"Finding data for {cities.__len__()} cities")
 
     logging.info("Extracting pollutant forecast data")
+    model_base_time = None
     if (
         os.environ.get("FORECAST_BASE_DATE") is not None
         and os.environ.get("FORECAST_BASE_TIME") is not None

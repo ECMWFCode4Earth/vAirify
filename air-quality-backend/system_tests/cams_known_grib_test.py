@@ -6,6 +6,7 @@ from system_tests.utils.cams_utilities import get_database_data
 import os
 from dotenv import load_dotenv
 from unittest import mock
+import xarray as xr
 
 load_dotenv()
 
@@ -54,28 +55,28 @@ def test_known_vancouver_grib(query_params, expected_values):
 
     for document in dict_result:
         assert (
-            document["name"] == expected_values["name"]
+                document["name"] == expected_values["name"]
         ), "Name does not match the search query!"
         assert (
-            document["forecast_valid_time"] == expected_values["forecast_valid_time"]
+                document["forecast_valid_time"] == expected_values["forecast_valid_time"]
         ), "forecast_valid_time does not match!"
         assert (
-            document["forecast_base_time"] == expected_values["forecast_base_time"]
+                document["forecast_base_time"] == expected_values["forecast_base_time"]
         ), "forecast_base_time does not match!"
         assert (
-            document["no2_value"] == expected_values["no2_value"]
+                document["no2_value"] == expected_values["no2_value"]
         ), "no2 value does not match!"
         assert (
-            document["o3_value"] == expected_values["o3_value"]
+                document["o3_value"] == expected_values["o3_value"]
         ), "o3 value does not match!"
         assert (
-            document["so2_value"] == expected_values["so2_value"]
+                document["so2_value"] == expected_values["so2_value"]
         ), "o2 value does not match!"
         assert (
-            document["pm10_value"] == expected_values["pm10_value"]
+                document["pm10_value"] == expected_values["pm10_value"]
         ), "pm10 value does not match!"
         assert (
-            document["pm2_5_value"] == expected_values["pm2_5_value"]
+                document["pm2_5_value"] == expected_values["pm2_5_value"]
         ), "pm2.5 value does not match!"
 
 
