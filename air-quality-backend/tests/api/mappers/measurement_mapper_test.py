@@ -12,7 +12,13 @@ from tests.util.mock_measurement import (
 
 
 def test__map_measurements():
-    result = map_measurements([create_mock_measurement_document({})])
+    result = map_measurements(
+        [
+            create_mock_measurement_document(
+                {"no2": 0.0, "o3": 0.0, "pm10": 0.0, "pm2_5": 0.0, "so2": 0.0}
+            )
+        ]
+    )
     assert result == [
         {
             "measurement_date": datetime(2024, 6, 4, 0, 0, tzinfo=timezone.utc),
