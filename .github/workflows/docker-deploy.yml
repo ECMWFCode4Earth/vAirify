@@ -26,8 +26,10 @@ jobs:
       - name: activate docker
         run: |  
           ssh ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} "cd /usr/config && \\
+            sudo docker container stop etl-pipeline || true && \\
+            sudo docker rm etl-pipeline || true && \\
             sudo docker pull ghcr.io/${{ github.repository }}/etl:latest && \\
-            sudo docker run --env-file .env ghcr.io/${{ github.repository }}/etl:latest && \\
+            sudo docker run -name etl-pipeline --env-file .env ghcr.io/${{ github.repository }}/etl:latest && \\
             exit"
       - name: clean up
         run: |
