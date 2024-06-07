@@ -1,4 +1,5 @@
 name: Deploy
+
 on:
   [workflow_dispatch]
 
@@ -26,12 +27,12 @@ jobs:
       - name: activate docker
         run: |  
           ssh ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} "cd /usr/config && \\
-            sudo docker container stop etl-pipeline || true && \\
-            sudo docker rm etl-pipeline || true && \\
-            sudo docker pull ghcr.io/${{ github.repository }}/etl:latest && \\
-            sudo docker run -name etl-pipeline --env-file .env ghcr.io/${{ github.repository }}/etl:latest && \\
+            sudo docker container stop etl-forecast || true && \\
+            sudo docker rm etl-forecast || true && \\
+            sudo docker pull ghcr.io/${{ github.repository }}/etl-forecast:latest && \\
+            sudo docker run --name etl-forecast --env-file .env ghcr.io/${{ github.repository }}/etl-forecast:latest && \\
             exit"
       - name: clean up
         run: |
           rm -rf ~/.ssh
-
+          

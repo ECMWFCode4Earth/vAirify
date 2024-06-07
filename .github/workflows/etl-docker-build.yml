@@ -1,4 +1,5 @@
-name: Build and publish ETL docker image
+name: Build and publish ETL docker images
+
 on:
   [workflow_dispatch]
 
@@ -17,7 +18,7 @@ jobs:
       - name: build
         run: |
           cd air-quality-backend
-          docker build . -t ghcr.io/${{ github.repository }}/etl:latest -f Dockerfile.cron
+          docker build . -t ghcr.io/${{ github.repository }}/etl-forecast:latest -f Dockerfile.forecast.cron
       - name: publish
         run: |
-          docker push ghcr.io/${{ github.repository }}/etl:latest
+          docker push ghcr.io/${{ github.repository }}/etl-forecast:latest
