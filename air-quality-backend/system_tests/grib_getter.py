@@ -1,5 +1,4 @@
 import pprint
-
 import xarray as xr
 from system_tests.utils.cams_utilities import get_raw_cams_data
 
@@ -13,11 +12,11 @@ def release_the_gribbler():
         "longitude": 0,
     },
         method="nearest")
-
     pm2_5_raw = "pm2p5"
     data = ds[pm2_5_raw]
+    pm2_5_value = selection[pm2_5_raw].values.item()
 
-    pprint.pprint(selection[pm2_5_raw].values[0])
+    pprint.pprint(pm2_5_value * 10 ** 9)
 
 
 if __name__ == "__main__":
