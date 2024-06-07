@@ -1,6 +1,6 @@
 import mongomock
 from unittest.mock import patch
-from air_quality.database.locations import get_locations_by_type
+from air_quality.database.locations import get_locations_by_type, AirQualityLocationType
 
 mock_collection = mongomock.MongoClient().db.collection
 
@@ -21,5 +21,5 @@ def test__get_locations_by_type(mocked_fn):
     }
     mock_collection.insert_many([location_1, location_2])
 
-    results = get_locations_by_type("city")
+    results = get_locations_by_type(AirQualityLocationType.CITY)
     assert results == [location_1]

@@ -1,6 +1,6 @@
-from datetime import datetime
-
 import pytest
+
+from datetime import datetime
 from unittest.mock import call, patch
 from air_quality.etl.forecast.forecast_dao import (
     CamsRequestDetails,
@@ -9,7 +9,7 @@ from air_quality.etl.forecast.forecast_dao import (
     get_multi_level_request_body,
     get_single_level_request_body,
 )
-from .mock_forecast_data import single_level_data_set, multi_level_data_set
+from tests.util.mock_forecast_data import single_level_data_set, multi_level_data_set
 
 
 @pytest.fixture

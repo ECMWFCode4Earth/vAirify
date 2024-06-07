@@ -1,0 +1,8 @@
+.env
+
+liquibase
+docs
+tests
+system_tests
+
+*.grib

@@ -1,6 +1,35 @@
-from datetime import datetime
 import logging
-from .mongo_db_operations import get_collection, upsert_data
+from datetime import datetime
+from typing import TypedDict
+
+from bson import ObjectId
+
+from air_quality.database.locations import AirQualityLocationType
+from .mongo_db_operations import get_collection, upsert_data, GeoJSONPoint
+
+
+class PollutantData(TypedDict):
+    aqi_level: int
+    value: float
+
+
+class Forecast(TypedDict):
+    _id: ObjectId
+    forecast_valid_time: datetime
+    forecast_base_time: datetime
+    location_type: AirQualityLocationType
+    name: str
+    source: str
+    created_time: datetime
+    last_modified_time: datetime
+    location: GeoJSONPoint
+    location_name: str
+    overall_aqi_level: float
+    no2: PollutantData
+    o3: PollutantData
+    pm2_5: PollutantData
+    pm10: PollutantData
+    so2: PollutantData
 
 
 def insert_data(data):
@@ -22,3 +51,24 @@ def delete_data_before(forecast_valid_time: datetime):
         {"forecast_valid_time": {"$lt": forecast_valid_time}}
     )
     logging.info(f"Deleted {result.deleted_count} documents from forecast_data")
+
+
+def get_forecast_data_from_database(
+    valid_date_from: datetime,
+    valid_date_to: datetime,
+    location_type: str,
+    forecast_base_time: datetime,
+    location_name: str,
+) -> [Forecast]:
+    collection = get_collection("forecast_data")
+    query = {
+        "location_type": location_type,
+        "forecast_base_time": forecast_base_time,
+        "forecast_valid_time": {
+            "$gte": valid_date_from,
+            "$lt": valid_date_to,
+        },
+    }
+    if location_name is not None:
+        query["name"] = location_name
+    return list(collection.find(query))
