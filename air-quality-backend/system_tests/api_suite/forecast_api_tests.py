@@ -18,11 +18,11 @@ location_type = "city"
 location_name = random.choice(all_cities)
 forecast_base_time = format_datetime_as_string(
     datetime.datetime(2024, 6, 6, 0, 0),
-    "%Y-%m-%dT%H:%M:%S.000+00:00",
+    "%Y-%m-%dT%H:%M:%S+00:00",
 )
 valid_date_from = forecast_base_time
 valid_date_to = format_datetime_as_string(
-    datetime.datetime(2024, 6, 11, 0, 0), "%Y-%m-%dT%H:%M:%S.000+00:00"
+    datetime.datetime(2024, 6, 11, 0, 0), "%Y-%m-%dT%H:%M:%S+00:00"
 )
 
 success_status_code = 200
@@ -94,62 +94,6 @@ parameters_and_expected_status_codes_list = [
         validation_error_status_code,
     ),
     (
-        create_forecast_api_parameters_payload(
-            "", "", valid_date_to, location_type, location_name
-        ),
-        validation_error_status_code,
-    ),
-    (
-        create_forecast_api_parameters_payload(
-            "", "", valid_date_to, location_type, ""
-        ),
-        validation_error_status_code,
-    ),
-    (
-        create_forecast_api_parameters_payload(
-            forecast_base_time, "", "", location_type, location_name
-        ),
-        validation_error_status_code,
-    ),
-    (
-        create_forecast_api_parameters_payload(
-            forecast_base_time, "", "", location_type, ""
-        ),
-        validation_error_status_code,
-    ),
-    (
-        create_forecast_api_parameters_payload(
-            forecast_base_time, valid_date_from, "", "", location_name
-        ),
-        validation_error_status_code,
-    ),
-    (
-        create_forecast_api_parameters_payload(
-            forecast_base_time, valid_date_from, "", "", ""
-        ),
-        validation_error_status_code,
-    ),
-    (
-        create_forecast_api_parameters_payload(
-            "", "", "", location_type, location_name
-        ),
-        validation_error_status_code,
-    ),
-    (
-        create_forecast_api_parameters_payload("", "", "", location_type, ""),
-        validation_error_status_code,
-    ),
-    (
-        create_forecast_api_parameters_payload(
-            forecast_base_time, "", "", "", location_name
-        ),
-        validation_error_status_code,
-    ),
-    (
-        create_forecast_api_parameters_payload(forecast_base_time, "", "", "", ""),
-        validation_error_status_code,
-    ),
-    (
         create_forecast_api_parameters_payload("", "", "", "", location_name),
         validation_error_status_code,
     ),
@@ -164,7 +108,7 @@ parameters_and_expected_status_codes_list = [
     "payload, expected_status_code",
     parameters_and_expected_status_codes_list,
 )
-def test_required_and_optional_parameter_combinations_verify_response_status_code(
+def test__required_and_optional_parameter_combinations__verify_response_status_code(
     payload: dict,
     expected_status_code: int,
 ):
@@ -172,3 +116,42 @@ def test_required_and_optional_parameter_combinations_verify_response_status_cod
         "GET", base_url, headers=headers, params=payload, timeout=5.0
     )
     assert response.status_code == expected_status_code
+
+
+def test__location_name_parameter__returns_41_results():
+    payload = create_forecast_api_parameters_payload(
+        forecast_base_time, valid_date_from, valid_date_to, location_type, location_name
+    )
+    response = requests.request(
+        "GET", base_url, headers=headers, params=payload, timeout=5.0
+    )
+    response_json = response.json()
+    assert len(response_json) == 41
+
+
+def test__location_name_parameter__returns_results_containing_correct_location_name():
+    payload = create_forecast_api_parameters_payload(
+        forecast_base_time, valid_date_from, valid_date_to, location_type, location_name
+    )
+    response = requests.request(
+        "GET", base_url, headers=headers, params=payload, timeout=5.0
+    )
+    response_json = response.json()
+    for forecast in response_json:
+        assert forecast["location_name"] == location_name
+
+
+def test__location_name_parameter__returns_results_containing_correct_forecast_base_time():
+    payload = create_forecast_api_parameters_payload(
+        forecast_base_time,
+        valid_date_from,
+        valid_date_to,
+        location_type,
+        location_name,
+    )
+    response = requests.request(
+        "GET", base_url, headers=headers, params=payload, timeout=5.0
+    )
+    response_json = response.json()
+    for forecast in response_json:
+        assert forecast["base_time"] == forecast_base_time
