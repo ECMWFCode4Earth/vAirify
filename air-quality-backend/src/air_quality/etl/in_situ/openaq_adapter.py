@@ -18,8 +18,12 @@ required_pollutant_data = {
 }
 
 
-def measurement_value_is_positive(measurement):
-    return measurement["value"] > 0
+def measurement_is_valid(measurement):
+    valid_unit = measurement["unit"] in ["µg/m³", "ppm"]
+    if not valid_unit:
+        logging.info(f"Unsupported unit found {measurement['unit']}")
+
+    return valid_unit and measurement["value"] > 0
 
 
 def _create_document(
@@ -76,7 +80,7 @@ def transform_city(city_data):
     measurements_for_city = city_data["measurements"]
     if len(measurements_for_city) > 0:
         filtered_measurements = filter(
-            measurement_value_is_positive, measurements_for_city
+            measurement_is_valid, measurements_for_city
         )
         grouped_measurements = reduce(
             combine_measurement,

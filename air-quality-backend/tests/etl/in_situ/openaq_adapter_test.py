@@ -105,6 +105,33 @@ def test__transform_city__multiple_sites_in_city():
     ]
 
 
+def test__transform_city__invalid_unit_filtered_out():
+
+    measurement = create_measurement(
+                        (1, "Dublin 1", 0.0, 0.0),
+                        "2024-04-21T00:00:00+00:00",
+                        "so2",
+                        14.0,
+                    )
+    measurement["unit"] = "invalid"
+
+    result = transform_city({"city": city, "measurements": [measurement]})
+    assert result == []
+
+
+def test__transform_city__negative_value_filtered_out():
+
+    measurement = create_measurement(
+                        (1, "Dublin 1", 0.0, 0.0),
+                        "2024-04-21T00:00:00+00:00",
+                        "so2",
+                        -14.0,
+                    )
+
+    result = transform_city({"city": city, "measurements": [measurement]})
+    assert result == []
+
+
 def test__transform_city__all_five_pollutants():
     result = transform_city(
         {

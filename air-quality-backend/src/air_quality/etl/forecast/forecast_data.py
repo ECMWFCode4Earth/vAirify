@@ -138,7 +138,7 @@ class ForecastData:
         return int(self._single_level_data["time"].values)
 
     def get_surface_pressure(
-        self, longitude: int, latitude: int, forecast_datetime: datetime
+        self, longitude: float, latitude: float, forecast_datetime: datetime
     ):
         if self._cached_pressure is None:
             single_pres = self._single_level_data["sp"]
@@ -152,7 +152,7 @@ class ForecastData:
         return single_point.item()
 
     def get_temperature(
-        self, longitude: int, latitude: int, forecast_datetime: datetime
+        self, longitude: float, latitude: float, forecast_datetime: datetime
     ):
         if self._cached_temperature is None:
             multi_temp = self._multi_level_data["t"]

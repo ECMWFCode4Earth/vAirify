@@ -29,7 +29,6 @@ def call_openaq_api(city, date_from: datetime, date_to: datetime) -> list:
         "date_from": date_from.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "coordinates": format_coordinates(city),
         "parameter": ["o3", "no2", "pm10", "so2", "pm25"],
-        "unit": ["µg/m³", "ppm"],
     }
     url = base_url + "?" + urlencode(query_params, doseq=True)
     headers = {"X-API-Key": os.environ.get("OPEN_AQ_API_KEY")}

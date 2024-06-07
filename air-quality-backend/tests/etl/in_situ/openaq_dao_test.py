@@ -39,8 +39,7 @@ def test__fetch_in_situ_measurements__correct_url_params_encoded(
         "date_to": date_to.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "date_from": date_from.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "coordinates": "11,22",
-        "parameter": ["o3", "no2", "pm10", "so2", "pm25"],
-        "unit": ["µg/m³", "ppm"]}, doseq=True)
+        "parameter": ["o3", "no2", "pm10", "so2", "pm25"]}, doseq=True)
 
 
 @patch("air_quality.etl.in_situ.openaq_dao.urlencode")
