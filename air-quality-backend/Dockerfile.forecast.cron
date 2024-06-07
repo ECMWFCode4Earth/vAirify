@@ -13,12 +13,21 @@ RUN curl -fsSLO "$SUPERCRONIC_URL" \
  && mv "$SUPERCRONIC" "/usr/local/bin/${SUPERCRONIC}" \
  && ln -s "/usr/local/bin/${SUPERCRONIC}" /usr/local/bin/supercronic
 
-WORKDIR /usr/src/app
-COPY ./ ./
-RUN conda env create -f conda/environment.yml
+ WORKDIR /usr/src/app
+ COPY conda/environment.yml .
+ RUN conda env create -f environment.yml
+ 
+ SHELL ["conda", "run", "-n", "air-quality-backend", "/bin/bash", "-c"]
+ 
+ COPY pyproject.toml .
+ RUN poetry install
+ 
+ COPY src/ ./src
+ COPY scripts/run_forecast_etl.py ./scripts/run_forecast_etl.py
+ COPY README.md logging.ini ./
 
-SHELL ["conda", "run", "-n", "air-quality-backend", "/bin/bash", "-c"]
+ COPY cron/crontab.forecast crontab
+ 
+ RUN poetry install
 
-RUN poetry install
-
-CMD [ "/usr/local/bin/supercronic", "./crontest/crontab" ]
+CMD [ "/usr/local/bin/supercronic", "./crontab" ]
