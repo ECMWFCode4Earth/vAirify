@@ -35,3 +35,30 @@ class MeasurementDto(TypedDict):
     entity: NotRequired[str]
     sensor_type: NotRequired[str]
     site_name: str
+
+
+class AggregateAqiDataDto(TypedDict):
+    mean: float
+    median: float
+
+
+class AggregatePollutantDataDto(TypedDict):
+    mean: int
+    median: int
+
+
+class SummarizedPollutantDataDto(TypedDict):
+    aqi_level: AggregateAqiDataDto
+    value: AggregatePollutantDataDto
+
+
+class MeasurementSummaryDto(TypedDict):
+    measurement_base_time: datetime
+    location_type: AirQualityLocationType
+    location_name: str
+    overall_aqi_level: AggregateAqiDataDto
+    no2: NotRequired[SummarizedPollutantDataDto]
+    o3: NotRequired[SummarizedPollutantDataDto]
+    pm2_5: NotRequired[SummarizedPollutantDataDto]
+    pm10: NotRequired[SummarizedPollutantDataDto]
+    so2: NotRequired[SummarizedPollutantDataDto]
