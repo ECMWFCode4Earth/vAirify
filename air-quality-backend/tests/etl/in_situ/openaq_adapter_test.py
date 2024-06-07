@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 
-from air_quality.etl.air_quality_index.pollutant_type import PollutantType
+from air_quality.aqi.pollutant_type import PollutantType
 from air_quality.etl.in_situ.openaq_adapter import (
     transform_city,
     enrich_with_forecast_data

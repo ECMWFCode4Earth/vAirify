@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from air_quality.etl.air_quality_index.pollutant_type import PollutantType
+from air_quality.aqi.pollutant_type import PollutantType
 from air_quality.etl.common.unit_converter import convert_ppm_to_mgm3
 
 
