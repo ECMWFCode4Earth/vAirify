@@ -1,11 +1,13 @@
 from datetime import datetime
 from functools import reduce
 import logging
+
 from air_quality.database.locations import AirQualityLocationType
 from air_quality.aqi.pollutant_type import (
     PollutantType,
     pollutants_with_molecular_weight,
 )
+from air_quality.etl.in_situ.InSituMeasurement import InSituMeasurement
 from air_quality.etl.common.unit_converter import convert_ppm_to_mgm3
 from air_quality.etl.forecast.forecast_data import ForecastData
 
@@ -28,7 +30,7 @@ def measurement_is_valid(measurement):
 
 def _create_document(
     measurement, city_name: str, location_type: AirQualityLocationType
-):
+) -> InSituMeasurement:
     return {
         "api_source": "OpenAQ",
         "measurement_date": datetime.strptime(
@@ -38,11 +40,11 @@ def _create_document(
         "location_type": location_type,
         "location_name": measurement["location"],
         "location": {
-            "type": "Point",
-            "coordinates": [
+            "type": "point",
+            "coordinates": (
                 measurement["coordinates"]["longitude"],
                 measurement["coordinates"]["latitude"],
-            ],
+            ),
         },
         "metadata": {
             "entity": measurement["entity"],
@@ -74,7 +76,7 @@ def combine_measurement(state, measurement):
     return state
 
 
-def transform_city(city_data):
+def transform_city(city_data) -> list[InSituMeasurement]:
     formatted_dataset = []
     city = city_data["city"]
     measurements_for_city = city_data["measurements"]
@@ -94,8 +96,10 @@ def transform_city(city_data):
     return formatted_dataset
 
 
-def enrich_with_forecast_data(city_data, forecast_data: ForecastData):
-    for in_situ_reading in city_data:
+def enrich_with_forecast_data(
+        city_measurements: list[InSituMeasurement],
+        forecast_data: ForecastData):
+    for in_situ_reading in city_measurements:
         long = in_situ_reading["location"]["coordinates"][0]
         lat = in_situ_reading["location"]["coordinates"][1]
         measurement_date = in_situ_reading["measurement_date"]
@@ -121,4 +125,4 @@ def enrich_with_forecast_data(city_data, forecast_data: ForecastData):
 
                 in_situ_reading[pollutant.value]["unit"] = "µg/m³"
 
-    return city_data
+    return city_measurements

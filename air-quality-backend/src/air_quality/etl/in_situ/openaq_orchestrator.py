@@ -3,6 +3,8 @@ import math
 from multiprocessing.pool import ThreadPool
 
 from datetime import datetime, timedelta
+
+from air_quality.database.in_situ import InSituMeasurement
 from air_quality.etl.forecast.forecast_dao import (
     fetch_forecast_data,
     CAMS_FORECAST_INTERVAL_HOURS,
@@ -14,7 +16,8 @@ from air_quality.etl.in_situ.openaq_adapter import (
 )
 
 
-def retrieve_openaq_in_situ_data(cities, end_date: datetime, period_hours):
+def retrieve_openaq_in_situ_data(cities, end_date: datetime, period_hours)\
+        -> list[InSituMeasurement]:
 
     start_date = end_date - timedelta(hours=period_hours)
 
