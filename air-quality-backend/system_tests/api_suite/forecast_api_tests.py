@@ -28,7 +28,7 @@ valid_date_to = format_datetime_as_string(
 success_status_code = 200
 validation_error_status_code = 422
 
-required_and_optional_parameter_combinations = [
+parameters_and_expected_status_codes_list = [
     (
         create_forecast_api_parameters_payload(
             forecast_base_time,
@@ -162,22 +162,13 @@ required_and_optional_parameter_combinations = [
 
 @pytest.mark.parametrize(
     "payload, expected_status_code",
-    required_and_optional_parameter_combinations,
+    parameters_and_expected_status_codes_list,
 )
 def test_required_and_optional_parameter_combinations_verify_response_status_code(
     payload: dict,
     expected_status_code: int,
 ):
-    pprint.pprint(payload)
-    i = 0
-    success = False
-    while i < 3 and success is False:
-        try:
-            response = requests.request(
-                "GET", base_url, headers=headers, params=payload
-            )
-            assert response.status_code == expected_status_code
-            success = True
-        except:
-            print("Something went wrong here")
-            i = i + 1
+    response = requests.request(
+        "GET", base_url, headers=headers, params=payload, timeout=5.0
+    )
+    assert response.status_code == expected_status_code
