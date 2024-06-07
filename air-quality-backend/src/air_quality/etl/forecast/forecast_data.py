@@ -77,6 +77,9 @@ class ForecastData:
         self._single_level_data.load()
         self._multi_level_data.load()
 
+    _cached_pressure = None
+    _cached_temperature = None
+
     def _get_data_set(self, pollutant_type: PollutantType) -> xr.Dataset:
         if is_single_level(pollutant_type):
             return self._single_level_data
@@ -137,19 +140,27 @@ class ForecastData:
     def get_surface_pressure(
         self, longitude: int, latitude: int, forecast_datetime: datetime
     ):
+        if self._cached_pressure is None:
+            single_pres = self._single_level_data["sp"]
+            self._cached_pressure = single_pres.set_index(step=["valid_time"])
+
         since_epoch = forecast_datetime.timestamp()
-        single = self._single_level_data.set_index(step=["valid_time"])
-        single_point = single.sel(
+
+        single_point = self._cached_pressure.sel(
             longitude=longitude, latitude=latitude, step=since_epoch, method="nearest"
         )
-        return single_point["sp"].item()
+        return single_point.item()
 
     def get_temperature(
         self, longitude: int, latitude: int, forecast_datetime: datetime
     ):
+        if self._cached_temperature is None:
+            multi_temp = self._multi_level_data["t"]
+            self._cached_temperature = multi_temp.set_index(step=["valid_time"])
+
         since_epoch = forecast_datetime.timestamp()
-        multi = self._multi_level_data.set_index(step=["valid_time"])
-        multi_point = multi.sel(
+
+        multi_point = self._cached_temperature.sel(
             longitude=longitude, latitude=latitude, step=since_epoch, method="nearest"
         )
-        return multi_point["t"].item()
+        return multi_point.item()
