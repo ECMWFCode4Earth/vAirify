@@ -1,5 +1,9 @@
+from datetime import datetime, timezone
+
 import pandas as pd
 import xarray
+
+from air_quality.database.forecasts import Forecast
 from tests.util.mock_location import create_test_city
 
 default_steps = [24, 48]
@@ -203,3 +207,24 @@ multi_level_data_set = xarray.Dataset(
     coords=dict(time=default_time, step=default_steps, valid_time=default_valid_time),
     data_vars=dict(no2=no2, go3=go3, so2=so2, t=t),
 )
+
+
+def create_mock_forecast_document(overrides) -> Forecast:
+    default_document = {
+        "forecast_base_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
+        "forecast_valid_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
+        "name": "Abidjan",
+        "source": "cams-production",
+        "location_type": "city",
+        "last_modified_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
+        "created_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
+        "location": {"type": "Point", "coordinates": [90, 90]},
+        "forecast_range": 0,
+        "overall_aqi_level": 1,
+        "o3": {"aqi_level": 1, "value": 1.0},
+        "no2": {"aqi_level": 1, "value": 2.0},
+        "so2": {"aqi_level": 1, "value": 3.0},
+        "pm10": {"aqi_level": 2, "value": 4.0},
+        "pm2_5": {"aqi_level": 2, "value": 5.0},
+    }
+    return {**default_document, **overrides}
