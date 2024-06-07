@@ -129,7 +129,9 @@ def get_averaged(
             project_criteria[pollutant_name]["mean"] = f"${mean_key}"
 
     logging.info(
-        f"Averaging pollutant measurements with criteria between {date_from} and {date_to}"
+        "Averaging pollutant measurements with criteria between {} and {}".format(
+            date_from, date_to
+        )
     )
     results = get_collection(collection_name).aggregate(
         [
