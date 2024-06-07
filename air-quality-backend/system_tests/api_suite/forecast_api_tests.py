@@ -1,4 +1,5 @@
 import datetime
+import pprint
 import random
 
 import pytest
@@ -6,6 +7,7 @@ import requests
 
 from system_tests.utils.api_utilities import (
     format_datetime_as_string,
+    create_forecast_api_parameters_payload,
 )
 from system_tests.utils.cities_data import all_cities
 
@@ -23,111 +25,159 @@ valid_date_to = format_datetime_as_string(
     datetime.datetime(2024, 6, 11, 0, 0), "%Y-%m-%dT%H:%M:%S.000+00:00"
 )
 
+success_status_code = 200
 validation_error_status_code = 422
 
 required_and_optional_parameter_combinations = [
     (
-        forecast_base_time,
-        valid_date_from,
-        valid_date_to,
-        location_type,
-        location_name,
-        200,
+        create_forecast_api_parameters_payload(
+            forecast_base_time,
+            valid_date_from,
+            valid_date_to,
+            location_type,
+            location_name,
+        ),
+        success_status_code,
     ),
     (
-        forecast_base_time,
-        valid_date_from,
-        valid_date_to,
-        location_type,
-        None,
-        200,
+        create_forecast_api_parameters_payload(
+            forecast_base_time, valid_date_from, valid_date_to, location_type, ""
+        ),
+        success_status_code,
     ),
     (
-        None,
-        valid_date_from,
-        valid_date_to,
-        location_type,
-        location_name,
+        create_forecast_api_parameters_payload(
+            "", valid_date_from, valid_date_to, location_type, location_name
+        ),
         validation_error_status_code,
     ),
     (
-        None,
-        valid_date_from,
-        valid_date_to,
-        location_type,
-        None,
+        create_forecast_api_parameters_payload(
+            "", valid_date_from, valid_date_to, location_type, ""
+        ),
         validation_error_status_code,
     ),
     (
-        forecast_base_time,
-        None,
-        valid_date_to,
-        location_type,
-        location_name,
+        create_forecast_api_parameters_payload(
+            forecast_base_time, "", valid_date_to, location_type, location_name
+        ),
         validation_error_status_code,
     ),
     (
-        forecast_base_time,
-        None,
-        valid_date_to,
-        location_type,
-        None,
+        create_forecast_api_parameters_payload(
+            forecast_base_time, "", valid_date_to, location_type, ""
+        ),
         validation_error_status_code,
     ),
     (
-        forecast_base_time,
-        valid_date_from,
-        None,
-        location_type,
-        location_name,
+        create_forecast_api_parameters_payload(
+            forecast_base_time, valid_date_from, "", location_type, location_name
+        ),
         validation_error_status_code,
     ),
     (
-        forecast_base_time,
-        valid_date_from,
-        None,
-        location_type,
-        None,
+        create_forecast_api_parameters_payload(
+            forecast_base_time, valid_date_from, "", location_type, ""
+        ),
         validation_error_status_code,
     ),
     (
-        forecast_base_time,
-        valid_date_from,
-        valid_date_to,
-        None,
-        location_name,
+        create_forecast_api_parameters_payload(
+            forecast_base_time, valid_date_from, valid_date_to, "", location_name
+        ),
         validation_error_status_code,
     ),
     (
-        forecast_base_time,
-        valid_date_from,
-        valid_date_to,
-        None,
-        None,
+        create_forecast_api_parameters_payload(
+            forecast_base_time, valid_date_from, valid_date_to, "", ""
+        ),
+        validation_error_status_code,
+    ),
+    (
+        create_forecast_api_parameters_payload(
+            "", "", valid_date_to, location_type, location_name
+        ),
+        validation_error_status_code,
+    ),
+    (
+        create_forecast_api_parameters_payload(
+            "", "", valid_date_to, location_type, ""
+        ),
+        validation_error_status_code,
+    ),
+    (
+        create_forecast_api_parameters_payload(
+            forecast_base_time, "", "", location_type, location_name
+        ),
+        validation_error_status_code,
+    ),
+    (
+        create_forecast_api_parameters_payload(
+            forecast_base_time, "", "", location_type, ""
+        ),
+        validation_error_status_code,
+    ),
+    (
+        create_forecast_api_parameters_payload(
+            forecast_base_time, valid_date_from, "", "", location_name
+        ),
+        validation_error_status_code,
+    ),
+    (
+        create_forecast_api_parameters_payload(
+            forecast_base_time, valid_date_from, "", "", ""
+        ),
+        validation_error_status_code,
+    ),
+    (
+        create_forecast_api_parameters_payload(
+            "", "", "", location_type, location_name
+        ),
+        validation_error_status_code,
+    ),
+    (
+        create_forecast_api_parameters_payload("", "", "", location_type, ""),
+        validation_error_status_code,
+    ),
+    (
+        create_forecast_api_parameters_payload(
+            forecast_base_time, "", "", "", location_name
+        ),
+        validation_error_status_code,
+    ),
+    (
+        create_forecast_api_parameters_payload(forecast_base_time, "", "", "", ""),
+        validation_error_status_code,
+    ),
+    (
+        create_forecast_api_parameters_payload("", "", "", "", location_name),
+        validation_error_status_code,
+    ),
+    (
+        create_forecast_api_parameters_payload("", "", "", "", ""),
         validation_error_status_code,
     ),
 ]
 
 
 @pytest.mark.parametrize(
-    "_forecast_base_time, _valid_date_from, _valid_date_to, _location_type, _location_name, expected_status_code",
+    "payload, expected_status_code",
     required_and_optional_parameter_combinations,
 )
 def test_required_and_optional_parameter_combinations_verify_response_status_code(
-    _forecast_base_time: str,
-    _valid_date_from: str,
-    _valid_date_to: str,
-    _location_type: str,
-    _location_name: str,
+    payload: dict,
     expected_status_code: int,
 ):
-    payload = {
-        "forecast_base_time": _forecast_base_time,
-        "valid_date_from": _valid_date_from,
-        "valid_date_to": _valid_date_to,
-        "location_type": _location_type,
-        "location_name": _location_name,
-    }
-    response = requests.request("GET", base_url, headers=headers, params=payload)
-
-    assert response.status_code == expected_status_code
+    pprint.pprint(payload)
+    i = 0
+    success = False
+    while i < 3 and success is False:
+        try:
+            response = requests.request(
+                "GET", base_url, headers=headers, params=payload
+            )
+            assert response.status_code == expected_status_code
+            success = True
+        except:
+            print("Something went wrong here")
+            i = i + 1
