@@ -58,7 +58,7 @@ def get_forecast_data_from_database(
     valid_date_to: datetime,
     location_type: str,
     forecast_base_time: datetime,
-    location_name: str,
+    location_name: str = None,
 ) -> [Forecast]:
     collection = get_collection("forecast_data")
     query = {
@@ -66,7 +66,7 @@ def get_forecast_data_from_database(
         "forecast_base_time": forecast_base_time,
         "forecast_valid_time": {
             "$gte": valid_date_from,
-            "$lt": valid_date_to,
+            "$lte": valid_date_to,
         },
     }
     if location_name is not None:
