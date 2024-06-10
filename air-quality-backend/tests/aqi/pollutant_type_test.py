@@ -3,7 +3,7 @@ from air_quality.aqi.pollutant_type import (
     PollutantType,
     is_single_level,
     get_molecular_weight,
-    pollutants_with_molecular_weight
+    pollutants_with_molecular_weight,
 )
 
 

@@ -177,7 +177,7 @@ pm10 = create_test_pollutant_data_with_defaults(
 
 sp = create_test_pollutant_data_with_defaults(
     values=[
-        0.0000013,    # time: +24, lat : -10, long : 0
+        0.0000013,  # time: +24, lat : -10, long : 0
         None,
         None,
         None,
@@ -185,8 +185,8 @@ sp = create_test_pollutant_data_with_defaults(
         None,
         None,
         None,
-        0.00000135,   # time: +24, lat : 10, long : 350 -> lat : 10, long -10
-        0.0000012,    # time: +48, lat : -10, long : 0
+        0.00000135,  # time: +24, lat : 10, long : 350 -> lat : 10, long -10
+        0.0000012,  # time: +48, lat : -10, long : 0
         None,
         None,
         None,
@@ -194,7 +194,7 @@ sp = create_test_pollutant_data_with_defaults(
         None,
         None,
         None,
-        0.00000145,   # time: +48, lat : 10, long : 350 -> lat : 10, long -10
+        0.00000145,  # time: +48, lat : 10, long : 350 -> lat : 10, long -10
     ]
 )
 
@@ -204,7 +204,7 @@ def get_coordinates():
         coords={
             "step": default_steps,
             "time": default_time,
-            "valid_time": ("step", default_valid_time)
+            "valid_time": ("step", default_valid_time),
         }
     )
 

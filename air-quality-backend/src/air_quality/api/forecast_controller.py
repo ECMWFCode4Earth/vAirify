@@ -19,8 +19,10 @@ async def get_forecast_data(
     forecast_base_time: datetime,
     location_name: Optional[str] = None,
 ):
-    log.info("Fetching forecast data ({}) between {} - {} for {}".format(
-        forecast_base_time, valid_date_from, valid_date_to, location_type)
+    log.info(
+        "Fetching forecast data ({}) between {} - {} for {}".format(
+            forecast_base_time, valid_date_from, valid_date_to, location_type
+        )
     )
     db_results = get_forecast_data_from_database(
         valid_date_from,

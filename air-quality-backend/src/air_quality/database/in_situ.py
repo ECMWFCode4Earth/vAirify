@@ -11,27 +11,36 @@ from ..aqi.pollutant_type import PollutantType
 collection_name = "in_situ_data"
 
 
-class InSituMetadata(TypedDict):
+class InSituMetadata(TypedDict, total=False):
     entity: str
     sensor_type: str
+    estimated_surface_pressure_pa: NotRequired[float]
+    estimated_temperature_k: NotRequired[float]
+
+
+class InSituPollutantReading(TypedDict, total=False):
+    value: float
+    unit: str
+    original_value: float
+    original_unit: str
 
 
 class InSituMeasurement(TypedDict):
-    _id: ObjectId
+    _id: NotRequired[ObjectId]
     measurement_date: datetime
     name: str
     location_name: str
     api_source: str
-    created_time: datetime
-    last_modified_time: datetime
+    created_time: NotRequired[datetime]
+    last_modified_time: NotRequired[datetime]
     location: GeoJSONPoint
     location_type: AirQualityLocationType
     metadata: InSituMetadata
-    no2: NotRequired[float]
-    o3: NotRequired[float]
-    pm2_5: NotRequired[float]
-    pm10: NotRequired[float]
-    so2: NotRequired[float]
+    no2: NotRequired[InSituPollutantReading]
+    o3: NotRequired[InSituPollutantReading]
+    pm2_5: NotRequired[InSituPollutantReading]
+    pm10: NotRequired[InSituPollutantReading]
+    so2: NotRequired[InSituPollutantReading]
 
 
 class PollutantAverages(TypedDict):
@@ -119,13 +128,13 @@ def get_averaged(
         if "median" in averages:
             group_by_criteria[median_key] = {
                 "$median": {
-                    "input": f"${pollutant_name}",
+                    "input": f"${pollutant_name}.value",
                     "method": "approximate",
                 }
             }
             project_criteria[pollutant_name]["median"] = f"${median_key}"
         if "mean" in averages:
-            group_by_criteria[mean_key] = {"$avg": f"${pollutant_name}"}
+            group_by_criteria[mean_key] = {"$avg": f"${pollutant_name}.value"}
             project_criteria[pollutant_name]["mean"] = f"${mean_key}"
 
     logging.info(
