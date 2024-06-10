@@ -1,0 +1,20 @@
+services:
+  insitu-etl:
+    container_name: insitu-etl
+    build:
+      context: ./air-quality-backend/
+      dockerfile: Dockerfile.insitu
+    environment:
+      - MONGO_DB_URI=${MONGO_DB_URI}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - OPEN_AQ_API_KEY=${OPEN_AQ_API_KEY}
+  forecast-etl:
+    container_name: forecast-etl
+    build: 
+      context: ./air-quality-backend/
+      dockerfile: Dockerfile.forecast
+    environment:
+      - MONGO_DB_URI=${MONGO_DB_URI}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - CDSAPI_URL=${CDSAPI_URL}
+      - CDSAPI_KEY=${CDSAPI_KEY}
