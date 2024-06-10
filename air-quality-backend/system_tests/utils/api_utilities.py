@@ -1,8 +1,10 @@
 import datetime
 import os
 import requests
+from dotenv import load_dotenv
 from pymongo import MongoClient
 from air_quality.database.forecasts import Forecast
+from system_tests.utils.cams_utilities import delete_database_data
 
 
 def format_datetime_as_string(date_and_time: datetime, string_format: str) -> str:
@@ -107,3 +109,11 @@ def seed_api_test_data(collection_name: str, test_data_list: list[Forecast]):
     client = MongoClient(uri)
     collection = client[db_name][collection_name]
     collection.insert_many(test_data_list)
+
+
+def setup_purge_database_and_seed_with_test_data(
+    env_file_path: str, database_name: str, test_data: list
+):
+    load_dotenv(env_file_path)
+    delete_database_data(database_name)
+    seed_api_test_data(database_name, test_data)
