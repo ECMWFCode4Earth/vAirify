@@ -1,3 +1,4 @@
+import datetime
 from decimal import Decimal
 import logging
 import xarray as xr
@@ -38,8 +39,6 @@ def convert_mmr_to_mass_concentration(
                     f"Updated: {variable}, from units: 'kg kg**-1' to 'kg m**-3'."
                 )
 
-    single_level_data = single_level_data.drop_vars(["sp"])
-    multi_level_data = multi_level_data.drop_vars(["t"])
     return single_level_data, multi_level_data
 
 
@@ -77,6 +76,9 @@ class ForecastData:
         # Eager load datasets for quicker access
         self._single_level_data.load()
         self._multi_level_data.load()
+
+    _cached_pressure = None
+    _cached_temperature = None
 
     def _get_data_set(self, pollutant_type: PollutantType) -> xr.Dataset:
         if is_single_level(pollutant_type):
@@ -134,3 +136,31 @@ class ForecastData:
 
     def get_time_value(self) -> int:
         return int(self._single_level_data["time"].values)
+
+    def get_surface_pressure(
+        self, longitude: float, latitude: float, forecast_datetime: datetime
+    ):
+        if self._cached_pressure is None:
+            single_pres = self._single_level_data["sp"]
+            self._cached_pressure = single_pres.set_index(step=["valid_time"])
+
+        since_epoch = forecast_datetime.timestamp()
+
+        single_point = self._cached_pressure.sel(
+            longitude=longitude, latitude=latitude, step=since_epoch, method="nearest"
+        )
+        return single_point.item()
+
+    def get_temperature(
+        self, longitude: float, latitude: float, forecast_datetime: datetime
+    ):
+        if self._cached_temperature is None:
+            multi_temp = self._multi_level_data["t"]
+            self._cached_temperature = multi_temp.set_index(step=["valid_time"])
+
+        since_epoch = forecast_datetime.timestamp()
+
+        multi_point = self._cached_temperature.sel(
+            longitude=longitude, latitude=latitude, step=since_epoch, method="nearest"
+        )
+        return multi_point.item()

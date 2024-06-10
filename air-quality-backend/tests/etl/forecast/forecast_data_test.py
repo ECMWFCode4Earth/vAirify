@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 import xarray
 
@@ -8,6 +10,9 @@ from air_quality.etl.forecast.forecast_data import (
 )
 from tests.util.mock_forecast_data import (
     create_test_pollutant_data,
+    single_level_data_set,
+    multi_level_data_set,
+    default_time
 )
 
 
@@ -92,3 +97,33 @@ def test__get_pollutant_data_for_locations__interpolates_correctly(
         for location in locations
     ]
     assert result == expected_results
+
+
+def test__get_surface_pressure__retrieves_correctly():
+    single_level = single_level_data_set
+    multi_level = multi_level_data_set
+    forecast_data = ForecastData(single_level, multi_level)
+
+    # Add on 25 hours
+    timestamp_to_search = default_time + (25 * 60 * 60)
+    time_to_search = datetime.datetime.fromtimestamp(timestamp_to_search)
+
+    # This should find the pressure value long = 10, lat = 0, time = +24
+    result = forecast_data.get_surface_pressure(9, 1, time_to_search)
+
+    assert result == 0.000001325
+
+
+def test__get_temperature__retrieves_correctly():
+    single_level = single_level_data_set
+    multi_level = multi_level_data_set
+    forecast_data = ForecastData(single_level, multi_level)
+
+    # Add on 25 hours
+    timestamp_to_search = default_time + (25 * 60 * 60)
+    time_to_search = datetime.datetime.fromtimestamp(timestamp_to_search)
+
+    # This should find the temperature long = 10, lat = 0, time = +24
+    result = forecast_data.get_temperature(9, 1, time_to_search)
+
+    assert result == 0.000001125

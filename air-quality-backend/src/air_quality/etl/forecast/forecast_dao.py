@@ -5,27 +5,40 @@ import os
 import xarray as xr
 from .forecast_data import ForecastData
 
-
-class CamsModelDateTime:
-
-    def __init__(self, date: str, time: str):
-        self.date = date
-        self.time = time
+CAMS_FORECAST_INTERVAL_HOURS = 3
+CAMS_UPDATE_INTERVAL_HOURS = 12
 
 
-def __get_base_request_body(model_date_time: CamsModelDateTime) -> dict:
-    leadtime_hour = [str(i) for i in range(0, 121, 3)]
+class CamsRequestDetails:
+
+    def __init__(
+        self, base_forecast_datetime: datetime, no_of_forecast_times: int = 41
+    ):
+        self.base_forecast_datetime = base_forecast_datetime
+        self.no_of_forecast_times = no_of_forecast_times
+
+
+def __get_base_request_body(request_details: CamsRequestDetails) -> dict:
+
+    forecast_interval = CAMS_FORECAST_INTERVAL_HOURS
+    no_non_base_date_forecasts = request_details.no_of_forecast_times - 1
+
+    max_lead_time = (forecast_interval * no_non_base_date_forecasts) + 1
+    leadtime_hour = [str(i) for i in range(0, max_lead_time, forecast_interval)]
+    date_str = request_details.base_forecast_datetime.strftime("%Y-%m-%d")
+    time_str = request_details.base_forecast_datetime.strftime("%H:%M")
+
     return {
-        "date": f"{model_date_time.date}/{model_date_time.date}",
+        "date": f"{date_str}/{date_str}",
         "type": "forecast",
         "format": "grib",
-        "time": f"{model_date_time.time}:00",
+        "time": f"{time_str}",
         "leadtime_hour": leadtime_hour,
     }
 
 
-def get_single_level_request_body(model_date_time: CamsModelDateTime) -> dict:
-    base_request = __get_base_request_body(model_date_time)
+def get_single_level_request_body(request_details: CamsRequestDetails) -> dict:
+    base_request = __get_base_request_body(request_details)
     base_request["variable"] = [
         "particulate_matter_10um",
         "particulate_matter_2.5um",
@@ -34,8 +47,8 @@ def get_single_level_request_body(model_date_time: CamsModelDateTime) -> dict:
     return base_request
 
 
-def get_multi_level_request_body(model_date_time: CamsModelDateTime) -> dict:
-    base_request = __get_base_request_body(model_date_time)
+def get_multi_level_request_body(request_details: CamsRequestDetails) -> dict:
+    base_request = __get_base_request_body(request_details)
     base_request["variable"] = [
         "nitrogen_dioxide",
         "ozone",
@@ -58,37 +71,38 @@ def fetch_cams_data(request_body, file_name) -> xr.Dataset:
     )
 
 
-def get_latest_cam_model_date_time() -> CamsModelDateTime:
-    now = datetime.utcnow()
-    current_hour = int(now.strftime("%H"))
+def align_to_cams_publish_time(model_date_time: datetime) -> datetime:
+    current_hour = int(model_date_time.strftime("%H"))
     # CAMS data becomes available for current day, midnight at 10AM UTC
     if 10 <= current_hour < 22:
-        model_date = now
-        model_time = "00"
+        hour = 0
     # CAMS data becomes available for current day, midday at 10PM UTC
     elif 22 <= current_hour < 24:
-        model_date = now
-        model_time = "12"
+        hour = 12
     else:
-        model_date = now - timedelta(days=1)
-        model_time = "12"
-    return CamsModelDateTime(model_date.strftime("%Y-%m-%d"), model_time)
+        model_date_time -= timedelta(days=1)
+        hour = 12
+    return datetime(
+        model_date_time.year, model_date_time.month, model_date_time.day, hour
+    )
 
 
 def fetch_forecast_data(
-    model_date_time: CamsModelDateTime = None,
+    base_datetime: datetime = datetime.now(), no_of_forecast_times: int = 41
 ) -> ForecastData:
-    model_date_time = (
-        get_latest_cam_model_date_time() if model_date_time is None else model_date_time
-    )
+
+    base_datetime = align_to_cams_publish_time(base_datetime)
+    request_details = CamsRequestDetails(base_datetime, no_of_forecast_times)
+    file_ident = f"{no_of_forecast_times}_from_{base_datetime.strftime('%Y-%m-%d_%H')}"
+
     task_params = [
         (
-            get_single_level_request_body(model_date_time),
-            f"single_level_{model_date_time.date}_{model_date_time.time}.grib",
+            get_single_level_request_body(request_details),
+            f"single_level_{file_ident}.grib",
         ),
         (
-            get_multi_level_request_body(model_date_time),
-            f"multi_level_{model_date_time.date}_{model_date_time.time}.grib",
+            get_multi_level_request_body(request_details),
+            f"multi_level_{file_ident}.grib",
         ),
     ]
     results = [fetch_cams_data(*params) for params in task_params]
