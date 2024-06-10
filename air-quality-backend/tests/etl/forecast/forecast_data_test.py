@@ -6,8 +6,9 @@ import xarray
 from air_quality.aqi.pollutant_type import PollutantType
 from air_quality.etl.forecast.forecast_data import (
     convert_east_only_longitude_to_east_west,
-    ForecastData,
+    ForecastData, ForecastDataType,
 )
+from air_quality.etl.in_situ.InSituMeasurement import InSituMeasurement
 from tests.util.mock_forecast_data import (
     create_test_pollutant_data,
     single_level_data_set,
@@ -99,31 +100,33 @@ def test__get_pollutant_data_for_locations__interpolates_correctly(
     assert result == expected_results
 
 
-def test__get_surface_pressure__retrieves_correctly():
+def test__enrich_in_situ_measurements__retrieves_correctly():
     single_level = single_level_data_set
     multi_level = multi_level_data_set
     forecast_data = ForecastData(single_level, multi_level)
 
-    # Add on 25 hours
-    timestamp_to_search = default_time + (25 * 60 * 60)
-    time_to_search = datetime.datetime.fromtimestamp(timestamp_to_search)
+    initial_date = (datetime.datetime.fromtimestamp(default_time) +
+                    datetime.timedelta(hours=12))
+    required = [ForecastDataType.TEMPERATURE, ForecastDataType.SURFACE_PRESSURE]
+    in_situ_measurements: [InSituMeasurement] = [{
+        "location": {"type": "point", "coordinates": (5, -5)},
+        "measurement_date": initial_date,
+        "metadata": {},
+        "no2": {}
+    }]
 
-    # This should find the pressure value long = 10, lat = 0, time = +24
-    result = forecast_data.get_surface_pressure(9, 1, time_to_search)
+    # This should find the values interpolated bang in the middle of:
+    # T=0    (0,0) pressure = 0.4, temperature = 40
+    # T=0    (10,0) pressure = 0.5, temperature = 50
+    # T=0    (0,-10) pressure = 0.1, temperature = 10
+    # T=0    (10,-10) pressure = 0.2, temperature = 20
+    # T=24   (0,0) pressure = 1.3, temperature = 130
+    # T=24   (10,0) pressure = 1.4, temperature = 140
+    # T=24   (0,-10) pressure = 1, temperature = 100
+    # T=24   (10,-10) pressure = 1.1, temperature = 100
+    result = forecast_data.enrich_in_situ_measurements(in_situ_measurements, required)
 
-    assert result == 0.000001325
-
-
-def test__get_temperature__retrieves_correctly():
-    single_level = single_level_data_set
-    multi_level = multi_level_data_set
-    forecast_data = ForecastData(single_level, multi_level)
-
-    # Add on 25 hours
-    timestamp_to_search = default_time + (25 * 60 * 60)
-    time_to_search = datetime.datetime.fromtimestamp(timestamp_to_search)
-
-    # This should find the temperature long = 10, lat = 0, time = +24
-    result = forecast_data.get_temperature(9, 1, time_to_search)
-
-    assert result == 0.000001125
+    assert len(result) == 1
+    assert result[0][0] == in_situ_measurements[0]
+    assert result[0][1][ForecastDataType.SURFACE_PRESSURE] == 0.75
+    assert result[0][1][ForecastDataType.TEMPERATURE] == 75

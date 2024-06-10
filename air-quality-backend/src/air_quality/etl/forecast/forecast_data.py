@@ -1,12 +1,25 @@
 import datetime
 from decimal import Decimal
 import logging
+from enum import Enum
+
 import xarray as xr
 from air_quality.database.locations import AirQualityLocation
 from air_quality.aqi.pollutant_type import (
     PollutantType,
     is_single_level,
 )
+from air_quality.etl.in_situ.InSituMeasurement import InSituMeasurement
+
+
+class ForecastDataType(Enum):
+    NITROGEN_DIOXIDE = "no2"
+    OZONE = "o3"
+    PARTICULATE_MATTER_2_5 = "pm2_5"
+    PARTICULATE_MATTER_10 = "pm10"
+    SULPHUR_DIOXIDE = "so2"
+    SURFACE_PRESSURE = "sp"
+    TEMPERATURE = "t"
 
 
 def convert_east_only_longitude_to_east_west(longitude_value: float) -> float:
@@ -57,12 +70,30 @@ def convert_longitude(dataset: xr.Dataset) -> xr.Dataset:
     return converted_data
 
 
+def is_single_level(forecast_data_type: ForecastDataType) -> bool:
+        is_pm2_5 = forecast_data_type == ForecastDataType.PARTICULATE_MATTER_2_5
+        is_pm10 = forecast_data_type == ForecastDataType.PARTICULATE_MATTER_10
+        is_pressure = forecast_data_type == ForecastDataType.SURFACE_PRESSURE
+        return is_pm10 or is_pm2_5 or is_pressure
+
+
 pollutant_data_map = {
     PollutantType.OZONE: "go3",
     PollutantType.NITROGEN_DIOXIDE: "no2",
     PollutantType.SULPHUR_DIOXIDE: "so2",
     PollutantType.PARTICULATE_MATTER_10: "pm10",
     PollutantType.PARTICULATE_MATTER_2_5: "pm2p5",
+}
+
+
+forecast_data_type_map = {
+    ForecastDataType.OZONE: "go3",
+    ForecastDataType.NITROGEN_DIOXIDE: "no2",
+    ForecastDataType.SULPHUR_DIOXIDE: "so2",
+    ForecastDataType.PARTICULATE_MATTER_10: "pm10",
+    ForecastDataType.PARTICULATE_MATTER_2_5: "pm2p5",
+    ForecastDataType.SURFACE_PRESSURE: "sp",
+    ForecastDataType.TEMPERATURE: "t"
 }
 
 
@@ -86,9 +117,74 @@ class ForecastData:
         else:
             return self._multi_level_data
 
+    def _get_data_set(self, forecast_data_type: ForecastDataType) -> xr.Dataset:
+        if is_single_level(forecast_data_type):
+            return self._single_level_data
+        else:
+            return self._multi_level_data
+
+    def enrich_in_situ_measurements(
+            self,
+            in_situ_measurements: list[InSituMeasurement],
+            required_data: list[ForecastDataType]
+    ) -> list[tuple[InSituMeasurement, dict[ForecastDataType: float]]]:
+        if len(in_situ_measurements) == 0:
+            return []
+
+        latitudes = []
+        longitudes = []
+        valid_times = []
+        for in_situ_measurement in in_situ_measurements:
+            longitude = in_situ_measurement["location"]["coordinates"][0]
+            latitude = in_situ_measurement["location"]["coordinates"][1]
+            valid_time = in_situ_measurement["measurement_date"].timestamp()
+
+            if latitude not in latitudes:
+                latitudes.append(latitude)
+            if longitude not in longitudes:
+                longitudes.append(longitude)
+            if valid_time not in valid_times:
+                valid_times.append(valid_time)
+
+        interpolated_data_by_data_type = {}
+        for required_datum in required_data:
+            dataset = (self
+                       ._get_data_set(required_datum)
+                       .swap_dims({"step": "valid_time"}))
+
+            interpolated_data = dataset[forecast_data_type_map[required_datum]].interp(
+                latitude=xr.DataArray(latitudes, dims="latitude"),
+                longitude=xr.DataArray(longitudes, dims="longitude"),
+                valid_time=xr.DataArray(valid_times, dims="valid_time"),
+                method="linear",
+            )
+            (interpolated_data
+             .set_index(valid_time=["valid_time"])
+             .set_index(latitude=["latitude"])
+             .set_index(longitude=["longitude"]))
+
+            interpolated_data_by_data_type[required_datum] = interpolated_data
+
+        forecast_tuples = []
+        for in_situ_measurement in in_situ_measurements:
+            valid_time = in_situ_measurement["measurement_date"].timestamp()
+            longitude = in_situ_measurement["location"]["coordinates"][0]
+            latitude = in_situ_measurement["location"]["coordinates"][1]
+            forecast_data = {}
+
+            for (forecast_data_type, interpolated_data) \
+                    in interpolated_data_by_data_type.items():
+                forecast_value = interpolated_data.sel(
+                    valid_time=valid_time,
+                    longitude=longitude,
+                    latitude=latitude).item()
+                forecast_data[forecast_data_type] = forecast_value
+            forecast_tuples.append((in_situ_measurement, forecast_data))
+        return forecast_tuples
+
     def get_pollutant_data_for_locations(
         self, locations: list[AirQualityLocation], pollutant_types: list[PollutantType]
-    ) -> list[tuple[AirQualityLocation, dict[PollutantType : list[float]]]]:
+    ) -> list[tuple[AirQualityLocation, dict[PollutantType: list[float]]]]:
         """
         Get forecasted air pollutant values for given locations
         and pollutants using bilinear interpolation
@@ -136,31 +232,3 @@ class ForecastData:
 
     def get_time_value(self) -> int:
         return int(self._single_level_data["time"].values)
-
-    def get_surface_pressure(
-        self, longitude: float, latitude: float, forecast_datetime: datetime
-    ):
-        if self._cached_pressure is None:
-            single_pres = self._single_level_data["sp"]
-            self._cached_pressure = single_pres.set_index(step=["valid_time"])
-
-        since_epoch = forecast_datetime.timestamp()
-
-        single_point = self._cached_pressure.sel(
-            longitude=longitude, latitude=latitude, step=since_epoch, method="nearest"
-        )
-        return single_point.item()
-
-    def get_temperature(
-        self, longitude: float, latitude: float, forecast_datetime: datetime
-    ):
-        if self._cached_temperature is None:
-            multi_temp = self._multi_level_data["t"]
-            self._cached_temperature = multi_temp.set_index(step=["valid_time"])
-
-        since_epoch = forecast_datetime.timestamp()
-
-        multi_point = self._cached_temperature.sel(
-            longitude=longitude, latitude=latitude, step=since_epoch, method="nearest"
-        )
-        return multi_point.item()
