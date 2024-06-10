@@ -5,12 +5,12 @@ import { useState } from 'react'
 
 import classes from './GlobalSummary.module.css'
 import GlobalSummaryTable from './GlobalSummaryTable'
-import { getForecastData } from '../api/forecast-api'
-import { getMeasurementSummary } from '../api/measurement-api'
+import { getForecastData } from '../services/forecast-data-service'
 import {
   getLatestBaseForecastTime,
   getLatestValidForecastTime,
 } from '../services/forecast-time-service'
+import { getMeasurementSummary } from '../services/measurement-data-service'
 
 const GlobalSummary = (): JSX.Element => {
   const [latestForecastDate] = useState(getLatestBaseForecastTime())

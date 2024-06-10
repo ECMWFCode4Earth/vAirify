@@ -6,11 +6,11 @@ import './GlobalSummaryTable.module.css'
 import { useMemo } from 'react'
 
 import { LocationCellRenderer } from './LocationCellRenderer'
+import { PollutantType, pollutantTypeDisplay, pollutantTypes } from '../models'
 import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,
-} from '../api/types'
-import { PollutantType, pollutantTypeDisplay, pollutantTypes } from '../models'
+} from '../services/types'
 
 type SummaryDetail = {
   aqiLevel: number
