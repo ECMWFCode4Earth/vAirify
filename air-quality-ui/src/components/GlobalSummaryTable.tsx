@@ -3,13 +3,14 @@ import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import './GlobalSummaryTable.module.css'
-import { useState } from 'react'
+import { useMemo } from 'react'
 
+import { LocationCellRenderer } from './LocationCellRenderer'
 import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,
 } from '../api/types'
-import { PollutantType, pollutantTypes } from '../models'
+import { PollutantType, pollutantTypeDisplay, pollutantTypes } from '../models'
 
 type SummaryDetail = {
   aqiLevel: number
@@ -26,6 +27,35 @@ interface GlobalSummaryTableProps {
   forecast: ForecastResponseDto[]
   summarizedMeasurements: MeasurementSummaryResponseDto[]
 }
+
+const createColDefs = (): (ColDef | ColGroupDef)[] => [
+  {
+    field: 'locationName',
+    headerName: 'City',
+    pinned: true,
+    filter: true,
+    cellRenderer: LocationCellRenderer,
+  },
+  {
+    field: 'aqiDifference',
+    headerName: 'AQI Difference',
+    sort: 'desc',
+  },
+  {
+    headerName: 'AQI (1-6)',
+    children: [
+      { field: 'forecast.aqiLevel', headerName: 'Forecast' },
+      { field: 'measurements.aqiLevel', headerName: 'Measured' },
+    ],
+  },
+  ...pollutantTypes.flatMap((type) => ({
+    headerName: `${pollutantTypeDisplay[type]} (µg/m³)`,
+    children: [
+      { field: `forecast.${type}`, headerName: `Forecast` },
+      { field: `measurements.${type}`, headerName: `Measured` },
+    ],
+  })),
+]
 
 const mapApiRow = (
   forecastData: ForecastResponseDto,
@@ -73,30 +103,8 @@ const mapApiResponse = ({
 }
 
 const GlobalSummaryTable = (props: GlobalSummaryTableProps): JSX.Element => {
-  const [data] = useState<SummaryRow[]>(mapApiResponse(props))
-
-  const [colDefs] = useState<(ColDef | ColGroupDef)[]>([
-    { field: 'locationName', headerName: 'City', pinned: true, filter: true },
-    {
-      field: 'aqiDifference',
-      headerName: 'AQI Difference',
-      sort: 'desc',
-    },
-    {
-      headerName: 'AQI',
-      children: [
-        { field: 'forecast.aqiLevel', headerName: 'Forecast' },
-        { field: 'measurements.aqiLevel', headerName: 'Measured' },
-      ],
-    },
-    ...pollutantTypes.flatMap((type) => ({
-      headerName: type,
-      children: [
-        { field: `forecast.${type}`, headerName: `Forecast` },
-        { field: `measurements.${type}`, headerName: `Measured` },
-      ],
-    })),
-  ])
+  const colDefs = useMemo(() => createColDefs(), [])
+  const data = useMemo(() => mapApiResponse(props), [props])
 
   return (
     <div className="ag-theme-quartz" style={{ height: 500 }}>
