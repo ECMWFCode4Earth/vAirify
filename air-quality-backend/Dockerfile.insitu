@@ -10,7 +10,7 @@ COPY pyproject.toml .
 RUN poetry install
 
 COPY src/ ./src
-COPY scripts/run_forecast_etl.py ./scripts/run_in_situ_etl.py
+COPY scripts/run_in_situ_etl.py ./scripts/run_in_situ_etl.py
 COPY README.md logging.ini ./
 
 RUN poetry install 
