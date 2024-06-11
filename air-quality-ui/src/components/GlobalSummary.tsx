@@ -51,12 +51,10 @@ const GlobalSummary = (): JSX.Element => {
     <div className={classes['summary-container']}>
       <div>
         <div>
-          <label>Forecast Base Time</label>:{' '}
-          {latestForecastDate.toFormat('yyyy-MM-dd HH:mm')}
+          Forecast Base Time: {latestForecastDate.toFormat('yyyy-MM-dd HH:mm')}
         </div>
         <div>
-          <label>Forecast Valid Time</label>:{' '}
-          {latestValidDate.toFormat('yyyy-MM-dd HH:mm')}{' '}
+          Forecast Valid Time: {latestValidDate.toFormat('yyyy-MM-dd HH:mm')}
         </div>
       </div>
       <GlobalSummaryTable
