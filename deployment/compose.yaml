@@ -6,6 +6,8 @@ services:
       - MONGO_DB_URI=${MONGO_DB_URI}
       - MONGO_DB_NAME=${MONGO_DB_NAME}
       - OPEN_AQ_API_KEY=${OPEN_AQ_API_KEY}
+      - CDSAPI_URL=${CDSAPI_URL}
+      - CDSAPI_KEY=${CDSAPI_KEY}
   etl-forecast:
     container_name: etl-forecast
     image: ghcr.io/ecmwfcode4earth/vairify/vairify-etl-forecast
