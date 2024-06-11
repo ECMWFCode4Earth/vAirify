@@ -1,5 +1,6 @@
 import datetime
 import pytest
+import requests
 from air_quality.database.forecasts import Forecast
 from system_tests.utils.api_utilities import (
     format_datetime_as_string,
@@ -113,7 +114,6 @@ test_city_1_expected_response_data: dict = {
     "so2": test_city_1_input_data["so2"],
 }
 
-
 test_city_2_expected_response_data: dict = {
     "base_time": format_datetime_as_string(
         test_city_2_input_data["forecast_base_time"], "%Y-%m-%dT%H:%M:%S+00:00"
@@ -157,42 +157,61 @@ setup_purge_database_and_seed_with_test_data(
 
 # Tests
 @pytest.mark.parametrize(
-    "test_base_time, test_location_name, expected_cities",
+    "parameters, expected_cities",
     [
         (
-            datetime.datetime(2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc),
-            "",
+            {
+                "forecast_base_time": format_datetime_as_string(
+                    datetime.datetime(
+                        2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
+                    ),
+                    "%Y-%m-%dT%H:%M:%S+00:00",
+                ),
+                "valid_date_from": valid_time_from,
+                "valid_date_to": valid_time_to,
+                "location_type": location_type,
+            },
             ["Test City 1", "Test City 2"],
         ),
         (
-            datetime.datetime(2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc),
-            "Test City 1",
+            {
+                "forecast_base_time": format_datetime_as_string(
+                    datetime.datetime(
+                        2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
+                    ),
+                    "%Y-%m-%dT%H:%M:%S+00:00",
+                ),
+                "valid_date_from": valid_time_from,
+                "valid_date_to": valid_time_to,
+                "location_type": location_type,
+                "location_name": "Test City 1",
+            },
             ["Test City 1"],
         ),
         (
-            datetime.datetime(2024, 6, 11, 0, 0, 0, tzinfo=datetime.timezone.utc),
-            "",
+            {
+                "forecast_base_time": format_datetime_as_string(
+                    datetime.datetime(
+                        2024, 6, 11, 0, 0, 0, tzinfo=datetime.timezone.utc
+                    ),
+                    "%Y-%m-%dT%H:%M:%S+00:00",
+                ),
+                "valid_date_from": valid_time_from,
+                "valid_date_to": valid_time_to,
+                "location_type": location_type,
+            },
             ["Test City 3"],
         ),
     ],
 )
 def test__different_base_times__assert_correct_results_returned(
-    test_base_time,
-    test_location_name: str,
+    parameters: dict,
     expected_cities: list,
 ):
-    test_base_time_string = format_datetime_as_string(
-        test_base_time, "%Y-%m-%dT%H:%M:%S+00:00"
+    response = requests.request(
+        "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
-    response = get_forecast(
-        test_base_time_string,
-        valid_time_from,
-        valid_time_to,
-        location_type,
-        test_location_name,
-        base_url,
-        headers,
-    )
+
     expected = expected_cities
     actual_cities = get_list_of_keys(response.json(), "location_name")
     for city in actual_cities:
@@ -201,47 +220,103 @@ def test__different_base_times__assert_correct_results_returned(
 
 
 @pytest.mark.parametrize(
-    "test_location_name, test_base_time, expected",
+    "parameters, expected",
     [
-        ("", datetime.datetime(2024, 6, 9, 12, 0, 0, tzinfo=datetime.timezone.utc), 0),
-        ("", datetime.datetime(2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc), 2),
-        ("", datetime.datetime(2024, 6, 10, 12, 0, 0, tzinfo=datetime.timezone.utc), 0),
         (
-            "Test City 1",
-            datetime.datetime(2024, 6, 9, 12, 0, 0, tzinfo=datetime.timezone.utc),
+            {
+                "forecast_base_time": format_datetime_as_string(
+                    datetime.datetime(
+                        2024, 6, 9, 12, 0, 0, tzinfo=datetime.timezone.utc
+                    ),
+                    "%Y-%m-%dT%H:%M:%S+00:00",
+                ),
+                "valid_date_from": valid_time_from,
+                "valid_date_to": valid_time_to,
+                "location_type": location_type,
+            },
             0,
         ),
         (
-            "Test City 1",
-            datetime.datetime(2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            {
+                "forecast_base_time": format_datetime_as_string(
+                    datetime.datetime(
+                        2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
+                    ),
+                    "%Y-%m-%dT%H:%M:%S+00:00",
+                ),
+                "valid_date_from": valid_time_from,
+                "valid_date_to": valid_time_to,
+                "location_type": location_type,
+            },
+            2,
+        ),
+        (
+            {
+                "forecast_base_time": format_datetime_as_string(
+                    datetime.datetime(
+                        2024, 6, 10, 12, 0, 0, tzinfo=datetime.timezone.utc
+                    ),
+                    "%Y-%m-%dT%H:%M:%S+00:00",
+                ),
+                "valid_date_from": valid_time_from,
+                "valid_date_to": valid_time_to,
+                "location_type": location_type,
+            },
+            0,
+        ),
+        (
+            {
+                "forecast_base_time": format_datetime_as_string(
+                    datetime.datetime(
+                        2024, 6, 9, 12, 0, 0, tzinfo=datetime.timezone.utc
+                    ),
+                    "%Y-%m-%dT%H:%M:%S+00:00",
+                ),
+                "valid_date_from": valid_time_from,
+                "valid_date_to": valid_time_to,
+                "location_type": location_type,
+                "location_name": "Test City 1",
+            },
+            0,
+        ),
+        (
+            {
+                "forecast_base_time": format_datetime_as_string(
+                    datetime.datetime(
+                        2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
+                    ),
+                    "%Y-%m-%dT%H:%M:%S+00:00",
+                ),
+                "valid_date_from": valid_time_from,
+                "valid_date_to": valid_time_to,
+                "location_type": location_type,
+                "location_name": "Test City 1",
+            },
             1,
         ),
         (
-            "Test City 1",
-            datetime.datetime(2024, 6, 10, 12, 0, 0, tzinfo=datetime.timezone.utc),
+            {
+                "forecast_base_time": format_datetime_as_string(
+                    datetime.datetime(
+                        2024, 6, 10, 12, 0, 0, tzinfo=datetime.timezone.utc
+                    ),
+                    "%Y-%m-%dT%H:%M:%S+00:00",
+                ),
+                "valid_date_from": valid_time_from,
+                "valid_date_to": valid_time_to,
+                "location_type": location_type,
+                "location_name": "Test City 1",
+            },
             0,
         ),
     ],
 )
-def test__base_time_bva__assert_number_of_results(
-    test_location_name: str, test_base_time: datetime.datetime, expected: int
-):
-    test_base_time_string = format_datetime_as_string(
-        test_base_time,
-        "%Y-%m-%dT%H:%M:%S+00:00",
+def test__base_time_bva__assert_number_of_results(parameters: dict, expected: int):
+    response = requests.request(
+        "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
-
-    response = get_forecast(
-        test_base_time_string,
-        valid_time_from,
-        valid_time_to,
-        location_type,
-        test_location_name,
-        base_url,
-        headers,
-    )
-
     response_json = response.json()
+
     assert len(response_json) == expected
 
 
