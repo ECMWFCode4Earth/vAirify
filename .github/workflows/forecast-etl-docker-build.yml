@@ -18,7 +18,7 @@ jobs:
       - name: build
         run: |
           cd air-quality-backend
-          docker build . -t ghcr.io/${{ github.repository }}/etl-forecast:latest -f Dockerfile.forecast.cron
+          docker build . -t ghcr.io/${{ github.repository }}/vairify-etl-forecast:latest -f Dockerfile.forecast.cron
       - name: publish
         run: |
-          docker push ghcr.io/${{ github.repository }}/etl-forecast:latest
+          docker push ghcr.io/${{ github.repository }}/vairify-etl-forecast:latest

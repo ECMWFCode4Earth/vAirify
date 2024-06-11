@@ -1,12 +1,14 @@
 services:
-  insitu-etl:
-    image: ghcr.io/ecmwfcode4earth/vairify/vairify-insitu-etl
+  etl-insitu:
+    container_name: etl-insitu
+    image: ghcr.io/ecmwfcode4earth/vairify/vairify-etl-insitu
     environment:
       - MONGO_DB_URI=${MONGO_DB_URI}
       - MONGO_DB_NAME=${MONGO_DB_NAME}
       - OPEN_AQ_API_KEY=${OPEN_AQ_API_KEY}
-  forecast-etl:
-    image: ghcr.io/ecmwfcode4earth/vairify/vairify-forecast-etl
+  etl-forecast:
+    container_name: etl-forecast
+    image: ghcr.io/ecmwfcode4earth/vairify/vairify-etl-forecast
     environment:
       - MONGO_DB_URI=${MONGO_DB_URI}
       - MONGO_DB_NAME=${MONGO_DB_NAME}
