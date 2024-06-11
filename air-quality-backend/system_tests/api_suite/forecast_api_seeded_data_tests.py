@@ -5,7 +5,6 @@ import pytest
 from air_quality.database.forecasts import Forecast
 from system_tests.utils.api_utilities import (
     format_datetime_as_string,
-    get_expected_valid_times_list,
     get_list_of_keys,
     get_forecast,
     setup_purge_database_and_seed_with_test_data,
@@ -57,7 +56,7 @@ test_city_2_data: Forecast = {
 test_city_3_data: Forecast = {
     "forecast_valid_time": datetime.datetime(2024, 6, 10, 15, 0, 0),
     "source": "cams-production",
-    "forecast_base_time": datetime.datetime(2024, 6, 10, 12, 0, 0),
+    "forecast_base_time": datetime.datetime(2024, 6, 11, 0, 0, 0),
     "location_type": "city",
     "name": "Test City 3",
     "forecast_range": 0,
@@ -96,55 +95,53 @@ setup_purge_database_and_seed_with_test_data(
 )
 
 
-@pytest.mark.parametrize("location_name, expected", [("", 2), ("Test City 1", 1)])
-def test__get_results_within_date_range_on_same_base_time__assert_number_of_results(
-    location_name: str, expected: int
+@pytest.mark.parametrize(
+    "test_forecast_base_time, test_location_name, expected_cities",
+    [
+        (datetime.datetime(2024, 6, 10, 0, 0), "", ["Test City 1", "Test City 2"]),
+        (datetime.datetime(2024, 6, 10, 0, 0), "Test City 1", ["Test City 1"]),
+        (datetime.datetime(2024, 6, 11, 0, 0, 0), "", ["Test City 3"]),
+    ],
+)
+def test__different_base_times__assert_correct_results_returned(
+    test_forecast_base_time: datetime.datetime,
+    test_location_name: str,
+    expected_cities: list,
 ):
+    test_forecast_base_time_string = format_datetime_as_string(
+        test_forecast_base_time, "%Y-%m-%dT%H:%M:%S+00:00"
+    )
     response = get_forecast(
-        forecast_base_time_string,
+        test_forecast_base_time_string,
         valid_date_from,
         valid_date_to,
         location_type,
-        location_name,
+        test_location_name,
         base_url,
         headers,
     )
-
-    response_json = response.json()
-    assert len(response_json) == expected
-
-
-def test__no_location_name__get_results_within_date_range_on_same_base_time__assert_correct_results_returned():
-    response = get_forecast(
-        forecast_base_time_string,
-        valid_date_from,
-        valid_date_to,
-        location_type,
-        "",
-        base_url,
-        headers,
-    )
-    expected_cities = ["Test City 1", "Test City 2"]
+    expected = expected_cities
     actual_cities = get_list_of_keys(response.json(), "location_name")
     for city in actual_cities:
         index = actual_cities.index(city)
 
-        assert city == expected_cities[index]
+        assert city == expected[index]
 
 
 @pytest.mark.parametrize(
-    "location_name, test_forecast_base_time",
+    "test_location_name, test_forecast_base_time, expected",
     [
-        ("", datetime.datetime(2024, 6, 9, 12, 0, 0)),
-        ("", datetime.datetime(2024, 6, 10, 12, 0, 0)),
-        ("Test City 1", datetime.datetime(2024, 6, 9, 12, 0, 0)),
-        ("Test City 1", datetime.datetime(2024, 6, 10, 12, 0, 0)),
+        ("", datetime.datetime(2024, 6, 9, 12, 0, 0), 0),
+        ("", datetime.datetime(2024, 6, 10, 0, 0, 0), 2),
+        ("", datetime.datetime(2024, 6, 10, 12, 0, 0), 0),
+        ("Test City 1", datetime.datetime(2024, 6, 9, 12, 0, 0), 0),
+        ("Test City 1", datetime.datetime(2024, 6, 10, 0, 0, 0), 1),
+        ("Test City 1", datetime.datetime(2024, 6, 10, 12, 0, 0), 0),
     ],
 )
-def test_no_matching_base_time_in_database__assert_0_results(
-    location_name: str, test_forecast_base_time: datetime.datetime
+def test__base_time_bva__assert_number_of_results(
+    test_location_name: str, test_forecast_base_time: datetime.datetime, expected: int
 ):
-    test_forecast_base_time = datetime.datetime(2024, 5, 4, 0, 0)
     test_base_time_string = format_datetime_as_string(
         test_forecast_base_time,
         "%Y-%m-%dT%H:%M:%S+00:00",
@@ -155,41 +152,82 @@ def test_no_matching_base_time_in_database__assert_0_results(
         valid_date_from,
         valid_date_to,
         location_type,
-        location_name,
+        test_location_name,
         base_url,
         headers,
     )
 
     response_json = response.json()
-    assert len(response_json) == 0
+    assert len(response_json) == expected
 
 
-@pytest.mark.parametrize("location_name", ("", "Test City 1"))
-def test__valid_date_range_outside_of_database_data__assert_0_results(
-    location_name: str,
+@pytest.mark.parametrize(
+    "test_valid_date_from, test_location_name, expected_cities",
+    [
+        (datetime.datetime(2024, 6, 10, 0, 0, 0), "", ["Test City 1", "Test City 2"]),
+        (datetime.datetime(2024, 6, 11, 0, 0, 0), "", ["Test City 2"]),
+        (datetime.datetime(2024, 6, 10, 0, 0, 0), "Test City 2", ["Test City 2"]),
+        (datetime.datetime(2024, 6, 11, 0, 0, 0), "", ["Test City 2"]),
+    ],
+)
+def test__different_valid_from_times__assert_correct_results(
+    test_valid_date_from: datetime.datetime,
+    test_location_name: str,
+    expected_cities: list,
 ):
-    test_valid_date_from = datetime.datetime(2024, 8, 10, 0, 0, 0)
-    test_valid_date_to = datetime.datetime(2024, 8, 15, 0, 0, 0)
-
     test_valid_date_from_string = format_datetime_as_string(
         test_valid_date_from, "%Y-%m-%dT%H:%M:%S+00:00"
-    )
-    test_valid_date_to_string = format_datetime_as_string(
-        test_valid_date_to, "%Y-%m-%dT%H:%M:%S+00:00"
     )
 
     response = get_forecast(
         forecast_base_time_string,
         test_valid_date_from_string,
-        test_valid_date_to_string,
+        valid_date_to,
         location_type,
-        location_name,
+        test_location_name,
+        base_url,
+        headers,
+    )
+
+    expected = expected_cities
+    actual_cities = get_list_of_keys(response.json(), "location_name")
+    for city in actual_cities:
+        index = actual_cities.index(city)
+
+        assert city == expected[index]
+
+
+@pytest.mark.parametrize(
+    "test_valid_time_from, test_location_name, expected",
+    [
+        (datetime.datetime(2024, 6, 10, 0, 0, 0), "", 2),
+        (datetime.datetime(2024, 6, 10, 3, 0, 0), "", 2),
+        (datetime.datetime(2024, 6, 10, 6, 0, 0), "", 1),
+        (datetime.datetime(2024, 6, 10, 0, 0, 0), "Test City 1", 1),
+        (datetime.datetime(2024, 6, 10, 3, 0, 0), "Test City 1", 1),
+        (datetime.datetime(2024, 6, 10, 6, 0, 0), "Test City 1", 0),
+    ],
+)
+def test__valid_date_from_bva__assert_number_of_results(
+    test_valid_time_from: datetime.datetime, test_location_name: str, expected: int
+):
+    test_valid_time_from_string = format_datetime_as_string(
+        test_valid_time_from,
+        "%Y-%m-%dT%H:%M:%S+00:00",
+    )
+
+    response = get_forecast(
+        forecast_base_time_string,
+        test_valid_time_from_string,
+        valid_date_to,
+        location_type,
+        test_location_name,
         base_url,
         headers,
     )
 
     response_json = response.json()
-    assert len(response_json) == 0
+    assert len(response_json) == expected
 
 
 def test__location_name_parameter_filters_response_correctly__assert_1_result():
@@ -242,13 +280,13 @@ def test__results_containing_relevant_base_time(
 #     assert expected_valid_time_list == actual_valid_time_list
 
 
-def test__verify__parameters__work():
-    get_forecast(
-        forecast_base_time_string,
-        valid_date_from,
-        valid_date_to,
-        location_type,
-        location_name,
-        base_url,
-        headers,
-    )
+# def test__verify__parameters__work():
+#     get_forecast(
+#         forecast_base_time_string,
+#         valid_date_from,
+#         valid_date_to,
+#         location_type,
+#         location_name,
+#         base_url,
+#         headers,
+#     )
