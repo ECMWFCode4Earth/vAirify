@@ -73,39 +73,39 @@ test_city_3_input_data: Forecast = {
     "created_time": datetime.datetime(2024, 6, 10, 7, 49, 53, 664),
 }
 
-test_city_1_response_data: dict = {
+test_city_1_expected_response_data: dict = {
     "base_time": format_datetime_as_string(
-        datetime.datetime(2024, 6, 10, 0, 0, 0), "%Y-%m-%dT%H:%M:%S+00:00"
+        test_city_1_input_data["forecast_base_time"], "%Y-%m-%dT%H:%M:%S+00:00"
     ),
     "valid_time": format_datetime_as_string(
-        datetime.datetime(2024, 6, 10, 3, 0, 0), "%Y-%m-%dT%H:%M:%S+00:00"
+        test_city_1_input_data["forecast_valid_time"], "%Y-%m-%dT%H:%M:%S+00:00"
     ),
-    "location_type": "city",
-    "location_name": "Test City 1",
-    "overall_aqi_level": 6,
-    "no2": {"aqi_level": 1, "value": 7.79346375328925},
-    "o3": {"aqi_level": 4, "value": 212.70172151472397},
-    "pm2_5": {"aqi_level": 4, "value": 48.76003397454627},
-    "pm10": {"aqi_level": 6, "value": 205.640266314635},
-    "so2": {"aqi_level": 1, "value": 7.58745619326088},
+    "location_type": test_city_1_input_data["location_type"],
+    "location_name": test_city_1_input_data["name"],
+    "overall_aqi_level": test_city_1_input_data["overall_aqi_level"],
+    "no2": test_city_1_input_data["no2"],
+    "o3": test_city_1_input_data["o3"],
+    "pm2_5": test_city_1_input_data["pm2_5"],
+    "pm10": test_city_1_input_data["pm10"],
+    "so2": test_city_1_input_data["so2"],
 }
 
 
-test_city_2_response_data: dict = {
+test_city_2_expected_response_data: dict = {
     "base_time": format_datetime_as_string(
-        datetime.datetime(2024, 6, 10, 0, 0, 0), "%Y-%m-%dT%H:%M:%S+00:00"
+        test_city_2_input_data["forecast_base_time"], "%Y-%m-%dT%H:%M:%S+00:00"
     ),
     "valid_time": format_datetime_as_string(
-        datetime.datetime(2024, 6, 12, 0, 0, 0), "%Y-%m-%dT%H:%M:%S+00:00"
+        test_city_2_input_data["forecast_valid_time"], "%Y-%m-%dT%H:%M:%S+00:00"
     ),
-    "location_type": "city",
-    "location_name": "Test City 2",
-    "overall_aqi_level": 6,
-    "no2": {"aqi_level": 6, "value": 350.76859403417895},
-    "o3": {"aqi_level": 5, "value": 261.70172151472397},
-    "pm2_5": {"aqi_level": 1, "value": 9.76003397454627},
-    "pm10": {"aqi_level": 1, "value": 10.640266314635},
-    "so2": {"aqi_level": 3, "value": 212.58745619326088},
+    "location_type": test_city_2_input_data["location_type"],
+    "location_name": test_city_2_input_data["name"],
+    "overall_aqi_level": test_city_2_input_data["overall_aqi_level"],
+    "no2": test_city_2_input_data["no2"],
+    "o3": test_city_2_input_data["o3"],
+    "pm2_5": test_city_2_input_data["pm2_5"],
+    "pm10": test_city_2_input_data["pm10"],
+    "so2": test_city_2_input_data["so2"],
 }
 
 # API GET request
@@ -350,37 +350,20 @@ def test__results_containing_relevant_base_time(
         assert forecast["base_time"] == base_time_string
 
 
-# def test__location_name_parameter__returns_results_containing_correct_valid_times():
-#     response = get_forecast(
-#         forecast_base_time_string,
-#         valid_date_from,
-#         valid_date_to,
-#         location_type,
-#         location_name,
-#         base_url,
-#         headers,
-#     )
-#     response_json = response.json()
-#     expected_valid_time_list = get_expected_valid_times_list(forecast_base_time, 3)
-#     actual_valid_time_list = get_list_of_keys(response_json, "valid_date")
-#
-#     assert expected_valid_time_list == actual_valid_time_list
-
-
 @pytest.mark.parametrize(
     "test_location_name, expected_response",
     [
         (
             "",
             [
-                test_city_1_response_data,
-                test_city_2_response_data,
+                test_city_1_expected_response_data,
+                test_city_2_expected_response_data,
             ],
         ),
         (
             "Test City 2",
             [
-                test_city_2_response_data,
+                test_city_2_expected_response_data,
             ],
         ),
     ],
