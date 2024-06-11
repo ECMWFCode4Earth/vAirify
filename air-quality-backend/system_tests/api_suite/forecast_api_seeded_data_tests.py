@@ -1,5 +1,4 @@
 import datetime
-import pprint
 import pytest
 from air_quality.database.forecasts import Forecast
 from system_tests.utils.api_utilities import (
@@ -11,13 +10,19 @@ from system_tests.utils.api_utilities import (
 
 # Test Data
 test_city_1_input_data: Forecast = {
-    "forecast_valid_time": datetime.datetime(2024, 6, 10, 3, 0, 0),
+    "forecast_valid_time": datetime.datetime(
+        2024, 6, 10, 3, 0, 0, tzinfo=datetime.timezone.utc
+    ),
     "source": "cams-production",
-    "forecast_base_time": datetime.datetime(2024, 6, 10, 0, 0, 0),
+    "forecast_base_time": datetime.datetime(
+        2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
+    ),
     "location_type": "city",
     "name": "Test City 1",
     "forecast_range": 0,
-    "last_modified_time": datetime.datetime(2024, 6, 10, 7, 49, 53, 664),
+    "last_modified_time": datetime.datetime(
+        2024, 6, 10, 7, 49, 53, 664, tzinfo=datetime.timezone.utc
+    ),
     "location": {
         "type": "Point",
         "coordinates": [54.36667, 24.46667],
@@ -28,17 +33,25 @@ test_city_1_input_data: Forecast = {
     "pm10": {"aqi_level": 6, "value": 205.640266314635},
     "pm2_5": {"aqi_level": 4, "value": 48.76003397454627},
     "so2": {"aqi_level": 1, "value": 7.58745619326088},
-    "created_time": datetime.datetime(2024, 6, 10, 7, 49, 53, 664),
+    "created_time": datetime.datetime(
+        2024, 6, 10, 7, 49, 53, 664, tzinfo=datetime.timezone.utc
+    ),
 }
 
 test_city_2_input_data: Forecast = {
-    "forecast_valid_time": datetime.datetime(2024, 6, 12, 0, 0, 0),
+    "forecast_valid_time": datetime.datetime(
+        2024, 6, 12, 0, 0, 0, tzinfo=datetime.timezone.utc
+    ),
     "source": "cams-production",
-    "forecast_base_time": datetime.datetime(2024, 6, 10, 0, 0, 0),
+    "forecast_base_time": datetime.datetime(
+        2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
+    ),
     "location_type": "city",
     "name": "Test City 2",
     "forecast_range": 0,
-    "last_modified_time": datetime.datetime(2024, 6, 10, 7, 49, 53, 664),
+    "last_modified_time": datetime.datetime(
+        2024, 6, 10, 7, 49, 53, 664, tzinfo=datetime.timezone.utc
+    ),
     "location": {
         "type": "Point",
         "coordinates": [54.36667, 24.46667],
@@ -49,17 +62,25 @@ test_city_2_input_data: Forecast = {
     "pm10": {"aqi_level": 1, "value": 10.640266314635},
     "pm2_5": {"aqi_level": 1, "value": 9.76003397454627},
     "so2": {"aqi_level": 3, "value": 212.58745619326088},
-    "created_time": datetime.datetime(2024, 6, 10, 7, 49, 53, 664),
+    "created_time": datetime.datetime(
+        2024, 6, 10, 7, 49, 53, 664, tzinfo=datetime.timezone.utc
+    ),
 }
 
 test_city_3_input_data: Forecast = {
-    "forecast_valid_time": datetime.datetime(2024, 6, 10, 15, 0, 0),
+    "forecast_valid_time": datetime.datetime(
+        2024, 6, 10, 15, 0, 0, tzinfo=datetime.timezone.utc
+    ),
     "source": "cams-production",
-    "forecast_base_time": datetime.datetime(2024, 6, 11, 0, 0, 0),
+    "forecast_base_time": datetime.datetime(
+        2024, 6, 11, 0, 0, 0, tzinfo=datetime.timezone.utc
+    ),
     "location_type": "city",
     "name": "Test City 3",
     "forecast_range": 0,
-    "last_modified_time": datetime.datetime(2024, 6, 10, 7, 49, 53, 664),
+    "last_modified_time": datetime.datetime(
+        2024, 6, 10, 7, 49, 53, 664, tzinfo=datetime.timezone.utc
+    ),
     "location": {
         "type": "Point",
         "coordinates": [54.36667, 24.46667],
@@ -70,7 +91,9 @@ test_city_3_input_data: Forecast = {
     "pm10": {"aqi_level": 2, "value": 30.640266314635},
     "pm2_5": {"aqi_level": 3, "value": 22.76003397454627},
     "so2": {"aqi_level": 2, "value": 103.58745619326088},
-    "created_time": datetime.datetime(2024, 6, 10, 7, 49, 53, 664),
+    "created_time": datetime.datetime(
+        2024, 6, 10, 7, 49, 53, 664, tzinfo=datetime.timezone.utc
+    ),
 }
 
 test_city_1_expected_response_data: dict = {
@@ -113,14 +136,15 @@ base_url = "http://127.0.0.1:8000/air-pollutant/forecast"
 headers = {"accept": "application/json"}
 location_type = "city"
 
-base_time = datetime.datetime(2024, 6, 10, 0, 0)
+base_time = datetime.datetime(2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc)
 base_time_string = format_datetime_as_string(
     base_time,
     "%Y-%m-%dT%H:%M:%S+00:00",
 )
 valid_time_from = base_time_string
 valid_time_to = format_datetime_as_string(
-    datetime.datetime(2024, 6, 15, 0, 0), "%Y-%m-%dT%H:%M:%S+00:00"
+    datetime.datetime(2024, 6, 15, 0, 0, 0, tzinfo=datetime.timezone.utc),
+    "%Y-%m-%dT%H:%M:%S+00:00",
 )
 
 # Test Setup
@@ -135,9 +159,21 @@ setup_purge_database_and_seed_with_test_data(
 @pytest.mark.parametrize(
     "test_base_time, test_location_name, expected_cities",
     [
-        (datetime.datetime(2024, 6, 10, 0, 0), "", ["Test City 1", "Test City 2"]),
-        (datetime.datetime(2024, 6, 10, 0, 0), "Test City 1", ["Test City 1"]),
-        (datetime.datetime(2024, 6, 11, 0, 0, 0), "", ["Test City 3"]),
+        (
+            datetime.datetime(2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "",
+            ["Test City 1", "Test City 2"],
+        ),
+        (
+            datetime.datetime(2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "Test City 1",
+            ["Test City 1"],
+        ),
+        (
+            datetime.datetime(2024, 6, 11, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "",
+            ["Test City 3"],
+        ),
     ],
 )
 def test__different_base_times__assert_correct_results_returned(
@@ -167,12 +203,24 @@ def test__different_base_times__assert_correct_results_returned(
 @pytest.mark.parametrize(
     "test_location_name, test_base_time, expected",
     [
-        ("", datetime.datetime(2024, 6, 9, 12, 0, 0), 0),
-        ("", datetime.datetime(2024, 6, 10, 0, 0, 0), 2),
-        ("", datetime.datetime(2024, 6, 10, 12, 0, 0), 0),
-        ("Test City 1", datetime.datetime(2024, 6, 9, 12, 0, 0), 0),
-        ("Test City 1", datetime.datetime(2024, 6, 10, 0, 0, 0), 1),
-        ("Test City 1", datetime.datetime(2024, 6, 10, 12, 0, 0), 0),
+        ("", datetime.datetime(2024, 6, 9, 12, 0, 0, tzinfo=datetime.timezone.utc), 0),
+        ("", datetime.datetime(2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc), 2),
+        ("", datetime.datetime(2024, 6, 10, 12, 0, 0, tzinfo=datetime.timezone.utc), 0),
+        (
+            "Test City 1",
+            datetime.datetime(2024, 6, 9, 12, 0, 0, tzinfo=datetime.timezone.utc),
+            0,
+        ),
+        (
+            "Test City 1",
+            datetime.datetime(2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            1,
+        ),
+        (
+            "Test City 1",
+            datetime.datetime(2024, 6, 10, 12, 0, 0, tzinfo=datetime.timezone.utc),
+            0,
+        ),
     ],
 )
 def test__base_time_bva__assert_number_of_results(
@@ -200,10 +248,26 @@ def test__base_time_bva__assert_number_of_results(
 @pytest.mark.parametrize(
     "test_valid_time_from, test_location_name, expected_cities",
     [
-        (datetime.datetime(2024, 6, 10, 0, 0, 0), "", ["Test City 1", "Test City 2"]),
-        (datetime.datetime(2024, 6, 11, 0, 0, 0), "", ["Test City 2"]),
-        (datetime.datetime(2024, 6, 10, 0, 0, 0), "Test City 1", ["Test City 1"]),
-        (datetime.datetime(2024, 6, 11, 0, 0, 0), "Test City 2", ["Test City 2"]),
+        (
+            datetime.datetime(2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "",
+            ["Test City 1", "Test City 2"],
+        ),
+        (
+            datetime.datetime(2024, 6, 11, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "",
+            ["Test City 2"],
+        ),
+        (
+            datetime.datetime(2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "Test City 1",
+            ["Test City 1"],
+        ),
+        (
+            datetime.datetime(2024, 6, 11, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "Test City 2",
+            ["Test City 2"],
+        ),
     ],
 )
 def test__different_valid_time_from_times__assert_correct_results(
@@ -235,12 +299,24 @@ def test__different_valid_time_from_times__assert_correct_results(
 @pytest.mark.parametrize(
     "test_valid_time_from, test_location_name, expected",
     [
-        (datetime.datetime(2024, 6, 10, 0, 0, 0), "", 2),
-        (datetime.datetime(2024, 6, 10, 3, 0, 0), "", 2),
-        (datetime.datetime(2024, 6, 10, 6, 0, 0), "", 1),
-        (datetime.datetime(2024, 6, 10, 0, 0, 0), "Test City 1", 1),
-        (datetime.datetime(2024, 6, 10, 3, 0, 0), "Test City 1", 1),
-        (datetime.datetime(2024, 6, 10, 6, 0, 0), "Test City 1", 0),
+        (datetime.datetime(2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc), "", 2),
+        (datetime.datetime(2024, 6, 10, 3, 0, 0, tzinfo=datetime.timezone.utc), "", 2),
+        (datetime.datetime(2024, 6, 10, 6, 0, 0, tzinfo=datetime.timezone.utc), "", 1),
+        (
+            datetime.datetime(2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "Test City 1",
+            1,
+        ),
+        (
+            datetime.datetime(2024, 6, 10, 3, 0, 0, tzinfo=datetime.timezone.utc),
+            "Test City 1",
+            1,
+        ),
+        (
+            datetime.datetime(2024, 6, 10, 6, 0, 0, tzinfo=datetime.timezone.utc),
+            "Test City 1",
+            0,
+        ),
     ],
 )
 def test__valid_time_from_bva__assert_number_of_results(
@@ -268,10 +344,26 @@ def test__valid_time_from_bva__assert_number_of_results(
 @pytest.mark.parametrize(
     "test_valid_time_to, test_location_name, expected_cities",
     [
-        (datetime.datetime(2024, 6, 11, 0, 0, 0), "", ["Test City 1"]),
-        (datetime.datetime(2024, 6, 12, 0, 0, 0), "", ["Test City 1", "Test City 2"]),
-        (datetime.datetime(2024, 6, 11, 0, 0, 0), "Test City 2", []),
-        (datetime.datetime(2024, 6, 12, 0, 0, 0), "Test City 2", ["Test City 2"]),
+        (
+            datetime.datetime(2024, 6, 11, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "",
+            ["Test City 1"],
+        ),
+        (
+            datetime.datetime(2024, 6, 12, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "",
+            ["Test City 1", "Test City 2"],
+        ),
+        (
+            datetime.datetime(2024, 6, 11, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "Test City 2",
+            [],
+        ),
+        (
+            datetime.datetime(2024, 6, 12, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "Test City 2",
+            ["Test City 2"],
+        ),
     ],
 )
 def test__different_valid_time_to_times__assert_correct_results(
@@ -303,12 +395,24 @@ def test__different_valid_time_to_times__assert_correct_results(
 @pytest.mark.parametrize(
     "test_valid_time_to, test_location_name, expected",
     [
-        (datetime.datetime(2024, 6, 11, 12, 0, 0), "", 1),
-        (datetime.datetime(2024, 6, 12, 0, 0, 0), "", 2),
-        (datetime.datetime(2024, 6, 12, 12, 0, 0), "", 2),
-        (datetime.datetime(2024, 6, 11, 12, 0, 0), "Test City 1", 1),
-        (datetime.datetime(2024, 6, 12, 0, 0, 0), "Test City 1", 1),
-        (datetime.datetime(2024, 6, 12, 0, 0, 0), "Test City 2", 1),
+        (datetime.datetime(2024, 6, 11, 12, 0, 0, tzinfo=datetime.timezone.utc), "", 1),
+        (datetime.datetime(2024, 6, 12, 0, 0, 0, tzinfo=datetime.timezone.utc), "", 2),
+        (datetime.datetime(2024, 6, 12, 12, 0, 0, tzinfo=datetime.timezone.utc), "", 2),
+        (
+            datetime.datetime(2024, 6, 11, 12, 0, 0, tzinfo=datetime.timezone.utc),
+            "Test City 1",
+            1,
+        ),
+        (
+            datetime.datetime(2024, 6, 12, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "Test City 1",
+            1,
+        ),
+        (
+            datetime.datetime(2024, 6, 12, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "Test City 2",
+            1,
+        ),
     ],
 )
 def test__valid_time_to_bva__assert_number_of_results(
@@ -372,7 +476,6 @@ def test__results_containing_relevant_base_time(
 def test__assert_response_keys_and_values_are_correct(
     test_location_name: str, expected_response: list
 ):
-    pprint.pprint(expected_response)
     response = get_forecast(
         base_time_string,
         valid_time_from,
@@ -383,5 +486,4 @@ def test__assert_response_keys_and_values_are_correct(
         headers,
     )
     response_json = response.json()
-    pprint.pprint(response_json)
     assert response_json == expected_response
