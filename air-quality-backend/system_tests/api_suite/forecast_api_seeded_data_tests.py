@@ -79,13 +79,13 @@ base_url = "http://127.0.0.1:8000/air-pollutant/forecast"
 headers = {"accept": "application/json"}
 location_type = "city"
 
-forecast_base_time = datetime.datetime(2024, 6, 10, 0, 0)
-forecast_base_time_string = format_datetime_as_string(
-    forecast_base_time,
+base_time = datetime.datetime(2024, 6, 10, 0, 0)
+base_time_string = format_datetime_as_string(
+    base_time,
     "%Y-%m-%dT%H:%M:%S+00:00",
 )
-valid_date_from = forecast_base_time_string
-valid_date_to = format_datetime_as_string(
+valid_time_from = base_time_string
+valid_time_to = format_datetime_as_string(
     datetime.datetime(2024, 6, 15, 0, 0), "%Y-%m-%dT%H:%M:%S+00:00"
 )
 
@@ -96,7 +96,7 @@ setup_purge_database_and_seed_with_test_data(
 
 
 @pytest.mark.parametrize(
-    "test_forecast_base_time, test_location_name, expected_cities",
+    "test_base_time, test_location_name, expected_cities",
     [
         (datetime.datetime(2024, 6, 10, 0, 0), "", ["Test City 1", "Test City 2"]),
         (datetime.datetime(2024, 6, 10, 0, 0), "Test City 1", ["Test City 1"]),
@@ -104,17 +104,17 @@ setup_purge_database_and_seed_with_test_data(
     ],
 )
 def test__different_base_times__assert_correct_results_returned(
-    test_forecast_base_time: datetime.datetime,
+    test_base_time,
     test_location_name: str,
     expected_cities: list,
 ):
-    test_forecast_base_time_string = format_datetime_as_string(
-        test_forecast_base_time, "%Y-%m-%dT%H:%M:%S+00:00"
+    test_base_time_string = format_datetime_as_string(
+        test_base_time, "%Y-%m-%dT%H:%M:%S+00:00"
     )
     response = get_forecast(
-        test_forecast_base_time_string,
-        valid_date_from,
-        valid_date_to,
+        test_base_time_string,
+        valid_time_from,
+        valid_time_to,
         location_type,
         test_location_name,
         base_url,
@@ -129,7 +129,7 @@ def test__different_base_times__assert_correct_results_returned(
 
 
 @pytest.mark.parametrize(
-    "test_location_name, test_forecast_base_time, expected",
+    "test_location_name, test_base_time, expected",
     [
         ("", datetime.datetime(2024, 6, 9, 12, 0, 0), 0),
         ("", datetime.datetime(2024, 6, 10, 0, 0, 0), 2),
@@ -140,17 +140,17 @@ def test__different_base_times__assert_correct_results_returned(
     ],
 )
 def test__base_time_bva__assert_number_of_results(
-    test_location_name: str, test_forecast_base_time: datetime.datetime, expected: int
+    test_location_name: str, test_base_time: datetime.datetime, expected: int
 ):
     test_base_time_string = format_datetime_as_string(
-        test_forecast_base_time,
+        test_base_time,
         "%Y-%m-%dT%H:%M:%S+00:00",
     )
 
     response = get_forecast(
         test_base_time_string,
-        valid_date_from,
-        valid_date_to,
+        valid_time_from,
+        valid_time_to,
         location_type,
         test_location_name,
         base_url,
@@ -162,7 +162,7 @@ def test__base_time_bva__assert_number_of_results(
 
 
 @pytest.mark.parametrize(
-    "test_valid_date_from, test_location_name, expected_cities",
+    "test_valid_time_from, test_location_name, expected_cities",
     [
         (datetime.datetime(2024, 6, 10, 0, 0, 0), "", ["Test City 1", "Test City 2"]),
         (datetime.datetime(2024, 6, 11, 0, 0, 0), "", ["Test City 2"]),
@@ -170,19 +170,19 @@ def test__base_time_bva__assert_number_of_results(
         (datetime.datetime(2024, 6, 11, 0, 0, 0), "", ["Test City 2"]),
     ],
 )
-def test__different_valid_from_times__assert_correct_results(
-    test_valid_date_from: datetime.datetime,
+def test__different_valid_time_from_times__assert_correct_results(
+    test_valid_time_from: datetime.datetime,
     test_location_name: str,
     expected_cities: list,
 ):
     test_valid_date_from_string = format_datetime_as_string(
-        test_valid_date_from, "%Y-%m-%dT%H:%M:%S+00:00"
+        test_valid_time_from, "%Y-%m-%dT%H:%M:%S+00:00"
     )
 
     response = get_forecast(
-        forecast_base_time_string,
+        base_time_string,
         test_valid_date_from_string,
-        valid_date_to,
+        valid_time_to,
         location_type,
         test_location_name,
         base_url,
@@ -208,7 +208,7 @@ def test__different_valid_from_times__assert_correct_results(
         (datetime.datetime(2024, 6, 10, 6, 0, 0), "Test City 1", 0),
     ],
 )
-def test__valid_date_from_bva__assert_number_of_results(
+def test__valid_time_from_bva__assert_number_of_results(
     test_valid_time_from: datetime.datetime, test_location_name: str, expected: int
 ):
     test_valid_time_from_string = format_datetime_as_string(
@@ -217,9 +217,78 @@ def test__valid_date_from_bva__assert_number_of_results(
     )
 
     response = get_forecast(
-        forecast_base_time_string,
+        base_time_string,
         test_valid_time_from_string,
-        valid_date_to,
+        valid_time_to,
+        location_type,
+        test_location_name,
+        base_url,
+        headers,
+    )
+
+    response_json = response.json()
+    assert len(response_json) == expected
+
+
+@pytest.mark.parametrize(
+    "test_valid_time_to, test_location_name, expected_cities",
+    [
+        (datetime.datetime(2024, 6, 10, 0, 0, 0), "", ["Test City 1", "Test City 2"]),
+        (datetime.datetime(2024, 6, 11, 0, 0, 0), "", ["Test City 2"]),
+        (datetime.datetime(2024, 6, 10, 0, 0, 0), "Test City 2", ["Test City 2"]),
+        (datetime.datetime(2024, 6, 11, 0, 0, 0), "", ["Test City 2"]),
+    ],
+)
+def test__different_valid_time_to_times__assert_correct_results(
+    test_valid_time_to: datetime.datetime,
+    test_location_name: str,
+    expected_cities: list,
+):
+    test_valid_time_to_string = format_datetime_as_string(
+        test_valid_time_to, "%Y-%m-%dT%H:%M:%S+00:00"
+    )
+
+    response = get_forecast(
+        base_time_string,
+        test_valid_time_to_string,
+        valid_time_to,
+        location_type,
+        test_location_name,
+        base_url,
+        headers,
+    )
+
+    expected = expected_cities
+    actual_cities = get_list_of_keys(response.json(), "location_name")
+    for city in actual_cities:
+        index = actual_cities.index(city)
+
+        assert city == expected[index]
+
+
+@pytest.mark.parametrize(
+    "test_valid_time_from, test_location_name, expected",
+    [
+        (datetime.datetime(2024, 6, 10, 0, 0, 0), "", 2),
+        (datetime.datetime(2024, 6, 10, 3, 0, 0), "", 2),
+        (datetime.datetime(2024, 6, 10, 6, 0, 0), "", 1),
+        (datetime.datetime(2024, 6, 10, 0, 0, 0), "Test City 1", 1),
+        (datetime.datetime(2024, 6, 10, 3, 0, 0), "Test City 1", 1),
+        (datetime.datetime(2024, 6, 10, 6, 0, 0), "Test City 1", 0),
+    ],
+)
+def test__valid_time_to_bva__assert_number_of_results(
+    test_valid_time_from: datetime.datetime, test_location_name: str, expected: int
+):
+    test_valid_time_from_string = format_datetime_as_string(
+        test_valid_time_from,
+        "%Y-%m-%dT%H:%M:%S+00:00",
+    )
+
+    response = get_forecast(
+        base_time_string,
+        test_valid_time_from_string,
+        valid_time_to,
         location_type,
         test_location_name,
         base_url,
@@ -232,9 +301,9 @@ def test__valid_date_from_bva__assert_number_of_results(
 
 def test__location_name_parameter_filters_response_correctly__assert_1_result():
     response = get_forecast(
-        forecast_base_time_string,
-        valid_date_from,
-        valid_date_to,
+        base_time_string,
+        valid_time_from,
+        valid_time_to,
         location_type,
         "Test City 2",
         base_url,
@@ -250,9 +319,9 @@ def test__results_containing_relevant_base_time(
     location_name: str,
 ):
     response = get_forecast(
-        forecast_base_time_string,
-        valid_date_from,
-        valid_date_to,
+        base_time_string,
+        valid_time_from,
+        valid_time_to,
         location_type,
         location_name,
         base_url,
@@ -260,7 +329,7 @@ def test__results_containing_relevant_base_time(
     )
     response_json = response.json()
     for forecast in response_json:
-        assert forecast["base_time"] == forecast_base_time_string
+        assert forecast["base_time"] == base_time_string
 
 
 # def test__location_name_parameter__returns_results_containing_correct_valid_times():
