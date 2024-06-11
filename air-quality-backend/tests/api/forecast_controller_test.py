@@ -1,364 +1,126 @@
-import mongomock
+from datetime import datetime, timezone
+from unittest.mock import patch
+
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import patch
+
 from air_quality.api.main import app
-from tests.database.forecast_database_test_data import forecast_from_database
 
 client = TestClient(app)
 
 
-@pytest.fixture
-def mock_collection():
-    yield mongomock.MongoClient(tz_aware=True).db.collection
+default_request_params = {
+    "valid_date_from": "2024-05-27T12:00:00.000+00:00",
+    "valid_date_to": "2024-05-27T23:00:00.000+00:00",
+    "location_type": "city",
+    "forecast_base_time": "2024-05-27T12:00:00.000+00:00",
+}
 
 
-def test_get_forecast_data_no_city_name(mock_collection):
+def test__get_forecast_data__no_city_name():
     with patch(
-        "air_quality.database.forecasts.get_collection",
-        return_value=mock_collection,
-    ):
-        mock_collection.insert_many(forecast_from_database)
-
-        valid_date_from = "2024-05-27T12%3A00%3A00.000%2B00%3A00"
-        valid_date_to = "2024-05-27T23%3A00%3A00.000%2B00%3A00"
-        location_type = "city"
-        forecast_base_time = "2024-05-27T12%3A00%3A00.000%2B00%3A00"
-        response = client.get(
-            "/air-pollutant/forecast?valid_date_from="
-            + valid_date_from
-            + "&valid_date_to="
-            + valid_date_to
-            + "&location_type="
-            + location_type
-            + "&forecast_base_time="
-            + forecast_base_time
-        )
+        "air_quality.api.forecast_controller.get_forecast_data_from_database",
+        return_value=[],
+    ) as mock_fetch_data:
+        response = client.get("/air-pollutant/forecast", params=default_request_params)
         assert response.status_code == 200
-        assert response.json() == [
-            {
-                "base_time": "2024-05-27T12:00:00+00:00",
-                "location_name": "Abidjan",
-                "location_type": "city",
-                "no2": {"aqi_level": 1, "value": 0.3145229730198031},
-                "o3": {"aqi_level": 1, "value": 48.8483987731408},
-                "overall_aqi_level": 2,
-                "pm10": {"aqi_level": 2, "value": 24.464592631770792},
-                "pm2_5": {"aqi_level": 2, "value": 14.396278071945583},
-                "so2": {"aqi_level": 1, "value": 0.676714188255428},
-                "valid_date": "2024-05-27T12:00:00+00:00",
-            },
-            {
-                "base_time": "2024-05-27T12:00:00+00:00",
-                "location_name": "London",
-                "location_type": "city",
-                "no2": {"aqi_level": 1, "value": 0.3145229730198031},
-                "o3": {"aqi_level": 1, "value": 48.8483987731408},
-                "overall_aqi_level": 2,
-                "pm10": {"aqi_level": 2, "value": 24.464592631770792},
-                "pm2_5": {"aqi_level": 2, "value": 14.396278071945583},
-                "so2": {"aqi_level": 1, "value": 0.676714188255428},
-                "valid_date": "2024-05-27T21:00:00+00:00",
-            },
-            {
-                "base_time": "2024-05-27T12:00:00+00:00",
-                "location_name": "London",
-                "location_type": "city",
-                "no2": {"aqi_level": 1, "value": 0.3145229730198031},
-                "o3": {"aqi_level": 1, "value": 48.8483987731408},
-                "overall_aqi_level": 2,
-                "pm10": {"aqi_level": 2, "value": 24.464592631770792},
-                "pm2_5": {"aqi_level": 2, "value": 14.396278071945583},
-                "so2": {"aqi_level": 1, "value": 0.676714188255428},
-                "valid_date": "2024-05-27T22:00:00+00:00",
-            },
-        ]
+        assert response.json() == []
+        mock_fetch_data.assert_called_with(
+            datetime(2024, 5, 27, 12, tzinfo=timezone.utc),
+            datetime(2024, 5, 27, 23, tzinfo=timezone.utc),
+            "city",
+            datetime(2024, 5, 27, 12, tzinfo=timezone.utc),
+            None,
+        )
 
 
-def test_get_forecast_data_with_city_name(mock_collection):
+def test__get_forecast_data__with_city_name():
     with patch(
-        "air_quality.database.forecasts.get_collection",
-        return_value=mock_collection,
-    ):
-        mock_collection.insert_many(forecast_from_database)
-
-        valid_date_from = "2024-05-27T12%3A00%3A00.000%2B00%3A00"
-        valid_date_to = "2024-05-27T23%3A00%3A00.000%2B00%3A00"
-        location_type = "city"
-        forecast_base_time = "2024-05-27T12%3A00%3A00.000%2B00%3A00"
-        name = "London"
-        response = client.get(
-            "/air-pollutant/forecast?valid_date_from="
-            + valid_date_from
-            + "&valid_date_to="
-            + valid_date_to
-            + "&location_type="
-            + location_type
-            + "&forecast_base_time="
-            + forecast_base_time
-            + "&location_name="
-            + name
-        )
+        "air_quality.api.forecast_controller.get_forecast_data_from_database",
+        return_value=[],
+    ) as mock_fetch_data:
+        params = {**default_request_params, "location_name": "Test City"}
+        response = client.get("/air-pollutant/forecast", params=params)
         assert response.status_code == 200
-        assert response.json() == [
-            {
-                "base_time": "2024-05-27T12:00:00+00:00",
-                "location_name": "London",
-                "location_type": "city",
-                "no2": {"aqi_level": 1, "value": 0.3145229730198031},
-                "o3": {"aqi_level": 1, "value": 48.8483987731408},
-                "overall_aqi_level": 2,
-                "pm10": {"aqi_level": 2, "value": 24.464592631770792},
-                "pm2_5": {"aqi_level": 2, "value": 14.396278071945583},
-                "so2": {"aqi_level": 1, "value": 0.676714188255428},
-                "valid_date": "2024-05-27T21:00:00+00:00",
-            },
-            {
-                "base_time": "2024-05-27T12:00:00+00:00",
-                "location_name": "London",
-                "location_type": "city",
-                "no2": {"aqi_level": 1, "value": 0.3145229730198031},
-                "o3": {"aqi_level": 1, "value": 48.8483987731408},
-                "overall_aqi_level": 2,
-                "pm10": {"aqi_level": 2, "value": 24.464592631770792},
-                "pm2_5": {"aqi_level": 2, "value": 14.396278071945583},
-                "so2": {"aqi_level": 1, "value": 0.676714188255428},
-                "valid_date": "2024-05-27T22:00:00+00:00",
-            },
+        assert response.json() == []
+        mock_fetch_data.assert_called_with(
+            datetime(2024, 5, 27, 12, tzinfo=timezone.utc),
+            datetime(2024, 5, 27, 23, tzinfo=timezone.utc),
+            "city",
+            datetime(2024, 5, 27, 12, tzinfo=timezone.utc),
+            "Test City",
+        )
+
+
+def test__required_query_params__error_if_not_supplied():
+    required_fields = [
+        "location_type",
+        "valid_date_from",
+        "valid_date_to",
+        "forecast_base_time",
+    ]
+    response = client.get("/air-pollutant/forecast", params={})
+    expected_response_message_schema = {
+        "input": None,
+        "loc": [],
+        "msg": "Field required",
+        "type": "missing",
+    }
+    assert response.status_code == 422
+    assert response.json() == {
+        "detail": [
+            {**expected_response_message_schema, "loc": ["query", field]}
+            for field in required_fields
         ]
+    }
 
 
 @pytest.mark.parametrize(
-    "valid_date_from, valid_date_to, location_type, forecast_base_time, name, expected",
+    "field, params, expected_msg",
     [
+        # valid_date_from invalid
         (
-            "2023A00.000%2B00%3A00",
-            "2024-05-27T23%3A00%3A00.000%2B00%3A00",
-            "city",
-            "2024-05-27T12%3A00%3A00.000%2B00%3A00",
-            "Abu%20Dhabi",
-            [
-                422,
-                {
-                    "detail": [
-                        {
-                            "ctx": {"error": "invalid date separator, expected `-`"},
-                            "input": "2023A00.000+00:00",
-                            "loc": ["query", "valid_date_from"],
-                            "msg": "Input should be a valid datetime or date, "
-                            "invalid date "
-                            "separator, expected `-`",
-                            "type": "datetime_from_date_parsing",
-                        }
-                    ]
-                },
-            ],
+            "valid_date_from",
+            {
+                **default_request_params,
+                "valid_date_from": "2024-06-01T",
+            },
+            "Input should be a valid datetime or date, "
+            + "unexpected extra characters at the end of the input",
         ),
+        # valid_date_to invalid
         (
-            "2024-05-27T00%3A00%3A00.000%2B00%3A00",
-            "20200%A00",
-            "city",
-            "2024-05-27T12%3A00%3A00.000%2B00%3A00",
-            "Abu%20Dhabi",
-            [
-                422,
-                {
-                    "detail": [
-                        {
-                            "ctx": {"error": "input is too short"},
-                            "input": "20200�0",
-                            "loc": ["query", "valid_date_to"],
-                            "msg": "Input should be a valid datetime or date, input is "
-                            "too short",
-                            "type": "datetime_from_date_parsing",
-                        }
-                    ]
-                },
-            ],
+            "valid_date_to",
+            {
+                **default_request_params,
+                "valid_date_to": "2024-06-01T",
+            },
+            "Input should be a valid datetime or date, "
+            + "unexpected extra characters at the end of the input",
         ),
+        # location_type invalid
         (
-            "2024-05-27T00%3A00%3A00.000%2B00%3A00",
-            "2024-05-27T00%3A00%3A00.000%2B00%3A00",
-            "city",
-            "212%3A0%3A0.000%2B00%3A00",
-            "Abu%20Dhabi",
-            [
-                422,
-                {
-                    "detail": [
-                        {
-                            "ctx": {"error": "invalid character in year"},
-                            "input": "212:0:0.000+00:00",
-                            "loc": ["query", "forecast_base_time"],
-                            "msg": "Input should be a valid datetime or date, invalid "
-                            "character in year",
-                            "type": "datetime_from_date_parsing",
-                        }
-                    ]
-                },
-            ],
+            "location_type",
+            {
+                **default_request_params,
+                "location_type": "town",
+            },
+            "Input should be 'city'",
+        ),
+        # forecast_base_time invalid
+        (
+            "forecast_base_time",
+            {
+                **default_request_params,
+                "forecast_base_time": "2024-06-01T",
+            },
+            "Input should be a valid datetime or date, "
+            + "unexpected extra characters at the end of the input",
         ),
     ],
 )
-def test_get_forecast_data_incorrect_input_date(
-    valid_date_from, valid_date_to, location_type, forecast_base_time, name, expected
-):
-    response = client.get(
-        "/air-pollutant/forecast?valid_date_from="
-        + valid_date_from
-        + "&valid_date_to="
-        + valid_date_to
-        + "&location_type="
-        + location_type
-        + "&forecast_base_time="
-        + forecast_base_time
-        + "&location_name="
-        + name
-    )
-    assert response.status_code == expected[0]
-    assert response.json() == expected[1]
-
-
-def test_get_forecast_data_no_valid_date_from():
-    valid_date_to = "2024-05-27T23%3A00%3A00.000%2B00%3A00"
-    location_type = "city"
-    forecast_base_time = "2024-05-27T12%3A00%3A00.000%2B00%3A00"
-    name = "Abu%20Dhabi"
-    response = client.get(
-        "/air-pollutant/forecast?"
-        "&valid_date_to="
-        + valid_date_to
-        + "&location_type="
-        + location_type
-        + "&forecast_base_time="
-        + forecast_base_time
-        + "&location_name="
-        + name
-    )
+def test__invalid_query_params__throw_error(field, params, expected_msg):
+    response = client.get("/air-pollutant/forecast", params=params)
     assert response.status_code == 422
-    assert response.json() == {
-        "detail": [
-            {
-                "input": None,
-                "loc": ["query", "valid_date_from"],
-                "msg": "Field required",
-                "type": "missing",
-            }
-        ]
-    }
-
-
-def test_get_forecast_data_no_valid_date_to():
-    valid_date_from = "2024-05-27T00%3A00%3A00.000%2B00%3A00"
-    location_type = "city"
-    forecast_base_time = "2024-05-27T12%3A00%3A00.000%2B00%3A00"
-    name = "Abu%20Dhabi"
-    response = client.get(
-        "/air-pollutant/forecast?valid_date_from="
-        + valid_date_from
-        + "&location_type="
-        + location_type
-        + "&forecast_base_time="
-        + forecast_base_time
-        + "&location_name="
-        + name
-    )
-    assert response.status_code == 422
-    assert response.json() == {
-        "detail": [
-            {
-                "input": None,
-                "loc": ["query", "valid_date_to"],
-                "msg": "Field required",
-                "type": "missing",
-            }
-        ]
-    }
-
-
-def test_get_forecast_data_no_forecast_base_time():
-    valid_date_from = "2024-05-27T00%3A00%3A00.000%2B00%3A00"
-    valid_date_to = "2024-05-27T23%3A00%3A00.000%2B00%3A00"
-    location_type = "city"
-    name = "Abu%20Dhabi"
-    response = client.get(
-        "/air-pollutant/forecast?valid_date_from="
-        + valid_date_from
-        + "&valid_date_to="
-        + valid_date_to
-        + "&location_type="
-        + location_type
-        + "&location_name="
-        + name
-    )
-    assert response.status_code == 422
-    assert response.json() == {
-        "detail": [
-            {
-                "input": None,
-                "loc": ["query", "forecast_base_time"],
-                "msg": "Field required",
-                "type": "missing",
-            }
-        ]
-    }
-
-
-def test_get_forecast_data_incorrect_location_type():
-    valid_date_from = "2024-05-27T00%3A00%3A00.000%2B00%3A00"
-    valid_date_to = "2024-05-27T23%3A00%3A00.000%2B00%3A00"
-    location_type = "not a city"
-    forecast_base_time = "2024-05-27T12%3A00%3A00.000%2B00%3A00"
-    name = "Abu%20Dhabi"
-    response = client.get(
-        "/air-pollutant/forecast?valid_date_from="
-        + valid_date_from
-        + "&valid_date_to="
-        + valid_date_to
-        + "&location_type="
-        + location_type
-        + "&forecast_base_time="
-        + forecast_base_time
-        + "&location_name="
-        + name
-    )
-    assert response.status_code == 422
-    assert response.json() == {
-        "detail": [
-            {
-                "type": "enum",
-                "loc": ["query", "location_type"],
-                "msg": "Input should be 'city'",
-                "input": "not a city",
-                "ctx": {"expected": "'city'"},
-            }
-        ]
-    }
-
-
-def test_get_forecast_data_no_location_type():
-    valid_date_from = "2024-05-27T00%3A00%3A00.000%2B00%3A00"
-    valid_date_to = "2024-05-27T23%3A00%3A00.000%2B00%3A00"
-    forecast_base_time = "2024-05-27T12%3A00%3A00.000%2B00%3A00"
-    name = "Abu%20Dhabi"
-    response = client.get(
-        "/air-pollutant/forecast?valid_date_from="
-        + valid_date_from
-        + "&valid_date_to="
-        + valid_date_to
-        + "&forecast_base_time="
-        + forecast_base_time
-        + "&location_name="
-        + name
-    )
-    assert response.status_code == 422
-    assert response.json() == {
-        "detail": [
-            {
-                "input": None,
-                "loc": ["query", "location_type"],
-                "msg": "Field required",
-                "type": "missing",
-            }
-        ]
-    }
+    assert len(response.json()["detail"]) == 1
+    assert response.json()["detail"][0]["msg"] == expected_msg

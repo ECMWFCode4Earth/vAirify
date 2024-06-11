@@ -1,15 +1,14 @@
 from datetime import datetime, timezone
+from unittest.mock import patch
 
-from bson import ObjectId
-from bson.tz_util import utc
-from freezegun import freeze_time
 import mongomock
 import pytest
-from unittest.mock import patch
-from air_quality.database.forecasts import insert_data, delete_data_before
+from bson.tz_util import utc
+from freezegun import freeze_time
 
 from air_quality.database.forecasts import get_forecast_data_from_database
-from tests.database.forecast_database_test_data import forecast_from_database
+from air_quality.database.forecasts import insert_data, delete_data_before
+from tests.util.mock_forecast_data import create_mock_forecast_document
 
 
 @pytest.fixture
@@ -71,122 +70,46 @@ def test__delete_data_before(mock_collection):
         assert len(results) == 2
 
 
-def test_get_forecast_from_database_no_location_location_name(mock_collection):
+def test__get_forecast_from_database__no_location(mock_collection):
     with patch(
         "air_quality.database.forecasts.get_collection",
         return_value=mock_collection,
     ):
-        mock_collection.insert_many(forecast_from_database)
-        datetime.strptime("2024-05-27T12:00:00+00:00", "%Y-%m-%dT%H:%M:%S%z")
+        mock_collection.insert_many(
+            [
+                create_mock_forecast_document({"name": "ABC"}),
+                create_mock_forecast_document({"name": "DEF"}),
+            ]
+        )
         result = get_forecast_data_from_database(
-            datetime.strptime("2024-05-27T12:00:00+00:00", "%Y-%m-%dT%H:%M:%S%z"),
-            datetime.strptime("2024-05-27T23:00:00+00:00", "%Y-%m-%dT%H:%M:%S%z"),
+            datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
+            datetime(2024, 5, 27, 23, 0, tzinfo=timezone.utc),
             "city",
-            datetime.strptime("2024-05-27T12:00:00+00:00", "%Y-%m-%dT%H:%M:%S%z"),
-            None,
+            datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
         )
 
-        assert result == [
-            {
-                "_id": ObjectId("66558bf12d46a42baea0b8e1"),
-                "created_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-                "forecast_base_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-                "forecast_range": 0,
-                "forecast_valid_time": datetime(
-                    2024, 5, 27, 12, 0, tzinfo=timezone.utc
-                ),
-                "last_modified_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-                "location": {"coordinates": [-4.01266, 5.30966], "type": "Point"},
-                "location_type": "city",
-                "name": "Abidjan",
-                "no2": {"aqi_level": 1, "value": 0.3145229730198031},
-                "o3": {"aqi_level": 1, "value": 48.8483987731408},
-                "overall_aqi_level": 2,
-                "pm10": {"aqi_level": 2, "value": 24.464592631770792},
-                "pm2_5": {"aqi_level": 2, "value": 14.396278071945583},
-                "so2": {"aqi_level": 1, "value": 0.676714188255428},
-                "source": "cams-production",
-            },
-            {
-                "_id": ObjectId("66558bf12d46a42baea0b8ed"),
-                "created_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-                "forecast_base_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-                "forecast_range": 0,
-                "forecast_valid_time": datetime(
-                    2024, 5, 27, 21, 0, tzinfo=timezone.utc
-                ),
-                "last_modified_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-                "location": {"coordinates": [-4.01266, 5.30966], "type": "Point"},
-                "location_type": "city",
-                "name": "London",
-                "no2": {"aqi_level": 1, "value": 0.3145229730198031},
-                "o3": {"aqi_level": 1, "value": 48.8483987731408},
-                "overall_aqi_level": 2,
-                "pm10": {"aqi_level": 2, "value": 24.464592631770792},
-                "pm2_5": {"aqi_level": 2, "value": 14.396278071945583},
-                "so2": {"aqi_level": 1, "value": 0.676714188255428},
-                "source": "cams-production",
-            },
-            {
-                "_id": ObjectId("66558bf12d46a42baea0b8f2"),
-                "created_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-                "forecast_base_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-                "forecast_range": 0,
-                "forecast_valid_time": datetime(
-                    2024, 5, 27, 22, 0, tzinfo=timezone.utc
-                ),
-                "last_modified_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-                "location": {"coordinates": [-4.01266, 5.30966], "type": "Point"},
-                "location_type": "city",
-                "name": "London",
-                "no2": {"aqi_level": 1, "value": 0.3145229730198031},
-                "o3": {"aqi_level": 1, "value": 48.8483987731408},
-                "overall_aqi_level": 2,
-                "pm10": {"aqi_level": 2, "value": 24.464592631770792},
-                "pm2_5": {"aqi_level": 2, "value": 14.396278071945583},
-                "so2": {"aqi_level": 1, "value": 0.676714188255428},
-                "source": "cams-production",
-            },
-        ]
+        assert len(result) == 2
 
-    def test_get_forecast_from_database_with_location_location_name(mock_collection):
-        with patch(
-            "air_quality.database.forecasts.get_collection",
-            return_value=mock_collection,
-        ):
-            mock_collection.insert_many(forecast_from_database)
 
-            result = get_forecast_data_from_database(
-                datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-                datetime(2024, 5, 27, 23, 0, tzinfo=timezone.utc),
-                "city",
-                datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-                "Abidjan",
-            )
-
-            assert result == [
-                {
-                    "_id": ObjectId("66558bf12d46a42baea0b8e1"),
-                    "created_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-                    "forecast_base_time": datetime(
-                        2024, 5, 27, 12, 0, tzinfo=timezone.utc
-                    ),
-                    "forecast_range": 0,
-                    "forecast_valid_time": datetime(
-                        2024, 5, 27, 12, 0, tzinfo=timezone.utc
-                    ),
-                    "last_modified_time": datetime(
-                        2024, 5, 27, 12, 0, tzinfo=timezone.utc
-                    ),
-                    "location": {"coordinates": [-4.01266, 5.30966], "type": "Point"},
-                    "location_type": "city",
-                    "name": "Abidjan",
-                    "no2": {"aqi_level": 1, "value": 0.3145229730198031},
-                    "o3": {"aqi_level": 1, "value": 48.8483987731408},
-                    "overall_aqi_level": 2,
-                    "pm10": {"aqi_level": 2, "value": 24.464592631770792},
-                    "pm2_5": {"aqi_level": 2, "value": 14.396278071945583},
-                    "so2": {"aqi_level": 1, "value": 0.676714188255428},
-                    "source": "cams-production",
-                }
+def test__get_forecast_from_database__with_location(mock_collection):
+    with patch(
+        "air_quality.database.forecasts.get_collection",
+        return_value=mock_collection,
+    ):
+        mock_collection.insert_many(
+            [
+                create_mock_forecast_document({"name": "Abidjan"}),
+                create_mock_forecast_document({"name": "Not Abidjan"}),
             ]
+        )
+
+        result = get_forecast_data_from_database(
+            datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
+            datetime(2024, 5, 27, 23, 0, tzinfo=timezone.utc),
+            "city",
+            datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
+            "Abidjan",
+        )
+
+        assert len(result) == 1
+        assert result[0]["name"] == "Abidjan"

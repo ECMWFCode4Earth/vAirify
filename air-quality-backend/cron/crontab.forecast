@@ -1,2 +1,1 @@
 30 0,12 * * * conda run --no-capture-output -n air-quality-backend python "/usr/src/app/scripts/run_forecast_etl.py"
-* /2 * * * conda run --no-capture-output -n air-quality-backend python "/usr/src/app/scripts/run_in_situ_etl.py"
