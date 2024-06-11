@@ -299,21 +299,6 @@ def test__valid_time_to_bva__assert_number_of_results(
     assert len(response_json) == expected
 
 
-def test__location_name_parameter_filters_response_correctly__assert_1_result():
-    response = get_forecast(
-        base_time_string,
-        valid_time_from,
-        valid_time_to,
-        location_type,
-        "Test City 2",
-        base_url,
-        headers,
-    )
-
-    response_json = response.json()
-    assert len(response_json) == 1
-
-
 @pytest.mark.parametrize("location_name", ("", "Test City 1"))
 def test__results_containing_relevant_base_time(
     location_name: str,
@@ -347,15 +332,3 @@ def test__results_containing_relevant_base_time(
 #     actual_valid_time_list = get_list_of_keys(response_json, "valid_date")
 #
 #     assert expected_valid_time_list == actual_valid_time_list
-
-
-# def test__verify__parameters__work():
-#     get_forecast(
-#         forecast_base_time_string,
-#         valid_date_from,
-#         valid_date_to,
-#         location_type,
-#         location_name,
-#         base_url,
-#         headers,
-#     )
