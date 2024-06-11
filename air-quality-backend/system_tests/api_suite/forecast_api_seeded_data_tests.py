@@ -124,7 +124,6 @@ def test__different_base_times__assert_correct_results_returned(
     actual_cities = get_list_of_keys(response.json(), "location_name")
     for city in actual_cities:
         index = actual_cities.index(city)
-
         assert city == expected[index]
 
 
@@ -193,7 +192,6 @@ def test__different_valid_time_from_times__assert_correct_results(
     actual_cities = get_list_of_keys(response.json(), "location_name")
     for city in actual_cities:
         index = actual_cities.index(city)
-
         assert city == expected[index]
 
 
@@ -262,7 +260,6 @@ def test__different_valid_time_to_times__assert_correct_results(
     actual_cities = get_list_of_keys(response.json(), "location_name")
     for city in actual_cities:
         index = actual_cities.index(city)
-
         assert city == expected[index]
 
 
