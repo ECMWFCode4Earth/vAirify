@@ -6,7 +6,9 @@ import xarray
 from air_quality.aqi.pollutant_type import PollutantType
 from air_quality.etl.forecast.forecast_data import (
     convert_east_only_longitude_to_east_west,
-    ForecastData, ForecastDataType,
+    is_single_level,
+    ForecastData,
+    ForecastDataType,
 )
 from air_quality.etl.in_situ.InSituMeasurement import InSituMeasurement
 from tests.util.mock_forecast_data import (
@@ -32,6 +34,22 @@ from tests.util.mock_forecast_data import (
 )
 def test__convert_longitude_east_range(longitude: float, expected: float):
     assert convert_east_only_longitude_to_east_west(longitude) == expected
+
+
+@pytest.mark.parametrize(
+    "forecast_data_type, expected",
+    [
+        (ForecastDataType.PARTICULATE_MATTER_10, True),
+        (ForecastDataType.PARTICULATE_MATTER_2_5, True),
+        (ForecastDataType.SURFACE_PRESSURE, True),
+        (ForecastDataType.NITROGEN_DIOXIDE, False),
+        (ForecastDataType.OZONE, False),
+        (ForecastDataType.SULPHUR_DIOXIDE, False),
+        (ForecastDataType.TEMPERATURE, False),
+    ],
+)
+def test_is_single_level(forecast_data_type: ForecastDataType, expected: bool):
+    assert is_single_level(forecast_data_type) == expected
 
 
 @pytest.mark.parametrize(
@@ -105,8 +123,8 @@ def test__enrich_in_situ_measurements__retrieves_correctly():
     multi_level = multi_level_data_set
     forecast_data = ForecastData(single_level, multi_level)
 
-    initial_date = (datetime.datetime.fromtimestamp(default_time) +
-                    datetime.timedelta(hours=12))
+    initial_date = (datetime.datetime.fromtimestamp(default_time)
+                    + datetime.timedelta(hours=12))
     required = [ForecastDataType.TEMPERATURE, ForecastDataType.SURFACE_PRESSURE]
     in_situ_measurements: [InSituMeasurement] = [{
         "location": {"type": "point", "coordinates": (5, -5)},

@@ -228,10 +228,10 @@ def test__enrich_with_forecast_data__forecast_data_called_correctly_and_enriched
     date1 = datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc)
 
     in_situ_measurement: InSituMeasurement = {
-            "location": {"type": "point", "coordinates": [11, 22]},
-            "measurement_date": date1,
-            "metadata": {},
-        }
+        "location": {"type": "point", "coordinates": [11, 22]},
+        "measurement_date": date1,
+        "metadata": {},
+    }
 
     mock_forecast_data = Mock()
     mock_forecast_data.enrich_in_situ_measurements.return_value = [(

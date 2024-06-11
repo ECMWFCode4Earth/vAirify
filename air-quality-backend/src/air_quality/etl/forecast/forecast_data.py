@@ -1,4 +1,3 @@
-import datetime
 from decimal import Decimal
 import logging
 from enum import Enum
@@ -6,16 +5,15 @@ from enum import Enum
 import xarray as xr
 from air_quality.database.locations import AirQualityLocation
 from air_quality.aqi.pollutant_type import (
-    PollutantType,
-    is_single_level,
+    PollutantType
 )
 from air_quality.etl.in_situ.InSituMeasurement import InSituMeasurement
 
 
 class ForecastDataType(Enum):
     NITROGEN_DIOXIDE = "no2"
-    OZONE = "o3"
-    PARTICULATE_MATTER_2_5 = "pm2_5"
+    OZONE = "go3"
+    PARTICULATE_MATTER_2_5 = "pm2p5"
     PARTICULATE_MATTER_10 = "pm10"
     SULPHUR_DIOXIDE = "so2"
     SURFACE_PRESSURE = "sp"
@@ -71,30 +69,31 @@ def convert_longitude(dataset: xr.Dataset) -> xr.Dataset:
 
 
 def is_single_level(forecast_data_type: ForecastDataType) -> bool:
-        is_pm2_5 = forecast_data_type == ForecastDataType.PARTICULATE_MATTER_2_5
-        is_pm10 = forecast_data_type == ForecastDataType.PARTICULATE_MATTER_10
-        is_pressure = forecast_data_type == ForecastDataType.SURFACE_PRESSURE
-        return is_pm10 or is_pm2_5 or is_pressure
+    is_pm2_5 = forecast_data_type == ForecastDataType.PARTICULATE_MATTER_2_5
+    is_pm10 = forecast_data_type == ForecastDataType.PARTICULATE_MATTER_10
+    is_pressure = forecast_data_type == ForecastDataType.SURFACE_PRESSURE
+    return is_pm10 or is_pm2_5 or is_pressure
 
 
-pollutant_data_map = {
-    PollutantType.OZONE: "go3",
-    PollutantType.NITROGEN_DIOXIDE: "no2",
-    PollutantType.SULPHUR_DIOXIDE: "so2",
-    PollutantType.PARTICULATE_MATTER_10: "pm10",
-    PollutantType.PARTICULATE_MATTER_2_5: "pm2p5",
-}
-
-
-forecast_data_type_map = {
-    ForecastDataType.OZONE: "go3",
-    ForecastDataType.NITROGEN_DIOXIDE: "no2",
-    ForecastDataType.SULPHUR_DIOXIDE: "so2",
-    ForecastDataType.PARTICULATE_MATTER_10: "pm10",
-    ForecastDataType.PARTICULATE_MATTER_2_5: "pm2p5",
-    ForecastDataType.SURFACE_PRESSURE: "sp",
-    ForecastDataType.TEMPERATURE: "t"
-}
+def _convert_to_forecast_data_type(pollutant_type: PollutantType) -> ForecastDataType:
+    match pollutant_type:
+        case PollutantType.OZONE:
+            return ForecastDataType.OZONE
+        case PollutantType.SULPHUR_DIOXIDE:
+            return ForecastDataType.SULPHUR_DIOXIDE
+        case PollutantType.NITROGEN_DIOXIDE:
+            return ForecastDataType.NITROGEN_DIOXIDE
+        case PollutantType.PARTICULATE_MATTER_2_5:
+            return ForecastDataType.PARTICULATE_MATTER_2_5
+        case PollutantType.PARTICULATE_MATTER_10:
+            return ForecastDataType.PARTICULATE_MATTER_10
+        case _:
+            raise (
+                ValueError(
+                    f"Unable to convert pollutant to forecast data type "
+                    f"'{pollutant_type.value}'"
+                )
+            )
 
 
 class ForecastData:
@@ -110,12 +109,6 @@ class ForecastData:
 
     _cached_pressure = None
     _cached_temperature = None
-
-    def _get_data_set(self, pollutant_type: PollutantType) -> xr.Dataset:
-        if is_single_level(pollutant_type):
-            return self._single_level_data
-        else:
-            return self._multi_level_data
 
     def _get_data_set(self, forecast_data_type: ForecastDataType) -> xr.Dataset:
         if is_single_level(forecast_data_type):
@@ -152,7 +145,7 @@ class ForecastData:
                        ._get_data_set(required_datum)
                        .swap_dims({"step": "valid_time"}))
 
-            interpolated_data = dataset[forecast_data_type_map[required_datum]].interp(
+            interpolated_data = dataset[required_datum.value].interp(
                 latitude=xr.DataArray(latitudes, dims="latitude"),
                 longitude=xr.DataArray(longitudes, dims="longitude"),
                 valid_time=xr.DataArray(valid_times, dims="valid_time"),
@@ -187,7 +180,7 @@ class ForecastData:
     ) -> list[tuple[AirQualityLocation, dict[PollutantType: list[float]]]]:
         """
         Get forecasted air pollutant values for given locations
-        and pollutants using bilinear interpolation
+        and pollutants using bi-linear interpolation
         :param locations:
         :param pollutant_types:
         :return: values for pollutant at lat/long
@@ -200,14 +193,15 @@ class ForecastData:
 
         interpolated_data_by_pollutant_type = {}
         for pollutant_type in pollutant_types:
-            dataset = self._get_data_set(pollutant_type)
+            forecast_data_type = _convert_to_forecast_data_type(pollutant_type)
+            dataset = self._get_data_set(forecast_data_type)
             # Interpolation is called n times, where n = len(pollutant_types),
             # irrespective of len(locations)
-            interpolated_data = dataset[pollutant_data_map[pollutant_type]].interp(
+            interpolated_data = (dataset[forecast_data_type.value].interp(
                 latitude=xr.DataArray(latitudes, dims="points"),
                 longitude=xr.DataArray(longitudes, dims="points"),
                 method="linear",
-            )
+            ))
             interpolated_data_by_pollutant_type[pollutant_type] = interpolated_data
 
         location_pollutant_tuples = []
