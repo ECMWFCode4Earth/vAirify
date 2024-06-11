@@ -91,7 +91,7 @@ def _convert_to_forecast_data_type(pollutant_type: PollutantType) -> ForecastDat
             raise (
                 ValueError(
                     f"Unable to convert pollutant to forecast data type "
-                    f"'{pollutant_type.value}'"
+                    f"'{pollutant_type}'"
                 )
             )
 

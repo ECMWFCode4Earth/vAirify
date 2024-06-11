@@ -7,6 +7,7 @@ from air_quality.aqi.pollutant_type import PollutantType
 from air_quality.etl.forecast.forecast_data import (
     convert_east_only_longitude_to_east_west,
     is_single_level,
+    _convert_to_forecast_data_type,
     ForecastData,
     ForecastDataType,
 )
@@ -32,7 +33,9 @@ from tests.util.mock_forecast_data import (
         (-180.0, -180.0),
     ],
 )
-def test__convert_longitude_east_range(longitude: float, expected: float):
+def test__convert_east_only_longitude_to_east_west__converts_correctly(
+        longitude: float,
+        expected: float):
     assert convert_east_only_longitude_to_east_west(longitude) == expected
 
 
@@ -48,8 +51,31 @@ def test__convert_longitude_east_range(longitude: float, expected: float):
         (ForecastDataType.TEMPERATURE, False),
     ],
 )
-def test_is_single_level(forecast_data_type: ForecastDataType, expected: bool):
+def test__is_single_level__returns_correctly(
+        forecast_data_type: ForecastDataType,
+        expected: bool):
     assert is_single_level(forecast_data_type) == expected
+
+
+@pytest.mark.parametrize(
+    "pollutant_data_type, forecast_data_type",
+    [
+        (PollutantType.PARTICULATE_MATTER_10, ForecastDataType.PARTICULATE_MATTER_10),
+        (PollutantType.PARTICULATE_MATTER_2_5, ForecastDataType.PARTICULATE_MATTER_2_5),
+        (PollutantType.SULPHUR_DIOXIDE, ForecastDataType.SULPHUR_DIOXIDE),
+        (PollutantType.NITROGEN_DIOXIDE, ForecastDataType.NITROGEN_DIOXIDE),
+        (PollutantType.OZONE, ForecastDataType.OZONE),
+    ],
+)
+def test__convert_to_forecast_data_type__valid_input_converts_correctly(
+        pollutant_data_type: PollutantType,
+        forecast_data_type: ForecastDataType):
+    assert _convert_to_forecast_data_type(pollutant_data_type) == forecast_data_type
+
+
+def test__convert_to_forecast_data_type__invalid_input_raises_error():
+    with pytest.raises(ValueError):
+        _convert_to_forecast_data_type(_convert_to_forecast_data_type(999))
 
 
 @pytest.mark.parametrize(
@@ -118,7 +144,7 @@ def test__get_pollutant_data_for_locations__interpolates_correctly(
     assert result == expected_results
 
 
-def test__enrich_in_situ_measurements__retrieves_correctly():
+def test__enrich_in_situ_measurements__interpolates_correctly():
     single_level = single_level_data_set
     multi_level = multi_level_data_set
     forecast_data = ForecastData(single_level, multi_level)
