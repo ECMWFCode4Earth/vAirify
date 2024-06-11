@@ -174,3 +174,59 @@ def test__enrich_in_situ_measurements__interpolates_correctly():
     assert result[0][0] == in_situ_measurements[0]
     assert result[0][1][ForecastDataType.SURFACE_PRESSURE] == 0.75
     assert result[0][1][ForecastDataType.TEMPERATURE] == 75
+
+
+def test__enrich_in_situ_measurements__duplicate_longitude_functions_correctly():
+    single_level = single_level_data_set
+    multi_level = multi_level_data_set
+    forecast_data = ForecastData(single_level, multi_level)
+
+    initial_date = (datetime.datetime.fromtimestamp(default_time))
+    required = [ForecastDataType.TEMPERATURE, ForecastDataType.SURFACE_PRESSURE]
+    in_situ_measurements: [InSituMeasurement] = [{
+        "location": {"type": "point", "coordinates": (5, -5)},
+        "measurement_date": initial_date,
+        "name": "city1",
+        "metadata": {},
+        "no2": {}
+    }, {
+        "location": {"type": "point", "coordinates": (5, -10)},
+        "measurement_date": initial_date,
+        "name": "city2",
+        "metadata": {},
+        "no2": {}
+    }]
+
+    result = forecast_data.enrich_in_situ_measurements(in_situ_measurements, required)
+
+    assert len(result) == 2
+    assert result[0][0] == in_situ_measurements[0]
+    assert result[1][0] == in_situ_measurements[1]
+
+
+def test__enrich_in_situ_measurements__duplicate_latitude_functions_correctly():
+    single_level = single_level_data_set
+    multi_level = multi_level_data_set
+    forecast_data = ForecastData(single_level, multi_level)
+
+    initial_date = (datetime.datetime.fromtimestamp(default_time))
+    required = [ForecastDataType.TEMPERATURE, ForecastDataType.SURFACE_PRESSURE]
+    in_situ_measurements: [InSituMeasurement] = [{
+        "location": {"type": "point", "coordinates": (0, -10)},
+        "measurement_date": initial_date,
+        "name": "city1",
+        "metadata": {},
+        "no2": {}
+    }, {
+        "location": {"type": "point", "coordinates": (10, -10)},
+        "measurement_date": initial_date,
+        "name": "city2",
+        "metadata": {},
+        "no2": {}
+    }]
+
+    result = forecast_data.enrich_in_situ_measurements(in_situ_measurements, required)
+
+    assert len(result) == 2
+    assert result[0][0] == in_situ_measurements[0]
+    assert result[1][0] == in_situ_measurements[1]
