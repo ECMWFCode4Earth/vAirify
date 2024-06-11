@@ -166,8 +166,8 @@ def test__base_time_bva__assert_number_of_results(
     [
         (datetime.datetime(2024, 6, 10, 0, 0, 0), "", ["Test City 1", "Test City 2"]),
         (datetime.datetime(2024, 6, 11, 0, 0, 0), "", ["Test City 2"]),
-        (datetime.datetime(2024, 6, 10, 0, 0, 0), "Test City 2", ["Test City 2"]),
-        (datetime.datetime(2024, 6, 11, 0, 0, 0), "", ["Test City 2"]),
+        (datetime.datetime(2024, 6, 10, 0, 0, 0), "Test City 1", ["Test City 1"]),
+        (datetime.datetime(2024, 6, 11, 0, 0, 0), "Test City 2", ["Test City 2"]),
     ],
 )
 def test__different_valid_time_from_times__assert_correct_results(
@@ -233,10 +233,10 @@ def test__valid_time_from_bva__assert_number_of_results(
 @pytest.mark.parametrize(
     "test_valid_time_to, test_location_name, expected_cities",
     [
-        (datetime.datetime(2024, 6, 10, 0, 0, 0), "", ["Test City 1", "Test City 2"]),
-        (datetime.datetime(2024, 6, 11, 0, 0, 0), "", ["Test City 2"]),
-        (datetime.datetime(2024, 6, 10, 0, 0, 0), "Test City 2", ["Test City 2"]),
-        (datetime.datetime(2024, 6, 11, 0, 0, 0), "", ["Test City 2"]),
+        (datetime.datetime(2024, 6, 11, 0, 0, 0), "", ["Test City 1"]),
+        (datetime.datetime(2024, 6, 12, 0, 0, 0), "", ["Test City 1", "Test City 2"]),
+        (datetime.datetime(2024, 6, 11, 0, 0, 0), "Test City 2", []),
+        (datetime.datetime(2024, 6, 12, 0, 0, 0), "Test City 2", ["Test City 2"]),
     ],
 )
 def test__different_valid_time_to_times__assert_correct_results(
@@ -251,7 +251,7 @@ def test__different_valid_time_to_times__assert_correct_results(
     response = get_forecast(
         base_time_string,
         test_valid_time_to_string,
-        valid_time_to,
+        valid_time_from,
         location_type,
         test_location_name,
         base_url,
@@ -267,28 +267,28 @@ def test__different_valid_time_to_times__assert_correct_results(
 
 
 @pytest.mark.parametrize(
-    "test_valid_time_from, test_location_name, expected",
+    "test_valid_time_to, test_location_name, expected",
     [
-        (datetime.datetime(2024, 6, 10, 0, 0, 0), "", 2),
-        (datetime.datetime(2024, 6, 10, 3, 0, 0), "", 2),
-        (datetime.datetime(2024, 6, 10, 6, 0, 0), "", 1),
-        (datetime.datetime(2024, 6, 10, 0, 0, 0), "Test City 1", 1),
-        (datetime.datetime(2024, 6, 10, 3, 0, 0), "Test City 1", 1),
-        (datetime.datetime(2024, 6, 10, 6, 0, 0), "Test City 1", 0),
+        (datetime.datetime(2024, 6, 11, 12, 0, 0), "", 1),
+        (datetime.datetime(2024, 6, 12, 0, 0, 0), "", 2),
+        (datetime.datetime(2024, 6, 12, 12, 0, 0), "", 2),
+        (datetime.datetime(2024, 6, 11, 12, 0, 0), "Test City 1", 1),
+        (datetime.datetime(2024, 6, 12, 0, 0, 0), "Test City 1", 1),
+        (datetime.datetime(2024, 6, 12, 0, 0, 0), "Test City 2", 1),
     ],
 )
 def test__valid_time_to_bva__assert_number_of_results(
-    test_valid_time_from: datetime.datetime, test_location_name: str, expected: int
+    test_valid_time_to, test_location_name: str, expected: int
 ):
-    test_valid_time_from_string = format_datetime_as_string(
-        test_valid_time_from,
+    test_valid_time_to_string = format_datetime_as_string(
+        test_valid_time_to,
         "%Y-%m-%dT%H:%M:%S+00:00",
     )
 
     response = get_forecast(
         base_time_string,
-        test_valid_time_from_string,
-        valid_time_to,
+        valid_time_from,
+        test_valid_time_to_string,
         location_type,
         test_location_name,
         base_url,
