@@ -4,13 +4,14 @@ import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { useState } from 'react'
 
 import classes from './GlobalSummary.module.css'
-import GlobalSummaryTable from './GlobalSummaryTable'
-import { getForecastData } from '../services/forecast-data-service'
+import { combineApiResult } from './summary-data-mapper'
+import { getForecastData } from '../../services/forecast-data-service'
 import {
   getLatestBaseForecastTime,
   getLatestValidForecastTime,
-} from '../services/forecast-time-service'
-import { getMeasurementSummary } from '../services/measurement-data-service'
+} from '../../services/forecast-time-service'
+import { getMeasurementSummary } from '../../services/measurement-data-service'
+import GlobalSummaryTable from '../summary-grid/GlobalSummaryTable'
 
 const GlobalSummary = (): JSX.Element => {
   const [latestForecastDate] = useState(getLatestBaseForecastTime())
@@ -28,16 +29,7 @@ const GlobalSummary = (): JSX.Element => {
         queryFn: () => getMeasurementSummary(latestValidDate),
       },
     ],
-    combine: ([forecast, summarizedMeasurements]) => {
-      return {
-        data: {
-          forecast: forecast.data,
-          summarizedMeasurements: summarizedMeasurements.data,
-        },
-        isPending: forecast.isPending || summarizedMeasurements.isPending,
-        isError: forecast.isError || summarizedMeasurements.isError,
-      }
-    },
+    combine: (result) => combineApiResult(result),
   })
 
   if (isPending) {

@@ -11,7 +11,7 @@ jest.mock('@tanstack/react-query', () => ({
     .mockReturnValue({ data: [], isPending: false, isError: false }),
 }))
 
-jest.mock('../services/forecast-time-service', () => ({
+jest.mock('../../services/forecast-time-service', () => ({
   getLatestBaseForecastTime: jest
     .fn()
     .mockImplementation(() => DateTime.fromISO('2024-06-01T00:00:00')),
@@ -57,6 +57,12 @@ describe('GlobalSummary component', () => {
       expect(
         screen.getByText('Forecast Valid Time: 2024-06-01 12:00'),
       ).toBeInTheDocument()
+    })
+  })
+  it('shows the summary table', async () => {
+    render(<GlobalSummary />)
+    await waitFor(() => {
+      expect(screen.getByTestId('summary-grid')).toBeInTheDocument()
     })
   })
 })

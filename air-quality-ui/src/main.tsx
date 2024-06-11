@@ -3,7 +3,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 
-import GlobalSummary from './components/GlobalSummary'
+import GlobalSummary from './components/summary-view/GlobalSummary'
 import SingleCity from './SingleCity'
 
 import './index.css'

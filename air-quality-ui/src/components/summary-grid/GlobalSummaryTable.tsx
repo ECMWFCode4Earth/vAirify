@@ -6,11 +6,15 @@ import './GlobalSummaryTable.module.css'
 import { useMemo } from 'react'
 
 import { LocationCellRenderer } from './LocationCellRenderer'
-import { PollutantType, pollutantTypeDisplay, pollutantTypes } from '../models'
+import {
+  PollutantType,
+  pollutantTypeDisplay,
+  pollutantTypes,
+} from '../../models'
 import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,
-} from '../services/types'
+} from '../../services/types'
 
 type SummaryDetail = {
   aqiLevel: number
@@ -107,7 +111,11 @@ const GlobalSummaryTable = (props: GlobalSummaryTableProps): JSX.Element => {
   const data = useMemo(() => mapApiResponse(props), [props])
 
   return (
-    <div className="ag-theme-quartz" style={{ height: 500 }}>
+    <div
+      className="ag-theme-quartz"
+      style={{ height: 500 }}
+      data-testid="summary-grid"
+    >
       <AgGridReact rowData={data} columnDefs={colDefs} />
     </div>
   )
