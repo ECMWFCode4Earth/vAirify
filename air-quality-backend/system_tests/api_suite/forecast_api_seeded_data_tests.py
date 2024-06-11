@@ -1,10 +1,6 @@
 import datetime
-import json
 import pprint
-
 import pytest
-
-from air_quality.api.types import ForecastDto
 from air_quality.database.forecasts import Forecast
 from system_tests.utils.api_utilities import (
     format_datetime_as_string,
