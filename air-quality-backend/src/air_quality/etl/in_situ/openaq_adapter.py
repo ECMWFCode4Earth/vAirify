@@ -95,12 +95,13 @@ def transform_city(city_data) -> list[InSituMeasurement]:
 
 
 def enrich_with_forecast_data(
-        in_situ_measurements: list[InSituMeasurement],
-        forecast_data: ForecastData):
+    in_situ_measurements: list[InSituMeasurement], forecast_data: ForecastData
+):
 
     in_situ_readings = forecast_data.enrich_in_situ_measurements(
         in_situ_measurements,
-        [ForecastDataType.TEMPERATURE, ForecastDataType.SURFACE_PRESSURE])
+        [ForecastDataType.TEMPERATURE, ForecastDataType.SURFACE_PRESSURE],
+    )
 
     enriched_measurements = []
     for in_situ_reading, forecast_dict in in_situ_readings:

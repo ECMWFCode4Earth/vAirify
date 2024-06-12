@@ -4,10 +4,8 @@ from enum import Enum
 
 import xarray as xr
 from air_quality.database.locations import AirQualityLocation
-from air_quality.aqi.pollutant_type import (
-    PollutantType
-)
-from air_quality.etl.in_situ.InSituMeasurement import InSituMeasurement
+from air_quality.aqi.pollutant_type import PollutantType
+from air_quality.database.in_situ import InSituMeasurement
 
 
 class ForecastDataType(Enum):
@@ -117,10 +115,10 @@ class ForecastData:
             return self._multi_level_data
 
     def enrich_in_situ_measurements(
-            self,
-            in_situ_measurements: list[InSituMeasurement],
-            required_data: list[ForecastDataType]
-    ) -> list[tuple[InSituMeasurement, dict[ForecastDataType: float]]]:
+        self,
+        in_situ_measurements: list[InSituMeasurement],
+        required_data: list[ForecastDataType],
+    ) -> list[tuple[InSituMeasurement, dict[ForecastDataType:float]]]:
         if len(in_situ_measurements) == 0:
             return []
 
@@ -141,9 +139,9 @@ class ForecastData:
 
         interpolated_data_by_data_type = {}
         for required_datum in required_data:
-            dataset = (self
-                       ._get_data_set(required_datum)
-                       .swap_dims({"step": "valid_time"}))
+            dataset = self._get_data_set(required_datum).swap_dims(
+                {"step": "valid_time"}
+            )
 
             interpolated_data = dataset[required_datum.value].interp(
                 latitude=xr.DataArray(latitudes, dims="latitude"),
@@ -151,10 +149,11 @@ class ForecastData:
                 valid_time=xr.DataArray(valid_times, dims="valid_time"),
                 method="linear",
             )
-            (interpolated_data
-             .set_index(valid_time=["valid_time"])
-             .set_index(latitude=["latitude"])
-             .set_index(longitude=["longitude"]))
+            (
+                interpolated_data.set_index(valid_time=["valid_time"])
+                .set_index(latitude=["latitude"])
+                .set_index(longitude=["longitude"])
+            )
 
             interpolated_data_by_data_type[required_datum] = interpolated_data
 
@@ -165,19 +164,20 @@ class ForecastData:
             latitude = in_situ_measurement["location"]["coordinates"][1]
             forecast_data = {}
 
-            for (forecast_data_type, interpolated_data) \
-                    in interpolated_data_by_data_type.items():
+            for (
+                forecast_data_type,
+                interpolated_data,
+            ) in interpolated_data_by_data_type.items():
                 forecast_value = interpolated_data.sel(
-                    valid_time=valid_time,
-                    longitude=longitude,
-                    latitude=latitude).item()
+                    valid_time=valid_time, longitude=longitude, latitude=latitude
+                ).item()
                 forecast_data[forecast_data_type] = forecast_value
             forecast_tuples.append((in_situ_measurement, forecast_data))
         return forecast_tuples
 
     def get_pollutant_data_for_locations(
         self, locations: list[AirQualityLocation], pollutant_types: list[PollutantType]
-    ) -> list[tuple[AirQualityLocation, dict[PollutantType: list[float]]]]:
+    ) -> list[tuple[AirQualityLocation, dict[PollutantType : list[float]]]]:
         """
         Get forecasted air pollutant values for given locations
         and pollutants using bi-linear interpolation
@@ -197,11 +197,11 @@ class ForecastData:
             dataset = self._get_data_set(forecast_data_type)
             # Interpolation is called n times, where n = len(pollutant_types),
             # irrespective of len(locations)
-            interpolated_data = (dataset[forecast_data_type.value].interp(
+            interpolated_data = dataset[forecast_data_type.value].interp(
                 latitude=xr.DataArray(latitudes, dims="points"),
                 longitude=xr.DataArray(longitudes, dims="points"),
                 method="linear",
-            ))
+            )
             interpolated_data_by_pollutant_type[pollutant_type] = interpolated_data
 
         location_pollutant_tuples = []

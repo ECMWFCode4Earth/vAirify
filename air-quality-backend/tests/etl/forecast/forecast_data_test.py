@@ -4,6 +4,7 @@ import pytest
 import xarray
 
 from air_quality.aqi.pollutant_type import PollutantType
+from air_quality.database.locations import AirQualityLocation, AirQualityLocationType
 from air_quality.etl.forecast.forecast_data import (
     convert_east_only_longitude_to_east_west,
     is_single_level,
@@ -11,13 +12,14 @@ from air_quality.etl.forecast.forecast_data import (
     ForecastData,
     ForecastDataType,
 )
-from air_quality.etl.in_situ.InSituMeasurement import InSituMeasurement
+from air_quality.database.in_situ import InSituMeasurement
 from tests.util.mock_forecast_data import (
     create_test_pollutant_data,
     single_level_data_set,
     multi_level_data_set,
     default_time,
 )
+from tests.util.mock_measurement import create_mock_measurement_document
 
 
 @pytest.mark.parametrize(
@@ -34,8 +36,8 @@ from tests.util.mock_forecast_data import (
     ],
 )
 def test__convert_east_only_longitude_to_east_west__converts_correctly(
-        longitude: float,
-        expected: float):
+    longitude: float, expected: float
+):
     assert convert_east_only_longitude_to_east_west(longitude) == expected
 
 
@@ -52,8 +54,8 @@ def test__convert_east_only_longitude_to_east_west__converts_correctly(
     ],
 )
 def test__is_single_level__returns_correctly(
-        forecast_data_type: ForecastDataType,
-        expected: bool):
+    forecast_data_type: ForecastDataType, expected: bool
+):
     assert is_single_level(forecast_data_type) == expected
 
 
@@ -68,14 +70,14 @@ def test__is_single_level__returns_correctly(
     ],
 )
 def test__convert_to_forecast_data_type__valid_input_converts_correctly(
-        pollutant_data_type: PollutantType,
-        forecast_data_type: ForecastDataType):
+    pollutant_data_type: PollutantType, forecast_data_type: ForecastDataType
+):
     assert convert_to_forecast_data_type(pollutant_data_type) == forecast_data_type
 
 
 def test__convert_to_forecast_data_type__invalid_input_raises_error():
     with pytest.raises(ValueError):
-        convert_to_forecast_data_type(convert_to_forecast_data_type(999))
+        convert_to_forecast_data_type(PollutantType(999))
 
 
 @pytest.mark.parametrize(
@@ -122,10 +124,10 @@ def test__get_pollutant_data_for_locations__interpolates_correctly(
         data_vars=dict(no2=input_data, so2=input_data, go3=input_data, t=temperature),
     )
     forecast_data = ForecastData(single_level, multi_level)
-    locations = [
+    locations: list[AirQualityLocation] = [
         {
             "name": "test",
-            "type": "test",
+            "type": AirQualityLocationType.CITY,
             "latitude": lat_long[0],
             "longitude": lat_long[1],
         }
@@ -149,15 +151,18 @@ def test__enrich_in_situ_measurements__interpolates_correctly():
     multi_level = multi_level_data_set
     forecast_data = ForecastData(single_level, multi_level)
 
-    initial_date = (datetime.datetime.fromtimestamp(default_time)
-                    + datetime.timedelta(hours=12))
+    initial_date = datetime.datetime.fromtimestamp(default_time) + datetime.timedelta(
+        hours=12
+    )
     required = [ForecastDataType.TEMPERATURE, ForecastDataType.SURFACE_PRESSURE]
-    in_situ_measurements: [InSituMeasurement] = [{
-        "location": {"type": "point", "coordinates": (5, -5)},
-        "measurement_date": initial_date,
-        "metadata": {},
-        "no2": {}
-    }]
+    in_situ_measurements: list[InSituMeasurement] = [
+        create_mock_measurement_document(
+            {
+                "location": {"type": "point", "coordinates": (5, -5)},
+                "measurement_date": initial_date,
+            }
+        )
+    ]
 
     # This should find the values interpolated bang in the middle of:
     # T=0    (0,0) pressure = 0.4, temperature = 40
@@ -181,23 +186,25 @@ def test__enrich_in_situ_measurements__duplicate_longitude_functions_correctly()
     multi_level = multi_level_data_set
     forecast_data = ForecastData(single_level, multi_level)
 
-    initial_date = ((datetime.datetime.fromtimestamp(default_time))
-                    + datetime.timedelta(hours=24))
+    initial_date = (datetime.datetime.fromtimestamp(default_time)) + datetime.timedelta(
+        hours=24
+    )
     required = [ForecastDataType.TEMPERATURE, ForecastDataType.SURFACE_PRESSURE]
     # co-ords are (long, lat)
-    in_situ_measurements: [InSituMeasurement] = [{
-        "location": {"type": "point", "coordinates": (0, -10)},
-        "measurement_date": initial_date,
-        "name": "city1",
-        "metadata": {},
-        "no2": {}
-    }, {
-        "location": {"type": "point", "coordinates": (0, 0)},
-        "measurement_date": initial_date,
-        "name": "city2",
-        "metadata": {},
-        "no2": {}
-    }]
+    in_situ_measurements: list[InSituMeasurement] = [
+        create_mock_measurement_document(
+            {
+                "location": {"type": "point", "coordinates": (0, -10)},
+                "measurement_date": initial_date,
+            }
+        ),
+        create_mock_measurement_document(
+            {
+                "location": {"type": "point", "coordinates": (0, 0)},
+                "measurement_date": initial_date,
+            }
+        ),
+    ]
 
     result = forecast_data.enrich_in_situ_measurements(in_situ_measurements, required)
 
@@ -220,23 +227,24 @@ def test__enrich_in_situ_measurements__duplicate_latitude_functions_correctly():
     multi_level = multi_level_data_set
     forecast_data = ForecastData(single_level, multi_level)
 
-    initial_date = (datetime.datetime.fromtimestamp(default_time))
+    initial_date = datetime.datetime.fromtimestamp(default_time)
     required = [ForecastDataType.TEMPERATURE, ForecastDataType.SURFACE_PRESSURE]
 
     # co-ords are (long, lat)
-    in_situ_measurements: [InSituMeasurement] = [{
-        "location": {"type": "point", "coordinates": (0, -10)},
-        "measurement_date": initial_date,
-        "name": "city1",
-        "metadata": {},
-        "no2": {}
-    }, {
-        "location": {"type": "point", "coordinates": (10, -10)},
-        "measurement_date": initial_date,
-        "name": "city2",
-        "metadata": {},
-        "no2": {}
-    }]
+    in_situ_measurements: list[InSituMeasurement] = [
+        create_mock_measurement_document(
+            {
+                "location": {"type": "point", "coordinates": (0, -10)},
+                "measurement_date": initial_date,
+            }
+        ),
+        create_mock_measurement_document(
+            {
+                "location": {"type": "point", "coordinates": (10, -10)},
+                "measurement_date": initial_date,
+            }
+        ),
+    ]
 
     result = forecast_data.enrich_in_situ_measurements(in_situ_measurements, required)
 

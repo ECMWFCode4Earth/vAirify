@@ -177,24 +177,24 @@ pm10 = create_test_pollutant_data_with_defaults(
 
 sp = create_test_pollutant_data_with_defaults(
     values=[
-        0.1,    # time: +0, lat : -10, long : 0
-        0.2,    # time: +0, lat : -10, long : 10
-        0.3,    # time: +0, lat : -10, long : 350 -> lat : -10, long : -10
-        0.4,    # time: +0, lat : 0, long : 0
-        0.5,    # time: +0, lat : 0, long : 10
-        0.6,    # time: +0, lat : 0, long : 350 -> lat : 0, long : -10
-        0.7,    # time: +0, lat : 10, long : 0
-        0.8,    # time: +0, lat : 10, long : 10
-        0.9,    # time: +0, lat : 10, long : 350 -> lat : 10, long -10
-        1,      # time: +24, lat : -10, long : 0
+        0.1,  # time: +0, lat : -10, long : 0
+        0.2,  # time: +0, lat : -10, long : 10
+        0.3,  # time: +0, lat : -10, long : 350 -> lat : -10, long : -10
+        0.4,  # time: +0, lat : 0, long : 0
+        0.5,  # time: +0, lat : 0, long : 10
+        0.6,  # time: +0, lat : 0, long : 350 -> lat : 0, long : -10
+        0.7,  # time: +0, lat : 10, long : 0
+        0.8,  # time: +0, lat : 10, long : 10
+        0.9,  # time: +0, lat : 10, long : 350 -> lat : 10, long -10
+        1,  # time: +24, lat : -10, long : 0
         1.1,
         1.2,
         1.3,
-        1.4,    # time: +24, lat : 0, long : 10
+        1.4,  # time: +24, lat : 0, long : 10
         1.5,
         1.6,
         1.7,
-        1.8,    # time: +24, lat : 10, long : 350 -> lat : 10, long -10
+        1.8,  # time: +24, lat : 10, long : 350 -> lat : 10, long -10
     ]
 )
 
