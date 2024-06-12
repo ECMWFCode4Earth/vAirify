@@ -30,6 +30,7 @@ jobs:
       - name: activate docker
         run: |  
           ssh ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} "cd /usr/config && \\
+            echo ${{ secrets.GITHUB_TOKEN}} | sudo docker login --username ${{ github.actor }} --password-stdin  ghcr.io
             sudo docker compose pull
             sudo docker compose up --force-recreate --build -d
             sudo docker image prune -f
