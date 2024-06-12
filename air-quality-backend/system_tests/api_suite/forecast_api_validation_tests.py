@@ -2,7 +2,6 @@ import datetime
 import random
 import pytest
 import requests
-
 from system_tests.utils.api_utilities import (
     format_datetime_as_string,
 )

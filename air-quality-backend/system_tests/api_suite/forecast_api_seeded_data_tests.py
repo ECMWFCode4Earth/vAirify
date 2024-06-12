@@ -1,13 +1,15 @@
 import datetime
 import pytest
 import requests
+from dotenv import load_dotenv
+
 from air_quality.database.forecasts import Forecast
 from system_tests.utils.api_utilities import (
     format_datetime_as_string,
-    get_list_of_keys,
-    get_forecast,
-    setup_purge_database_and_seed_with_test_data,
+    get_list_of_key_values,
+    seed_api_test_data,
 )
+from system_tests.utils.cams_utilities import delete_database_data
 
 # Test Data
 test_city_1_input_data: Forecast = {
@@ -148,8 +150,9 @@ valid_time_to_string = format_datetime_as_string(
 )
 
 # Test Setup
-setup_purge_database_and_seed_with_test_data(
-    ".env-qa",
+load_dotenv(".env-qa")
+delete_database_data("forecast_data")
+seed_api_test_data(
     "forecast_data",
     [test_city_1_input_data, test_city_2_input_data, test_city_3_input_data],
 )
@@ -208,12 +211,13 @@ def test__different_base_times__assert_correct_results_returned(
     parameters: dict,
     expected_cities: list,
 ):
+    load_dotenv(".env-qa")
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
 
     expected = expected_cities
-    actual_cities = get_list_of_keys(response.json(), "location_name")
+    actual_cities = get_list_of_key_values(response.json(), "location_name")
     for city in actual_cities:
         index = actual_cities.index(city)
         assert city == expected[index]
@@ -312,6 +316,7 @@ def test__different_base_times__assert_correct_results_returned(
     ],
 )
 def test__base_time_bva__assert_number_of_results(parameters: dict, expected: int):
+    load_dotenv(".env-qa")
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -387,11 +392,12 @@ def test__different_valid_time_from_times__assert_correct_results(
     parameters: dict,
     expected_cities: list,
 ):
+    load_dotenv(".env-qa")
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
     expected = expected_cities
-    actual_cities = get_list_of_keys(response.json(), "location_name")
+    actual_cities = get_list_of_key_values(response.json(), "location_name")
     for city in actual_cities:
         index = actual_cities.index(city)
         assert city == expected[index]
@@ -492,6 +498,7 @@ def test__different_valid_time_from_times__assert_correct_results(
 def test__valid_time_from_bva__assert_number_of_results(
     parameters: dict, expected: int
 ):
+    load_dotenv(".env-qa")
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -567,11 +574,12 @@ def test__different_valid_time_to_times__assert_correct_results(
     parameters: dict,
     expected_cities: list,
 ):
+    load_dotenv(".env-qa")
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
     expected = expected_cities
-    actual_cities = get_list_of_keys(response.json(), "location_name")
+    actual_cities = get_list_of_key_values(response.json(), "location_name")
     for city in actual_cities:
         index = actual_cities.index(city)
         assert city == expected[index]
@@ -670,6 +678,7 @@ def test__different_valid_time_to_times__assert_correct_results(
     ],
 )
 def test__valid_time_to_bva__assert_number_of_results(parameters: dict, expected: int):
+    load_dotenv(".env-qa")
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -697,6 +706,7 @@ def test__valid_time_to_bva__assert_number_of_results(parameters: dict, expected
     ),
 )
 def test__results_containing_relevant_base_time(parameters: dict):
+    load_dotenv(".env-qa")
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -726,7 +736,7 @@ def test__results_containing_relevant_base_time(parameters: dict):
                 "valid_date_from": valid_time_from_string,
                 "valid_date_to": valid_time_to_string,
                 "location_type": location_type,
-                "location_name": "Test City 1",
+                "location_name": "Test City 2",
             },
             [
                 test_city_2_expected_response_data,
@@ -737,6 +747,7 @@ def test__results_containing_relevant_base_time(parameters: dict):
 def test__assert_response_keys_and_values_are_correct(
     parameters: dict, expected_response: list
 ):
+    load_dotenv(".env-qa")
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )

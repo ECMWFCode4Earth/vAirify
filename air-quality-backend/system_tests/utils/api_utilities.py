@@ -1,9 +1,7 @@
 import datetime
 import os
-from dotenv import load_dotenv
 from pymongo import MongoClient
 from air_quality.database.forecasts import Forecast
-from system_tests.utils.cams_utilities import delete_database_data
 
 
 def format_datetime_as_string(date_and_time: datetime, string_format: str) -> str:
@@ -36,11 +34,8 @@ def get_expected_valid_times_list(
     return formatted_expected_valid_time_list
 
 
-def get_list_of_keys(response_json, key_to_add_to_list: str) -> list:
-    list_of_keys = []
-    for forecast in response_json:
-        list_of_keys.append(forecast[key_to_add_to_list])
-    return list_of_keys
+def get_list_of_key_values(response_json, key: str) -> list:
+    return [forecast[key] for forecast in response_json]
 
 
 def seed_api_test_data(collection_name: str, test_data_list: list[Forecast]):
@@ -49,11 +44,3 @@ def seed_api_test_data(collection_name: str, test_data_list: list[Forecast]):
     client = MongoClient(uri)
     collection = client[db_name][collection_name]
     collection.insert_many(test_data_list)
-
-
-def setup_purge_database_and_seed_with_test_data(
-    env_file_path: str, database_name: str, test_data: list
-):
-    load_dotenv(env_file_path)
-    delete_database_data(database_name)
-    seed_api_test_data(database_name, test_data)
