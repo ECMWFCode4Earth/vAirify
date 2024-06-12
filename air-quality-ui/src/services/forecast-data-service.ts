@@ -13,9 +13,9 @@ export const getForecastData = async (
 ): Promise<ForecastResponseDto[]> => {
   const params: Record<string, string> = {
     location_type: locationType,
-    valid_date_from: dateFrom.toJSDate().toISOString(),
-    valid_date_to: dateTo.toJSDate().toISOString(),
-    forecast_base_time: baseTime.toJSDate().toISOString(),
+    valid_time_from: dateFrom.toJSDate().toISOString(),
+    valid_time_to: dateTo.toJSDate().toISOString(),
+    base_time: baseTime.toJSDate().toISOString(),
   }
   const url = new URL(`${API_URL}/air-pollutant/forecast`)
   Object.keys(params).forEach((key) =>

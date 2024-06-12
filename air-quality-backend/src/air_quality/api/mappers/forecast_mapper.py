@@ -1,4 +1,5 @@
 from datetime import UTC
+from typing import List
 
 from air_quality.api.types import ForecastDto
 from air_quality.database.forecasts import Forecast
@@ -7,7 +8,7 @@ from air_quality.database.forecasts import Forecast
 def database_to_api_result(measurement: Forecast) -> ForecastDto:
     return {
         "base_time": measurement["forecast_base_time"].astimezone(UTC),
-        "valid_date": measurement["forecast_valid_time"].astimezone(UTC),
+        "valid_time": measurement["forecast_valid_time"].astimezone(UTC),
         "location_type": measurement["location_type"],
         "location_name": measurement["name"],
         "overall_aqi_level": measurement["overall_aqi_level"],
@@ -19,5 +20,5 @@ def database_to_api_result(measurement: Forecast) -> ForecastDto:
     }
 
 
-def map_forecast(measurements_from_database: [Forecast]) -> [ForecastDto]:
+def map_forecast(measurements_from_database: List[Forecast]) -> List[ForecastDto]:
     return list(map(database_to_api_result, measurements_from_database))

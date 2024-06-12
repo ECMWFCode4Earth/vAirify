@@ -1,5 +1,7 @@
 from datetime import datetime
-from typing import TypedDict, NotRequired
+
+from typing_extensions import TypedDict
+from typing import NotRequired
 
 from air_quality.database.locations import AirQualityLocationType
 
@@ -11,7 +13,7 @@ class PollutantDataDto(TypedDict):
 
 class ForecastDto(TypedDict):
     base_time: datetime
-    valid_date: datetime
+    valid_time: datetime
     location_type: AirQualityLocationType
     location_name: str
     overall_aqi_level: float

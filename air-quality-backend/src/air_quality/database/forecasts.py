@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import TypedDict
+from typing import TypedDict, List
 
 from bson import ObjectId
 
@@ -54,19 +54,19 @@ def delete_data_before(forecast_valid_time: datetime):
 
 
 def get_forecast_data_from_database(
-    valid_date_from: datetime,
-    valid_date_to: datetime,
+    valid_time_from: datetime,
+    valid_time_to: datetime,
     location_type: str,
     forecast_base_time: datetime,
     location_name: str = None,
-) -> [Forecast]:
+) -> List[Forecast]:
     collection = get_collection("forecast_data")
     query = {
         "location_type": location_type,
         "forecast_base_time": forecast_base_time,
         "forecast_valid_time": {
-            "$gte": valid_date_from,
-            "$lte": valid_date_to,
+            "$gte": valid_time_from,
+            "$lte": valid_time_to,
         },
     }
     if location_name is not None:

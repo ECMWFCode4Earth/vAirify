@@ -8,7 +8,7 @@ export const mockForecastResponseDto = (
 ): ForecastResponseDto => {
   return {
     base_time: '2024-06-01T00:00:00',
-    valid_date: '2024-06-01T00:00:00',
+    valid_time: '2024-06-01T00:00:00',
     location_type: 'city',
     location_name: 'Bristol',
     overall_aqi_level: 5,
