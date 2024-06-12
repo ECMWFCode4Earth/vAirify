@@ -6,7 +6,7 @@ import xarray
 from air_quality.database.forecasts import Forecast
 from tests.util.mock_location import create_test_city
 
-default_steps = [24, 48]
+default_steps = [0, 24]
 default_latitudes = [-10, 0, 10]
 default_longitudes = [0, 10, 350]
 default_time = 1713744000
@@ -106,24 +106,24 @@ so2 = create_test_pollutant_data_with_defaults(
 
 t = create_test_pollutant_data_with_defaults(
     values=[
-        0.0000011,
-        None,
-        None,
-        None,
-        0.000001125,
-        None,
-        None,
-        None,
-        0.00000115,
-        0.0000012,
-        None,
-        None,
-        None,
-        0.000001625,
-        None,
-        None,
-        None,
-        0.00000125,
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100,
+        110,
+        120,
+        130,
+        140,
+        150,
+        160,
+        170,
+        180,
     ]
 )
 
@@ -177,24 +177,24 @@ pm10 = create_test_pollutant_data_with_defaults(
 
 sp = create_test_pollutant_data_with_defaults(
     values=[
-        0.0000013,  # time: +24, lat : -10, long : 0
-        None,
-        None,
-        None,
-        0.000001325,  # time: +24, lat : 0, long : 10
-        None,
-        None,
-        None,
-        0.00000135,  # time: +24, lat : 10, long : 350 -> lat : 10, long -10
-        0.0000012,  # time: +48, lat : -10, long : 0
-        None,
-        None,
-        None,
-        0.000001425,  # time: +48, lat : 0, long : 10
-        None,
-        None,
-        None,
-        0.00000145,  # time: +48, lat : 10, long : 350 -> lat : 10, long -10
+        0.1,  # time: +0, lat : -10, long : 0
+        0.2,  # time: +0, lat : -10, long : 10
+        0.3,  # time: +0, lat : -10, long : 350 -> lat : -10, long : -10
+        0.4,  # time: +0, lat : 0, long : 0
+        0.5,  # time: +0, lat : 0, long : 10
+        0.6,  # time: +0, lat : 0, long : 350 -> lat : 0, long : -10
+        0.7,  # time: +0, lat : 10, long : 0
+        0.8,  # time: +0, lat : 10, long : 10
+        0.9,  # time: +0, lat : 10, long : 350 -> lat : 10, long -10
+        1,  # time: +24, lat : -10, long : 0
+        1.1,
+        1.2,
+        1.3,
+        1.4,  # time: +24, lat : 0, long : 10
+        1.5,
+        1.6,
+        1.7,
+        1.8,  # time: +24, lat : 10, long : 350 -> lat : 10, long -10
     ]
 )
 

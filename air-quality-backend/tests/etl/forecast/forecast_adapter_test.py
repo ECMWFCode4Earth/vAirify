@@ -32,14 +32,14 @@ from tests.util.mock_forecast_data import (
         (
             "forecast_valid_time",
             [
+                datetime(2024, 4, 22, 0, 0, tzinfo=timezone.utc),
                 datetime(2024, 4, 23, 0, 0, tzinfo=timezone.utc),
-                datetime(2024, 4, 24, 0, 0, tzinfo=timezone.utc),
+                datetime(2024, 4, 22, 0, 0, tzinfo=timezone.utc),
                 datetime(2024, 4, 23, 0, 0, tzinfo=timezone.utc),
-                datetime(2024, 4, 24, 0, 0, tzinfo=timezone.utc),
             ],
         ),
         ("forecast_base_time", datetime.fromtimestamp(default_time, timezone.utc)),
-        ("forecast_range", [24, 48, 24, 48]),
+        ("forecast_range", [0, 24, 0, 24]),
         ("source", "cams-production"),
     ],
 )

@@ -2,12 +2,13 @@ from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 
 from air_quality.aqi.pollutant_type import PollutantType
-from air_quality.database.in_situ import InSituMeasurement
+from air_quality.etl.forecast.forecast_data import ForecastDataType
 from air_quality.etl.in_situ.openaq_adapter import (
     transform_city,
     enrich_with_forecast_data,
 )
 from .mock_openaq_data import create_measurement
+from ...util.mock_measurement import create_mock_measurement_document
 
 city = {"name": "Dublin", "latitude": 53.350140, "longitude": -6.266155, "type": "city"}
 
@@ -220,78 +221,64 @@ def test__transform_city__all_five_pollutants():
 def test__enrich_with_forecast_data__forecast_data_called_correctly_and_enriched(
     pollutants_patch,
 ):
-    date1 = datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc)
-    date2 = datetime(2024, 4, 25, 0, 0, tzinfo=timezone.utc)
-
-    city_data: list[InSituMeasurement] = [
-        {
-            "location": {"type": "point", "coordinates": [11, 22]},
-            "measurement_date": date1,
-            "metadata": {},
-        },
-        {
-            "location": {"type": "point", "coordinates": [33, 44]},
-            "measurement_date": date2,
-            "metadata": {},
-        },
-    ]
+    in_situ_measurement = create_mock_measurement_document({})
 
     mock_forecast_data = Mock()
-    mock_forecast_data.get_surface_pressure.side_effect = lambda *x: {
-        (11, 22, date1): 35,
-        (33, 44, date2): 75,
-    }[x]
-    mock_forecast_data.get_temperature.side_effect = lambda *x: {
-        (11, 22, date1): 135,
-        (33, 44, date2): 175,
-    }[x]
+    mock_forecast_data.enrich_in_situ_measurements.return_value = [
+        (
+            in_situ_measurement,
+            {ForecastDataType.SURFACE_PRESSURE: 35, ForecastDataType.TEMPERATURE: 135},
+        )
+    ]
 
     pollutants_patch.return_value = []
 
-    result = enrich_with_forecast_data(city_data, mock_forecast_data)
+    result = enrich_with_forecast_data([in_situ_measurement], mock_forecast_data)
 
     assert result[0]["metadata"]["estimated_surface_pressure_pa"] == 35
-    assert result[1]["metadata"]["estimated_surface_pressure_pa"] == 75
-
     assert result[0]["metadata"]["estimated_temperature_k"] == 135
-    assert result[1]["metadata"]["estimated_temperature_k"] == 175
 
 
 @patch("air_quality.etl.in_situ.openaq_adapter.pollutants_with_molecular_weight")
 def test__enrich_with_forecast_data__non_present_pollutant_ignored(pollutants_patch):
-    city_data: InSituMeasurement = {
-        "location": {"type": "point", "coordinates": (11, 22)},
-        "measurement_date": datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc),
-        "metadata": {},
-        "no2": {},
-    }
+    in_situ_measurement = create_mock_measurement_document({})
 
     mock_forecast_data = Mock()
+    mock_forecast_data.enrich_in_situ_measurements.return_value = [
+        (
+            in_situ_measurement,
+            {ForecastDataType.SURFACE_PRESSURE: 101, ForecastDataType.TEMPERATURE: 102},
+        )
+    ]
     pollutants_patch.return_value = [PollutantType.OZONE]
 
-    result = enrich_with_forecast_data([city_data], mock_forecast_data)
+    result = enrich_with_forecast_data([in_situ_measurement], mock_forecast_data)
     assert PollutantType.OZONE.value not in result[0]
 
 
 @patch("air_quality.etl.in_situ.openaq_adapter.pollutants_with_molecular_weight")
 def test__enrich_with_forecast_data__pollutant_without_ppm_ignored(pollutants_patch):
-
-    city_data: InSituMeasurement = {
-        "location": {"type": "point", "coordinates": (11, 22)},
-        "measurement_date": datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc),
-        "metadata": {},
-        "o3": {
-            "value": 4,
-            "unit": "test1",
-            "original_value": 7,
-            "original_unit": "test2",
-        },
-    }
+    in_situ_measurement = create_mock_measurement_document(
+        {
+            "o3": {
+                "value": 4,
+                "unit": "test1",
+                "original_value": 7,
+                "original_unit": "test2",
+            }
+        }
+    )
 
     mock_forecast_data = Mock()
+    mock_forecast_data.enrich_in_situ_measurements.return_value = [
+        (
+            in_situ_measurement,
+            {ForecastDataType.SURFACE_PRESSURE: 101, ForecastDataType.TEMPERATURE: 102},
+        )
+    ]
     pollutants_patch.return_value = [PollutantType.OZONE]
 
-    result = enrich_with_forecast_data([city_data], mock_forecast_data)
+    result = enrich_with_forecast_data([in_situ_measurement], mock_forecast_data)
     assert result[0]["o3"]["value"] == 4
     assert result[0]["o3"]["unit"] == "test1"
     assert result[0]["o3"]["original_value"] == 7
@@ -303,25 +290,28 @@ def test__enrich_with_forecast_data__pollutant_without_ppm_ignored(pollutants_pa
 def test__enrich_with_forecast_data__pollutant_with_ppm_converted(
     converter_patch, pollutants_patch
 ):
-    city_data: InSituMeasurement = {
-        "location": {"type": "point", "coordinates": (11, 22)},
-        "measurement_date": datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc),
-        "metadata": {},
-        "o3": {
-            "value": 4,
-            "unit": "test1",
-            "original_value": 5,
-            "original_unit": "ppm",
-        },
-    }
+    in_situ_measurement = create_mock_measurement_document(
+        {
+            "o3": {
+                "value": 4,
+                "unit": "test1",
+                "original_value": 5,
+                "original_unit": "ppm",
+            }
+        }
+    )
 
     mock_forecast_data = Mock()
-    mock_forecast_data.get_surface_pressure.return_value = 101
-    mock_forecast_data.get_temperature.return_value = 102
+    mock_forecast_data.enrich_in_situ_measurements.return_value = [
+        (
+            in_situ_measurement,
+            {ForecastDataType.SURFACE_PRESSURE: 101, ForecastDataType.TEMPERATURE: 102},
+        )
+    ]
     pollutants_patch.return_value = [PollutantType.OZONE]
     converter_patch.return_value = 201
 
-    result = enrich_with_forecast_data([city_data], mock_forecast_data)
+    result = enrich_with_forecast_data([in_situ_measurement], mock_forecast_data)
     assert result[0]["o3"]["value"] == 201
     assert result[0]["o3"]["unit"] == "µg/m³"
     assert result[0]["o3"]["original_value"] == 5
