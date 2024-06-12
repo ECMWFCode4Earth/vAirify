@@ -35,7 +35,8 @@ jobs:
             echo ${{ secrets.GITHUB_TOKEN}} | sudo docker login --username ${{ github.actor }} --password-stdin  ghcr.io
             sudo docker compose pull
             sudo docker compose up --force-recreate --build -d
-            sudo docker image prune -f
+            sudo docker container prune -f
+            sudo docker image prune -a -f
             exit"
       - name: clean up
         run: |
