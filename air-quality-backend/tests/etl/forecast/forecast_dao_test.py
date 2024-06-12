@@ -20,7 +20,8 @@ def mock_open_dataset():
 
 def test__get_single_level_request_body():
     request = get_single_level_request_body(
-        CamsRequestDetails(datetime(2024, 4, 29, 0)))
+        CamsRequestDetails(datetime(2024, 4, 29, 0))
+    )
     assert request == {
         "date": "2024-04-29/2024-04-29",
         "type": "forecast",
@@ -78,8 +79,7 @@ def test__get_single_level_request_body():
 
 
 def test__get_multi_level_request_body():
-    request = get_multi_level_request_body(
-        CamsRequestDetails(datetime(2024, 4, 29, 0)))
+    request = get_multi_level_request_body(CamsRequestDetails(datetime(2024, 4, 29, 0)))
     assert request == {
         "date": "2024-04-29/2024-04-29",
         "type": "forecast",

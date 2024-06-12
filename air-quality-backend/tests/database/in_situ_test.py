@@ -172,11 +172,11 @@ def test__get_averaged(mock_collection):
                 {
                     "name": "city 1",
                     "measurement_date": datetime(2024, 6, 5, 1, 30),
-                    "o3": 1.0,
-                    "no2": 1.0,
-                    "so2": 1.0,
-                    "pm10": 1.0,
-                    "pm2_5": 1.0,
+                    "o3": {"value": 1.0},
+                    "no2": {"value": 1.0},
+                    "so2": {"value": 1.0},
+                    "pm10": {"value": 1.0},
+                    "pm2_5": {"value": 1.0},
                 }
             ),
             # Only one pollutant measurement
@@ -184,7 +184,7 @@ def test__get_averaged(mock_collection):
                 {
                     "name": "city 1",
                     "measurement_date": datetime(2024, 6, 5, 4, 30),
-                    "o3": 3.0,
+                    "o3": {"value": 3.0},
                 }
             ),
             # Only one pollutant measurement
@@ -192,7 +192,7 @@ def test__get_averaged(mock_collection):
                 {
                     "name": "city 1",
                     "measurement_date": datetime(2024, 6, 5, 3, 0),
-                    "o3": 5.0,
+                    "o3": {"value": 5.0},
                 }
             ),
             # Before date range
@@ -200,7 +200,7 @@ def test__get_averaged(mock_collection):
                 {
                     "name": "city 1",
                     "measurement_date": datetime(2024, 6, 5, 1, 29),
-                    "o3": 100.0,
+                    "o3": {"value": 100.0},
                 }
             ),
             # After date range
@@ -208,7 +208,7 @@ def test__get_averaged(mock_collection):
                 {
                     "name": "city 1",
                     "measurement_date": datetime(2024, 6, 5, 4, 31),
-                    "o3": 100.0,
+                    "o3": {"value": 100.0},
                 }
             ),
             # Second city, pollutants missing
@@ -216,8 +216,8 @@ def test__get_averaged(mock_collection):
                 {
                     "name": "city 2",
                     "measurement_date": datetime(2024, 6, 5, 1, 30),
-                    "pm10": 5.0,
-                    "pm2_5": 5.0,
+                    "pm10": {"value": 5.0},
+                    "pm2_5": {"value": 5.0},
                 }
             ),
         ]

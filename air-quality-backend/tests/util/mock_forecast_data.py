@@ -204,7 +204,7 @@ def get_coordinates():
         coords={
             "step": default_steps,
             "time": default_time,
-            "valid_time": ("step", default_valid_time)
+            "valid_time": ("step", default_valid_time),
         }
     )
 
