@@ -164,28 +164,28 @@ seed_api_test_data(
     [
         (
             {
-                "forecast_base_time": format_datetime_as_string(
+                "base_time": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
             },
             ["Test City 1", "Test City 2"],
         ),
         (
             {
-                "forecast_base_time": format_datetime_as_string(
+                "base_time": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
                 "location_name": "Test City 1",
             },
@@ -193,14 +193,14 @@ seed_api_test_data(
         ),
         (
             {
-                "forecast_base_time": format_datetime_as_string(
+                "base_time": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 11, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
             },
             ["Test City 3"],
@@ -228,56 +228,56 @@ def test__different_base_times__assert_correct_results_returned(
     [
         (
             {
-                "forecast_base_time": format_datetime_as_string(
+                "base_time": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 9, 12, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
             },
             0,
         ),
         (
             {
-                "forecast_base_time": format_datetime_as_string(
+                "base_time": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
             },
             2,
         ),
         (
             {
-                "forecast_base_time": format_datetime_as_string(
+                "base_time": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 10, 12, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
             },
             0,
         ),
         (
             {
-                "forecast_base_time": format_datetime_as_string(
+                "base_time": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 9, 12, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
                 "location_name": "Test City 1",
             },
@@ -285,14 +285,14 @@ def test__different_base_times__assert_correct_results_returned(
         ),
         (
             {
-                "forecast_base_time": format_datetime_as_string(
+                "base_time": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
                 "location_name": "Test City 1",
             },
@@ -300,14 +300,14 @@ def test__different_base_times__assert_correct_results_returned(
         ),
         (
             {
-                "forecast_base_time": format_datetime_as_string(
+                "base_time": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 10, 12, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
                 "location_name": "Test City 1",
             },
@@ -330,42 +330,42 @@ def test__base_time_bva__assert_number_of_results(parameters: dict, expected: in
     [
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_to": valid_time_to_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
             },
             ["Test City 1", "Test City 2"],
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 11, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_to": valid_time_to_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
             },
             ["Test City 2"],
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_to": valid_time_to_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
                 "location_name": "Test City 1",
             },
@@ -373,14 +373,14 @@ def test__base_time_bva__assert_number_of_results(parameters: dict, expected: in
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 11, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_to": valid_time_to_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
                 "location_name": "Test City 2",
             },
@@ -408,56 +408,56 @@ def test__different_valid_time_from_times__assert_correct_results(
     [
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_to": valid_time_to_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
             },
             2,
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 10, 3, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_to": valid_time_to_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
             },
             2,
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 10, 6, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_to": valid_time_to_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
             },
             1,
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_to": valid_time_to_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
                 "location_name": "Test City 1",
             },
@@ -465,14 +465,14 @@ def test__different_valid_time_from_times__assert_correct_results(
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 10, 3, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_to": valid_time_to_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
                 "location_name": "Test City 1",
             },
@@ -480,14 +480,14 @@ def test__different_valid_time_from_times__assert_correct_results(
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 10, 6, 0, 0, tzinfo=datetime.timezone.utc
                     ),
                     "%Y-%m-%dT%H:%M:%S+00:00",
                 ),
-                "valid_date_to": valid_time_to_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
                 "location_name": "Test City 1",
             },
@@ -512,9 +512,9 @@ def test__valid_time_from_bva__assert_number_of_results(
     [
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 11, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
@@ -526,9 +526,9 @@ def test__valid_time_from_bva__assert_number_of_results(
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 12, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
@@ -540,9 +540,9 @@ def test__valid_time_from_bva__assert_number_of_results(
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 11, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
@@ -555,9 +555,9 @@ def test__valid_time_from_bva__assert_number_of_results(
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 12, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
@@ -590,9 +590,9 @@ def test__different_valid_time_to_times__assert_correct_results(
     [
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 11, 12, 0, 0, tzinfo=datetime.timezone.utc
                     ),
@@ -604,9 +604,9 @@ def test__different_valid_time_to_times__assert_correct_results(
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 12, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
@@ -618,9 +618,9 @@ def test__different_valid_time_to_times__assert_correct_results(
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 12, 12, 0, 0, tzinfo=datetime.timezone.utc
                     ),
@@ -632,9 +632,9 @@ def test__different_valid_time_to_times__assert_correct_results(
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 11, 12, 0, 0, tzinfo=datetime.timezone.utc
                     ),
@@ -647,9 +647,9 @@ def test__different_valid_time_to_times__assert_correct_results(
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 12, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
@@ -662,9 +662,9 @@ def test__different_valid_time_to_times__assert_correct_results(
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": format_datetime_as_string(
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": format_datetime_as_string(
                     datetime.datetime(
                         2024, 6, 12, 0, 0, 0, tzinfo=datetime.timezone.utc
                     ),
@@ -691,15 +691,15 @@ def test__valid_time_to_bva__assert_number_of_results(parameters: dict, expected
     "parameters",
     (
         {
-            "forecast_base_time": base_time_string,
-            "valid_date_from": valid_time_from_string,
-            "valid_date_to": valid_time_to_string,
+            "base_time": base_time_string,
+            "valid_time_from": valid_time_from_string,
+            "valid_time_to": valid_time_to_string,
             "location_type": location_type,
         },
         {
-            "forecast_base_time": base_time_string,
-            "valid_date_from": valid_time_from_string,
-            "valid_date_to": valid_time_to_string,
+            "base_time": base_time_string,
+            "valid_time_from": valid_time_from_string,
+            "valid_time_to": valid_time_to_string,
             "location_type": location_type,
             "location_name": "Test City 1",
         },
@@ -720,9 +720,9 @@ def test__results_containing_relevant_base_time(parameters: dict):
     [
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
             },
             [
@@ -732,9 +732,9 @@ def test__results_containing_relevant_base_time(parameters: dict):
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
                 "location_name": "Test City 2",
             },

@@ -30,9 +30,9 @@ validation_error_status_code = 422
     [
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
                 "location_name": location_name,
             },
@@ -40,17 +40,17 @@ validation_error_status_code = 422
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
             },
             success_status_code,
         ),
         (
             {
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
                 "location_name": location_name,
             },
@@ -58,33 +58,16 @@ validation_error_status_code = 422
         ),
         (
             {
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
             },
             validation_error_status_code,
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_to": valid_time_to_string,
-                "location_type": location_type,
-                "location_name": location_name,
-            },
-            validation_error_status_code,
-        ),
-        (
-            {
-                "forecast_base_time": base_time_string,
-                "valid_date_to": valid_time_to_string,
-                "location_type": location_type,
-            },
-            validation_error_status_code,
-        ),
-        (
-            {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
+                "base_time": base_time_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
                 "location_name": location_name,
             },
@@ -92,26 +75,43 @@ validation_error_status_code = 422
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
+                "base_time": base_time_string,
+                "valid_time_to": valid_time_to_string,
                 "location_type": location_type,
             },
             validation_error_status_code,
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "location_type": location_type,
                 "location_name": location_name,
             },
             validation_error_status_code,
         ),
         (
             {
-                "forecast_base_time": base_time_string,
-                "valid_date_from": valid_time_from_string,
-                "valid_date_to": valid_time_to_string,
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "location_type": location_type,
+            },
+            validation_error_status_code,
+        ),
+        (
+            {
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
+                "location_name": location_name,
+            },
+            validation_error_status_code,
+        ),
+        (
+            {
+                "base_time": base_time_string,
+                "valid_time_from": valid_time_from_string,
+                "valid_time_to": valid_time_to_string,
             },
             validation_error_status_code,
         ),
