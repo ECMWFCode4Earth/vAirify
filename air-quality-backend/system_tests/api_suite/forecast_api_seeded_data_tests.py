@@ -10,6 +10,7 @@ from system_tests.utils.api_utilities import (
     seed_api_test_data,
 )
 from system_tests.utils.cams_utilities import delete_database_data
+from system_tests.utils.routes import Routes
 
 # Test Data
 test_city_1_input_data: Forecast = {
@@ -134,7 +135,7 @@ test_city_2_expected_response_data: dict = {
 }
 
 # API GET request
-base_url = "http://127.0.0.1:8000/air-pollutant/forecast"
+base_url = Routes.forecast_api_url
 headers = {"accept": "application/json"}
 location_type = "city"
 

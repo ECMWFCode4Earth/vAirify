@@ -6,8 +6,9 @@ from system_tests.utils.api_utilities import (
     format_datetime_as_string,
 )
 from system_tests.utils.cities_data import all_cities
+from system_tests.utils.routes import Routes
 
-base_url = "http://127.0.0.1:8000/air-pollutant/forecast"
+base_url = Routes.forecast_api_url
 headers = {"accept": "application/json"}
 location_type = "city"
 location_name = random.choice(all_cities)
