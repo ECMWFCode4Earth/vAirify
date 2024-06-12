@@ -10,6 +10,8 @@ jobs:
     environment: dev
 
     steps:
+      - name: checkout
+        uses: actions/checkout@v4
       - name: install ssh keys
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
