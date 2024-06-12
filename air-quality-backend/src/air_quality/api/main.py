@@ -1,33 +1,23 @@
-from datetime import datetime
-from typing import Optional
+from dotenv import load_dotenv
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from logging import config
+from air_quality.api import forecast_controller, measurements_controller
 
-from fastapi import FastAPI, HTTPException
+origins = [
+    "http://localhost:5173",
+]
 
-from air_quality.api.mappers.forecast_mapper import map_forecast
-from air_quality.database.forecasts import get_forecast_data_from_database
+load_dotenv()
+config.fileConfig("./logging.ini", disable_existing_loggers=False)
 
 app = FastAPI()
-
-location_types = ["city"]
-
-
-@app.get("/air-pollutant-forecast")
-async def get_forecast_data(
-    location_type,
-    valid_date_from: datetime,
-    valid_date_to: datetime,
-    forecast_base_time: datetime,
-    location_name: Optional[str] = None,
-):
-    if location_type not in location_types:
-        raise HTTPException(400, "Incorrect location type")
-
-    return map_forecast(
-        get_forecast_data_from_database(
-            valid_date_from,
-            valid_date_to,
-            location_type,
-            forecast_base_time,
-            location_name,
-        )
-    )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+app.include_router(forecast_controller.router)
+app.include_router(measurements_controller.router)

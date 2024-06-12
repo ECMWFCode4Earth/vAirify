@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:mongodb="http://www.liquibase.org/xml/ns/mongodb"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+         http://www.liquibase.org/xml/ns/mongodb
+         http://www.liquibase.org/xml/ns/mongodb/liquibase-mongodb-latest.xsd">
+
+  <changeSet id="update_in_situ_unq_idx" author="amehta">
+    <mongodb:dropIndex collectionName="in_situ_data">
+        <mongodb:keys>
+            { measurement_date: 1, name: 1, location_name: 1 }
+        </mongodb:keys>
+    </mongodb:dropIndex>
+    <mongodb:createIndex collectionName="in_situ_data">
+      <mongodb:keys>
+        { measurement_date: 1, location_type: 1, name: 1, api_source: 1, location_name: 1 }
+      </mongodb:keys>
+      <mongodb:options>
+        {unique: true, name: "uniq_in_situ_idx"}
+      </mongodb:options>
+    </mongodb:createIndex>
+  </changeSet>
+</databaseChangeLog>

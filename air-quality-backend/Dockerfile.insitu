@@ -1,0 +1,18 @@
+FROM continuumio/miniconda3
+
+WORKDIR /usr/src/app
+COPY conda/environment.yml .
+RUN conda env create -f environment.yml
+
+SHELL ["conda", "run", "-n", "air-quality-backend", "/bin/bash", "-c"]
+
+COPY pyproject.toml .
+RUN poetry install
+
+COPY src/ ./src
+COPY scripts/run_in_situ_etl.py ./scripts/run_in_situ_etl.py
+COPY README.md logging.ini ./
+
+RUN poetry install 
+
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "air-quality-backend", "python", "scripts/run_in_situ_etl.py"]

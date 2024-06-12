@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:mongodb="http://www.liquibase.org/xml/ns/mongodb"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+         http://www.liquibase.org/xml/ns/mongodb
+         http://www.liquibase.org/xml/ns/mongodb/liquibase-mongodb-latest.xsd">
+
+  <changeSet id="locations_schema_validation" author="amehta">
+    <mongodb:runCommand>
+        <mongodb:command>
+          {
+            collMod: "locations",
+            validator: {
+              $jsonSchema: {
+                 bsonType: "object",
+                 title: "Location Object Validation",
+                 required: [ "name", "latitude", "longitude", "type" ],
+                 properties: {
+                    name: {
+                       bsonType: "string",
+                       description: "'name' must be a string and is required"
+                    },
+                    latitude: {
+                       bsonType: "double",
+                       minimum: -90,
+                       maximum: 90,
+                       description: "'latitude' must be a double between -90 and 90 and is required"
+                    },
+                    longitude: {
+                       bsonType: "double",
+                       minimum: -180,
+                       maximum: 180,
+                       description: "'longitude' must be a double between -180 and 180 and is required"
+                    },
+                    type: {
+                       bsonType: "string",
+                       description: "'type' must be a string and is required"
+                    },
+                    country: {
+                       bsonType: "string",
+                       description: "'country' must be a string if it is there"
+                    }
+                 }
+              }
+            },
+          }
+        </mongodb:command>
+    </mongodb:runCommand>
+  </changeSet>
+</databaseChangeLog>
