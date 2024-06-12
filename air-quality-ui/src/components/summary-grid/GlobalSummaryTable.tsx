@@ -2,9 +2,9 @@ import { ColDef, ColGroupDef, GridOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-import './GlobalSummaryTable.module.css'
 import { useMemo } from 'react'
 
+import classes from './GlobalSummaryTable.module.css'
 import { LocationCellRenderer } from './LocationCellRenderer'
 import {
   PollutantType,
@@ -125,8 +125,7 @@ const GlobalSummaryTable = (
 
   return (
     <div
-      className="ag-theme-quartz"
-      style={{ height: 500 }}
+      className={`ag-theme-quartz ${classes['summary-grid-wrapper']} `}
       data-testid="summary-grid"
     >
       <AgGridReact
