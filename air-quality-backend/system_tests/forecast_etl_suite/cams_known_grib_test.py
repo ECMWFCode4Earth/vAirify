@@ -19,7 +19,7 @@ test_cases = [
             "source": "cams-production",
         },
         {
-            "name": "Vancouvr",
+            "name": "Vancouver",
             "forecast_valid_time": datetime(2024, 6, 4, 3, 0, 0),
             "forecast_base_time": datetime(2024, 6, 4, 0, 0, 0),
             "no2_value": 10.115771485462055,
