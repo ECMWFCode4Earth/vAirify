@@ -12,7 +12,7 @@ from tests.util.mock_forecast_data import (
     create_test_pollutant_data,
     single_level_data_set,
     multi_level_data_set,
-    default_time
+    default_time,
 )
 
 

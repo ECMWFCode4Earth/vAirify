@@ -18,12 +18,13 @@ end_date = datetime.datetime(2024, 3, 29, 9, 18)
         (12, 12),
         (72, 32),
         (0, 8),
-    ]
+    ],
 )
 @patch("air_quality.etl.in_situ.openaq_orchestrator.fetch_in_situ_measurements")
 @patch("air_quality.etl.in_situ.openaq_orchestrator.fetch_forecast_data")
 def test__retrieve_openaq_in_situ_data__external_apis_called_correctly(
-        fetch_forecast_patch, fetch_in_situ_patch, period_hours, no_of_forecasts):
+    fetch_forecast_patch, fetch_in_situ_patch, period_hours, no_of_forecasts
+):
 
     start_date = end_date - datetime.timedelta(hours=period_hours)
 
@@ -40,10 +41,11 @@ def test__retrieve_openaq_in_situ_data__external_apis_called_correctly(
 @patch("air_quality.etl.in_situ.openaq_orchestrator.fetch_forecast_data")
 @patch("air_quality.etl.in_situ.openaq_orchestrator.fetch_in_situ_measurements")
 def test__retrieve_openaq_in_situ_data__transform_calls_made_per_city(
-        fetch_in_situ_patch,
-        fetch_forecast_patch,
-        transform_city_patch,
-        enrich_with_forecast_data_patch):
+    fetch_in_situ_patch,
+    fetch_forecast_patch,
+    transform_city_patch,
+    enrich_with_forecast_data_patch,
+):
 
     extracted_forecast = "dummy_forecasts_var"
     dublin_data = "dummy_dublin_data"
@@ -60,12 +62,12 @@ def test__retrieve_openaq_in_situ_data__transform_calls_made_per_city(
 
     transform_city_patch.side_effect = lambda x: {
         dublin_data: transformed_dublin_data,
-        london_data: transformed_london_data
+        london_data: transformed_london_data,
     }[x]
 
     enrich_with_forecast_data_patch.side_effect = lambda *x: {
         (transformed_dublin_data, extracted_forecast): [enriched_dublin_data],
-        (transformed_london_data, extracted_forecast): [enriched_london_data]
+        (transformed_london_data, extracted_forecast): [enriched_london_data],
     }[x]
 
     expected = [enriched_dublin_data, enriched_london_data]
@@ -77,5 +79,6 @@ def test__retrieve_openaq_in_situ_data__transform_calls_made_per_city(
     enrich_with_forecast_data_patch.assert_has_calls(
         [
             call(transformed_dublin_data, extracted_forecast),
-            call(transformed_london_data, extracted_forecast)
-        ])
+            call(transformed_london_data, extracted_forecast),
+        ]
+    )

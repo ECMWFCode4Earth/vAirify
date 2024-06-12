@@ -23,7 +23,5 @@ def test__run_in_situ_etl(mock_locations, mock_fetch, mock_insert):
         main()
 
         mock_locations.assert_called_with(AirQualityLocationType.CITY)
-        mock_fetch.assert_called_with(
-            cities, datetime(2024, 6, 5), 24
-        )
+        mock_fetch.assert_called_with(cities, datetime(2024, 6, 5), 24)
         mock_insert.assert_called_with(in_situ_data)

@@ -2,10 +2,10 @@ from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 
 from air_quality.aqi.pollutant_type import PollutantType
-from air_quality.etl.in_situ.InSituMeasurement import InSituMeasurement
+from air_quality.database.in_situ import InSituMeasurement
 from air_quality.etl.in_situ.openaq_adapter import (
     transform_city,
-    enrich_with_forecast_data
+    enrich_with_forecast_data,
 )
 from .mock_openaq_data import create_measurement
 
@@ -16,27 +16,26 @@ def test__transform_city__multiple_sites_in_city():
     result = transform_city(
         {
             "city": city,
-            "measurements":
-                [
-                    create_measurement(
-                        (1, "Dublin 1", 0.0, 0.0),
-                        "2024-04-21T00:00:00+00:00",
-                        "so2",
-                        14.0,
-                    ),
-                    create_measurement(
-                        (1, "Dublin 2", 1.0, 1.0),
-                        "2024-04-21T00:00:00+00:00",
-                        "so2",
-                        11.0,
-                    ),
-                    create_measurement(
-                        (1, "Dublin 2", 1.0, 1.0),
-                        "2024-04-21T03:00:00+00:00",
-                        "so2",
-                        12.0,
-                    ),
-                ],
+            "measurements": [
+                create_measurement(
+                    (1, "Dublin 1", 0.0, 0.0),
+                    "2024-04-21T00:00:00+00:00",
+                    "so2",
+                    14.0,
+                ),
+                create_measurement(
+                    (1, "Dublin 2", 1.0, 1.0),
+                    "2024-04-21T00:00:00+00:00",
+                    "so2",
+                    11.0,
+                ),
+                create_measurement(
+                    (1, "Dublin 2", 1.0, 1.0),
+                    "2024-04-21T03:00:00+00:00",
+                    "so2",
+                    12.0,
+                ),
+            ],
         }
     )
     assert result == [
@@ -58,8 +57,8 @@ def test__transform_city__multiple_sites_in_city():
                 "value": 14.0,
                 "unit": "µg/m³",
                 "original_value": 14.0,
-                "original_unit": "µg/m³"
-            }
+                "original_unit": "µg/m³",
+            },
         },
         {
             "api_source": "OpenAQ",
@@ -79,8 +78,8 @@ def test__transform_city__multiple_sites_in_city():
                 "value": 11.0,
                 "unit": "µg/m³",
                 "original_value": 11.0,
-                "original_unit": "µg/m³"
-            }
+                "original_unit": "µg/m³",
+            },
         },
         {
             "api_source": "OpenAQ",
@@ -100,8 +99,8 @@ def test__transform_city__multiple_sites_in_city():
                 "value": 12.0,
                 "unit": "µg/m³",
                 "original_value": 12.0,
-                "original_unit": "µg/m³"
-            }
+                "original_unit": "µg/m³",
+            },
         },
     ]
 
@@ -109,10 +108,7 @@ def test__transform_city__multiple_sites_in_city():
 def test__transform_city__invalid_unit_filtered_out():
 
     measurement = create_measurement(
-        (1, "Dublin 1", 0.0, 0.0),
-        "2024-04-21T00:00:00+00:00",
-        "so2",
-        14.0
+        (1, "Dublin 1", 0.0, 0.0), "2024-04-21T00:00:00+00:00", "so2", 14.0
     )
     measurement["unit"] = "invalid"
 
@@ -137,39 +133,38 @@ def test__transform_city__all_five_pollutants():
     result = transform_city(
         {
             "city": city,
-            "measurements":
-                [
-                    create_measurement(
-                        (1, "Dublin 1", 53.34187500024688, -6.2140750004382745),
-                        "2024-04-21T00:00:00+00:00",
-                        "no2",
-                        1.0,
-                    ),
-                    create_measurement(
-                        (1, "Dublin 1", 53.34187500024688, -6.2140750004382745),
-                        "2024-04-21T00:00:00+00:00",
-                        "o3",
-                        2.0,
-                    ),
-                    create_measurement(
-                        (1, "Dublin 1", 53.34187500024688, -6.2140750004382745),
-                        "2024-04-21T00:00:00+00:00",
-                        "so2",
-                        3.0,
-                    ),
-                    create_measurement(
-                        (1, "Dublin 1", 53.34187500024688, -6.2140750004382745),
-                        "2024-04-21T00:00:00+00:00",
-                        "pm10",
-                        4.0,
-                    ),
-                    create_measurement(
-                        (1, "Dublin 1", 53.34187500024688, -6.2140750004382745),
-                        "2024-04-21T00:00:00+00:00",
-                        "pm25",
-                        5.0,
-                    )
-                ]
+            "measurements": [
+                create_measurement(
+                    (1, "Dublin 1", 53.34187500024688, -6.2140750004382745),
+                    "2024-04-21T00:00:00+00:00",
+                    "no2",
+                    1.0,
+                ),
+                create_measurement(
+                    (1, "Dublin 1", 53.34187500024688, -6.2140750004382745),
+                    "2024-04-21T00:00:00+00:00",
+                    "o3",
+                    2.0,
+                ),
+                create_measurement(
+                    (1, "Dublin 1", 53.34187500024688, -6.2140750004382745),
+                    "2024-04-21T00:00:00+00:00",
+                    "so2",
+                    3.0,
+                ),
+                create_measurement(
+                    (1, "Dublin 1", 53.34187500024688, -6.2140750004382745),
+                    "2024-04-21T00:00:00+00:00",
+                    "pm10",
+                    4.0,
+                ),
+                create_measurement(
+                    (1, "Dublin 1", 53.34187500024688, -6.2140750004382745),
+                    "2024-04-21T00:00:00+00:00",
+                    "pm25",
+                    5.0,
+                ),
+            ],
         }
     )
     assert result == [
@@ -191,31 +186,31 @@ def test__transform_city__all_five_pollutants():
                 "value": 1.0,
                 "unit": "µg/m³",
                 "original_value": 1.0,
-                "original_unit": "µg/m³"
+                "original_unit": "µg/m³",
             },
             "o3": {
                 "value": 2.0,
                 "unit": "µg/m³",
                 "original_value": 2.0,
-                "original_unit": "µg/m³"
+                "original_unit": "µg/m³",
             },
             "pm10": {
                 "value": 4.0,
                 "unit": "µg/m³",
                 "original_value": 4.0,
-                "original_unit": "µg/m³"
+                "original_unit": "µg/m³",
             },
             "pm2_5": {
                 "value": 5.0,
                 "unit": "µg/m³",
                 "original_value": 5.0,
-                "original_unit": "µg/m³"
+                "original_unit": "µg/m³",
             },
             "so2": {
                 "value": 3.0,
                 "unit": "µg/m³",
                 "original_value": 3.0,
-                "original_unit": "µg/m³"
+                "original_unit": "µg/m³",
             },
         }
     ]
@@ -223,7 +218,8 @@ def test__transform_city__all_five_pollutants():
 
 @patch("air_quality.etl.in_situ.openaq_adapter.pollutants_with_molecular_weight")
 def test__enrich_with_forecast_data__forecast_data_called_correctly_and_enriched(
-        pollutants_patch):
+    pollutants_patch,
+):
     date1 = datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc)
     date2 = datetime(2024, 4, 25, 0, 0, tzinfo=timezone.utc)
 
@@ -267,7 +263,7 @@ def test__enrich_with_forecast_data__non_present_pollutant_ignored(pollutants_pa
         "location": {"type": "point", "coordinates": (11, 22)},
         "measurement_date": datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc),
         "metadata": {},
-        "no2": {}
+        "no2": {},
     }
 
     mock_forecast_data = Mock()
@@ -288,8 +284,8 @@ def test__enrich_with_forecast_data__pollutant_without_ppm_ignored(pollutants_pa
             "value": 4,
             "unit": "test1",
             "original_value": 7,
-            "original_unit": "test2"
-        }
+            "original_unit": "test2",
+        },
     }
 
     mock_forecast_data = Mock()
@@ -305,8 +301,8 @@ def test__enrich_with_forecast_data__pollutant_without_ppm_ignored(pollutants_pa
 @patch("air_quality.etl.in_situ.openaq_adapter.pollutants_with_molecular_weight")
 @patch("air_quality.etl.in_situ.openaq_adapter.convert_ppm_to_mgm3")
 def test__enrich_with_forecast_data__pollutant_with_ppm_converted(
-        converter_patch,
-        pollutants_patch):
+    converter_patch, pollutants_patch
+):
     city_data: InSituMeasurement = {
         "location": {"type": "point", "coordinates": (11, 22)},
         "measurement_date": datetime(2024, 4, 21, 0, 0, tzinfo=timezone.utc),
@@ -315,8 +311,8 @@ def test__enrich_with_forecast_data__pollutant_with_ppm_converted(
             "value": 4,
             "unit": "test1",
             "original_value": 5,
-            "original_unit": "ppm"
-        }
+            "original_unit": "ppm",
+        },
     }
 
     mock_forecast_data = Mock()

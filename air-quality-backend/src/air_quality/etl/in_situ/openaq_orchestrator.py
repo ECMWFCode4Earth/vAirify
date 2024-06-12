@@ -16,19 +16,20 @@ from air_quality.etl.in_situ.openaq_adapter import (
 )
 
 
-def retrieve_openaq_in_situ_data(cities, end_date: datetime, period_hours)\
-        -> list[InSituMeasurement]:
+def retrieve_openaq_in_situ_data(
+    cities, end_date: datetime, period_hours
+) -> list[InSituMeasurement]:
 
     start_date = end_date - timedelta(hours=period_hours)
 
     pool = ThreadPool(processes=2)
 
     async_in_situ_data = pool.apply_async(
-        get_in_situ_data,
-        (cities, start_date, end_date))
+        get_in_situ_data, (cities, start_date, end_date)
+    )
     async_forecast_data = pool.apply_async(
-        get_forecast_data,
-        (start_date, period_hours))
+        get_forecast_data, (start_date, period_hours)
+    )
 
     in_situ_measurements_by_city = async_in_situ_data.get()
     extracted_forecast_data = async_forecast_data.get()
