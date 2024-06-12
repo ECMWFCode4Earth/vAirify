@@ -101,10 +101,10 @@ test_city_3_input_data: Forecast = {
 
 test_city_1_expected_response_data: dict = {
     "base_time": format_datetime_as_string(
-        test_city_1_input_data["forecast_base_time"], "%Y-%m-%dT%H:%M:%S+00:00"
+        test_city_1_input_data["forecast_base_time"], "%Y-%m-%dT%H:%M:%SZ"
     ),
     "valid_time": format_datetime_as_string(
-        test_city_1_input_data["forecast_valid_time"], "%Y-%m-%dT%H:%M:%S+00:00"
+        test_city_1_input_data["forecast_valid_time"], "%Y-%m-%dT%H:%M:%SZ"
     ),
     "location_type": test_city_1_input_data["location_type"],
     "location_name": test_city_1_input_data["name"],
@@ -118,10 +118,10 @@ test_city_1_expected_response_data: dict = {
 
 test_city_2_expected_response_data: dict = {
     "base_time": format_datetime_as_string(
-        test_city_2_input_data["forecast_base_time"], "%Y-%m-%dT%H:%M:%S+00:00"
+        test_city_2_input_data["forecast_base_time"], "%Y-%m-%dT%H:%M:%SZ"
     ),
     "valid_time": format_datetime_as_string(
-        test_city_2_input_data["forecast_valid_time"], "%Y-%m-%dT%H:%M:%S+00:00"
+        test_city_2_input_data["forecast_valid_time"], "%Y-%m-%dT%H:%M:%SZ"
     ),
     "location_type": test_city_2_input_data["location_type"],
     "location_name": test_city_2_input_data["name"],
@@ -141,7 +141,7 @@ location_type = "city"
 base_time = datetime.datetime(2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc)
 base_time_string = format_datetime_as_string(
     base_time,
-    "%Y-%m-%dT%H:%M:%S+00:00",
+    "%Y-%m-%dT%H:%M:%SZ",
 )
 valid_time_from_string = base_time_string
 valid_time_to_string = format_datetime_as_string(
