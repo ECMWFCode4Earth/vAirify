@@ -41,11 +41,11 @@ const createColDefs = (): (ColDef | ColGroupDef)[] => [
     cellRenderer: LocationCellRenderer,
   },
   {
-    headerName: 'AQI (1-6)',
+    headerName: 'AQI Level',
     children: [
       { field: 'forecast.aqiLevel', headerName: 'Forecast' },
       { field: 'measurements.aqiLevel', headerName: 'Measured' },
-      { field: 'aqiDifference', headerName: 'Diff' },
+      { field: 'aqiDifference', headerName: 'Diff', sort: 'desc' },
     ],
   },
   ...pollutantTypes.flatMap((type) => ({

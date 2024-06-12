@@ -77,7 +77,7 @@ describe('GlobalSummaryTable component', () => {
       renderGrid([], [])
       await waitFor(() => {
         expect(screen.getByText('City')).toBeInTheDocument()
-        expect(screen.getByText('AQI (1-6)')).toBeInTheDocument()
+        expect(screen.getByText('AQI Level')).toBeInTheDocument()
         expect(screen.getByText('Nitrogen Dioxide (µg/m³)')).toBeInTheDocument()
         expect(screen.getByText('Ozone (µg/m³)')).toBeInTheDocument()
         expect(screen.getByText('Sulphur Dioxide (µg/m³)')).toBeInTheDocument()
