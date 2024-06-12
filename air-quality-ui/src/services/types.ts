@@ -20,7 +20,7 @@ type SummaryMeasurementPollutantDataDto = {
 
 export type ForecastResponseDto = {
   base_time: string
-  valid_date: string
+  valid_time: string
   location_type: LocationType
   location_name: string
   overall_aqi_level: number

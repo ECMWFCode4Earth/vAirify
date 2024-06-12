@@ -32,9 +32,9 @@ describe('Forecast Data Service', () => {
     expect(global.fetch).toHaveBeenCalledWith(
       'https://test.com/air-pollutant/forecast' +
         '?location_type=city' +
-        '&valid_date_from=2024-01-01T12%3A00%3A00.000Z' +
-        '&valid_date_to=2024-01-05T12%3A00%3A00.000Z' +
-        '&forecast_base_time=2024-01-03T12%3A00%3A00.000Z',
+        '&valid_time_from=2024-01-01T12%3A00%3A00.000Z' +
+        '&valid_time_to=2024-01-05T12%3A00%3A00.000Z' +
+        '&base_time=2024-01-03T12%3A00%3A00.000Z',
       {
         method: 'GET',
         headers: {
