@@ -11,14 +11,15 @@ base_url = "http://127.0.0.1:8000/air-pollutant/forecast"
 headers = {"accept": "application/json"}
 location_type = "city"
 location_name = random.choice(all_cities)
-base_time = datetime.datetime(2024, 6, 10, 0, 0)
+base_time = datetime.datetime(2024, 6, 10, 0, 0, tzinfo=datetime.timezone.utc)
 base_time_string = format_datetime_as_string(
     base_time,
     "%Y-%m-%dT%H:%M:%S+00:00",
 )
 valid_time_from_string = base_time_string
 valid_time_to_string = format_datetime_as_string(
-    datetime.datetime(2024, 6, 15, 0, 0), "%Y-%m-%dT%H:%M:%S+00:00"
+    datetime.datetime(2024, 6, 15, 0, 0, tzinfo=datetime.timezone.utc),
+    "%Y-%m-%dT%H:%M:%S+00:00",
 )
 
 success_status_code = 200
