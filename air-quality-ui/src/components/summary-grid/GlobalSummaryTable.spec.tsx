@@ -18,8 +18,8 @@ const measurementData = mockMeasurementSummaryResponseDto({
 })
 
 const renderGrid = (
-  forecast: ForecastResponseDto[],
-  measurements: MeasurementSummaryResponseDto[],
+  forecast?: ForecastResponseDto[],
+  measurements?: MeasurementSummaryResponseDto[],
 ) => {
   return render(
     <GlobalSummaryTable
@@ -34,6 +34,12 @@ const renderGrid = (
 
 describe('GlobalSummaryTable component', () => {
   describe('renders the summary table', () => {
+    it('and displays message when data is loading', async () => {
+      renderGrid(undefined, undefined)
+      await waitFor(() => {
+        expect(screen.getByText('Loading...')).toBeInTheDocument()
+      })
+    })
     it('and displays message when no data is available', async () => {
       renderGrid([], [])
       await waitFor(() => {

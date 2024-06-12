@@ -89,7 +89,7 @@ const mapApiRow = (
 const mapApiResponse = ({
   forecast,
   summarizedMeasurements,
-}: GlobalSummaryTableProps) => {
+}: GlobalSummaryTableProps): SummaryRow[] => {
   const measurements = summarizedMeasurements.reduce<
     Record<string, MeasurementSummaryResponseDto>
   >((acc, result) => {
@@ -106,9 +106,19 @@ const mapApiResponse = ({
   })
 }
 
-const GlobalSummaryTable = (props: GlobalSummaryTableProps): JSX.Element => {
+const GlobalSummaryTable = (
+  props: Partial<GlobalSummaryTableProps>,
+): JSX.Element => {
   const colDefs = useMemo(() => createColDefs(), [])
-  const data = useMemo(() => mapApiResponse(props), [props])
+  const data = useMemo(() => {
+    if (props.forecast && props.summarizedMeasurements) {
+      return mapApiResponse({
+        forecast: props.forecast,
+        summarizedMeasurements: props.summarizedMeasurements,
+      })
+    }
+    return null
+  }, [props.forecast, props.summarizedMeasurements])
 
   return (
     <div

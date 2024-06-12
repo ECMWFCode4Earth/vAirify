@@ -17,7 +17,7 @@ const GlobalSummary = (): JSX.Element => {
   const [latestForecastDate] = useState(getLatestBaseForecastTime())
   const [latestValidDate] = useState(getLatestValidForecastTime())
 
-  const { data, isPending, isError } = useQueries({
+  const { data, isError } = useQueries({
     queries: [
       {
         queryKey: ['forecast'],
@@ -31,10 +31,6 @@ const GlobalSummary = (): JSX.Element => {
     ],
     combine: (result) => combineApiResult(result),
   })
-
-  if (isPending) {
-    return <span>Loading...</span>
-  }
 
   if (isError) {
     return <span>Error occurred</span>
@@ -50,8 +46,8 @@ const GlobalSummary = (): JSX.Element => {
         </div>
       </div>
       <GlobalSummaryTable
-        forecast={data.forecast ?? []}
-        summarizedMeasurements={data.summarizedMeasurements ?? []}
+        forecast={data.forecast}
+        summarizedMeasurements={data.summarizedMeasurements}
       />
     </div>
   )

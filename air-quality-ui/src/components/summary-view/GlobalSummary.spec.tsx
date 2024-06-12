@@ -21,17 +21,6 @@ jest.mock('../../services/forecast-time-service', () => ({
 }))
 
 describe('GlobalSummary component', () => {
-  it('shows message when loading data', async () => {
-    ;(useQueries as jest.Mock).mockReturnValueOnce({
-      data: null,
-      isPending: true,
-      isError: false,
-    })
-    render(<GlobalSummary />)
-    await waitFor(() => {
-      expect(screen.getByText('Loading...')).toBeInTheDocument()
-    })
-  })
   it('shows message when loading data errors', async () => {
     ;(useQueries as jest.Mock).mockReturnValueOnce({
       data: null,
