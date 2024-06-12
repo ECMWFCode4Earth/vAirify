@@ -7,4 +7,5 @@
   <include file="forecast_data.xml"/>
   <include file="in_situ_data.xml"/>
   <include file="locations.xml"/>
+  <include file="47_update_in_situ_index.xml"/>
 </databaseChangeLog>

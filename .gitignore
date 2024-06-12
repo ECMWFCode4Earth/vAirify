@@ -166,3 +166,6 @@ air-quality-backend/liquibase/liquibase.properties
 
 # Mac OS specific
 .DS_Store
+
+# vscode
+.vscode

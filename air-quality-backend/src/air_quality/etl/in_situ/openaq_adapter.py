@@ -1,7 +1,15 @@
 from datetime import datetime
 from functools import reduce
 import logging
-from air_quality.etl.air_quality_index.pollutant_type import PollutantType
+
+from air_quality.database.locations import AirQualityLocationType
+from air_quality.aqi.pollutant_type import (
+    PollutantType,
+    pollutants_with_molecular_weight,
+)
+from air_quality.etl.in_situ.InSituMeasurement import InSituMeasurement
+from air_quality.etl.common.unit_converter import convert_ppm_to_mgm3
+from air_quality.etl.forecast.forecast_data import ForecastData
 
 required_pollutant_data = {
     "o3": PollutantType.OZONE,
@@ -12,11 +20,17 @@ required_pollutant_data = {
 }
 
 
-def measurement_value_is_positive(measurement):
-    return measurement["value"] > 0
+def measurement_is_valid(measurement):
+    valid_unit = measurement["unit"] in ["µg/m³", "ppm"]
+    if not valid_unit:
+        logging.info(f"Unsupported unit found {measurement['unit']}")
+
+    return valid_unit and measurement["value"] > 0
 
 
-def _create_document(measurement, city_name, location_type):
+def _create_document(
+    measurement, city_name: str, location_type: AirQualityLocationType
+) -> InSituMeasurement:
     return {
         "api_source": "OpenAQ",
         "measurement_date": datetime.strptime(
@@ -26,16 +40,25 @@ def _create_document(measurement, city_name, location_type):
         "location_type": location_type,
         "location_name": measurement["location"],
         "location": {
-            "type": "Point",
-            "coordinates": [
+            "type": "point",
+            "coordinates": (
                 measurement["coordinates"]["longitude"],
                 measurement["coordinates"]["latitude"],
-            ],
+            ),
         },
         "metadata": {
             "entity": measurement["entity"],
             "sensor_type": measurement["sensorType"],
         },
+    }
+
+
+def _create_measurement_value(measurement):
+    return {
+        "value": measurement["value"],
+        "unit": measurement["unit"],
+        "original_value": measurement["value"],
+        "original_unit": measurement["unit"],
     }
 
 
@@ -46,29 +69,60 @@ def combine_measurement(state, measurement):
         results[key] = _create_document(
             measurement, state["city"], state["location_type"]
         )
-    measurement_value = measurement["value"]
+    measurement_value = _create_measurement_value(measurement)
     measurement_parameter = measurement["parameter"]
     measurement_parameter_key = required_pollutant_data[measurement_parameter]
     results[key][measurement_parameter_key.value] = measurement_value
     return state
 
 
-def transform(in_situ_data):
+def transform_city(city_data) -> list[InSituMeasurement]:
     formatted_dataset = []
-    for city_name, city_data in in_situ_data.items():
-        city = city_data["city"]
-        measurements_for_city = city_data["measurements"]
-        if len(measurements_for_city) > 0:
-            filtered_measurements = filter(
-                measurement_value_is_positive, measurements_for_city
-            )
-            grouped_measurements = reduce(
-                combine_measurement,
-                filtered_measurements,
-                {"city": city["name"], "location_type": city["type"], "results": {}},
-            )["results"]
-            formatted_dataset.extend(list(grouped_measurements.values()))
-        else:
-            logging.info(f"No in situ measurements found for {city_name}")
+    city = city_data["city"]
+    measurements_for_city = city_data["measurements"]
+    if len(measurements_for_city) > 0:
+        filtered_measurements = filter(
+            measurement_is_valid, measurements_for_city
+        )
+        grouped_measurements = reduce(
+            combine_measurement,
+            filtered_measurements,
+            {"city": city["name"], "location_type": city["type"], "results": {}},
+        )["results"]
+        formatted_dataset.extend(list(grouped_measurements.values()))
+    else:
+        logging.info(f"No in situ measurements found for {city['name']}")
 
     return formatted_dataset
+
+
+def enrich_with_forecast_data(
+        city_measurements: list[InSituMeasurement],
+        forecast_data: ForecastData):
+    for in_situ_reading in city_measurements:
+        long = in_situ_reading["location"]["coordinates"][0]
+        lat = in_situ_reading["location"]["coordinates"][1]
+        measurement_date = in_situ_reading["measurement_date"]
+
+        surface_pressure = forecast_data.get_surface_pressure(
+            long, lat, measurement_date
+        )
+        temperature = forecast_data.get_temperature(long, lat, measurement_date)
+
+        in_situ_reading["metadata"]["estimated_surface_pressure_pa"] = surface_pressure
+        in_situ_reading["metadata"]["estimated_temperature_k"] = temperature
+
+        for pollutant in pollutants_with_molecular_weight():
+            if (
+                pollutant.value in in_situ_reading
+                and in_situ_reading[pollutant.value]["original_unit"] == "ppm"
+            ):
+                original_value = in_situ_reading[pollutant.value]["original_value"]
+
+                in_situ_reading[pollutant.value]["value"] = convert_ppm_to_mgm3(
+                    original_value, pollutant, surface_pressure, temperature
+                )
+
+                in_situ_reading[pollutant.value]["unit"] = "µg/m³"
+
+    return city_measurements

@@ -57,6 +57,13 @@ OPEN_AQ_API_KEY=<api_key>
 ### 5. Get CDS API access (CAMS)
 Create your .cdsapirc file as detailed [here](https://ads.atmosphere.copernicus.eu/api-how-to).
 
+#### Alternately
+Instead of creating the .cdsapirc file can add the the following to your .env file
+```
+CDSAPI_URL=https://ads.atmosphere.copernicus.eu/api/v2
+CDSAPI_KEY=<cds_api_key>
+```
+
 ### 6. Get OpenAQ access
 Register for a key [here](https://api.openaq.org/register).
 
@@ -69,3 +76,25 @@ Once you receive your key, place it in your **.env** file
 - Select your conda env as the python interpreter
 - Check 'On save'
 - Press Apply
+
+
+### 8. Docker
+#### Locally
+You can build the docker image with the following... 
+```
+    docker build . -t <image_name> -f <dockerfile>
+
+    e.g. 
+    docker build . -t forecast_etl -f Dockerfile.forecast
+```
+
+To run the docker image (from the base air-quality-backend directory)
+```
+    docker run --env-file <environment_file> <image_name>
+
+    e.g.
+    docker run --env_file .env forecast_etl
+```
+
+n.b.
+to run with docker the CDS API uri and key need to be in the .env file

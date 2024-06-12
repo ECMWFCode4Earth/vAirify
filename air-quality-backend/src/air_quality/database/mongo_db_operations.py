@@ -2,6 +2,12 @@ from datetime import datetime
 import logging
 import os
 from pymongo import MongoClient, UpdateOne
+from typing import Literal, TypedDict, Tuple
+
+
+class GeoJSONPoint(TypedDict):
+    type: Literal["point"]
+    coordinates: Tuple[float, float]
 
 
 def get_collection(name: str):
