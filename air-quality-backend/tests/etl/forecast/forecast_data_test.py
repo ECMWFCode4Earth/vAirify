@@ -7,7 +7,7 @@ from air_quality.aqi.pollutant_type import PollutantType
 from air_quality.etl.forecast.forecast_data import (
     convert_east_only_longitude_to_east_west,
     is_single_level,
-    _convert_to_forecast_data_type,
+    convert_to_forecast_data_type,
     ForecastData,
     ForecastDataType,
 )
@@ -70,12 +70,12 @@ def test__is_single_level__returns_correctly(
 def test__convert_to_forecast_data_type__valid_input_converts_correctly(
         pollutant_data_type: PollutantType,
         forecast_data_type: ForecastDataType):
-    assert _convert_to_forecast_data_type(pollutant_data_type) == forecast_data_type
+    assert convert_to_forecast_data_type(pollutant_data_type) == forecast_data_type
 
 
 def test__convert_to_forecast_data_type__invalid_input_raises_error():
     with pytest.raises(ValueError):
-        _convert_to_forecast_data_type(_convert_to_forecast_data_type(999))
+        convert_to_forecast_data_type(convert_to_forecast_data_type(999))
 
 
 @pytest.mark.parametrize(
@@ -181,16 +181,18 @@ def test__enrich_in_situ_measurements__duplicate_longitude_functions_correctly()
     multi_level = multi_level_data_set
     forecast_data = ForecastData(single_level, multi_level)
 
-    initial_date = (datetime.datetime.fromtimestamp(default_time))
+    initial_date = ((datetime.datetime.fromtimestamp(default_time))
+                    + datetime.timedelta(hours=24))
     required = [ForecastDataType.TEMPERATURE, ForecastDataType.SURFACE_PRESSURE]
+    # co-ords are (long, lat)
     in_situ_measurements: [InSituMeasurement] = [{
-        "location": {"type": "point", "coordinates": (5, -5)},
+        "location": {"type": "point", "coordinates": (0, -10)},
         "measurement_date": initial_date,
         "name": "city1",
         "metadata": {},
         "no2": {}
     }, {
-        "location": {"type": "point", "coordinates": (5, -10)},
+        "location": {"type": "point", "coordinates": (0, 0)},
         "measurement_date": initial_date,
         "name": "city2",
         "metadata": {},
@@ -200,8 +202,17 @@ def test__enrich_in_situ_measurements__duplicate_longitude_functions_correctly()
     result = forecast_data.enrich_in_situ_measurements(in_situ_measurements, required)
 
     assert len(result) == 2
+
     assert result[0][0] == in_situ_measurements[0]
     assert result[1][0] == in_situ_measurements[1]
+
+    assert result[0][0] == in_situ_measurements[0]
+    assert result[0][1][ForecastDataType.TEMPERATURE] == 100
+    assert result[0][1][ForecastDataType.SURFACE_PRESSURE] == pytest.approx(1)
+
+    assert result[1][0] == in_situ_measurements[1]
+    assert result[1][1][ForecastDataType.TEMPERATURE] == 130
+    assert result[1][1][ForecastDataType.SURFACE_PRESSURE] == pytest.approx(1.3)
 
 
 def test__enrich_in_situ_measurements__duplicate_latitude_functions_correctly():
@@ -211,6 +222,8 @@ def test__enrich_in_situ_measurements__duplicate_latitude_functions_correctly():
 
     initial_date = (datetime.datetime.fromtimestamp(default_time))
     required = [ForecastDataType.TEMPERATURE, ForecastDataType.SURFACE_PRESSURE]
+
+    # co-ords are (long, lat)
     in_situ_measurements: [InSituMeasurement] = [{
         "location": {"type": "point", "coordinates": (0, -10)},
         "measurement_date": initial_date,
@@ -228,5 +241,11 @@ def test__enrich_in_situ_measurements__duplicate_latitude_functions_correctly():
     result = forecast_data.enrich_in_situ_measurements(in_situ_measurements, required)
 
     assert len(result) == 2
+
     assert result[0][0] == in_situ_measurements[0]
+    assert result[0][1][ForecastDataType.TEMPERATURE] == 10
+    assert result[0][1][ForecastDataType.SURFACE_PRESSURE] == pytest.approx(0.1)
+
     assert result[1][0] == in_situ_measurements[1]
+    assert result[1][1][ForecastDataType.TEMPERATURE] == 20
+    assert result[1][1][ForecastDataType.SURFACE_PRESSURE] == pytest.approx(0.2)

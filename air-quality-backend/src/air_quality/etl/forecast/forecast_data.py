@@ -75,7 +75,7 @@ def is_single_level(forecast_data_type: ForecastDataType) -> bool:
     return is_pm10 or is_pm2_5 or is_pressure
 
 
-def _convert_to_forecast_data_type(pollutant_type: PollutantType) -> ForecastDataType:
+def convert_to_forecast_data_type(pollutant_type: PollutantType) -> ForecastDataType:
     match pollutant_type:
         case PollutantType.OZONE:
             return ForecastDataType.OZONE
@@ -193,7 +193,7 @@ class ForecastData:
 
         interpolated_data_by_pollutant_type = {}
         for pollutant_type in pollutant_types:
-            forecast_data_type = _convert_to_forecast_data_type(pollutant_type)
+            forecast_data_type = convert_to_forecast_data_type(pollutant_type)
             dataset = self._get_data_set(forecast_data_type)
             # Interpolation is called n times, where n = len(pollutant_types),
             # irrespective of len(locations)
