@@ -35,16 +35,12 @@ test_cases = [
 @mock.patch.dict(
     os.environ,
     {
-        "FORECAST_BASE_DATE": "2024-06-04",
-        "FORECAST_BASE_TIME": "00",
+        "FORECAST_BASE_DATE_TIME": "2024-06-04T00:00:00+000"
     },
 )
 @pytest.mark.parametrize("query_params, expected_values", test_cases)
 def test_known_vancouver_grib(query_params, expected_values):
-    # Setup code: delete database data
     delete_database_data("forecast_data")
-
-        # Run main process
     main()
 
     query = {
@@ -133,6 +129,13 @@ def test_that_each_document_has_location_type_city():
         assert (
                 document["location_type"] == "city"
         ), f"location_type '{document['location_type']}' is not a city!"
+
+
+def test_document_count_for_single_day_is_6273():
+    query = {}
+    dict_result = get_database_data(query, "forecast_data")
+
+    assert len(dict_result) == 6273, f"Expected 6273 documents, but got {len(dict_result)}"
 
 
 if __name__ == "__main__":
