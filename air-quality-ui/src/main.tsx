@@ -13,7 +13,7 @@ const router = createBrowserRouter([
     element: <GlobalSummary />,
   },
   {
-    path: '/city/:city',
+    path: '/city/:name',
     element: <SingleCity />,
   },
 ])

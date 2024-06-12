@@ -1,4 +1,3 @@
-export type ProcessDataResult = [string[], number[]]
 export type Measurements = {
   base_time: string
   valid_date: string
