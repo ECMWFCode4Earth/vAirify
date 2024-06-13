@@ -33,9 +33,10 @@ def create_in_situ_database_data_with_overrides(overrides):
     return {**default_city, **overrides}
 
 
-def create_city(
+def create_in_situ_database_data(
     measurement_date: datetime,
-    city_name: str = "Test City 1",
+    name: str,
+    location_name: str,
     no2: float = None,
     o3: float = None,
     pm2_5: float = None,
@@ -44,15 +45,11 @@ def create_city(
 ):
     created_city = {
         "measurement_date": measurement_date,
-        "name": city_name,
-        "location_name": "Test City 1, Site 1, All keys",
+        "name": name,
+        "location_name": location_name,
         "api_source": "OpenAQ",
-        "created_time": datetime.datetime(
-            2024, 6, 11, 14, 0, 0, tzinfo=datetime.timezone.utc
-        ),
-        "last_modified_time": datetime.datetime(
-            2024, 6, 11, 14, 0, 0, tzinfo=datetime.timezone.utc
-        ),
+        "created_time": measurement_date,
+        "last_modified_time": measurement_date,
         "location": {
             "type": "point",
             "coordinates": [54.433746, 24.424399],
