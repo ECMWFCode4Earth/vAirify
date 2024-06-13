@@ -21,7 +21,7 @@ def main():
 
     logging.info("Extracting pollutant forecast data")
     extracted_forecast_data = fetch_forecast_data(
-        datetime(2024, 6, 7, 11,59,000))
+        datetime(2024, 6, 8, 11,59,000))
 
     logging.info("Transforming forecast data")
     transformed_forecast_data = transform(extracted_forecast_data, cities)

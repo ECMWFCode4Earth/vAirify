@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 
 export const useGetSingleCityForecastData = (
-  valid_date_from: string,
-  valid_date_to: string,
+  valid_date_from: string | null,
+  valid_date_to: string | null,
   location_type: string,
-  forecast_base_time: string,
+  forecast_base_time: string | null,
   location_name: string | undefined,
 ) => {
   const queryOptions = {
