@@ -23,10 +23,15 @@ test_cases = [
             "forecast_valid_time": datetime(2024, 6, 4, 3, 0, 0),
             "forecast_base_time": datetime(2024, 6, 4, 0, 0, 0),
             "no2_value": 10.115771485462055,
+            "no2_aqi_level": 1,
             "o3_value": 63.39522524659603,
+            "o3_aqi_level": 2,
             "so2_value": 2.000387638160907,
+            "so2_aqi_level": 1,
             "pm10_value": 5.810208243195257,
+            "pm10_aqi_level": 1,
             "pm2_5_value": 3.6327574082026914,
+            "pm2_5_aqi_level": 1,
         },
     ),
 ]
@@ -35,7 +40,7 @@ test_cases = [
 @mock.patch.dict(
     os.environ,
     {
-        "FORECAST_BASE_DATE_TIME": "2024-06-04T00:00:00+000"
+        "FORECAST_BASE_TIME": "2024-6-4 00"
     },
 )
 @pytest.mark.parametrize("query_params, expected_values", test_cases)
@@ -132,11 +137,7 @@ def test_that_each_document_has_location_type_city():
 
 
 def test_document_count_for_single_day_is_6273():
-    query = {}
-    dict_result = get_database_data(query, "forecast_data")
+    dict_result = get_database_data({}, "forecast_data")
 
     assert len(dict_result) == 6273, f"Expected 6273 documents, but got {len(dict_result)}"
 
-
-if __name__ == "__main__":
-    test_known_vancouver_grib()
