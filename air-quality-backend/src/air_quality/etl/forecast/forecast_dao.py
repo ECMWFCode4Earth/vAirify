@@ -1,5 +1,5 @@
 import cdsapi
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 import logging
 import os
 import xarray as xr
@@ -104,7 +104,7 @@ def align_to_cams_publish_time(forecast_base_time: datetime) -> datetime:
 
 
 def fetch_forecast_data(
-    base_datetime: datetime = datetime.now(tz=timezone.utc),
+    base_datetime: datetime = datetime.utcnow(),
     no_of_forecast_times: int = 41,
 ) -> ForecastData:
 

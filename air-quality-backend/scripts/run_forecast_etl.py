@@ -3,7 +3,7 @@ import os
 from logging import config
 
 from dotenv import load_dotenv
-from datetime import datetime, timezone
+from datetime import datetime
 from air_quality.database.forecasts import insert_data
 from air_quality.database.locations import get_locations_by_type, AirQualityLocationType
 from air_quality.etl.forecast.forecast_adapter import transform
@@ -18,7 +18,7 @@ def main():
     cities = get_locations_by_type(AirQualityLocationType.CITY)
     logging.info(f"Finding data for {cities.__len__()} cities")
 
-    base_date = datetime.now(tz=timezone.utc)
+    base_date = datetime.utcnow()
     base_date_env = os.environ.get("FORECAST_INITIAL_DATE_TIME")
     if base_date_env is not None:
         date_format = "%Y-%m-%d %H"

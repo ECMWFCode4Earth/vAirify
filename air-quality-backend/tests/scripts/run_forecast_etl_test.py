@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from unittest.mock import patch
 
 from freezegun import freeze_time
@@ -32,7 +32,7 @@ def test__run_forecast_etl__no_forecast_time_in_environment_uses_now(
 
         main()
 
-        expected_datetime = datetime(2024, 5, 24, 11, 12, 13, 0, timezone.utc)
+        expected_datetime = datetime(2024, 5, 24, 11, 12, 13, 0)
         mock_os.assert_called_with("FORECAST_INITIAL_DATE_TIME")
         mock_locations.assert_called_with(AirQualityLocationType.CITY)
         mock_fetch.assert_called_with(expected_datetime)
