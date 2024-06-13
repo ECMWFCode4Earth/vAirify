@@ -10,7 +10,6 @@ from unittest import mock
 load_dotenv()
 
 test_cases = [
-
     # Close to -180 Longitude
     (
         {
@@ -35,7 +34,6 @@ test_cases = [
             "pm2_5_value": 3.6327574082026914,
             "pm2_5_aqi_level": 1,
         },
-
     ),
     # Extreme Longitude Check 180
     (
@@ -92,9 +90,7 @@ test_cases = [
 
 @mock.patch.dict(
     os.environ,
-    {
-        "FORECAST_BASE_TIME": "2024-6-4 00"
-    },
+    {"FORECAST_BASE_TIME": "2024-6-4 00"},
 )
 @pytest.mark.parametrize("query_params, expected_values", test_cases)
 def test__extreme_longitudes__to_assert_exact_values(query_params, expected_values):
@@ -112,43 +108,43 @@ def test__extreme_longitudes__to_assert_exact_values(query_params, expected_valu
 
     for document in dict_result:
         assert (
-                document["name"] == expected_values["name"]
+            document["name"] == expected_values["name"]
         ), "Name does not match the search query!"
         assert (
-                document["forecast_valid_time"] == expected_values["forecast_valid_time"]
+            document["forecast_valid_time"] == expected_values["forecast_valid_time"]
         ), "forecast_valid_time does not match!"
         assert (
-                document["forecast_base_time"] == expected_values["forecast_base_time"]
+            document["forecast_base_time"] == expected_values["forecast_base_time"]
         ), "forecast_base_time does not match!"
         assert (
-                document["no2_value"] == expected_values["no2_value"]
+            document["no2_value"] == expected_values["no2_value"]
         ), "no2 value does not match!"
         assert (
-                document["no2_aqi_level"] == expected_values["no2_aqi_level"]
+            document["no2_aqi_level"] == expected_values["no2_aqi_level"]
         ), "no2 aqi value does not match!"
         assert (
-                document["o3_value"] == expected_values["o3_value"]
+            document["o3_value"] == expected_values["o3_value"]
         ), "o3 value does not match!"
         assert (
-                document["o3_aqi_level"] == expected_values["o3_aqi_level"]
+            document["o3_aqi_level"] == expected_values["o3_aqi_level"]
         ), "o3 aqi value does not match!"
         assert (
-                document["so2_value"] == expected_values["so2_value"]
+            document["so2_value"] == expected_values["so2_value"]
         ), "o2 value does not match!"
         assert (
-                document["so2_aqi_level"] == expected_values["so2_aqi_level"]
+            document["so2_aqi_level"] == expected_values["so2_aqi_level"]
         ), "so2 aqi value does not match!"
         assert (
-                document["pm10_value"] == expected_values["pm10_value"]
+            document["pm10_value"] == expected_values["pm10_value"]
         ), "pm10 value does not match!"
         assert (
-                document["pm10_aqi_level"] == expected_values["pm10_aqi_level"]
+            document["pm10_aqi_level"] == expected_values["pm10_aqi_level"]
         ), "pm10 aqi value does not match!"
         assert (
-                document["pm2_5_value"] == expected_values["pm2_5_value"]
+            document["pm2_5_value"] == expected_values["pm2_5_value"]
         ), "pm2.5 value does not match!"
         assert (
-                document["pm2_5_aqi_level"] == expected_values["pm2_5_aqi_level"]
+            document["pm2_5_aqi_level"] == expected_values["pm2_5_aqi_level"]
         ), "pm2_5 aqi value does not match!"
 
 
@@ -190,7 +186,7 @@ def test__overall_aqi_level_is_highest_value_of_individual_pollutant_aqi_levels(
     for document in dict_result:
         highest_aqi = max(document[key] for key in pollutant_keys)
         assert (
-                document["overall_aqi_level"] == highest_aqi
+            document["overall_aqi_level"] == highest_aqi
         ), f"{document['overall_aqi_level']} is not equal to {highest_aqi}"
 
 
@@ -199,14 +195,16 @@ def test_that_each_document_has_location_type_city():
 
     for document in dict_result:
         assert (
-                document["location_type"] == "city"
+            document["location_type"] == "city"
         ), f"location_type '{document['location_type']}' is not a city!"
 
 
 def test_document_count_for_single_day_is_6273():
     dict_result = get_database_data({}, "forecast_data")
 
-    assert len(dict_result) == 6273, f"Expected 6273 documents, but got {len(dict_result)}"
+    assert (
+        len(dict_result) == 6273
+    ), f"Expected 6273 documents, but got {len(dict_result)}"
 
 
 def test__created_time_is_similar_to_system_time():
@@ -215,6 +213,4 @@ def test__created_time_is_similar_to_system_time():
     for document in dict_result:
         created_time = document["created_time"]
 
-        assert now - timedelta(seconds=1000) <= created_time <= now, (
-
-        )
+        assert now - timedelta(seconds=1000) <= created_time <= now, ()
