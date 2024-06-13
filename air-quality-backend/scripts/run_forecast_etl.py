@@ -1,15 +1,16 @@
 import logging
+from datetime import datetime
 from logging import config
 
 from dotenv import load_dotenv
 
 from air_quality.database.forecasts import insert_data
-from air_quality.etl.forecast.forecast_dao import fetch_forecast_data, CamsModelDateTime
+
 from air_quality.database.locations import get_locations_by_type, AirQualityLocationType
 from air_quality.etl.forecast.forecast_adapter import transform
 from air_quality.etl.forecast.forecast_dao import fetch_forecast_data
 
-config.fileConfig("./logging.ini")
+config.fileConfig("../logging.ini")
 
 
 def main():
@@ -20,7 +21,7 @@ def main():
 
     logging.info("Extracting pollutant forecast data")
     extracted_forecast_data = fetch_forecast_data(
-        model_date_time=CamsModelDateTime("2024-06-06", "00"))
+        datetime(2024, 6, 7, 11,59,000))
 
     logging.info("Transforming forecast data")
     transformed_forecast_data = transform(extracted_forecast_data, cities)

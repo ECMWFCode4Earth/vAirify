@@ -12,12 +12,12 @@ export const useGetSingleCityForecastData = (
     queryKey: ['data'],
     queryFn: async () => {
       const request = await axios.get(
-        'http://127.0.0.1:8000/air-pollutant-forecast',
+        'http://127.0.0.1:8000/air-pollutant/forecast',
         {
           params: {
+            location_type: location_type,
             valid_date_from: valid_date_from,
             valid_date_to: valid_date_to,
-            location_type: location_type,
             forecast_base_time: forecast_base_time,
             location_name: location_name,
           },

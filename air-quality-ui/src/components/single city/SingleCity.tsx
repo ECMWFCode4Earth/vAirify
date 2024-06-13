@@ -1,26 +1,11 @@
 import './SingleCity.css'
 import ReactECharts from 'echarts-for-react'
-import { DateTime } from 'luxon'
+import { DateTime, Interval } from 'luxon'
 import { useParams } from 'react-router-dom'
 
 import { formatDate, getLatestBaseForecastTime } from './HandleTime'
 import { useGetSingleCityForecastData } from './SingleCityQueries'
 import { Measurements } from './SingleCityTypes'
-
-// function processData(dataInput: Measurements[]) {
-//   const data = []
-//   for (let i = 0; i < dataInput.length; i++) {
-//     data.push([
-//       DateTime.fromISO(dataInput[i]['valid_date']).toUTC().toString(),
-//       dataInput[i]['overall_aqi_level'],
-//     ])
-//     console.log(
-//       'Date in processData: ' +
-//         DateTime.fromISO(dataInput[i]['valid_date']).toUTC().toString(),
-//     )
-//   }
-//   return data
-// }
 
 function SingleCity() {
   const { name } = useParams()
@@ -37,35 +22,23 @@ function SingleCity() {
     formatDate(getLatestBaseForecastTime(DateTime.fromJSDate(dateFiveDaysAgo))),
     name,
   )
-  let data = []
-  if (result.data) {
-    data = result.data.map((measurement: Measurements) => {
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
-      const { year, month, day, hour, minute, second, millisecond } =
-        DateTime.fromISO(measurement.valid_date, {
-          zone: 'utc',
-        })
-      const finishedob = [
-        DateTime.fromObject(
-          { year, month, day, hour, minute, second, millisecond },
-          {
-            zone: tz,
-          },
-        ).toFormat('yyyy-MM-dd HH:mm'),
-        measurement.overall_aqi_level,
-      ]
-      return finishedob
-    })
-  }
 
+  console.log(result.data)
   return result.data ? (
     <div className="chart">
       <ReactECharts
         option={{
           xAxis: {
             type: 'time',
+            max: 'dataMax',
             axisLabel: {
-              interval: 0,
+              showMinLabel: true,
+              showMaxLabel: true,
+              hideOverlap: false,
+              fontSize: 7,
+              align: 'right',
+              rotate: 45,
+              overflow: 'break',
               formatter: (timestamp: number) => {
                 const date =
                   DateTime.fromMillis(timestamp).toFormat('yyyy-MM-dd, HH:mm')
@@ -78,7 +51,23 @@ function SingleCity() {
           },
           series: [
             {
-              data: data,
+              data: result.data.map((measurement: Measurements) => {
+                const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+                const { year, month, day, hour, minute, second, millisecond } =
+                  DateTime.fromISO(measurement.valid_date, {
+                    zone: 'utc',
+                  })
+                const finishedob = [
+                  DateTime.fromObject(
+                    { year, month, day, hour, minute, second, millisecond },
+                    {
+                      zone: tz,
+                    },
+                  ).toFormat('yyyy-MM-dd HH:mm'),
+                  measurement.overall_aqi_level,
+                ]
+                return finishedob
+              }),
               type: 'line',
               name: 'Forecast',
             },
