@@ -37,11 +37,11 @@ def create_in_situ_database_data(
     measurement_date: datetime,
     name: str,
     location_name: str,
-    no2: float = None,
-    o3: float = None,
-    pm2_5: float = None,
-    pm10: float = None,
-    so2: float = None,
+    no2_value: float = None,
+    o3_value: float = None,
+    pm2_5_value: float = None,
+    pm10_value: float = None,
+    so2_value: float = None,
 ):
     created_city = {
         "measurement_date": measurement_date,
@@ -63,12 +63,26 @@ def create_in_situ_database_data(
         },
     }
 
-    optional_pollutants = [no2, o3, pm2_5, pm10, so2]
-    for pollutant_value in optional_pollutants:
-        if pollutant_value is not None:
-            created_city[str(pollutant_value)] = create_pollutant_value(
-                pollutant_value, "µg/m³", pollutant_value, "µg/m³"
-            )
+    if no2_value is not None:
+        created_city["no2"] = create_pollutant_value(
+            no2_value, "µg/m³", no2_value, "µg/m³"
+        )
+    if o3_value is not None:
+        created_city["o3"] = create_pollutant_value(
+            o3_value, "µg/m³", o3_value, "µg/m³"
+        )
+    if pm10_value is not None:
+        created_city["pm10"] = create_pollutant_value(
+            pm10_value, "µg/m³", pm10_value, "µg/m³"
+        )
+    if pm2_5_value is not None:
+        created_city["pm2_5"] = create_pollutant_value(
+            pm2_5_value, "µg/m³", pm2_5_value, "µg/m³"
+        )
+    if so2_value is not None:
+        created_city["so2"] = create_pollutant_value(
+            so2_value, "µg/m³", so2_value, "µg/m³"
+        )
 
     return created_city
 
