@@ -1,5 +1,4 @@
 import datetime
-import pprint
 import statistics
 import pytest
 import requests
@@ -396,11 +395,11 @@ def test__different_measurement_time_range__assert_data_filtered_appropriately(
 
 
 @pytest.mark.parametrize(
-    """api_parameters, 
-    expected_test_city_a_no2_mean, expected_test_city_b_no2_mean, 
-    expected_test_city_a_o3_mean, expected_test_city_b_o3_mean, 
-    expected_test_city_a_pm10_mean, expected_test_city_b_pm10_mean, 
-    expected_test_city_a_pm2_5_mean, expected_test_city_b_pm2_5_mean, 
+    """api_parameters,
+    expected_test_city_a_no2_mean, expected_test_city_b_no2_mean,
+    expected_test_city_a_o3_mean, expected_test_city_b_o3_mean,
+    expected_test_city_a_pm10_mean, expected_test_city_b_pm10_mean,
+    expected_test_city_a_pm2_5_mean, expected_test_city_b_pm2_5_mean,
     expected_test_city_a_so2_mean, expected_test_city_b_so2_mean""",
     [
         (
