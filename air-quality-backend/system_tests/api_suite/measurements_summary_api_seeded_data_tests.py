@@ -18,7 +18,7 @@ from system_tests.utils.cams_utilities import delete_database_data
 from system_tests.utils.routes import Routes
 
 # Parameter Test Data
-test_city_1_site_1 = create_in_situ_database_data_with_overrides(
+city_1_location_1 = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 6, 11, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -27,7 +27,7 @@ test_city_1_site_1 = create_in_situ_database_data_with_overrides(
         "location_name": "Test City 1, Site 1, All keys",
     }
 )
-test_city_2_site_1 = create_in_situ_database_data_with_overrides(
+city_2_location_1 = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 6, 12, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -36,7 +36,7 @@ test_city_2_site_1 = create_in_situ_database_data_with_overrides(
         "location_name": "Test City 2, Site 1, All keys",
     }
 )
-test_city_2_site_2 = create_in_situ_database_data_with_overrides(
+city_2_location_2 = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 6, 12, 15, 0, 0, tzinfo=datetime.timezone.utc
@@ -45,7 +45,7 @@ test_city_2_site_2 = create_in_situ_database_data_with_overrides(
         "location_name": "Test City 2, Site 2, All keys",
     }
 )
-test_city_3_site_1 = create_in_situ_database_data_with_overrides(
+city_3_location_1 = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 6, 12, 13, 0, 0, tzinfo=datetime.timezone.utc
@@ -56,40 +56,65 @@ test_city_3_site_1 = create_in_situ_database_data_with_overrides(
 )
 
 # Calculation Test Data
-no2_data_1 = create_in_situ_database_data(
+city_a_location_1 = create_in_situ_database_data(
     datetime.datetime(2024, 7, 20, 13, 0, 0, tzinfo=datetime.timezone.utc),
     "Test City A",
     "Location 1",
     53,
+    53,
+    53,
+    53,
+    53,
 )
-no2_data_2 = create_in_situ_database_data(
+create_in_situ_database_data_with_overrides({})
+city_a_location_2 = create_in_situ_database_data(
     datetime.datetime(2024, 7, 20, 14, 0, 0, tzinfo=datetime.timezone.utc),
     "Test City A",
     "Location 2",
     102,
+    102,
+    102,
+    102,
+    102,
 )
-no2_data_3 = create_in_situ_database_data(
+city_a_location_3 = create_in_situ_database_data(
     datetime.datetime(2024, 7, 20, 15, 0, 0, tzinfo=datetime.timezone.utc),
     "Test City A",
     "Location 3",
     303,
+    303,
+    303,
+    303,
+    303,
 )
-no2_data_4 = create_in_situ_database_data(
+city_a_location_4 = create_in_situ_database_data(
     datetime.datetime(2024, 7, 20, 16, 0, 0, tzinfo=datetime.timezone.utc),
     "Test City A",
     "Location 1",
     10,
+    10,
+    10,
+    10,
+    10,
 )
-no2_data_5 = create_in_situ_database_data(
+city_b_location_1 = create_in_situ_database_data(
     datetime.datetime(2024, 7, 20, 13, 30, 0, tzinfo=datetime.timezone.utc),
     "Test City B",
     "Location 1",
     400,
+    400,
+    400,
+    400,
+    400,
 )
-no2_data_6 = create_in_situ_database_data(
-    datetime.datetime(2024, 7, 20, 17, 0, 0, tzinfo=datetime.timezone.utc),
+city_b_location_2 = create_in_situ_database_data(
+    datetime.datetime(2024, 7, 20, 16, 30, 0, tzinfo=datetime.timezone.utc),
     "Test City B",
     "Location 2",
+    303,
+    303,
+    303,
+    303,
     303,
 )
 
@@ -100,13 +125,16 @@ delete_database_data("in_situ_data")
 seed_api_test_data(
     "in_situ_data",
     [
-        test_city_1_site_1,
-        test_city_2_site_1,
-        test_city_2_site_2,
-        test_city_3_site_1,
-        no2_data_1,
-        no2_data_2,
-        no2_data_3,
+        city_1_location_1,
+        city_2_location_1,
+        city_2_location_2,
+        city_3_location_1,
+        city_a_location_1,
+        city_a_location_2,
+        city_a_location_3,
+        city_a_location_4,
+        city_b_location_1,
+        city_b_location_2,
     ],
 )
 
@@ -368,13 +396,12 @@ def test__different_measurement_time_range__assert_data_filtered_appropriately(
 
 
 @pytest.mark.parametrize(
-    """api_parameters,
-    expected_test_city_1_mean_no2, expected_test_city_1_mean_o3, expected_test_city_1_mean_pm10,
-    expected_test_city_1_mean_pm2_5, expected_test_city_1_mean_so2,
-    expected_test_city_2_mean_no2, expected_test_city_2_mean_o3, expected_test_city_2_mean_pm10,
-    expected_test_city_2_mean_pm2_5, expected_test_city_2_mean_so2,
-    expected_test_city_3_mean_no2, expected_test_city_3_mean_o3, expected_test_city_3_mean_pm10,
-    expected_test_city_3_mean_pm2_5, expected_test_city_3_mean_so2""",
+    """api_parameters, 
+    expected_test_city_a_no2_mean, expected_test_city_b_no2_mean, 
+    expected_test_city_a_o3_mean, expected_test_city_b_o3_mean, 
+    expected_test_city_a_pm10_mean, expected_test_city_b_pm10_mean, 
+    expected_test_city_a_pm2_5_mean, expected_test_city_b_pm2_5_mean, 
+    expected_test_city_a_so2_mean, expected_test_city_b_so2_mean""",
     [
         (
             {
@@ -382,235 +409,131 @@ def test__different_measurement_time_range__assert_data_filtered_appropriately(
                 "measurement_base_time": measurement_base_time_calculation_tests_string,
                 "measurement_time_range": measurement_time_range,
             },
-            None,
-            None,
-            None,
-            None,
-            None,
             statistics.mean(
                 [
-                    api_parameter_testing_data["test_city_2_1_input_data"]["no2"][
-                        "value"
-                    ],
-                    api_parameter_testing_data["test_city_2_2_input_data"]["no2"][
-                        "value"
-                    ],
+                    city_a_location_1["no2"]["value"],
+                    city_a_location_2["no2"]["value"],
+                    city_a_location_3["no2"]["value"],
                 ]
             ),
+            city_b_location_1["no2"]["value"],
             statistics.mean(
                 [
-                    api_parameter_testing_data["test_city_2_1_input_data"]["o3"][
-                        "value"
-                    ],
-                    api_parameter_testing_data["test_city_2_2_input_data"]["o3"][
-                        "value"
-                    ],
+                    city_a_location_1["o3"]["value"],
+                    city_a_location_2["o3"]["value"],
+                    city_a_location_3["o3"]["value"],
                 ]
             ),
+            city_b_location_1["o3"]["value"],
             statistics.mean(
                 [
-                    api_parameter_testing_data["test_city_2_1_input_data"]["pm10"][
-                        "value"
-                    ],
-                    api_parameter_testing_data["test_city_2_2_input_data"]["pm10"][
-                        "value"
-                    ],
+                    city_a_location_1["pm10"]["value"],
+                    city_a_location_2["pm10"]["value"],
+                    city_a_location_3["pm10"]["value"],
                 ]
             ),
+            city_b_location_1["pm10"]["value"],
             statistics.mean(
                 [
-                    api_parameter_testing_data["test_city_2_1_input_data"]["pm2_5"][
-                        "value"
-                    ],
-                    api_parameter_testing_data["test_city_2_2_input_data"]["pm2_5"][
-                        "value"
-                    ],
+                    city_a_location_1["pm2_5"]["value"],
+                    city_a_location_2["pm2_5"]["value"],
+                    city_a_location_3["pm2_5"]["value"],
                 ]
             ),
+            city_b_location_1["pm2_5"]["value"],
             statistics.mean(
                 [
-                    api_parameter_testing_data["test_city_2_1_input_data"]["so2"][
-                        "value"
-                    ],
-                    api_parameter_testing_data["test_city_2_2_input_data"]["so2"][
-                        "value"
-                    ],
+                    city_a_location_1["so2"]["value"],
+                    city_a_location_2["so2"]["value"],
+                    city_a_location_3["so2"]["value"],
                 ]
             ),
-            api_parameter_testing_data["test_city_3_input_data"]["no2"]["value"],
-            api_parameter_testing_data["test_city_3_input_data"]["o3"]["value"],
-            api_parameter_testing_data["test_city_3_input_data"]["pm10"]["value"],
-            api_parameter_testing_data["test_city_3_input_data"]["pm2_5"]["value"],
-            api_parameter_testing_data["test_city_3_input_data"]["so2"]["value"],
+            city_b_location_1["so2"]["value"],
         ),
-        # (
-        #     {
-        #         "location_type": location_type,
-        #         "measurement_base_time": format_datetime_as_string(
-        #             datetime.datetime(
-        #                 2024, 6, 10, 14, 0, 0, tzinfo=datetime.timezone.utc
-        #             ),
-        #             "%Y-%m-%dT%H:%M:%S+00:00",
-        #         ),
-        #         "measurement_time_range": measurement_time_range,
-        #     },
-        #     [],
-        # ),
-        # (
-        #     {
-        #         "location_type": location_type,
-        #         "measurement_base_time": format_datetime_as_string(
-        #             datetime.datetime(
-        #                 2024, 6, 11, 12, 29, 0, tzinfo=datetime.timezone.utc
-        #             ),
-        #             "%Y-%m-%dT%H:%M:%S+00:00",
-        #         ),
-        #         "measurement_time_range": measurement_time_range,
-        #     },
-        #     [],
-        # ),
-        # (
-        #     {
-        #         "location_type": location_type,
-        #         "measurement_base_time": format_datetime_as_string(
-        #             datetime.datetime(
-        #                 2024, 6, 11, 12, 30, 0, tzinfo=datetime.timezone.utc
-        #             ),
-        #             "%Y-%m-%dT%H:%M:%S+00:00",
-        #         ),
-        #         "measurement_time_range": measurement_time_range,
-        #     },
-        #     ["Test City 1"],
-        # ),
-        # (
-        #     {
-        #         "location_type": location_type,
-        #         "measurement_base_time": format_datetime_as_string(
-        #             datetime.datetime(
-        #                 2024, 6, 11, 15, 30, 0, tzinfo=datetime.timezone.utc
-        #             ),
-        #             "%Y-%m-%dT%H:%M:%S+00:00",
-        #         ),
-        #         "measurement_time_range": measurement_time_range,
-        #     },
-        #     ["Test City 1"],
-        # ),
-        # (
-        #     {
-        #         "location_type": location_type,
-        #         "measurement_base_time": format_datetime_as_string(
-        #             datetime.datetime(
-        #                 2024, 6, 11, 15, 31, 0, tzinfo=datetime.timezone.utc
-        #             ),
-        #             "%Y-%m-%dT%H:%M:%S+00:00",
-        #         ),
-        #         "measurement_time_range": measurement_time_range,
-        #     },
-        #     [],
-        # ),
-        # (
-        #     {
-        #         "location_type": location_type,
-        #         "measurement_base_time": format_datetime_as_string(
-        #             datetime.datetime(
-        #                 2024, 6, 12, 12, 29, 0, tzinfo=datetime.timezone.utc
-        #             ),
-        #             "%Y-%m-%dT%H:%M:%S+00:00",
-        #         ),
-        #         "measurement_time_range": measurement_time_range,
-        #     },
-        #     ["Test City 3"],
-        # ),
-        # (
-        #     {
-        #         "location_type": location_type,
-        #         "measurement_base_time": format_datetime_as_string(
-        #             datetime.datetime(
-        #                 2024, 6, 12, 12, 30, 0, tzinfo=datetime.timezone.utc
-        #             ),
-        #             "%Y-%m-%dT%H:%M:%S+00:00",
-        #         ),
-        #         "measurement_time_range": measurement_time_range,
-        #     },
-        #     ["Test City 2", "Test City 3"],
-        # ),
-        # (
-        #     {
-        #         "location_type": location_type,
-        #         "measurement_base_time": format_datetime_as_string(
-        #             datetime.datetime(
-        #                 2024, 6, 12, 14, 30, 0, tzinfo=datetime.timezone.utc
-        #             ),
-        #             "%Y-%m-%dT%H:%M:%S+00:00",
-        #         ),
-        #         "measurement_time_range": measurement_time_range,
-        #     },
-        #     ["Test City 2", "Test City 3"],
-        # ),
-        # (
-        #     {
-        #         "location_type": location_type,
-        #         "measurement_base_time": format_datetime_as_string(
-        #             datetime.datetime(
-        #                 2024, 6, 12, 14, 31, 0, tzinfo=datetime.timezone.utc
-        #             ),
-        #             "%Y-%m-%dT%H:%M:%S+00:00",
-        #         ),
-        #         "measurement_time_range": measurement_time_range,
-        #     },
-        #     ["Test City 2"],
-        # ),
-        # (
-        #     {
-        #         "location_type": location_type,
-        #         "measurement_base_time": format_datetime_as_string(
-        #             datetime.datetime(
-        #                 2024, 6, 12, 16, 30, 0, tzinfo=datetime.timezone.utc
-        #             ),
-        #             "%Y-%m-%dT%H:%M:%S+00:00",
-        #         ),
-        #         "measurement_time_range": measurement_time_range,
-        #     },
-        #     ["Test City 2"],
-        # ),
-        # (
-        #     {
-        #         "location_type": location_type,
-        #         "measurement_base_time": format_datetime_as_string(
-        #             datetime.datetime(
-        #                 2024, 6, 12, 16, 31, 0, tzinfo=datetime.timezone.utc
-        #             ),
-        #             "%Y-%m-%dT%H:%M:%S+00:00",
-        #         ),
-        #         "measurement_time_range": measurement_time_range,
-        #     },
-        #     [],
-        # ),
+        (
+            {
+                "location_type": location_type,
+                "measurement_base_time": format_datetime_as_string(
+                    datetime.datetime(
+                        2024, 7, 20, 15, 0, 0, tzinfo=datetime.timezone.utc
+                    ),
+                    "%Y-%m-%dT%H:%M:%S+00:00",
+                ),
+                "measurement_time_range": measurement_time_range,
+            },
+            statistics.mean(
+                [
+                    city_a_location_2["no2"]["value"],
+                    city_a_location_3["no2"]["value"],
+                    city_a_location_4["no2"]["value"],
+                ]
+            ),
+            statistics.mean(
+                [city_b_location_1["no2"]["value"], city_b_location_2["no2"]["value"]]
+            ),
+            statistics.mean(
+                [
+                    city_a_location_2["o3"]["value"],
+                    city_a_location_3["o3"]["value"],
+                    city_a_location_4["o3"]["value"],
+                ]
+            ),
+            statistics.mean(
+                [city_b_location_1["o3"]["value"], city_b_location_2["o3"]["value"]]
+            ),
+            statistics.mean(
+                [
+                    city_a_location_2["pm10"]["value"],
+                    city_a_location_3["pm10"]["value"],
+                    city_a_location_4["pm10"]["value"],
+                ]
+            ),
+            statistics.mean(
+                [city_b_location_1["pm10"]["value"], city_b_location_2["pm10"]["value"]]
+            ),
+            statistics.mean(
+                [
+                    city_a_location_2["pm2_5"]["value"],
+                    city_a_location_3["pm2_5"]["value"],
+                    city_a_location_4["pm2_5"]["value"],
+                ]
+            ),
+            statistics.mean(
+                [
+                    city_b_location_1["pm2_5"]["value"],
+                    city_b_location_2["pm2_5"]["value"],
+                ]
+            ),
+            statistics.mean(
+                [
+                    city_a_location_2["so2"]["value"],
+                    city_a_location_3["so2"]["value"],
+                    city_a_location_4["so2"]["value"],
+                ]
+            ),
+            statistics.mean(
+                [
+                    city_b_location_1["so2"]["value"],
+                    city_b_location_2["so2"]["value"],
+                ]
+            ),
+        ),
     ],
 )
 def test__response_contains_correct_mean_values(
     api_parameters: dict,
-    expected_test_city_1_mean_no2: float | int,
-    expected_test_city_1_mean_o3: float | int,
-    expected_test_city_1_mean_pm10: float | int,
-    expected_test_city_1_mean_pm2_5: float | int,
-    expected_test_city_1_mean_so2: float | int,
-    expected_test_city_2_mean_no2: float | int,
-    expected_test_city_2_mean_o3: float | int,
-    expected_test_city_2_mean_pm10: float | int,
-    expected_test_city_2_mean_pm2_5: float | int,
-    expected_test_city_2_mean_so2: float | int,
-    expected_test_city_3_mean_no2: float | int,
-    expected_test_city_3_mean_o3: float | int,
-    expected_test_city_3_mean_pm10: float | int,
-    expected_test_city_3_mean_pm2_5: float | int,
-    expected_test_city_3_mean_so2: float | int,
+    expected_test_city_a_no2_mean: float,
+    expected_test_city_b_no2_mean: float,
+    expected_test_city_a_o3_mean: float,
+    expected_test_city_b_o3_mean: float,
+    expected_test_city_a_pm10_mean: float,
+    expected_test_city_b_pm10_mean: float,
+    expected_test_city_a_pm2_5_mean: float,
+    expected_test_city_b_pm2_5_mean: float,
+    expected_test_city_a_so2_mean: float,
+    expected_test_city_b_so2_mean: float,
 ):
     load_dotenv(".env-qa")
-    delete_database_data("in_situ_data")
-    seed_api_test_data(
-        "in_situ_data",
-    )
     response: Response = requests.request(
         "GET", base_url, params=api_parameters, timeout=5.0
     )
@@ -624,26 +547,17 @@ def test__response_contains_correct_mean_values(
         response_so2_mean_value = city.get("so2").get("mean").get("value")
 
         match city.get("location_name"):
-            case "Test City 1":
-                assert response_no2_mean_value == expected_test_city_1_mean_no2
-                assert response_o3_mean_value == expected_test_city_1_mean_o3
-                assert response_pm10_mean_value == expected_test_city_1_mean_pm10
-                assert response_pm2_5_mean_value == expected_test_city_1_mean_pm2_5
-                assert response_so2_mean_value == expected_test_city_1_mean_so2
-            case "Test City 2":
-                assert response_no2_mean_value == expected_test_city_2_mean_no2
-                assert response_o3_mean_value == expected_test_city_2_mean_o3
-                assert response_pm10_mean_value == expected_test_city_2_mean_pm10
-                assert response_pm2_5_mean_value == expected_test_city_2_mean_pm2_5
-                assert response_so2_mean_value == expected_test_city_2_mean_so2
-            case "Test City 3":
-                assert response_no2_mean_value == expected_test_city_3_mean_no2
-                assert response_o3_mean_value == expected_test_city_3_mean_o3
-                assert response_pm10_mean_value == expected_test_city_3_mean_pm10
-                assert response_pm2_5_mean_value == expected_test_city_3_mean_pm2_5
-                assert response_so2_mean_value == expected_test_city_3_mean_so2
+            case "Test City A":
+                assert response_no2_mean_value == expected_test_city_a_no2_mean
+                assert response_o3_mean_value == expected_test_city_a_o3_mean
+                assert response_pm10_mean_value == expected_test_city_a_pm10_mean
+                assert response_pm2_5_mean_value == expected_test_city_a_pm2_5_mean
+                assert response_so2_mean_value == expected_test_city_a_so2_mean
+            case "Test City B":
+                assert response_no2_mean_value == expected_test_city_b_no2_mean
+                assert response_o3_mean_value == expected_test_city_b_o3_mean
+                assert response_pm10_mean_value == expected_test_city_b_pm10_mean
+                assert response_pm2_5_mean_value == expected_test_city_b_pm2_5_mean
+                assert response_so2_mean_value == expected_test_city_b_so2_mean
             case _:
                 print("Unexpected location_name: {}".format(city))
-
-
-# Use data without optional fields
