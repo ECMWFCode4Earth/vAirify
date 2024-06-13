@@ -2,7 +2,7 @@ import datetime
 import pytest
 from dotenv import load_dotenv
 
-from system_tests.utils.cities_data import all_cities
+from system_tests.data.cities_data import all_cities
 from system_tests.utils.cams_utilities import (
     get_ecmwf_forecast_to_dict_for_countries,
     get_database_data,

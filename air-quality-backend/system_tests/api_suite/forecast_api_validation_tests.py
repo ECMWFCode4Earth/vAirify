@@ -5,7 +5,7 @@ import requests
 from system_tests.utils.api_utilities import (
     format_datetime_as_string,
 )
-from system_tests.utils.cities_data import all_cities
+from system_tests.data.cities_data import all_cities
 from system_tests.utils.routes import Routes
 
 base_url = Routes.forecast_api_url
