@@ -10,6 +10,7 @@ import {
 
 import Layout from './components/layout/Layout'
 import GlobalSummary from './components/summary-view/GlobalSummary'
+import { RouteConstants } from './routes'
 import SingleCity from './SingleCity'
 
 import './index.css'
@@ -19,15 +20,15 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
-        path: '/city/summary',
+        path: RouteConstants.CITY_SUMMARY,
         handle: { breadcrumbConfig: [{ title: () => 'Cities' }] },
         element: <GlobalSummary />,
       },
       {
-        path: '/city/:name',
+        path: `${RouteConstants.SINGLE_CITY}/:name`,
         handle: {
           breadcrumbConfig: [
-            { path: '/city/summary', title: () => 'Cities' },
+            { path: RouteConstants.CITY_SUMMARY, title: () => 'Cities' },
             {
               title: (match: UIMatch<unknown, unknown>) =>
                 `${match.params.name}`,
@@ -38,7 +39,7 @@ const router = createBrowserRouter([
       },
       {
         path: '*',
-        element: <Navigate replace to="/city/summary" />,
+        element: <Navigate replace to={RouteConstants.CITY_SUMMARY} />,
       },
     ],
   },
