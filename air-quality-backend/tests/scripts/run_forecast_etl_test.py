@@ -33,7 +33,7 @@ def test__run_forecast_etl__no_forecast_time_in_environment_uses_now(
         main()
 
         expected_datetime = datetime(2024, 5, 24, 11, 12, 13, 0)
-        mock_os.assert_called_with("FORECAST_INITIAL_DATE_TIME")
+        mock_os.assert_called_with("FORECAST_BASE_TIME")
         mock_locations.assert_called_with(AirQualityLocationType.CITY)
         mock_fetch.assert_called_with(expected_datetime)
         mock_transform.assert_called_with(forecast_data, cities)
@@ -58,7 +58,7 @@ def test__run_forecast_etl__forecast_time_in_environment_uses(
         main()
 
         expected_datetime = datetime(2024, 6, 1, 17, 0, 0, 0)
-        mock_os.assert_called_with("FORECAST_INITIAL_DATE_TIME")
+        mock_os.assert_called_with("FORECAST_BASE_TIME")
         mock_locations.assert_called_with(AirQualityLocationType.CITY)
         mock_fetch.assert_called_with(expected_datetime)
         mock_transform.assert_called_with(forecast_data, cities)

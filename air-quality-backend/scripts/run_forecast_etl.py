@@ -19,7 +19,7 @@ def main():
     logging.info(f"Finding data for {cities.__len__()} cities")
 
     base_date = datetime.utcnow()
-    base_date_env = os.environ.get("FORECAST_INITIAL_DATE_TIME")
+    base_date_env = os.environ.get("FORECAST_BASE_TIME")
     if base_date_env is not None:
         date_format = "%Y-%m-%d %H"
         base_date = datetime.strptime(base_date_env, date_format)
