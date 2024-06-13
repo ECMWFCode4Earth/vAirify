@@ -21,13 +21,13 @@ const router = createBrowserRouter([
     children: [
       {
         path: RouteConstants.CITY_SUMMARY,
-        handle: { breadcrumbConfig: [{ title: () => 'Cities' }] },
+        handle: { breadcrumbs: [{ title: () => 'Cities' }] },
         element: <GlobalSummary />,
       },
       {
         path: `${RouteConstants.SINGLE_CITY}/:name`,
         handle: {
-          breadcrumbConfig: [
+          breadcrumbs: [
             { path: RouteConstants.CITY_SUMMARY, title: () => 'Cities' },
             {
               title: (match: UIMatch<unknown, unknown>) =>

@@ -1,7 +1,7 @@
 import classes from './Header.module.css'
-import Toolbar from './Toolbar'
+import { Toolbar } from './Toolbar'
 
-const Header = () => (
+export const Header = () => (
   <header>
     <section className={classes['header-section']}>
       <div>
@@ -14,5 +14,3 @@ const Header = () => (
     <Toolbar></Toolbar>
   </header>
 )
-
-export default Header

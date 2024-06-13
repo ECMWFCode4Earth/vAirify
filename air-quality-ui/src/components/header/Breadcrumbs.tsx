@@ -1,65 +1,77 @@
+import { useMemo } from 'react'
 import { Link, UIMatch, useMatches } from 'react-router-dom'
 
 import classes from './Breadcrumbs.module.css'
 
-interface Breadcrumb {
+interface BreadcrumbConfig {
   path?: string
   title: (match: UIMatch<unknown, unknown>) => string
 }
 
 interface BreadcrumbHandle {
-  breadcrumbConfig: Breadcrumb[]
+  breadcrumbs: BreadcrumbConfig[]
 }
 
-const isBreadcrumbConfig = (object: unknown): object is Breadcrumb =>
+const isBreadcrumbConfig = (object: unknown): object is BreadcrumbConfig =>
   object !== null &&
   typeof object === 'object' &&
   (!('path' in object) ||
     ('path' in object && typeof object.path === 'string')) &&
   'title' in object &&
-  (typeof object.title === 'function' || typeof object.title === 'string')
+  typeof object.title === 'function'
 
 const isBreadcrumbHandle = (object: unknown): object is BreadcrumbHandle =>
   object !== null &&
   typeof object === 'object' &&
-  'breadcrumbConfig' in object &&
-  Array.isArray(object.breadcrumbConfig) &&
-  object.breadcrumbConfig.every((entry) => isBreadcrumbConfig(entry))
+  'breadcrumbs' in object &&
+  Array.isArray(object.breadcrumbs) &&
+  object.breadcrumbs.every((entry) => isBreadcrumbConfig(entry))
 
-function Breadcrumbs() {
+export const Breadcrumbs = (): JSX.Element => {
   const matches = useMatches()
-  const breadcrumbs = matches.flatMap((match) => {
-    const { handle } = match
-    if (!isBreadcrumbHandle(handle)) {
-      return []
-    }
-    return handle.breadcrumbConfig.map(({ path, title }) => ({
-      path,
-      title: title(match),
-    }))
-  })
+  const breadcrumbs = useMemo(
+    () =>
+      matches.flatMap((match) => {
+        const { handle } = match
+        if (!isBreadcrumbHandle(handle)) {
+          return []
+        }
+        return handle.breadcrumbs.map(({ path, title }) => ({
+          path,
+          title: title(match),
+        }))
+      }),
+    [matches],
+  )
 
   return (
     <nav>
       <ol className={classes['breadcrumb-list']}>
-        {breadcrumbs.map(({ path, title }, index) => (
-          <>
-            <li key={index} className={classes['breadcrumb']}>
+        {breadcrumbs.flatMap(({ path, title }, index) => {
+          const breadcrumbComponents = [
+            <li key={`crumb-${index}`} className={classes['breadcrumb']}>
               {path && (
-                <Link className={classes['breadcrumb-link']} to={path}>
+                <Link
+                  className={classes['breadcrumb-link']}
+                  to={path}
+                  role="link"
+                >
                   {title}
                 </Link>
               )}
               {!path && (
                 <div className={classes['breadcrumb-leaf']}>{title}</div>
               )}
-            </li>
-            <li>{index < breadcrumbs.length - 1 && <>/</>}</li>
-          </>
-        ))}
+            </li>,
+          ]
+          if (index < breadcrumbs.length - 1) {
+            breadcrumbComponents.push(
+              <li key={`crumb-separator-${index}`}>/</li>,
+            )
+          }
+          return breadcrumbComponents
+        })}
       </ol>
     </nav>
   )
 }
-
-export default Breadcrumbs

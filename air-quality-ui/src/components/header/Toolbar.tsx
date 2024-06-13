@@ -1,12 +1,10 @@
-import Breadcrumbs from './Breadcrumbs'
+import { Breadcrumbs } from './Breadcrumbs'
 import classes from './Toolbar.module.css'
 
-const Toolbar = () => {
+export const Toolbar = () => {
   return (
-    <section className={classes['toolbar-section']}>
+    <section role="toolbar" className={classes['toolbar-section']}>
       <Breadcrumbs />
     </section>
   )
 }
-
-export default Toolbar
