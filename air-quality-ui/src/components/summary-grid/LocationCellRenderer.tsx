@@ -5,7 +5,7 @@ export const LocationCellRenderer = (
   props: Pick<ICellRendererParams, 'value'>,
 ) => {
   return (
-    <Link to={`city/${props.value}`} role="link">
+    <Link to={`/city/${props.value}`} role="link">
       {props.value}
     </Link>
   )

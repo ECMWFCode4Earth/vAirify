@@ -1,0 +1,18 @@
+import classes from './Header.module.css'
+import Toolbar from './Toolbar'
+
+const Header = () => (
+  <header>
+    <section className={classes['header-section']}>
+      <div>
+        <img src="https://www.ecmwf.int/themes/ecmwf/src/images/svg/ECMWF_logo.svg" />
+      </div>
+      <div>
+        <h1>vAirify</h1>
+      </div>
+    </section>
+    <Toolbar></Toolbar>
+  </header>
+)
+
+export default Header
