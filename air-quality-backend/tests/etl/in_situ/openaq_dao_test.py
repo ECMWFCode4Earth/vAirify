@@ -2,7 +2,7 @@ import os
 import re
 from datetime import datetime
 from unittest import mock
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, mock_open
 
 import pytest
 from pytest_httpserver import HTTPServer
@@ -154,7 +154,7 @@ def test__fetch_in_situ_measurements__cache_supplied_reads_from_cache(
         mock_path_exists.assert_called_with(expected_file_name)
 
 
-@patch("air_quality.etl.in_situ.openaq_dao.requests")
+@patch("air_quality.etl.in_situ.openaq_dao.requests.Session.get")
 @patch("os.path.exists")
 @patch.dict(os.environ, {"OPEN_AQ_CACHE": "test_cache"})
 def test__fetch_in_situ_measurements__cache_supplied_but_no_file_for_city_calls_api(
@@ -163,7 +163,7 @@ def test__fetch_in_situ_measurements__cache_supplied_but_no_file_for_city_calls_
     mock_path_exists.return_value = False
     response_mock = Mock()
     response_mock.json.return_value = {"results": [100, 200]}
-    requests_patch.get.return_value = response_mock
+    requests_patch.return_value = response_mock
 
     cities = [{"name": "London", "latitude": 11, "longitude": 22}]
     result = fetch_in_situ_measurements(cities, date_from, date_to)
