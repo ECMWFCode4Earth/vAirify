@@ -1,5 +1,8 @@
+import re
 from datetime import datetime
 from unittest.mock import patch, Mock
+
+import requests_mock
 
 from air_quality.etl.in_situ.openaq_dao import fetch_in_situ_measurements, base_url
 
@@ -15,13 +18,13 @@ def test__fetch_in_situ_measurements__no_cities_returns_empty():
 
 
 @patch("air_quality.etl.in_situ.openaq_dao.urlencode")
-@patch("air_quality.etl.in_situ.openaq_dao.requests")
+@patch("air_quality.etl.in_situ.openaq_dao.requests.Session.get")
 def test__fetch_in_situ_measurements__correct_url_params_encoded(
     requests_patch, urlencode_patch
 ):
     response_mock = Mock()
     response_mock.json.return_value = {"results": []}
-    requests_patch.get.return_value = response_mock
+    requests_patch.return_value = response_mock
 
     cities = [{"name": "London", "latitude": 11, "longitude": 22}]
     fetch_in_situ_measurements(cities, date_from, date_to)
@@ -44,7 +47,7 @@ def test__fetch_in_situ_measurements__correct_url_params_encoded(
 
 
 @patch("air_quality.etl.in_situ.openaq_dao.urlencode")
-@patch("air_quality.etl.in_situ.openaq_dao.requests")
+@patch("air_quality.etl.in_situ.openaq_dao.requests.Session.get")
 @patch("air_quality.etl.in_situ.openaq_dao.os")
 def test__fetch_in_situ_measurements__correct_url_called(
     os_patch, requests_patch, urlencode_patch
@@ -53,21 +56,21 @@ def test__fetch_in_situ_measurements__correct_url_called(
     os_patch.environ.get.return_value = "test_api_key"
     response_mock = Mock()
     response_mock.json.return_value = {"results": []}
-    requests_patch.get.return_value = response_mock
+    requests_patch.return_value = response_mock
 
     cities = [{"name": "London", "latitude": 11, "longitude": 22}]
     fetch_in_situ_measurements(cities, date_from, date_to)
 
-    requests_patch.get.assert_called_with(
+    requests_patch.assert_called_with(
         f"{base_url}?test_url_params", headers={"X-API-Key": "test_api_key"}
     )
 
 
-@patch("air_quality.etl.in_situ.openaq_dao.requests")
+@patch("air_quality.etl.in_situ.openaq_dao.requests.Session.get")
 def test__fetch_in_situ_measurements__single_city_without_measurements(requests_patch):
     response_mock = Mock()
     response_mock.json.return_value = {"results": []}
-    requests_patch.get.return_value = response_mock
+    requests_patch.return_value = response_mock
 
     cities = [{"name": "London", "latitude": 11, "longitude": 22}]
     result = fetch_in_situ_measurements(cities, date_from, date_to)
@@ -76,11 +79,11 @@ def test__fetch_in_situ_measurements__single_city_without_measurements(requests_
     assert result["London"]["measurements"] == []
 
 
-@patch("air_quality.etl.in_situ.openaq_dao.requests")
+@patch("air_quality.etl.in_situ.openaq_dao.requests.Session.get")
 def test__fetch_in_situ_measurements__single_city_multiple_measurements(requests_patch):
     response_mock = Mock()
     response_mock.json.return_value = {"results": [100, 200]}
-    requests_patch.get.return_value = response_mock
+    requests_patch.return_value = response_mock
 
     cities = [{"name": "London", "latitude": 11, "longitude": 22}]
     result = fetch_in_situ_measurements(cities, date_from, date_to)
@@ -89,13 +92,13 @@ def test__fetch_in_situ_measurements__single_city_multiple_measurements(requests
     assert result["London"]["measurements"] == [100, 200]
 
 
-@patch("air_quality.etl.in_situ.openaq_dao.requests")
+@patch("air_quality.etl.in_situ.openaq_dao.requests.Session.get")
 def test__fetch_in_situ_measurements__single_city_too_many_measurements(requests_patch):
     response_mock = Mock()
 
     results = range(0, 3001)
     response_mock.json.return_value = {"results": results}
-    requests_patch.get.return_value = response_mock
+    requests_patch.return_value = response_mock
 
     cities = [{"name": "London", "latitude": 11, "longitude": 22}]
     result = fetch_in_situ_measurements(cities, date_from, date_to)
@@ -104,11 +107,11 @@ def test__fetch_in_situ_measurements__single_city_too_many_measurements(requests
     assert result["London"]["measurements"] == results
 
 
-@patch("air_quality.etl.in_situ.openaq_dao.requests")
+@patch("air_quality.etl.in_situ.openaq_dao.requests.Session.get")
 def test__fetch_in_situ_measurements__multiple_cities(requests_patch):
     response_mock = Mock()
-    response_mock.json.return_value = {}
-    requests_patch.get.return_value = response_mock
+    response_mock.json.return_value = {"results": []}
+    requests_patch.return_value = response_mock
 
     cities = [
         {"name": "London", "latitude": 11, "longitude": 22},
@@ -118,3 +121,16 @@ def test__fetch_in_situ_measurements__multiple_cities(requests_patch):
 
     assert result["London"]["city"] == cities[0]
     assert result["Dublin"]["city"] == cities[1]
+
+
+def test__fetch_in_situ_measurements__handles_error():
+    with requests_mock.Mocker() as m:
+        m.get(
+            re.compile(f"^{base_url}.*"),
+            base_url[{"status_code": 408},],
+        )
+        cities = [{"name": "London", "latitude": 11, "longitude": 22}]
+        result = fetch_in_situ_measurements(cities, date_from, date_to)
+
+        assert result["London"]["city"] == cities[0]
+        assert result["London"]["measurements"] == []
