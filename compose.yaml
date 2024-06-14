@@ -1,22 +1,36 @@
 services:
+  db:
+    container_name: mongo
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - database:/data/db
   etl-insitu:
     container_name: etl-insitu
+    depends_on:
+      - db
     build:
       context: ./air-quality-backend/
       dockerfile: Dockerfile.insitu
     environment:
-      - MONGO_DB_URI=${MONGO_DB_URI}
+      - MONGO_DB_URI=mongodb://mongo:27017
       - MONGO_DB_NAME=${MONGO_DB_NAME}
       - OPEN_AQ_API_KEY=${OPEN_AQ_API_KEY}
       - CDSAPI_URL=${CDSAPI_URL}
       - CDSAPI_KEY=${CDSAPI_KEY}
   etl-forecast:
     container_name: etl-forecast
+    depends_on:
+      - db
     build: 
       context: ./air-quality-backend/
       dockerfile: Dockerfile.forecast
     environment:
-      - MONGO_DB_URI=${MONGO_DB_URI}
+      - MONGO_DB_URI=mongodb://mongo:27017
       - MONGO_DB_NAME=${MONGO_DB_NAME}
       - CDSAPI_URL=${CDSAPI_URL}
       - CDSAPI_KEY=${CDSAPI_KEY}
+volumes:
+  database:
