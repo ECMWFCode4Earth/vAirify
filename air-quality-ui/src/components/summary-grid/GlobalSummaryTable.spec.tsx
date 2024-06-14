@@ -69,7 +69,7 @@ describe('GlobalSummaryTable component', () => {
       })
       it('displays rounded values', async () => {
         await waitFor(() => {
-          expect(screen.getByText('5.124')).toBeInTheDocument()
+          expect(screen.getByText('5.1')).toBeInTheDocument()
         })
       })
     })
