@@ -7,7 +7,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-base_url = "https://api.openaq.org/v2/measurements"
+measurements_path = "/v2/measurements"
 
 
 def _create_session() -> requests.Session:
@@ -35,7 +35,7 @@ def _call_openaq_api(
         "coordinates": str(city["latitude"]) + "," + str(city["longitude"]),
         "parameter": ["o3", "no2", "pm10", "so2", "pm25"],
     }
-    url = base_url + "?" + urlencode(query_params, doseq=True)
+    url = f"{os.environ.get('OPEN_AQ_API_URL')}/{measurements_path}?{urlencode(query_params, doseq=True)}"
     headers = {"X-API-Key": os.environ.get("OPEN_AQ_API_KEY")}
     logging.debug(f"Calling OpenAQ: {url}")
     try:

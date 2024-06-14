@@ -1,10 +1,16 @@
+import os
 import re
 from datetime import datetime
+from unittest import mock
 from unittest.mock import patch, Mock
 
-import requests_mock
+import pytest
+from pytest_httpserver import HTTPServer
 
-from air_quality.etl.in_situ.openaq_dao import fetch_in_situ_measurements, base_url
+from air_quality.etl.in_situ.openaq_dao import (
+    fetch_in_situ_measurements,
+    measurements_path,
+)
 
 date_from = datetime(2023, 12, 25, 7, 30)
 date_to = datetime(2023, 12, 25, 7, 30)
@@ -48,12 +54,14 @@ def test__fetch_in_situ_measurements__correct_url_params_encoded(
 
 @patch("air_quality.etl.in_situ.openaq_dao.urlencode")
 @patch("air_quality.etl.in_situ.openaq_dao.requests.Session.get")
-@patch("air_quality.etl.in_situ.openaq_dao.os")
+@mock.patch.dict(
+    os.environ,
+    {"OPEN_AQ_API_URL": "test_url", "OPEN_AQ_API_KEY": "test_api_key"},
+)
 def test__fetch_in_situ_measurements__correct_url_called(
-    os_patch, requests_patch, urlencode_patch
+    requests_patch, urlencode_patch
 ):
     urlencode_patch.return_value = "test_url_params"
-    os_patch.environ.get.return_value = "test_api_key"
     response_mock = Mock()
     response_mock.json.return_value = {"results": []}
     requests_patch.return_value = response_mock
@@ -62,7 +70,8 @@ def test__fetch_in_situ_measurements__correct_url_called(
     fetch_in_situ_measurements(cities, date_from, date_to)
 
     requests_patch.assert_called_with(
-        f"{base_url}?test_url_params", headers={"X-API-Key": "test_api_key"}
+        f"test_url/{measurements_path}?test_url_params",
+        headers={"X-API-Key": "test_api_key"},
     )
 
 
@@ -123,14 +132,28 @@ def test__fetch_in_situ_measurements__multiple_cities(requests_patch):
     assert result["Dublin"]["city"] == cities[1]
 
 
-def test__fetch_in_situ_measurements__handles_error():
-    with requests_mock.Mocker() as m:
-        m.get(
-            re.compile(f"^{base_url}.*"),
-            base_url[{"status_code": 408},],
-        )
-        cities = [{"name": "London", "latitude": 11, "longitude": 22}]
-        result = fetch_in_situ_measurements(cities, date_from, date_to)
+@pytest.fixture(scope="session")
+def httpserver_listen_address():
+    return "127.0.0.1", 9999
 
-        assert result["London"]["city"] == cities[0]
-        assert result["London"]["measurements"] == []
+
+@mock.patch.dict(
+    os.environ,
+    {
+        "OPEN_AQ_API_URL": "http://localhost:9999",
+    },
+)
+def test__fetch_in_situ_measurements__retries_408_responses(httpserver: HTTPServer):
+    expected_retries = 3
+    for index in range(expected_retries):
+        httpserver.expect_ordered_request(
+            re.compile("^/v2/measurements"), method="GET"
+        ).respond_with_data("{}", status=408, content_type="application/json")
+    httpserver.expect_ordered_request(
+        re.compile("^/v2/measurements"), method="GET"
+    ).respond_with_json({"results": [123]})
+
+    cities = [{"name": "London", "latitude": 11, "longitude": 22}]
+    result = fetch_in_situ_measurements(cities, date_from, date_to)
+    assert result["London"]["city"] == cities[0]
+    assert result["London"]["measurements"] == [123]
