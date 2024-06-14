@@ -1,5 +1,5 @@
 from datetime import UTC
-from typing import Literal
+from typing import Literal, List
 
 from air_quality.api.types import MeasurementDto, MeasurementSummaryDto
 from air_quality.aqi.calculator import get_pollutant_index_level, get_overall_aqi_level
@@ -13,7 +13,7 @@ def map_measurement(measurement: InSituMeasurement) -> MeasurementDto:
         "location_type": measurement["location_type"],
         "location_name": measurement["name"],
         **{
-            pollutant_type.value: measurement[pollutant_type.literal()]
+            pollutant_type.value: measurement[pollutant_type.literal()]["value"]
             for pollutant_type in PollutantType
             if pollutant_type.value in measurement
         },
@@ -66,6 +66,6 @@ def map_summarized_measurement(
 
 
 def map_summarized_measurements(
-    averages: list[InSituAveragedMeasurement],
-) -> list[MeasurementSummaryDto]:
+    averages: List[InSituAveragedMeasurement],
+) -> List[MeasurementSummaryDto]:
     return list(map(map_summarized_measurement, averages))

@@ -8,6 +8,7 @@ from air_quality.api.mappers.measurements_mapper import (
     map_measurements,
     map_summarized_measurements,
 )
+from air_quality.api.types import MeasurementSummaryDto, MeasurementDto
 from air_quality.database.in_situ import get_averaged, find_by_criteria
 from air_quality.database.locations import AirQualityLocationType
 
@@ -21,7 +22,7 @@ async def get_measurements(
     location_type: AirQualityLocationType,
     location_names: List[str] = Query(None),
     api_source: str = None,
-):
+) -> List[MeasurementDto]:
     log.info(
         f"Fetching measurements between {date_from} - {date_to} for {location_type}"
     )
@@ -38,7 +39,7 @@ async def get_measurements_summary(
     measurement_base_time: datetime,
     measurement_time_range: int,
     location_type: AirQualityLocationType,
-):
+) -> List[MeasurementSummaryDto]:
     log.info(
         "Fetching measurements aggregated around {} (+/- {}) for {}".format(
             measurement_base_time, measurement_time_range, location_type

@@ -1,7 +1,6 @@
 from datetime import datetime
 
-from typing_extensions import TypedDict
-from typing import NotRequired
+from typing_extensions import Generic, TypedDict, NotRequired, TypeVar
 
 from air_quality.database.locations import AirQualityLocationType
 
@@ -39,28 +38,21 @@ class MeasurementDto(TypedDict):
     site_name: str
 
 
-class AggregateAqiDataDto(TypedDict):
-    mean: float
-    median: float
+T = TypeVar('T')
 
 
-class AggregatePollutantDataDto(TypedDict):
-    mean: int
-    median: int
-
-
-class SummarizedPollutantDataDto(TypedDict):
-    aqi_level: AggregateAqiDataDto
-    value: AggregatePollutantDataDto
+class AggregateDataDto(TypedDict, Generic[T]):
+    mean: T
+    median: T
 
 
 class MeasurementSummaryDto(TypedDict):
     measurement_base_time: datetime
     location_type: AirQualityLocationType
     location_name: str
-    overall_aqi_level: AggregateAqiDataDto
-    no2: NotRequired[SummarizedPollutantDataDto]
-    o3: NotRequired[SummarizedPollutantDataDto]
-    pm2_5: NotRequired[SummarizedPollutantDataDto]
-    pm10: NotRequired[SummarizedPollutantDataDto]
-    so2: NotRequired[SummarizedPollutantDataDto]
+    overall_aqi_level: AggregateDataDto[int]
+    no2: NotRequired[AggregateDataDto[PollutantDataDto]]
+    o3: NotRequired[AggregateDataDto[PollutantDataDto]]
+    pm2_5: NotRequired[AggregateDataDto[PollutantDataDto]]
+    pm10: NotRequired[AggregateDataDto[PollutantDataDto]]
+    so2: NotRequired[AggregateDataDto[PollutantDataDto]]
