@@ -1,4 +1,4 @@
-from datetime import timezone, datetime, timedelta
+from datetime import timezone, datetime
 import pytest
 from system_tests.utils.cams_utilities import delete_database_data
 from scripts.run_forecast_etl import main
@@ -210,5 +210,6 @@ def test__document_count_for_single_day_is_6273():
 def test__created_time_exists():
     dict_result = get_database_data({}, "forecast_data")
     for document in dict_result:
-        assert "created_time" in document, "A document is missing the created_time key!"
+        assert "created_time" in document, \
+            "A document is missing the created_time key!"
 
