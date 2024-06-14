@@ -12,6 +12,7 @@ from system_tests.utils.api_utilities import (
     format_datetime_as_string,
     seed_api_test_data,
     get_list_of_key_values,
+    get_expected_mean_pollutant_value,
 )
 from system_tests.utils.cams_utilities import delete_database_data
 from system_tests.utils.routes import Routes
@@ -80,21 +81,21 @@ city_a_location_3 = create_in_situ_database_data(
     datetime.datetime(2024, 7, 20, 15, 0, 0, tzinfo=datetime.timezone.utc),
     "Test City A",
     "Location 3",
-    303,
-    303,
-    303,
-    303,
-    303,
+    220,
+    220,
+    220,
+    220,
+    220,
 )
 city_a_location_4 = create_in_situ_database_data(
     datetime.datetime(2024, 7, 20, 16, 0, 0, tzinfo=datetime.timezone.utc),
     "Test City A",
     "Location 1",
-    10,
-    10,
-    10,
-    10,
-    10,
+    9,
+    9,
+    9,
+    9,
+    9,
 )
 city_b_location_1 = create_in_situ_database_data(
     datetime.datetime(2024, 7, 20, 13, 30, 0, tzinfo=datetime.timezone.utc),
@@ -115,6 +116,62 @@ city_b_location_2 = create_in_situ_database_data(
     303,
     303,
     303,
+)
+
+expected_mean_no2_city_a_location_1_2_3 = get_expected_mean_pollutant_value(
+    "no2", city_a_location_1, city_a_location_2, city_a_location_3
+)
+
+expected_mean_no2_city_a_location_2_3_4 = get_expected_mean_pollutant_value(
+    "no2", city_a_location_2, city_a_location_3, city_a_location_4
+)
+
+expected_mean_o3_city_a_location_1_2_3 = get_expected_mean_pollutant_value(
+    "o3", city_a_location_1, city_a_location_2, city_a_location_3
+)
+
+expected_mean_o3_city_a_location_2_3_4 = get_expected_mean_pollutant_value(
+    "o3", city_a_location_2, city_a_location_3, city_a_location_4
+)
+
+expected_mean_pm10_city_a_location_1_2_3 = get_expected_mean_pollutant_value(
+    "pm10", city_a_location_1, city_a_location_2, city_a_location_3
+)
+
+expected_mean_pm10_city_a_location_2_3_4 = get_expected_mean_pollutant_value(
+    "pm10", city_a_location_2, city_a_location_3, city_a_location_4
+)
+
+expected_mean_pm2_5_city_a_location_1_2_3 = get_expected_mean_pollutant_value(
+    "pm2_5", city_a_location_1, city_a_location_2, city_a_location_3
+)
+
+expected_mean_pm2_5_city_a_location_2_3_4 = get_expected_mean_pollutant_value(
+    "pm2_5", city_a_location_2, city_a_location_3, city_a_location_4
+)
+
+expected_mean_so2_city_a_location_1_2_3 = get_expected_mean_pollutant_value(
+    "so2", city_a_location_1, city_a_location_2, city_a_location_3
+)
+
+expected_mean_so2_city_a_location_2_3_4 = get_expected_mean_pollutant_value(
+    "so2", city_a_location_2, city_a_location_3, city_a_location_4
+)
+
+expected_mean_no2_city_b_location_1_2 = get_expected_mean_pollutant_value(
+    "no2", city_b_location_1, city_b_location_2
+)
+expected_mean_o3_city_b_location_1_2 = get_expected_mean_pollutant_value(
+    "o3", city_b_location_1, city_b_location_2
+)
+expected_mean_pm10_city_b_location_1_2 = get_expected_mean_pollutant_value(
+    "pm10", city_b_location_1, city_b_location_2
+)
+expected_mean_pm2_5_city_b_location_1_2 = get_expected_mean_pollutant_value(
+    "pm2_5", city_b_location_1, city_b_location_2
+)
+expected_mean_so2_city_b_location_1_2 = get_expected_mean_pollutant_value(
+    "so2", city_b_location_1, city_b_location_2
 )
 
 
@@ -395,7 +452,7 @@ def test__different_measurement_time_range__assert_data_filtered_appropriately(
 
 
 @pytest.mark.parametrize(
-    """api_parameters,
+    """test_measurement_base_time_string,
     expected_test_city_a_no2_mean, expected_test_city_b_no2_mean,
     expected_test_city_a_o3_mean, expected_test_city_b_o3_mean,
     expected_test_city_a_pm10_mean, expected_test_city_b_pm10_mean,
@@ -403,11 +460,94 @@ def test__different_measurement_time_range__assert_data_filtered_appropriately(
     expected_test_city_a_so2_mean, expected_test_city_b_so2_mean""",
     [
         (
-            {
-                "location_type": location_type,
-                "measurement_base_time": measurement_base_time_calculation_tests_string,
-                "measurement_time_range": measurement_time_range,
-            },
+            measurement_base_time_calculation_tests_string,
+            expected_mean_no2_city_a_location_1_2_3,
+            city_b_location_1["no2"]["value"],
+            expected_mean_o3_city_a_location_1_2_3,
+            city_b_location_1["o3"]["value"],
+            expected_mean_pm10_city_a_location_1_2_3,
+            city_b_location_1["pm10"]["value"],
+            expected_mean_pm2_5_city_a_location_1_2_3,
+            city_b_location_1["pm2_5"]["value"],
+            expected_mean_so2_city_a_location_1_2_3,
+            city_b_location_1["so2"]["value"],
+        ),
+        (
+            format_datetime_as_string(
+                datetime.datetime(2024, 7, 20, 15, 0, 0, tzinfo=datetime.timezone.utc),
+                "%Y-%m-%dT%H:%M:%S+00:00",
+            ),
+            expected_mean_no2_city_a_location_2_3_4,
+            expected_mean_no2_city_b_location_1_2,
+            expected_mean_o3_city_a_location_2_3_4,
+            expected_mean_o3_city_b_location_1_2,
+            expected_mean_pm10_city_a_location_2_3_4,
+            expected_mean_pm10_city_b_location_1_2,
+            expected_mean_pm2_5_city_a_location_2_3_4,
+            expected_mean_pm2_5_city_b_location_1_2,
+            expected_mean_so2_city_a_location_2_3_4,
+            expected_mean_so2_city_b_location_1_2,
+        ),
+    ],
+)
+def test__response_contains_correct_pollutant_mean_values(
+    test_measurement_base_time_string: dict,
+    expected_test_city_a_no2_mean: float,
+    expected_test_city_b_no2_mean: float,
+    expected_test_city_a_o3_mean: float,
+    expected_test_city_b_o3_mean: float,
+    expected_test_city_a_pm10_mean: float,
+    expected_test_city_b_pm10_mean: float,
+    expected_test_city_a_pm2_5_mean: float,
+    expected_test_city_b_pm2_5_mean: float,
+    expected_test_city_a_so2_mean: float,
+    expected_test_city_b_so2_mean: float,
+):
+    load_dotenv(".env-qa")
+    api_parameters = {
+        "location_type": location_type,
+        "measurement_base_time": test_measurement_base_time_string,
+        "measurement_time_range": measurement_time_range,
+    }
+    response: Response = requests.request(
+        "GET", base_url, params=api_parameters, timeout=5.0
+    )
+    response_json: list = response.json()
+
+    for city in response_json:
+        response_no2_mean_value = city.get("no2").get("mean").get("value")
+        response_o3_mean_value = city.get("o3").get("mean").get("value")
+        response_pm10_mean_value = city.get("pm10").get("mean").get("value")
+        response_pm2_5_mean_value = city.get("pm2_5").get("mean").get("value")
+        response_so2_mean_value = city.get("so2").get("mean").get("value")
+
+        match city.get("location_name"):
+            case "Test City A":
+                assert response_no2_mean_value == expected_test_city_a_no2_mean
+                assert response_o3_mean_value == expected_test_city_a_o3_mean
+                assert response_pm10_mean_value == expected_test_city_a_pm10_mean
+                assert response_pm2_5_mean_value == expected_test_city_a_pm2_5_mean
+                assert response_so2_mean_value == expected_test_city_a_so2_mean
+            case "Test City B":
+                assert response_no2_mean_value == expected_test_city_b_no2_mean
+                assert response_o3_mean_value == expected_test_city_b_o3_mean
+                assert response_pm10_mean_value == expected_test_city_b_pm10_mean
+                assert response_pm2_5_mean_value == expected_test_city_b_pm2_5_mean
+                assert response_so2_mean_value == expected_test_city_b_so2_mean
+            case _:
+                print("Unexpected location_name: {}".format(city))
+
+
+@pytest.mark.parametrize(
+    """test_measurement_base_time_string,
+    expected_test_city_a_no2_mean_aqi_level, expected_test_city_b_no2_mean_aqi_level,
+    expected_test_city_a_o3_mean_aqi_level, expected_test_city_b_o3_mean_aqi_level,
+    expected_test_city_a_pm10_mean_aqi_level, expected_test_city_b_pm10_mean_aqi_level,
+    expected_test_city_a_pm2_5_mean_aqi_level, expected_test_city_b_pm2_5_mean_aqi_level,
+    expected_test_city_a_so2_mean_aqi_level, expected_test_city_b_so2_mean_aqi_level""",
+    [
+        (
+            measurement_base_time_calculation_tests_string,
             statistics.mean(
                 [
                     city_a_location_1["no2"]["value"],
@@ -450,16 +590,10 @@ def test__different_measurement_time_range__assert_data_filtered_appropriately(
             city_b_location_1["so2"]["value"],
         ),
         (
-            {
-                "location_type": location_type,
-                "measurement_base_time": format_datetime_as_string(
-                    datetime.datetime(
-                        2024, 7, 20, 15, 0, 0, tzinfo=datetime.timezone.utc
-                    ),
-                    "%Y-%m-%dT%H:%M:%S+00:00",
-                ),
-                "measurement_time_range": measurement_time_range,
-            },
+            format_datetime_as_string(
+                datetime.datetime(2024, 7, 20, 15, 0, 0, tzinfo=datetime.timezone.utc),
+                "%Y-%m-%dT%H:%M:%S+00:00",
+            ),
             statistics.mean(
                 [
                     city_a_location_2["no2"]["value"],
@@ -519,44 +653,86 @@ def test__different_measurement_time_range__assert_data_filtered_appropriately(
         ),
     ],
 )
-def test__response_contains_correct_mean_values(
-    api_parameters: dict,
-    expected_test_city_a_no2_mean: float,
-    expected_test_city_b_no2_mean: float,
-    expected_test_city_a_o3_mean: float,
-    expected_test_city_b_o3_mean: float,
-    expected_test_city_a_pm10_mean: float,
-    expected_test_city_b_pm10_mean: float,
-    expected_test_city_a_pm2_5_mean: float,
-    expected_test_city_b_pm2_5_mean: float,
-    expected_test_city_a_so2_mean: float,
-    expected_test_city_b_so2_mean: float,
+def test__response_contains_correct_pollutant_mean_aqi_level(
+    test_measurement_base_time_string: str,
+    expected_test_city_a_no2_mean_aqi_level: float,
+    expected_test_city_b_no2_mean_aqi_level: float,
+    expected_test_city_a_o3_mean_aqi_level: float,
+    expected_test_city_b_o3_mean_aqi_level: float,
+    expected_test_city_a_pm10_mean_aqi_level: float,
+    expected_test_city_b_pm10_mean_aqi_level: float,
+    expected_test_city_a_pm2_5_mean_aqi_level: float,
+    expected_test_city_b_pm2_5_mean_aqi_level: float,
+    expected_test_city_a_so2_mean_aqi_level: float,
+    expected_test_city_b_so2_mean_aqi_level: float,
 ):
     load_dotenv(".env-qa")
+
+    api_parameters = (
+        {
+            "location_type": location_type,
+            "measurement_base_time": test_measurement_base_time_string,
+            "measurement_time_range": measurement_time_range,
+        },
+    )
     response: Response = requests.request(
         "GET", base_url, params=api_parameters, timeout=5.0
     )
     response_json: list = response.json()
 
     for city in response_json:
-        response_no2_mean_value = city.get("no2").get("mean").get("value")
-        response_o3_mean_value = city.get("o3").get("mean").get("value")
-        response_pm10_mean_value = city.get("pm10").get("mean").get("value")
-        response_pm2_5_mean_value = city.get("pm2_5").get("mean").get("value")
-        response_so2_mean_value = city.get("so2").get("mean").get("value")
+        response_no2_mean_value_aqi_level = city.get("no2").get("mean").get("aqi_level")
+        response_o3_mean_value_aqi_level = city.get("o3").get("mean").get("aqi_level")
+        response_pm10_mean_value_aqi_level = (
+            city.get("pm10").get("mean").get("aqi_level")
+        )
+        response_pm2_5_mean_value_aqi_level = (
+            city.get("pm2_5").get("mean").get("aqi_level")
+        )
+        response_so2_mean_mean_aqi_level = city.get("so2").get("mean").get("aqi_level")
 
         match city.get("location_name"):
             case "Test City A":
-                assert response_no2_mean_value == expected_test_city_a_no2_mean
-                assert response_o3_mean_value == expected_test_city_a_o3_mean
-                assert response_pm10_mean_value == expected_test_city_a_pm10_mean
-                assert response_pm2_5_mean_value == expected_test_city_a_pm2_5_mean
-                assert response_so2_mean_value == expected_test_city_a_so2_mean
+                assert (
+                    response_no2_mean_value_aqi_level
+                    == expected_test_city_a_no2_mean_aqi_level
+                )
+                assert (
+                    response_o3_mean_value_aqi_level
+                    == expected_test_city_a_o3_mean_aqi_level
+                )
+                assert (
+                    response_pm10_mean_value_aqi_level
+                    == expected_test_city_a_pm10_mean_aqi_level
+                )
+                assert (
+                    response_pm2_5_mean_value_aqi_level
+                    == expected_test_city_a_pm2_5_mean_aqi_level
+                )
+                assert (
+                    response_so2_mean_mean_aqi_level
+                    == expected_test_city_a_so2_mean_aqi_level
+                )
             case "Test City B":
-                assert response_no2_mean_value == expected_test_city_b_no2_mean
-                assert response_o3_mean_value == expected_test_city_b_o3_mean
-                assert response_pm10_mean_value == expected_test_city_b_pm10_mean
-                assert response_pm2_5_mean_value == expected_test_city_b_pm2_5_mean
-                assert response_so2_mean_value == expected_test_city_b_so2_mean
+                assert (
+                    response_no2_mean_value_aqi_level
+                    == expected_test_city_b_no2_mean_aqi_level
+                )
+                assert (
+                    response_o3_mean_value_aqi_level
+                    == expected_test_city_b_o3_mean_aqi_level
+                )
+                assert (
+                    response_pm10_mean_value_aqi_level
+                    == expected_test_city_b_pm10_mean_aqi_level
+                )
+                assert (
+                    response_pm2_5_mean_value_aqi_level
+                    == expected_test_city_b_pm2_5_mean_aqi_level
+                )
+                assert (
+                    response_so2_mean_mean_aqi_level
+                    == expected_test_city_b_so2_mean_aqi_level
+                )
             case _:
                 print("Unexpected location_name: {}".format(city))

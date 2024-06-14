@@ -1,5 +1,7 @@
 import datetime
 import os
+import statistics
+
 from pymongo import MongoClient
 from air_quality.database.forecasts import Forecast
 from air_quality.database.in_situ import InSituMeasurement
@@ -47,3 +49,11 @@ def seed_api_test_data(
     client = MongoClient(uri)
     collection = client[db_name][collection_name]
     collection.insert_many(test_data_list)
+
+
+def get_expected_mean_pollutant_value(pollutant_name: str, *city_dicts):
+    pollutant_values_array: list[int] = []
+    for city_location in city_dicts:
+        pollutant_values_array.append(city_location[pollutant_name]["value"])
+        print(pollutant_values_array)
+    statistics.mean(pollutant_values_array)
