@@ -72,8 +72,8 @@ city_a_location_2 = create_in_situ_database_data(
     "Location 2",
     123,
     123,
-    123,
-    123,
+    50,
+    50,
     123,
 )
 city_a_location_3 = create_in_situ_database_data(
@@ -82,8 +82,8 @@ city_a_location_3 = create_in_situ_database_data(
     "Location 3",
     220,
     220,
-    220,
-    220,
+    20,
+    20,
     220,
 )
 city_a_location_4 = create_in_situ_database_data(
@@ -102,19 +102,19 @@ city_b_location_1 = create_in_situ_database_data(
     "Location 1",
     400,
     400,
-    400,
-    400,
+    101,
+    101,
     400,
 )
 city_b_location_2 = create_in_situ_database_data(
     datetime.datetime(2024, 7, 20, 16, 30, 0, tzinfo=datetime.timezone.utc),
     "Test City B",
     "Location 2",
-    304,
-    304,
-    304,
-    304,
-    304,
+    200,
+    200,
+    2,
+    2,
+    200,
 )
 
 expected_mean_no2_city_a_location_1_2_3 = statistics.mean(
@@ -602,8 +602,8 @@ def test__response_contains_correct_pollutant_mean_values(
     expected_test_city_a_pm2_5_mean_aqi_level, expected_test_city_b_pm2_5_mean_aqi_level,
     expected_test_city_a_so2_mean_aqi_level, expected_test_city_b_so2_mean_aqi_level""",
     [
-        (measurement_base_time_string_24_7_20_14_0_0, 6, 6, 6, 6, 6, 6, 6, 6, 4, 4),
-        (measurement_base_time_string_24_7_20_15_0_0, 3, 6, 3, 5, 5, 6, 6, 6, 2, 4),
+        (measurement_base_time_string_24_7_20_14_0_0, 6, 6, 6, 6, 6, 5, 6, 6, 4, 4),
+        (measurement_base_time_string_24_7_20_15_0_0, 3, 5, 3, 5, 2, 4, 4, 5, 2, 3),
     ],
 )
 def test__response_contains_correct_pollutant_mean_aqi_level(
@@ -689,15 +689,42 @@ def test__response_contains_correct_pollutant_mean_aqi_level(
                 print("Unexpected location_name: {}".format(city))
 
 
-# def test__response_contains_correct_mean_overall_aqi_level():
-#     load_dotenv(".env-qa")
-#     api_parameters: dict = {
-#         "location_type": location_type,
-#         "measurement_base_time": test_measurement_base_time_string,
-#         "measurement_time_range": measurement_time_range,
-#     }
-#
-#     response: Response = requests.request(
-#         "GET", base_url, params=api_parameters, timeout=5.0
-#     )
-#     response_json: list = response.json()
+@pytest.mark.parametrize(
+    "test_measurement_base_time_string, expected_test_city_a_mean_overall_aqi_level, expected_test_city_b_mean_overall_aqi_level",
+    [
+        (measurement_base_time_string_24_7_20_14_0_0, 6, 6),
+        (measurement_base_time_string_24_7_20_15_0_0, 4, 5),
+    ],
+)
+def test__response_contains_correct_mean_overall_aqi_level(
+    test_measurement_base_time_string,
+    expected_test_city_a_mean_overall_aqi_level: float,
+    expected_test_city_b_mean_overall_aqi_level: float,
+):
+    load_dotenv(".env-qa")
+    api_parameters: dict = {
+        "location_type": location_type,
+        "measurement_base_time": test_measurement_base_time_string,
+        "measurement_time_range": measurement_time_range,
+    }
+
+    response: Response = requests.request(
+        "GET", base_url, params=api_parameters, timeout=5.0
+    )
+    response_json: list = response.json()
+
+    for city in response_json:
+        response_mean_overall_aqi_level = city.get("overall_aqi_level").get("mean")
+
+        if city.get("location_name") == "Test City A":
+            assert (
+                response_mean_overall_aqi_level
+                == expected_test_city_a_mean_overall_aqi_level
+            )
+        elif city.get("location_name") == "Test City B":
+            assert (
+                response_mean_overall_aqi_level
+                == expected_test_city_b_mean_overall_aqi_level
+            )
+        else:
+            print("Unexpected location_name: {}".format(city))
