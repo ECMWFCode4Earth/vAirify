@@ -28,7 +28,7 @@ export const mockMeasurementSummaryResponseDto = (
     measurement_base_time: '2024-06-01T00:00:00',
     location_type: 'city',
     location_name: 'Bristol',
-    overall_aqi_level: { mean: 5, median: 4 },
+    overall_aqi_level: { mean: 5 },
     ...overrides,
   }
 }

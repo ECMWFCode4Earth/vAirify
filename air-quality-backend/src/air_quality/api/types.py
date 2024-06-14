@@ -43,7 +43,6 @@ T = TypeVar('T')
 
 class AggregateDataDto(TypedDict, Generic[T]):
     mean: T
-    median: T
 
 
 class MeasurementSummaryDto(TypedDict):

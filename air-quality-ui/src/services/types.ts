@@ -7,7 +7,6 @@ export interface PollutantDataDto {
 
 export interface PollutantAverageDataDto<T> {
   mean: T
-  median: T
 }
 
 type ForecastPollutantDataDto = {

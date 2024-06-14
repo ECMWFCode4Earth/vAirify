@@ -14,7 +14,7 @@ import {
 
 const forecastData = mockForecastResponseDto()
 const measurementData = mockMeasurementSummaryResponseDto({
-  no2: { mean: { aqi_level: 5, value: 1 }, median: { aqi_level: 5, value: 1 } },
+  no2: { mean: { aqi_level: 5, value: 1 } },
 })
 
 const renderGrid = (
@@ -63,7 +63,6 @@ describe('GlobalSummaryTable component', () => {
       })
       it('displays the mean aqi difference', async () => {
         await waitFor(() => {
-          // Median would be 4
           expect(screen.getByText('0')).toBeInTheDocument()
         })
       })

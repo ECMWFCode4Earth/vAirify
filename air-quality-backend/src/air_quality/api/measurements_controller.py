@@ -46,7 +46,7 @@ async def get_measurements_summary(
         )
     )
     averaged_measurements = get_averaged(
-        measurement_base_time, measurement_time_range, location_type, {"mean", "median"}
+        measurement_base_time, measurement_time_range, location_type
     )
     log.info(f"Found results for {len(averaged_measurements)} locations")
     return map_summarized_measurements(averaged_measurements)
