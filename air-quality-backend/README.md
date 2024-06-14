@@ -51,6 +51,7 @@ Add in the following environment variables e.g.
 ```
 MONGO_DB_URI=mongodb+srv://<username:password>@cluster0.ch5gkk4.mongodb.net/
 MONGO_DB_NAME=air_quality_dashboard_db
+OPEN_AQ_API_URL=https://api.openaq.org
 OPEN_AQ_API_KEY=<api_key>
 ```
 
