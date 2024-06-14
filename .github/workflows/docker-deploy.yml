@@ -22,6 +22,7 @@ jobs:
           ssh ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} "cd /usr/config && \\
             echo MONGO_DB_URI=${{ secrets.MONGO_URI }} | sudo tee .env && \\
             echo MONGO_DB_NAME=${{ secrets.MONGO_DB_NAME }} | sudo tee -a .env && \\
+            echo OPEN_AQ_API_URL=${{ secrets.OPEN_AQ_API_URL }} | sudo tee -a .env && \\
             echo OPEN_AQ_API_KEY=${{ secrets.OPEN_AQ_API_KEY }} | sudo tee -a .env && \\
             echo CDSAPI_URL=${{ secrets.CDSAPI_URL }} | sudo tee -a .env && \\
             echo CDSAPI_KEY=${{ secrets.CDSAPI_KEY }} | sudo tee -a .env && \\
