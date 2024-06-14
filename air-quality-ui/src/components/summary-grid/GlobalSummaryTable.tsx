@@ -1,10 +1,10 @@
-import { ColDef, ColGroupDef } from 'ag-grid-community'
+import { ColDef, ColGroupDef, GridOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-import './GlobalSummaryTable.module.css'
 import { useMemo } from 'react'
 
+import classes from './GlobalSummaryTable.module.css'
 import { LocationCellRenderer } from './LocationCellRenderer'
 import {
   PollutantType,
@@ -41,15 +41,11 @@ const createColDefs = (): (ColDef | ColGroupDef)[] => [
     cellRenderer: LocationCellRenderer,
   },
   {
-    field: 'aqiDifference',
-    headerName: 'AQI Difference',
-    sort: 'desc',
-  },
-  {
-    headerName: 'AQI (1-6)',
+    headerName: 'AQI Level',
     children: [
       { field: 'forecast.aqiLevel', headerName: 'Forecast' },
       { field: 'measurements.aqiLevel', headerName: 'Measured' },
+      { field: 'aqiDifference', headerName: 'Diff', sort: 'desc' },
     ],
   },
   ...pollutantTypes.flatMap((type) => ({
@@ -60,6 +56,12 @@ const createColDefs = (): (ColDef | ColGroupDef)[] => [
     ],
   })),
 ]
+
+const createGridOptions = (): GridOptions => ({
+  autoSizeStrategy: {
+    type: 'fitCellContents',
+  },
+})
 
 const mapApiRow = (
   forecastData: ForecastResponseDto,
@@ -119,14 +121,18 @@ const GlobalSummaryTable = (
     }
     return null
   }, [props.forecast, props.summarizedMeasurements])
+  const gridOptions = createGridOptions()
 
   return (
     <div
-      className="ag-theme-quartz"
-      style={{ height: 500 }}
+      className={`ag-theme-quartz ${classes['summary-grid-wrapper']} `}
       data-testid="summary-grid"
     >
-      <AgGridReact rowData={data} columnDefs={colDefs} />
+      <AgGridReact
+        rowData={data}
+        columnDefs={colDefs}
+        gridOptions={gridOptions}
+      />
     </div>
   )
 }
