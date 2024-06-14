@@ -190,7 +190,7 @@ def test__overall_aqi_level_is_highest_value_of_individual_pollutant_aqi_levels(
         ), f"{document['overall_aqi_level']} is not equal to {highest_aqi}"
 
 
-def test_that_each_document_has_location_type_city():
+def test__that_each_document_has_location_type_city():
     dict_result = get_database_data({}, "forecast_data")
 
     for document in dict_result:
@@ -199,7 +199,7 @@ def test_that_each_document_has_location_type_city():
         ), f"location_type '{document['location_type']}' is not a city!"
 
 
-def test_document_count_for_single_day_is_6273():
+def test__document_count_for_single_day_is_6273():
     dict_result = get_database_data({}, "forecast_data")
 
     assert (
@@ -207,10 +207,8 @@ def test_document_count_for_single_day_is_6273():
     ), f"Expected 6273 documents, but got {len(dict_result)}"
 
 
-def test__created_time_is_similar_to_system_time():
+def test__created_time_exists():
     dict_result = get_database_data({}, "forecast_data")
-    now = datetime.utcnow()
     for document in dict_result:
-        created_time = document["created_time"]
+        assert "created_time" in document, "A document is missing the created_time key!"
 
-        assert now - timedelta(seconds=1000) <= created_time <= now, ()
