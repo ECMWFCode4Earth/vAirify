@@ -1,7 +1,5 @@
 import datetime
 import os
-import statistics
-
 from pymongo import MongoClient
 from air_quality.database.forecasts import Forecast
 from air_quality.database.in_situ import InSituMeasurement

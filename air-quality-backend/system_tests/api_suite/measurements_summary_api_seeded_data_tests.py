@@ -59,22 +59,22 @@ city_a_location_1 = create_in_situ_database_data(
     datetime.datetime(2024, 7, 20, 13, 0, 0, tzinfo=datetime.timezone.utc),
     "Test City A",
     "Location 1",
-    53,
-    53,
-    53,
-    53,
-    53,
+    800,
+    800,
+    800,
+    800,
+    800,
 )
 create_in_situ_database_data_with_overrides({})
 city_a_location_2 = create_in_situ_database_data(
     datetime.datetime(2024, 7, 20, 14, 0, 0, tzinfo=datetime.timezone.utc),
     "Test City A",
     "Location 2",
-    102,
-    102,
-    102,
-    102,
-    102,
+    123,
+    123,
+    123,
+    123,
+    123,
 )
 city_a_location_3 = create_in_situ_database_data(
     datetime.datetime(2024, 7, 20, 15, 0, 0, tzinfo=datetime.timezone.utc),
@@ -90,11 +90,11 @@ city_a_location_4 = create_in_situ_database_data(
     datetime.datetime(2024, 7, 20, 16, 0, 0, tzinfo=datetime.timezone.utc),
     "Test City A",
     "Location 1",
-    9,
-    9,
-    9,
-    9,
-    9,
+    11,
+    11,
+    11,
+    11,
+    11,
 )
 city_b_location_1 = create_in_situ_database_data(
     datetime.datetime(2024, 7, 20, 13, 30, 0, tzinfo=datetime.timezone.utc),
@@ -110,11 +110,11 @@ city_b_location_2 = create_in_situ_database_data(
     datetime.datetime(2024, 7, 20, 16, 30, 0, tzinfo=datetime.timezone.utc),
     "Test City B",
     "Location 2",
-    303,
-    303,
-    303,
-    303,
-    303,
+    304,
+    304,
+    304,
+    304,
+    304,
 )
 
 expected_mean_no2_city_a_location_1_2_3 = statistics.mean(
@@ -251,21 +251,20 @@ seed_api_test_data(
     ],
 )
 
-# API GET request
+# API GET request setup
 base_url = Routes.measurement_summary_api_url
 location_type = "city"
-measurement_base_time_parameter_tests = datetime.datetime(
-    2024, 6, 12, 14, 0, 0, tzinfo=datetime.timezone.utc
-)
-measurement_base_time_parameter_tests_string = format_datetime_as_string(
-    measurement_base_time_parameter_tests,
+measurement_base_time_string_24_6_12_14_0_0 = format_datetime_as_string(
+    datetime.datetime(2024, 6, 12, 14, 0, 0, tzinfo=datetime.timezone.utc),
     "%Y-%m-%dT%H:%M:%S+00:00",
 )
-measurement_base_time_calculation_tests = datetime.datetime(
-    2024, 7, 20, 14, 0, 0, tzinfo=datetime.timezone.utc
+measurement_base_time_string_24_7_20_14_0_0 = format_datetime_as_string(
+    datetime.datetime(2024, 7, 20, 14, 0, 0, tzinfo=datetime.timezone.utc),
+    "%Y-%m-%dT%H:%M:%S+00:00",
 )
-measurement_base_time_calculation_tests_string = format_datetime_as_string(
-    measurement_base_time_calculation_tests, "%Y-%m-%dT%H:%M:%S+00:00"
+measurement_base_time_string_24_7_20_15_0_0 = format_datetime_as_string(
+    datetime.datetime(2024, 7, 20, 15, 0, 0, tzinfo=datetime.timezone.utc),
+    "%Y-%m-%dT%H:%M:%S+00:00",
 )
 
 measurement_time_range = 90
@@ -280,7 +279,7 @@ measurement_time_range = 90
         (
             {
                 "location_type": location_type,
-                "measurement_base_time": measurement_base_time_parameter_tests_string,
+                "measurement_base_time": measurement_base_time_string_24_6_12_14_0_0,
                 "measurement_time_range": measurement_time_range,
             },
             [
@@ -454,7 +453,7 @@ def test__different_base_times__assert_data_filtered_appropriately(
         (
             {
                 "location_type": location_type,
-                "measurement_base_time": measurement_base_time_parameter_tests_string,
+                "measurement_base_time": measurement_base_time_string_24_6_12_14_0_0,
                 "measurement_time_range": measurement_time_range,
             },
             ["Test City 2", "Test City 3"],
@@ -462,7 +461,7 @@ def test__different_base_times__assert_data_filtered_appropriately(
         (
             {
                 "location_type": location_type,
-                "measurement_base_time": measurement_base_time_parameter_tests_string,
+                "measurement_base_time": measurement_base_time_string_24_6_12_14_0_0,
                 "measurement_time_range": 60,
             },
             ["Test City 2", "Test City 3"],
@@ -470,7 +469,7 @@ def test__different_base_times__assert_data_filtered_appropriately(
         (
             {
                 "location_type": location_type,
-                "measurement_base_time": measurement_base_time_parameter_tests_string,
+                "measurement_base_time": measurement_base_time_string_24_6_12_14_0_0,
                 "measurement_time_range": 59,
             },
             ["Test City 2"],
@@ -478,7 +477,7 @@ def test__different_base_times__assert_data_filtered_appropriately(
         (
             {
                 "location_type": location_type,
-                "measurement_base_time": measurement_base_time_parameter_tests_string,
+                "measurement_base_time": measurement_base_time_string_24_6_12_14_0_0,
                 "measurement_time_range": 1440,
             },
             ["Test City 1", "Test City 2", "Test City 3"],
@@ -486,7 +485,7 @@ def test__different_base_times__assert_data_filtered_appropriately(
         (
             {
                 "location_type": location_type,
-                "measurement_base_time": measurement_base_time_parameter_tests_string,
+                "measurement_base_time": measurement_base_time_string_24_6_12_14_0_0,
                 "measurement_time_range": 1439,
             },
             ["Test City 2", "Test City 3"],
@@ -517,7 +516,7 @@ def test__different_measurement_time_range__assert_data_filtered_appropriately(
     expected_test_city_a_so2_mean, expected_test_city_b_so2_mean""",
     [
         (
-            measurement_base_time_calculation_tests_string,
+            measurement_base_time_string_24_7_20_14_0_0,
             expected_mean_no2_city_a_location_1_2_3,
             city_b_location_1["no2"]["value"],
             expected_mean_o3_city_a_location_1_2_3,
@@ -561,7 +560,7 @@ def test__response_contains_correct_pollutant_mean_values(
     expected_test_city_b_so2_mean: float,
 ):
     load_dotenv(".env-qa")
-    api_parameters = {
+    api_parameters: dict = {
         "location_type": location_type,
         "measurement_base_time": test_measurement_base_time_string,
         "measurement_time_range": measurement_time_range,
@@ -603,59 +602,30 @@ def test__response_contains_correct_pollutant_mean_values(
     expected_test_city_a_pm2_5_mean_aqi_level, expected_test_city_b_pm2_5_mean_aqi_level,
     expected_test_city_a_so2_mean_aqi_level, expected_test_city_b_so2_mean_aqi_level""",
     [
-        (
-            measurement_base_time_calculation_tests_string,
-            expected_mean_no2_city_a_location_1_2_3,
-            city_b_location_1["no2"]["value"],
-            expected_mean_o3_city_a_location_1_2_3,
-            city_b_location_1["o3"]["value"],
-            expected_mean_pm10_city_a_location_1_2_3,
-            city_b_location_1["pm10"]["value"],
-            expected_mean_pm2_5_city_a_location_1_2_3,
-            city_b_location_1["pm2_5"]["value"],
-            expected_mean_so2_city_a_location_1_2_3,
-            city_b_location_1["so2"]["value"],
-        ),
-        (
-            format_datetime_as_string(
-                datetime.datetime(2024, 7, 20, 15, 0, 0, tzinfo=datetime.timezone.utc),
-                "%Y-%m-%dT%H:%M:%S+00:00",
-            ),
-            expected_mean_no2_city_a_location_2_3_4,
-            expected_mean_no2_city_b_location_1_2,
-            expected_mean_o3_city_a_location_2_3_4,
-            expected_mean_o3_city_b_location_1_2,
-            expected_mean_pm10_city_a_location_2_3_4,
-            expected_mean_pm10_city_b_location_1_2,
-            expected_mean_pm2_5_city_a_location_2_3_4,
-            expected_mean_pm2_5_city_b_location_1_2,
-            expected_mean_so2_city_a_location_2_3_4,
-            expected_mean_so2_city_b_location_1_2,
-        ),
+        (measurement_base_time_string_24_7_20_14_0_0, 6, 6, 6, 6, 6, 6, 6, 6, 4, 4),
+        (measurement_base_time_string_24_7_20_15_0_0, 3, 6, 3, 5, 5, 6, 6, 6, 2, 4),
     ],
 )
 def test__response_contains_correct_pollutant_mean_aqi_level(
     test_measurement_base_time_string: str,
-    expected_test_city_a_no2_mean_aqi_level: float,
-    expected_test_city_b_no2_mean_aqi_level: float,
-    expected_test_city_a_o3_mean_aqi_level: float,
-    expected_test_city_b_o3_mean_aqi_level: float,
-    expected_test_city_a_pm10_mean_aqi_level: float,
-    expected_test_city_b_pm10_mean_aqi_level: float,
-    expected_test_city_a_pm2_5_mean_aqi_level: float,
-    expected_test_city_b_pm2_5_mean_aqi_level: float,
-    expected_test_city_a_so2_mean_aqi_level: float,
-    expected_test_city_b_so2_mean_aqi_level: float,
+    expected_test_city_a_no2_mean_aqi_level: int,
+    expected_test_city_b_no2_mean_aqi_level: int,
+    expected_test_city_a_o3_mean_aqi_level: int,
+    expected_test_city_b_o3_mean_aqi_level: int,
+    expected_test_city_a_pm10_mean_aqi_level: int,
+    expected_test_city_b_pm10_mean_aqi_level: int,
+    expected_test_city_a_pm2_5_mean_aqi_level: int,
+    expected_test_city_b_pm2_5_mean_aqi_level: int,
+    expected_test_city_a_so2_mean_aqi_level: int,
+    expected_test_city_b_so2_mean_aqi_level: int,
 ):
     load_dotenv(".env-qa")
+    api_parameters: dict = {
+        "location_type": location_type,
+        "measurement_base_time": test_measurement_base_time_string,
+        "measurement_time_range": measurement_time_range,
+    }
 
-    api_parameters = (
-        {
-            "location_type": location_type,
-            "measurement_base_time": test_measurement_base_time_string,
-            "measurement_time_range": measurement_time_range,
-        },
-    )
     response: Response = requests.request(
         "GET", base_url, params=api_parameters, timeout=5.0
     )
@@ -717,3 +687,17 @@ def test__response_contains_correct_pollutant_mean_aqi_level(
                 )
             case _:
                 print("Unexpected location_name: {}".format(city))
+
+
+# def test__response_contains_correct_mean_overall_aqi_level():
+#     load_dotenv(".env-qa")
+#     api_parameters: dict = {
+#         "location_type": location_type,
+#         "measurement_base_time": test_measurement_base_time_string,
+#         "measurement_time_range": measurement_time_range,
+#     }
+#
+#     response: Response = requests.request(
+#         "GET", base_url, params=api_parameters, timeout=5.0
+#     )
+#     response_json: list = response.json()
