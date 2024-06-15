@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 from air_quality.database.forecasts import insert_data
 from air_quality.database.locations import get_locations_by_type, AirQualityLocationType
-from air_quality.etl.forecast.forecast_adapter import transform
+from air_quality.etl.forecast.forecast_adapter import transform, create_data_textures
 from air_quality.etl.forecast.forecast_dao import fetch_forecast_data
 
 config.fileConfig("./logging.ini")
@@ -26,6 +26,9 @@ def main():
 
     logging.info("Extracting pollutant forecast data")
     extracted_forecast_data = fetch_forecast_data(base_date)
+
+    logging.info("Creating forecast data textures")
+    create_data_textures(extracted_forecast_data)
 
     logging.info("Transforming forecast data")
     transformed_forecast_data = transform(extracted_forecast_data, cities)
