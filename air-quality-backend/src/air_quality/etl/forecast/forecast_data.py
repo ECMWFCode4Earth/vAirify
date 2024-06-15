@@ -63,6 +63,7 @@ def convert_longitude(dataset: xr.Dataset) -> xr.Dataset:
         )
     )
     converted_data = converted_data.sortby("longitude")
+    converted_data["longitude"].attrs["units"] = "degrees_east"
     return converted_data
 
 

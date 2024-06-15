@@ -2,11 +2,15 @@ from datetime import datetime, timezone
 from decimal import Decimal
 import logging
 from typing import TypedDict
-from .forecast_data import ForecastData
+from .forecast_data import ForecastData, convert_to_forecast_data_type
 from air_quality.database.locations import AirQualityLocation
 from air_quality.aqi import calculator as aqi_calculator
 from air_quality.aqi.pollutant_type import PollutantType
-
+import re
+import os
+import xarray as xr
+import numpy as np
+from PIL import Image
 
 class PollutantData(TypedDict):
     values_ug_m3: list[float]
@@ -107,3 +111,131 @@ def transform(forecast_data: ForecastData, locations: list[AirQualityLocation]) 
             }
             pollutant_forecast_for_location.append(document)
     return pollutant_forecast_for_location
+
+def _get_dimension_by_attr(dataset, attr_name, attr_value):
+    """
+    Find the dimension by attribute name and value.
+    params:
+        dataset (xarray.Dataset): The dataset to search.
+        attr_name (str): The attribute name to search for.
+        attr_value (str): The attribute value to match.
+    
+    return:
+        xarray.DataArray: The matching DataArray if found, otherwise None.
+    """
+    for var in dataset.variables.values():
+        if attr_name in var.attrs and var.attrs[attr_name] == attr_value:
+            return var
+    return None
+
+
+def _get_spatial_temporal_dims(dataset):
+    """
+    Get the latitude, longitude, and time dimensions from the dataset.
+    params:
+        dataset (xarray.Dataset): The dataset to search.
+    return:
+        tuple: A tuple containing (latitude, longitude, time) DataArrays.
+    """
+    lat = _get_dimension_by_attr(dataset, 'units', 'degrees_north')
+    lon = _get_dimension_by_attr(dataset, 'units', 'degrees_east')
+    time = _get_dimension_by_attr(dataset, 'standard_name', 'time')    
+    return lat, lon, time
+
+
+def _normalise_data(arr, norm_min, norm_max):
+    return (arr - norm_min) / (norm_max - norm_min)
+
+def _normalize_data_irregular(arr, intervals):
+    # Ensure the intervals are sorted
+    intervals = np.sort(intervals)
+    num_intervals = len(intervals)
+    
+    # Calculate the normalized values for each interval
+    normalized_values = np.linspace(0, 1, num_intervals)
+    
+    def normalize_value(value):
+        # Find the correct interval for the value
+        for i in range(1, num_intervals):
+            if value <= intervals[i]:
+                return normalized_values[i-1]
+        return 1.0  # If the value is greater than the last interval
+
+    # Vectorize the function for efficiency
+    normalize_vectorized = np.vectorize(normalize_value)
+    return normalize_vectorized(arr)
+
+def _convert_data(input_data: xr.Dataset, variable: str):
+    """
+    Convert data to numpy array
+    :param input_data:
+    :param variable:
+    :return rgb_data_array:
+    """
+    lat, lon, time = _get_spatial_temporal_dims(input_data)
+
+    rgb_data_array = np.zeros( ( len(lat), len(lon) * len(time), 1 ))
+
+    if variable == 'pm10' or variable == 'pm2p5':
+        min_val = 0
+        max_val = 500.
+    elif variable == 'no2' or variable == 'so2':
+        min_val = 0
+        max_val = 100.
+    elif variable == 'go3':
+        min_val = 0
+        max_val = 150.
+
+    intervals = [0, 20, 30, 40, 50, 60, 80, 100, 150, 200, 300, 500, 1000]
+
+    for tt in range(len(time)):
+        start_index = tt * len(lon)
+        end_index = (tt + 1) * len(lon)
+        normalised_data = _normalise_data(input_data[variable].isel(step=tt) * 1e9, min_val, max_val)
+        # normalised_data = _normalize_data_irregular(input_data[variable].isel(step=tt) * 1e9, intervals)
+        rgb_data_array[:, start_index:end_index, 0] = np.clip(normalised_data * 255, 0, 255)
+
+    return np.uint8(rgb_data_array)
+
+
+def _create_output_directory(forecast_data: ForecastData):
+    """
+    Create output directory for data textures
+    :param forecast_data:
+    :return output_directory:
+    """
+
+    filename = forecast_data._single_level_data.encoding.get('source', 'Unknown source')
+    if filename != 'Unknown source':
+        forecast_date = re.search(r'\d{4}-\d{2}-\d{2}_\d{2}', filename).group()
+
+    output_directory = f"{os.getcwd()}/data_textures/{forecast_date}"
+    os.makedirs(output_directory, exist_ok=True)
+    return output_directory, forecast_date
+
+def _save_data_textures(rgb_data_array, output_directory, forecast_date, variable):
+    """
+    Save data textures
+    :param rgb_data_array:
+    :param output_directory:
+    :param variable:
+    :return:
+    """
+    grayscale_array = rgb_data_array.squeeze(axis=2)
+    image = Image.fromarray(grayscale_array, 'L')
+    output_file = f"{output_directory}/{variable}_{forecast_date}_CAMS_global.png"
+    image.save(output_file, format='PNG')
+
+def create_data_textures(forecast_data: ForecastData):
+    """
+    Create gridded data textures from forecast data for frontend maps
+    :param forecast_data:
+    :return:
+    """
+    output_directory, forecast_date = _create_output_directory(forecast_data)
+    for pollutant in PollutantType:
+        logging.info(f"Creating data texture for {pollutant.name}")
+        forecast_data_type = convert_to_forecast_data_type(pollutant)
+        dataset = forecast_data._get_data_set(forecast_data_type)
+        rgb_data_array = _convert_data(dataset, forecast_data_type.value)
+        _save_data_textures(rgb_data_array, output_directory, forecast_date, pollutant.value)
