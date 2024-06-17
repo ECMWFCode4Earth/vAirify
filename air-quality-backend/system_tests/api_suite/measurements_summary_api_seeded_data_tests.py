@@ -646,12 +646,12 @@ def test__response_contains_correct_pollutant_mean_values(
 
 
 @pytest.mark.parametrize(
-    """test_measurement_base_time_string,
-    expected_test_city_a_no2_mean_aqi_level, expected_test_city_b_no2_mean_aqi_level,
-    expected_test_city_a_o3_mean_aqi_level, expected_test_city_b_o3_mean_aqi_level,
-    expected_test_city_a_pm10_mean_aqi_level, expected_test_city_b_pm10_mean_aqi_level,
-    expected_test_city_a_pm2_5_mean_aqi_level, expected_test_city_b_pm2_5_mean_aqi_level,
-    expected_test_city_a_so2_mean_aqi_level, expected_test_city_b_so2_mean_aqi_level""",
+    "test_measurement_base_time_string,"
+    "expected_test_city_a_no2_mean_aqi_level, expected_test_city_b_no2_mean_aqi_level,"
+    "expected_test_city_a_o3_mean_aqi_level, expected_test_city_b_o3_mean_aqi_level, "
+    "expected_test_city_a_pm10_mean_aqi_level, expected_test_city_b_pm10_mean_aqi_level, "
+    "expected_test_city_a_pm2_5_mean_aqi_level, expected_test_city_b_pm2_5_mean_aqi_level, "
+    "expected_test_city_a_so2_mean_aqi_level, expected_test_city_b_so2_mean_aqi_level",
     [
         (measurement_base_time_string_24_7_20_14_0_0, 6, 6, 6, 6, 6, 5, 6, 6, 4, 4),
         (measurement_base_time_string_24_7_20_15_0_0, 3, 5, 3, 5, 2, 4, 4, 5, 2, 3),
@@ -741,7 +741,8 @@ def test__response_contains_correct_pollutant_mean_aqi_level(
 
 
 @pytest.mark.parametrize(
-    "test_measurement_base_time_string, expected_test_city_a_mean_overall_aqi_level, expected_test_city_b_mean_overall_aqi_level, expected_test_city_c_mean_overall_aqi_level",
+    "test_measurement_base_time_string, expected_test_city_a_mean_overall_aqi_level,"
+    "expected_test_city_b_mean_overall_aqi_level, expected_test_city_c_mean_overall_aqi_level",
     [
         (measurement_base_time_string_24_7_20_14_0_0, 6, 6, None),
         (measurement_base_time_string_24_7_20_15_0_0, 4, 5, None),
