@@ -71,24 +71,41 @@ def fetch_cams_data(request_body, file_name) -> xr.Dataset:
     )
 
 
-def align_to_cams_publish_time(model_date_time: datetime) -> datetime:
-    current_hour = int(model_date_time.strftime("%H"))
-    # CAMS data becomes available for current day, midnight at 10AM UTC
-    if 10 <= current_hour < 22:
-        hour = 0
-    # CAMS data becomes available for current day, midday at 10PM UTC
-    elif 22 <= current_hour < 24:
-        hour = 12
+def align_to_cams_publish_time(forecast_base_time: datetime) -> datetime:
+    now = datetime.utcnow()
+    if forecast_base_time > now:
+        raise ValueError("forecast base data cannot be in the future")
+
+    request_for_today = forecast_base_time.date() == now.date()
+
+    current_hour = int(now.strftime("%H"))
+    requested_hour = int(forecast_base_time.strftime("%H"))
+
+    if request_for_today:
+        if 0 <= current_hour < 10:
+            # If asking before 10am, only yesterdays is available
+            forecast_base_time -= timedelta(days=1)
+            hour = 12
+        elif requested_hour >= 12 and current_hour >= 22:
+            # If requesting post midday data, it must be past 10pm
+            hour = 12
+        else:
+            # Either the request was for morning data, or that's all that is available
+            hour = 0
     else:
-        model_date_time -= timedelta(days=1)
-        hour = 12
+        if requested_hour < 12:
+            hour = 0
+        else:
+            hour = 12
+
     return datetime(
-        model_date_time.year, model_date_time.month, model_date_time.day, hour
+        forecast_base_time.year, forecast_base_time.month, forecast_base_time.day, hour
     )
 
 
 def fetch_forecast_data(
-    base_datetime: datetime = datetime.now(), no_of_forecast_times: int = 41
+    base_datetime: datetime = datetime.utcnow(),
+    no_of_forecast_times: int = 41,
 ) -> ForecastData:
 
     base_datetime = align_to_cams_publish_time(base_datetime)

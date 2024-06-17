@@ -1,0 +1,27 @@
+name: Build and publish insitu ETL docker images
+
+on:
+  [workflow_dispatch]
+
+jobs:
+  publish_image:
+    runs-on: ubuntu-latest
+    permissions:
+        contents: read
+        packages: write
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: lowercase the repository name
+        run: |
+          echo "REPO=${GITHUB_REPOSITORY@L}" >> "${GITHUB_ENV}"
+      - name: login
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN}} | docker login --username ${{ github.actor }} --password-stdin  ghcr.io
+      - name: build
+        run: |
+          cd air-quality-backend
+          docker build . -t ghcr.io/${REPO}/vairify-etl-insitu:latest -f Dockerfile.insitu.cron
+      - name: publish
+        run: |
+          docker push ghcr.io/${REPO}/vairify-etl-insitu:latest

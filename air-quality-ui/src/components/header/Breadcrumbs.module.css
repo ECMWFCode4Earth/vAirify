@@ -1,0 +1,25 @@
+.breadcrumb-list {
+    display: flex;
+    justify-content: space-evenly;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.breadcrumb {
+    padding: 0 8px 0 8px;
+}
+
+.breadcrumb-link {
+    color: white;
+    text-decoration: none;
+
+    &:hover {
+        border-bottom: solid 2px white;
+        font-weight: bold;
+    }
+}
+
+.breadcrumb-leaf {
+    font-weight: bold;
+}

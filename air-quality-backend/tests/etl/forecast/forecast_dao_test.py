@@ -2,6 +2,9 @@ import pytest
 
 from datetime import datetime
 from unittest.mock import call, patch
+
+from freezegun import freeze_time
+
 from air_quality.etl.forecast.forecast_dao import (
     CamsRequestDetails,
     fetch_forecast_data,
@@ -20,7 +23,8 @@ def mock_open_dataset():
 
 def test__get_single_level_request_body():
     request = get_single_level_request_body(
-        CamsRequestDetails(datetime(2024, 4, 29, 0)))
+        CamsRequestDetails(datetime(2024, 4, 29, 0))
+    )
     assert request == {
         "date": "2024-04-29/2024-04-29",
         "type": "forecast",
@@ -78,8 +82,7 @@ def test__get_single_level_request_body():
 
 
 def test__get_multi_level_request_body():
-    request = get_multi_level_request_body(
-        CamsRequestDetails(datetime(2024, 4, 29, 0)))
+    request = get_multi_level_request_body(CamsRequestDetails(datetime(2024, 4, 29, 0)))
     assert request == {
         "date": "2024-04-29/2024-04-29",
         "type": "forecast",
@@ -136,20 +139,61 @@ def test__get_multi_level_request_body():
 @pytest.mark.parametrize(
     "str_to_align, expected_str",
     [
-        ("2024-05-22 00:00:00", "2024-05-21 12:00:00"),
-        ("2024-05-22 09:59:59", "2024-05-21 12:00:00"),
+        ("2024-05-22 00:00:00", "2024-05-22 00:00:00"),
+        ("2024-05-22 09:59:59", "2024-05-22 00:00:00"),
         ("2024-05-22 10:00:00", "2024-05-22 00:00:00"),
-        ("2024-05-22 21:59:59", "2024-05-22 00:00:00"),
+        ("2024-05-22 12:00:00", "2024-05-22 12:00:00"),
+        ("2024-05-22 21:59:59", "2024-05-22 12:00:00"),
         ("2024-05-22 22:00:00", "2024-05-22 12:00:00"),
         ("2024-05-22 23:59:59", "2024-05-22 12:00:00"),
     ],
 )
-def test__align_to_cams_publish_time(str_to_align: str, expected_str: str):
+@freeze_time("2024-05-28 00:00:00")
+def test__align_to_cams_publish_time__older_dates_retrieve_relevant_cams_time(
+    str_to_align: str, expected_str: str
+):
     date_to_align = datetime.strptime(str_to_align, "%Y-%m-%d %H:%M:%S")
     expected = datetime.strptime(expected_str, "%Y-%m-%d %H:%M:%S")
 
     result = align_to_cams_publish_time(date_to_align)
+
     assert result == expected
+
+
+@pytest.mark.parametrize(
+    "current_time, str_to_align, expected_str",
+    [
+        ("2024-05-22 00:00:00", "2024-05-22 00:00:00", "2024-05-21 12:00:00"),
+        ("2024-05-22 09:59:59", "2024-05-22 00:00:00", "2024-05-21 12:00:00"),
+        ("2024-05-22 10:00:00", "2024-05-22 00:00:00", "2024-05-22 00:00:00"),
+        ("2024-05-22 12:00:00", "2024-05-22 12:00:00", "2024-05-22 00:00:00"),
+        ("2024-05-22 21:59:59", "2024-05-22 12:00:00", "2024-05-22 00:00:00"),
+        ("2024-05-22 22:00:00", "2024-05-22 12:00:00", "2024-05-22 12:00:00"),
+        ("2024-05-22 23:59:59", "2024-05-22 12:00:00", "2024-05-22 12:00:00"),
+        ("2024-05-23 00:00:00", "2024-05-22 23:59:59", "2024-05-22 12:00:00"),
+    ],
+)
+def test__align_to_cams_publish_time__same_day_dates_retrieve_relevant_cams_time(
+    current_time: str, str_to_align: str, expected_str: str
+):
+    freezer = freeze_time(current_time)
+    try:
+        freezer.start()
+        date_to_align = datetime.strptime(str_to_align, "%Y-%m-%d %H:%M:%S")
+        expected = datetime.strptime(expected_str, "%Y-%m-%d %H:%M:%S")
+
+        result = align_to_cams_publish_time(date_to_align)
+
+        assert result == expected
+    finally:
+        freezer.stop()
+
+
+@freeze_time("2024-05-28 11:00:00")
+def test__align_to_cams_publish_time__requested_future_base_time_raises_error():
+    requested_time = datetime(2024, 5, 28, 11, 00, 1)  # 1 min in the future
+    with pytest.raises(ValueError):
+        align_to_cams_publish_time(requested_time)
 
 
 def test_fetch_forecast_data_returns_forecast_data(mocker, mock_open_dataset):
@@ -162,13 +206,13 @@ def test_fetch_forecast_data_returns_forecast_data(mocker, mock_open_dataset):
     mock_open_dataset.assert_has_calls(
         [
             call(
-                "single_level_41_from_2024-05-19_12.grib",
+                "single_level_41_from_2024-05-20_00.grib",
                 decode_times=False,
                 engine="cfgrib",
                 backend_kwargs={"indexpath": ""},
             ),
             call(
-                "multi_level_41_from_2024-05-19_12.grib",
+                "multi_level_41_from_2024-05-20_00.grib",
                 decode_times=False,
                 engine="cfgrib",
                 backend_kwargs={"indexpath": ""},

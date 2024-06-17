@@ -10,6 +10,8 @@ jobs:
     environment: dev
 
     steps:
+      - name: checkout
+        uses: actions/checkout@v4
       - name: install ssh keys
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
@@ -20,19 +22,22 @@ jobs:
           ssh ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} "cd /usr/config && \\
             echo MONGO_DB_URI=${{ secrets.MONGO_URI }} | sudo tee .env && \\
             echo MONGO_DB_NAME=${{ secrets.MONGO_DB_NAME }} | sudo tee -a .env && \\
-            echo OPEN_AQ_API_KEY=${{ secrets.OPENAQ_KEY }} | sudo tee -a .env && \\
+            echo OPEN_AQ_API_URL=${{ secrets.OPEN_AQ_API_URL }} | sudo tee -a .env && \\
+            echo OPEN_AQ_API_KEY=${{ secrets.OPEN_AQ_API_KEY }} | sudo tee -a .env && \\
             echo CDSAPI_URL=${{ secrets.CDSAPI_URL }} | sudo tee -a .env && \\
             echo CDSAPI_KEY=${{ secrets.CDSAPI_KEY }} | sudo tee -a .env && \\
             exit"
+      - name: copy compose
+        run: |
+          scp deployment/compose.yaml ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}:/usr/config
       - name: activate docker
         run: |  
           ssh ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} "cd /usr/config && \\
-            sudo docker container stop etl-forecast || true && \\
-            sudo docker rm etl-forecast || true && \\
-            sudo docker pull ghcr.io/${{ github.repository }}/etl-forecast:latest && \\
-            sudo docker run --name etl-forecast --env-file .env ghcr.io/${{ github.repository }}/etl-forecast:latest && \\
+            echo ${{ secrets.GITHUB_TOKEN}} | sudo docker login --username ${{ github.actor }} --password-stdin  ghcr.io
+            sudo docker compose pull
+            sudo docker compose up --force-recreate --build -d
+            sudo docker image prune -f
             exit"
       - name: clean up
         run: |
           rm -rf ~/.ssh
-          

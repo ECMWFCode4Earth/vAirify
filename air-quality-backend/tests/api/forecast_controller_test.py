@@ -10,10 +10,10 @@ client = TestClient(app)
 
 
 default_request_params = {
-    "valid_date_from": "2024-05-27T12:00:00.000+00:00",
-    "valid_date_to": "2024-05-27T23:00:00.000+00:00",
+    "valid_time_from": "2024-05-27T12:00:00.000+00:00",
+    "valid_time_to": "2024-05-27T23:00:00.000+00:00",
     "location_type": "city",
-    "forecast_base_time": "2024-05-27T12:00:00.000+00:00",
+    "base_time": "2024-05-27T12:00:00.000+00:00",
 }
 
 
@@ -55,9 +55,9 @@ def test__get_forecast_data__with_city_name():
 def test__required_query_params__error_if_not_supplied():
     required_fields = [
         "location_type",
-        "valid_date_from",
-        "valid_date_to",
-        "forecast_base_time",
+        "valid_time_from",
+        "valid_time_to",
+        "base_time",
     ]
     response = client.get("/air-pollutant/forecast", params={})
     expected_response_message_schema = {
@@ -78,22 +78,22 @@ def test__required_query_params__error_if_not_supplied():
 @pytest.mark.parametrize(
     "field, params, expected_msg",
     [
-        # valid_date_from invalid
+        # valid_time_from invalid
         (
-            "valid_date_from",
+            "valid_time_from",
             {
                 **default_request_params,
-                "valid_date_from": "2024-06-01T",
+                "valid_time_from": "2024-06-01T",
             },
             "Input should be a valid datetime or date, "
             + "unexpected extra characters at the end of the input",
         ),
-        # valid_date_to invalid
+        # valid_time_to invalid
         (
-            "valid_date_to",
+            "valid_time_to",
             {
                 **default_request_params,
-                "valid_date_to": "2024-06-01T",
+                "valid_time_to": "2024-06-01T",
             },
             "Input should be a valid datetime or date, "
             + "unexpected extra characters at the end of the input",
@@ -107,12 +107,12 @@ def test__required_query_params__error_if_not_supplied():
             },
             "Input should be 'city'",
         ),
-        # forecast_base_time invalid
+        # base_time invalid
         (
-            "forecast_base_time",
+            "base_time",
             {
                 **default_request_params,
-                "forecast_base_time": "2024-06-01T",
+                "base_time": "2024-06-01T",
             },
             "Input should be a valid datetime or date, "
             + "unexpected extra characters at the end of the input",

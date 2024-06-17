@@ -7,9 +7,9 @@ from air_quality.aqi.pollutant_type import (
     PollutantType,
     pollutants_with_molecular_weight,
 )
-from air_quality.etl.in_situ.InSituMeasurement import InSituMeasurement
+from air_quality.database.in_situ import InSituMeasurement
 from air_quality.etl.common.unit_converter import convert_ppm_to_mgm3
-from air_quality.etl.forecast.forecast_data import ForecastData
+from air_quality.etl.forecast.forecast_data import ForecastData, ForecastDataType
 
 required_pollutant_data = {
     "o3": PollutantType.OZONE,
@@ -81,9 +81,7 @@ def transform_city(city_data) -> list[InSituMeasurement]:
     city = city_data["city"]
     measurements_for_city = city_data["measurements"]
     if len(measurements_for_city) > 0:
-        filtered_measurements = filter(
-            measurement_is_valid, measurements_for_city
-        )
+        filtered_measurements = filter(measurement_is_valid, measurements_for_city)
         grouped_measurements = reduce(
             combine_measurement,
             filtered_measurements,
@@ -97,20 +95,21 @@ def transform_city(city_data) -> list[InSituMeasurement]:
 
 
 def enrich_with_forecast_data(
-        city_measurements: list[InSituMeasurement],
-        forecast_data: ForecastData):
-    for in_situ_reading in city_measurements:
-        long = in_situ_reading["location"]["coordinates"][0]
-        lat = in_situ_reading["location"]["coordinates"][1]
-        measurement_date = in_situ_reading["measurement_date"]
+    in_situ_measurements: list[InSituMeasurement], forecast_data: ForecastData
+):
 
-        surface_pressure = forecast_data.get_surface_pressure(
-            long, lat, measurement_date
-        )
-        temperature = forecast_data.get_temperature(long, lat, measurement_date)
+    in_situ_readings = forecast_data.enrich_in_situ_measurements(
+        in_situ_measurements,
+        [ForecastDataType.TEMPERATURE, ForecastDataType.SURFACE_PRESSURE],
+    )
 
-        in_situ_reading["metadata"]["estimated_surface_pressure_pa"] = surface_pressure
-        in_situ_reading["metadata"]["estimated_temperature_k"] = temperature
+    enriched_measurements = []
+    for in_situ_reading, forecast_dict in in_situ_readings:
+        sp = forecast_dict[ForecastDataType.SURFACE_PRESSURE]
+        t = forecast_dict[ForecastDataType.TEMPERATURE]
+
+        in_situ_reading["metadata"]["estimated_surface_pressure_pa"] = sp
+        in_situ_reading["metadata"]["estimated_temperature_k"] = t
 
         for pollutant in pollutants_with_molecular_weight():
             if (
@@ -120,9 +119,11 @@ def enrich_with_forecast_data(
                 original_value = in_situ_reading[pollutant.value]["original_value"]
 
                 in_situ_reading[pollutant.value]["value"] = convert_ppm_to_mgm3(
-                    original_value, pollutant, surface_pressure, temperature
+                    original_value, pollutant, sp, t
                 )
 
                 in_situ_reading[pollutant.value]["unit"] = "µg/m³"
 
-    return city_measurements
+        enriched_measurements.append(in_situ_reading)
+
+    return enriched_measurements

@@ -1,0 +1,33 @@
+services:
+  db:
+    container_name: mongo
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - database:/data/db
+  etl-insitu:
+    image: ghcr.io/ecmwfcode4earth/vairify/vairify-etl-insitu
+    container_name: etl-insitu
+    depends_on:
+      - db
+    environment:
+      - MONGO_DB_URI=mongodb://mongo:27017/
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - OPEN_AQ_API_URL=${OPEN_AQ_API_URL}
+      - OPEN_AQ_API_KEY=${OPEN_AQ_API_KEY}
+      - CDSAPI_URL=${CDSAPI_URL}
+      - CDSAPI_KEY=${CDSAPI_KEY}
+  etl-forecast:
+    container_name: etl-forecast
+    image: ghcr.io/ecmwfcode4earth/vairify/vairify-etl-forecast
+    depends_on:
+      - db
+    environment:
+      - MONGO_DB_URI=mongodb://mongo:27017/
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - CDSAPI_URL=${CDSAPI_URL}
+      - CDSAPI_KEY=${CDSAPI_KEY}
+volumes:
+  database:
