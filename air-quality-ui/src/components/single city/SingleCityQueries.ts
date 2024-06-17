@@ -16,9 +16,9 @@ export const useGetSingleCityForecastData = (
         {
           params: {
             location_type: location_type,
-            valid_date_from: valid_date_from,
-            valid_date_to: valid_date_to,
-            forecast_base_time: forecast_base_time,
+            valid_time_from: valid_date_from,
+            valid_time_to: valid_date_to,
+            base_time: forecast_base_time,
             location_name: location_name,
           },
         },

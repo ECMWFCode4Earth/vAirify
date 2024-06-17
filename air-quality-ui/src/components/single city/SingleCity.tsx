@@ -52,7 +52,7 @@ function SingleCity() {
       setProcessedData(
         requestResult.data.map((measurement: Measurements) => {
           return [
-            DateTime.fromISO(measurement.valid_date).toMillis(),
+            DateTime.fromISO(measurement.valid_time).toMillis(),
             measurement.overall_aqi_level,
           ]
         }),
