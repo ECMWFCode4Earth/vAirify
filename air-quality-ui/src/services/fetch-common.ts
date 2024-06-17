@@ -1,4 +1,4 @@
-export const fetchJson = (
+export const fetchJson = async (
   urlString: string,
   params: Record<string, string | string[]>,
 ) => {

@@ -1,5 +1,16 @@
-.chart{
-    margin: auto;
-    width: 90rem;
-    height: 250rem;
+.single-city-container {
+    align-items: center;
+    display: flex;
+    min-height: 80vh;
+    justify-content: center;
+}
+
+.site-measurements {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.site-measurements-chart {
+    padding: 32px 32px;
 }

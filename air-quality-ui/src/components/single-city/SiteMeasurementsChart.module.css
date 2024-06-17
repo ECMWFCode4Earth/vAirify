@@ -1,0 +1,9 @@
+.chart-label {
+    display: flex;
+    justify-content: center;
+}
+
+.chart {
+    height: 400px !important;
+    min-width: 800px !important;
+}

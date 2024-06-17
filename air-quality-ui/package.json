@@ -14,7 +14,9 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.40.1",
+    "@types/echarts": "^4.9.22",
     "ag-grid-react": "^31.3.2",
+    "echarts": "^5.5.0",
     "echarts-for-react": "^3.0.2",
     "luxon": "^3.4.4",
     "react": "^18.2.0",

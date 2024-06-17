@@ -6,7 +6,7 @@ import { LocationType } from '../models'
 
 const API_URL = import.meta.env.VITE_AIR_QUALITY_API_URL
 
-const queryMeasurements = (
+const queryMeasurements = async (
   urlString: string,
   params: Record<string, string | string[]>,
 ) => {
