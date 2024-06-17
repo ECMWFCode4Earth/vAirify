@@ -2,7 +2,7 @@ import os
 import re
 from datetime import datetime
 from unittest import mock
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, mock_open
 
 import pytest
 from pytest_httpserver import HTTPServer
@@ -130,6 +130,51 @@ def test__fetch_in_situ_measurements__multiple_cities(requests_patch):
 
     assert result["London"]["city"] == cities[0]
     assert result["Dublin"]["city"] == cities[1]
+
+
+@patch("json.load")
+@patch("os.path.exists")
+@patch.dict(os.environ, {"OPEN_AQ_CACHE": "test_cache"})
+def test__fetch_in_situ_measurements__cache_supplied_reads_from_cache(
+    mock_path_exists, mock_json_load
+):
+    with patch("builtins.open", new_callable=mock_open, read_data="data"):
+        mock_path_exists.return_value = True
+        mock_json_load.return_value = {"test_key": "test_value"}
+
+        date_from_str = date_from.strftime("%Y%m%d%H")
+        date_to_str = date_to.strftime("%Y%m%d%H")
+        expected_file_name = f"test_cache/London_{date_from_str}_{date_to_str}.json"
+
+        cities = [{"name": "London", "latitude": 11, "longitude": 22}]
+        result = fetch_in_situ_measurements(cities, date_from, date_to)
+
+        assert result["London"]["city"] == cities[0]
+        assert result["London"]["measurements"] == {"test_key": "test_value"}
+        mock_path_exists.assert_called_with(expected_file_name)
+
+
+@patch("air_quality.etl.in_situ.openaq_dao.requests.Session.get")
+@patch("os.path.exists")
+@patch.dict(os.environ, {"OPEN_AQ_CACHE": "test_cache"})
+def test__fetch_in_situ_measurements__cache_supplied_but_no_file_for_city_calls_api(
+    mock_path_exists, requests_patch
+):
+    mock_path_exists.return_value = False
+    response_mock = Mock()
+    response_mock.json.return_value = {"results": [100, 200]}
+    requests_patch.return_value = response_mock
+
+    cities = [{"name": "London", "latitude": 11, "longitude": 22}]
+    result = fetch_in_situ_measurements(cities, date_from, date_to)
+
+    assert result["London"]["city"] == cities[0]
+    assert result["London"]["measurements"] == [100, 200]
+
+    date_from_str = date_from.strftime("%Y%m%d%H")
+    date_to_str = date_to.strftime("%Y%m%d%H")
+    expected_file_name = f"test_cache/London_{date_from_str}_{date_to_str}.json"
+    mock_path_exists.assert_called_with(expected_file_name)
 
 
 @pytest.fixture(scope="session")

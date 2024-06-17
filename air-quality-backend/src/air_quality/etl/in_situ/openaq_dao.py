@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from datetime import datetime
@@ -19,9 +20,36 @@ def _create_session() -> requests.Session:
     return session
 
 
-def _call_openaq_api(
-    city, date_from: datetime, date_to: datetime, session: requests.Session
+def _retrieve_open_aq_results(
+    city, date_from: datetime, date_to: datetime, cache_location: str, session
+):
+
+    results = []
+    if cache_location is not None:
+        results = _read_city_from_cache(city, date_from, date_to, cache_location)
+
+    if len(results) == 0:
+        results = _call_openaq_api(city, date_from, date_to, session)
+
+    return results
+
+
+def _read_city_from_cache(
+    city, date_from: datetime, date_to: datetime, cache_location: str
 ) -> list:
+    results = []
+    date_from_str = date_from.strftime("%Y%m%d%H")
+    date_to_str = date_to.strftime("%Y%m%d%H")
+
+    file = f"{cache_location}/{city['name']}_{date_from_str}_{date_to_str}.json"
+    if os.path.exists(file):
+        with open(file, encoding="utf-8") as f:
+            results = json.load(f)
+
+    return results
+
+
+def _call_openaq_api(city, date_from: datetime, date_to: datetime, session) -> list:
     limit = 3000
     query_params = {
         "limit": limit,
@@ -59,7 +87,13 @@ def _call_openaq_api(
 def fetch_in_situ_measurements(cities, date_from: datetime, date_to: datetime):
     in_situ_data_by_city = {}
     session = _create_session()
+    cache_location = (
+        os.environ["OPEN_AQ_CACHE"] if "OPEN_AQ_CACHE" in os.environ else None
+    )
+
     for city in cities:
-        results = _call_openaq_api(city, date_from, date_to, session)
+        results = _retrieve_open_aq_results(
+            city, date_from, date_to, cache_location, session
+        )
         in_situ_data_by_city[city["name"]] = {"measurements": results, "city": city}
     return in_situ_data_by_city
