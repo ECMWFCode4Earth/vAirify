@@ -755,3 +755,30 @@ def test__response_contains_correct_mean_overall_aqi_level(
                 )
             case _:
                 print("Unexpected location_name: {}".format(city))
+
+
+@pytest.mark.parametrize(
+    "test_measurement_base_time_string",
+    [
+        measurement_base_time_string_24_7_20_14_0_0,
+        measurement_base_time_string_24_7_20_15_0_0,
+        measurement_base_time_string_24_8_20_17_0_0,
+    ],
+)
+def test__check_measurement_base_time_in_response_is_correct(
+    test_measurement_base_time_string: str,
+):
+    load_dotenv(".env-qa")
+    api_parameters: dict = {
+        "location_type": location_type,
+        "measurement_base_time": test_measurement_base_time_string,
+        "measurement_time_range": measurement_time_range,
+    }
+
+    response: Response = requests.request(
+        "GET", base_url, params=api_parameters, timeout=5.0
+    )
+    response_json: list = response.json()
+
+    for city in response_json:
+        assert city.get("measurement_base_time") == test_measurement_base_time_string
