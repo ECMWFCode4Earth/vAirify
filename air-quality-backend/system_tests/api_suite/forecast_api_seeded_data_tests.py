@@ -4,6 +4,10 @@ import requests
 from dotenv import load_dotenv
 
 from air_quality.database.forecasts import Forecast
+from system_tests.data.forecast_api_test_data import (
+    create_forecast_database_data_with_overrides,
+    create_forecast_api_database_data_pollutant_value,
+)
 from system_tests.utils.api_utilities import (
     format_datetime_as_string,
     get_list_of_key_values,
@@ -13,92 +17,65 @@ from system_tests.utils.cams_utilities import delete_database_data
 from system_tests.utils.routes import Routes
 
 # Test Data
-test_city_1_input_data: Forecast = {
-    "forecast_valid_time": datetime.datetime(
-        2024, 6, 10, 3, 0, 0, tzinfo=datetime.timezone.utc
-    ),
-    "source": "cams-production",
-    "forecast_base_time": datetime.datetime(
-        2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
-    ),
-    "location_type": "city",
-    "name": "Test City 1",
-    "forecast_range": 0,
-    "last_modified_time": datetime.datetime(
-        2024, 6, 10, 7, 49, 53, 664, tzinfo=datetime.timezone.utc
-    ),
-    "location": {
-        "type": "Point",
-        "coordinates": [54.36667, 24.46667],
-    },
-    "no2": {"aqi_level": 1, "value": 7.79346375328925},
-    "o3": {"aqi_level": 4, "value": 212.70172151472397},
-    "overall_aqi_level": 6,
-    "pm10": {"aqi_level": 6, "value": 205.640266314635},
-    "pm2_5": {"aqi_level": 4, "value": 48.76003397454627},
-    "so2": {"aqi_level": 1, "value": 7.58745619326088},
-    "created_time": datetime.datetime(
-        2024, 6, 10, 7, 49, 53, 664, tzinfo=datetime.timezone.utc
-    ),
-}
 
-test_city_2_input_data: Forecast = {
-    "forecast_valid_time": datetime.datetime(
-        2024, 6, 12, 0, 0, 0, tzinfo=datetime.timezone.utc
-    ),
-    "source": "cams-production",
-    "forecast_base_time": datetime.datetime(
-        2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
-    ),
-    "location_type": "city",
-    "name": "Test City 2",
-    "forecast_range": 0,
-    "last_modified_time": datetime.datetime(
-        2024, 6, 10, 7, 49, 53, 664, tzinfo=datetime.timezone.utc
-    ),
-    "location": {
-        "type": "Point",
-        "coordinates": [54.36667, 24.46667],
-    },
-    "no2": {"aqi_level": 6, "value": 350.76859403417895},
-    "o3": {"aqi_level": 5, "value": 261.70172151472397},
-    "overall_aqi_level": 6,
-    "pm10": {"aqi_level": 1, "value": 10.640266314635},
-    "pm2_5": {"aqi_level": 1, "value": 9.76003397454627},
-    "so2": {"aqi_level": 3, "value": 212.58745619326088},
-    "created_time": datetime.datetime(
-        2024, 6, 10, 7, 49, 53, 664, tzinfo=datetime.timezone.utc
-    ),
-}
+test_city_1_input_data = create_forecast_database_data_with_overrides(
+    {
+        "forecast_valid_time": datetime.datetime(
+            2024, 6, 10, 3, 0, 0, tzinfo=datetime.timezone.utc
+        ),
+        "forecast_base_time": datetime.datetime(
+            2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
+        ),
+        "name": "Test City 1",
+        "no2": create_forecast_api_database_data_pollutant_value(1, 7.79346375328925),
+        "o3": create_forecast_api_database_data_pollutant_value(4, 212.70172151472397),
+        "overall_aqi_level": 6,
+        "pm10": create_forecast_api_database_data_pollutant_value(6, 205.640266314635),
+        "pm2_5": create_forecast_api_database_data_pollutant_value(
+            4, 48.76003397454627
+        ),
+        "so2": create_forecast_api_database_data_pollutant_value(1, 7.58745619326088),
+    }
+)
 
-test_city_3_input_data: Forecast = {
-    "forecast_valid_time": datetime.datetime(
-        2024, 6, 10, 15, 0, 0, tzinfo=datetime.timezone.utc
-    ),
-    "source": "cams-production",
-    "forecast_base_time": datetime.datetime(
-        2024, 6, 11, 0, 0, 0, tzinfo=datetime.timezone.utc
-    ),
-    "location_type": "city",
-    "name": "Test City 3",
-    "forecast_range": 0,
-    "last_modified_time": datetime.datetime(
-        2024, 6, 10, 7, 49, 53, 664, tzinfo=datetime.timezone.utc
-    ),
-    "location": {
-        "type": "Point",
-        "coordinates": [54.36667, 24.46667],
-    },
-    "no2": {"aqi_level": 4, "value": 150.79346375328925},
-    "o3": {"aqi_level": 3, "value": 101.70172151472397},
-    "overall_aqi_level": 4,
-    "pm10": {"aqi_level": 2, "value": 30.640266314635},
-    "pm2_5": {"aqi_level": 3, "value": 22.76003397454627},
-    "so2": {"aqi_level": 2, "value": 103.58745619326088},
-    "created_time": datetime.datetime(
-        2024, 6, 10, 7, 49, 53, 664, tzinfo=datetime.timezone.utc
-    ),
-}
+test_city_2_input_data = create_forecast_database_data_with_overrides(
+    {
+        "forecast_valid_time": datetime.datetime(
+            2024, 6, 12, 0, 0, 0, tzinfo=datetime.timezone.utc
+        ),
+        "forecast_base_time": datetime.datetime(
+            2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
+        ),
+        "name": "Test City 2",
+        "no2": create_forecast_api_database_data_pollutant_value(6, 350.76859403417895),
+        "o3": create_forecast_api_database_data_pollutant_value(5, 261.70172151472397),
+        "overall_aqi_level": 6,
+        "pm10": create_forecast_api_database_data_pollutant_value(1, 10.640266314635),
+        "pm2_5": create_forecast_api_database_data_pollutant_value(1, 9.76003397454627),
+        "so2": create_forecast_api_database_data_pollutant_value(3, 212.58745619326088),
+    }
+)
+
+
+test_city_3_input_data = create_forecast_database_data_with_overrides(
+    {
+        "forecast_valid_time": datetime.datetime(
+            2024, 6, 10, 15, 0, 0, tzinfo=datetime.timezone.utc
+        ),
+        "forecast_base_time": datetime.datetime(
+            2024, 6, 11, 0, 0, 0, tzinfo=datetime.timezone.utc
+        ),
+        "name": "Test City 3",
+        "no2": create_forecast_api_database_data_pollutant_value(4, 150.79346375328925),
+        "o3": create_forecast_api_database_data_pollutant_value(3, 101.70172151472397),
+        "overall_aqi_level": 4,
+        "pm10": create_forecast_api_database_data_pollutant_value(2, 30.640266314635),
+        "pm2_5": create_forecast_api_database_data_pollutant_value(
+            3, 22.76003397454627
+        ),
+        "so2": create_forecast_api_database_data_pollutant_value(2, 103.58745619326088),
+    }
+)
 
 test_city_1_expected_response_data: dict = {
     "base_time": format_datetime_as_string(
