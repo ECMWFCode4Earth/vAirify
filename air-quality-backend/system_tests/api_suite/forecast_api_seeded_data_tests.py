@@ -3,7 +3,6 @@ import pytest
 import requests
 from dotenv import load_dotenv
 
-from air_quality.database.forecasts import Forecast
 from system_tests.data.forecast_api_test_data import (
     create_forecast_database_data_with_overrides,
     create_forecast_api_database_data_pollutant_value,
