@@ -220,122 +220,6 @@ city_c_location_2 = create_in_situ_database_data(
     100,
 )
 
-# Expected mean values
-
-expected_mean_no2_city_a_location_1_2_3 = statistics.mean(
-    [
-        city_a_location_1["no2"]["value"],
-        city_a_location_2["no2"]["value"],
-        city_a_location_3["no2"]["value"],
-    ]
-)
-
-expected_mean_no2_city_a_location_2_3_4 = statistics.mean(
-    [
-        city_a_location_2["no2"]["value"],
-        city_a_location_3["no2"]["value"],
-        city_a_location_4["no2"]["value"],
-    ]
-)
-
-expected_mean_o3_city_a_location_1_2_3 = statistics.mean(
-    [
-        city_a_location_1["o3"]["value"],
-        city_a_location_2["o3"]["value"],
-        city_a_location_3["o3"]["value"],
-    ]
-)
-
-expected_mean_o3_city_a_location_2_3_4 = statistics.mean(
-    [
-        city_a_location_2["o3"]["value"],
-        city_a_location_3["o3"]["value"],
-        city_a_location_4["o3"]["value"],
-    ]
-)
-
-expected_mean_pm10_city_a_location_1_2_3 = statistics.mean(
-    [
-        city_a_location_1["pm10"]["value"],
-        city_a_location_2["pm10"]["value"],
-        city_a_location_3["pm10"]["value"],
-    ]
-)
-
-expected_mean_pm10_city_a_location_2_3_4 = statistics.mean(
-    [
-        city_a_location_2["pm10"]["value"],
-        city_a_location_3["pm10"]["value"],
-        city_a_location_4["pm10"]["value"],
-    ]
-)
-
-expected_mean_pm2_5_city_a_location_1_2_3 = statistics.mean(
-    [
-        city_a_location_1["pm2_5"]["value"],
-        city_a_location_2["pm2_5"]["value"],
-        city_a_location_3["pm2_5"]["value"],
-    ]
-)
-
-expected_mean_pm2_5_city_a_location_2_3_4 = statistics.mean(
-    [
-        city_a_location_2["pm2_5"]["value"],
-        city_a_location_3["pm2_5"]["value"],
-        city_a_location_4["pm2_5"]["value"],
-    ]
-)
-
-expected_mean_so2_city_a_location_1_2_3 = statistics.mean(
-    [
-        city_a_location_1["so2"]["value"],
-        city_a_location_2["so2"]["value"],
-        city_a_location_3["so2"]["value"],
-    ]
-)
-
-expected_mean_so2_city_a_location_2_3_4 = statistics.mean(
-    [
-        city_a_location_2["so2"]["value"],
-        city_a_location_3["so2"]["value"],
-        city_a_location_4["so2"]["value"],
-    ]
-)
-
-expected_mean_no2_city_b_location_1_2 = statistics.mean(
-    [
-        city_b_location_1["no2"]["value"],
-        city_b_location_2["no2"]["value"],
-    ]
-)
-expected_mean_o3_city_b_location_1_2 = statistics.mean(
-    [
-        city_b_location_1["o3"]["value"],
-        city_b_location_2["o3"]["value"],
-    ]
-)
-
-expected_mean_pm10_city_b_location_1_2 = statistics.mean(
-    [
-        city_b_location_1["pm10"]["value"],
-        city_b_location_2["pm10"]["value"],
-    ]
-)
-
-expected_mean_pm2_5_city_b_location_1_2 = statistics.mean(
-    [
-        city_b_location_1["pm2_5"]["value"],
-        city_b_location_2["pm2_5"]["value"],
-    ]
-)
-
-expected_mean_so2_city_b_location_1_2 = statistics.mean(
-    [
-        city_b_location_1["so2"]["value"],
-        city_b_location_2["so2"]["value"],
-    ]
-)
-
 
 # Test Setup
 load_dotenv(".env-qa")
@@ -628,15 +512,45 @@ def test__different_measurement_time_range__assert_data_filtered_appropriately(
     [
         (
             measurement_base_time_string_24_7_20_14_0_0,
-            expected_mean_no2_city_a_location_1_2_3,
+            statistics.mean(
+                [
+                    city_a_location_1["no2"]["value"],
+                    city_a_location_2["no2"]["value"],
+                    city_a_location_3["no2"]["value"],
+                ]
+            ),
             city_b_location_1["no2"]["value"],
-            expected_mean_o3_city_a_location_1_2_3,
+            statistics.mean(
+                [
+                    city_a_location_1["o3"]["value"],
+                    city_a_location_2["o3"]["value"],
+                    city_a_location_3["o3"]["value"],
+                ]
+            ),
             city_b_location_1["o3"]["value"],
-            expected_mean_pm10_city_a_location_1_2_3,
+            statistics.mean(
+                [
+                    city_a_location_1["pm10"]["value"],
+                    city_a_location_2["pm10"]["value"],
+                    city_a_location_3["pm10"]["value"],
+                ]
+            ),
             city_b_location_1["pm10"]["value"],
-            expected_mean_pm2_5_city_a_location_1_2_3,
+            statistics.mean(
+                [
+                    city_a_location_1["pm2_5"]["value"],
+                    city_a_location_2["pm2_5"]["value"],
+                    city_a_location_3["pm2_5"]["value"],
+                ]
+            ),
             city_b_location_1["pm2_5"]["value"],
-            expected_mean_so2_city_a_location_1_2_3,
+            statistics.mean(
+                [
+                    city_a_location_1["so2"]["value"],
+                    city_a_location_2["so2"]["value"],
+                    city_a_location_3["so2"]["value"],
+                ]
+            ),
             city_b_location_1["so2"]["value"],
         ),
         (
@@ -644,16 +558,71 @@ def test__different_measurement_time_range__assert_data_filtered_appropriately(
                 datetime.datetime(2024, 7, 20, 15, 0, 0, tzinfo=datetime.timezone.utc),
                 "%Y-%m-%dT%H:%M:%S+00:00",
             ),
-            expected_mean_no2_city_a_location_2_3_4,
-            expected_mean_no2_city_b_location_1_2,
-            expected_mean_o3_city_a_location_2_3_4,
-            expected_mean_o3_city_b_location_1_2,
-            expected_mean_pm10_city_a_location_2_3_4,
-            expected_mean_pm10_city_b_location_1_2,
-            expected_mean_pm2_5_city_a_location_2_3_4,
-            expected_mean_pm2_5_city_b_location_1_2,
-            expected_mean_so2_city_a_location_2_3_4,
-            expected_mean_so2_city_b_location_1_2,
+            statistics.mean(
+                [
+                    city_a_location_2["no2"]["value"],
+                    city_a_location_3["no2"]["value"],
+                    city_a_location_4["no2"]["value"],
+                ]
+            ),
+            statistics.mean(
+                [
+                    city_b_location_1["no2"]["value"],
+                    city_b_location_2["no2"]["value"],
+                ]
+            ),
+            statistics.mean(
+                [
+                    city_a_location_2["o3"]["value"],
+                    city_a_location_3["o3"]["value"],
+                    city_a_location_4["o3"]["value"],
+                ]
+            ),
+            statistics.mean(
+                [
+                    city_b_location_1["o3"]["value"],
+                    city_b_location_2["o3"]["value"],
+                ]
+            ),
+            statistics.mean(
+                [
+                    city_a_location_2["pm10"]["value"],
+                    city_a_location_3["pm10"]["value"],
+                    city_a_location_4["pm10"]["value"],
+                ]
+            ),
+            statistics.mean(
+                [
+                    city_b_location_1["pm10"]["value"],
+                    city_b_location_2["pm10"]["value"],
+                ]
+            ),
+            statistics.mean(
+                [
+                    city_a_location_2["pm2_5"]["value"],
+                    city_a_location_3["pm2_5"]["value"],
+                    city_a_location_4["pm2_5"]["value"],
+                ]
+            ),
+            statistics.mean(
+                [
+                    city_b_location_1["pm2_5"]["value"],
+                    city_b_location_2["pm2_5"]["value"],
+                ]
+            ),
+            statistics.mean(
+                [
+                    city_a_location_2["so2"]["value"],
+                    city_a_location_3["so2"]["value"],
+                    city_a_location_4["so2"]["value"],
+                ]
+            ),
+            statistics.mean(
+                [
+                    city_b_location_1["so2"]["value"],
+                    city_b_location_2["so2"]["value"],
+                ]
+            ),
         ),
     ],
 )
