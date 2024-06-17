@@ -25,6 +25,7 @@ function toolTipFormat(params: { value: [string, number] }) {
 function SingleCity() {
   const { name } = useParams()
   const [processedData, setProcessedData] = useState()
+  const [isLoading, setIsLoading] = useState(true)
 
   let todaysDate = DateTime.now().toUTC()
   let dateFiveDaysAgo = todaysDate.minus(432000000).toUTC() //Minus 5 days in milliseconds
@@ -56,6 +57,7 @@ function SingleCity() {
           ]
         }),
       )
+      setIsLoading(false)
     }
   }, [requestResult.data])
 
@@ -92,12 +94,16 @@ function SingleCity() {
     },
   }
 
-  return processedData ? (
+  return (
     <div className="chart">
-      <ReactECharts option={reactEChartOptions} />
+      <ReactECharts
+        option={reactEChartOptions}
+        showLoading={isLoading}
+        loadingOption={{
+          text: 'Loading data...',
+        }}
+      />
     </div>
-  ) : (
-    <h1>Loading</h1>
   )
 }
 
