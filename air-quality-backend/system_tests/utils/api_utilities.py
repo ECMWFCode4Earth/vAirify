@@ -1,8 +1,4 @@
 import datetime
-import os
-from pymongo import MongoClient
-from air_quality.database.forecasts import Forecast
-from air_quality.database.in_situ import InSituMeasurement
 
 
 def format_datetime_as_string(date_and_time: datetime, string_format: str) -> str:
@@ -37,13 +33,3 @@ def get_expected_valid_times_list(
 
 def get_list_of_key_values(response_json, key: str) -> list:
     return [forecast[key] for forecast in response_json]
-
-
-def seed_api_test_data(
-    collection_name: str, test_data_list: list[Forecast | InSituMeasurement]
-):
-    uri = os.environ.get("MONGO_DB_URI")
-    db_name = os.environ.get("MONGO_DB_NAME")
-    client = MongoClient(uri)
-    collection = client[db_name][collection_name]
-    collection.insert_many(test_data_list)
