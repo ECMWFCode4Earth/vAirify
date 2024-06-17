@@ -7,7 +7,7 @@ from requests import Response
 from system_tests.data.measurement_summary_api_test_data import (
     create_in_situ_database_data_with_overrides,
     create_in_situ_database_data,
-    create_pollutant_value,
+    create_measurement_summary_database_data_pollutant_value,
 )
 from system_tests.utils.api_utilities import (
     format_datetime_as_string,
@@ -64,11 +64,21 @@ city_a_location_1 = create_in_situ_database_data_with_overrides(
         ),
         "name": "Test City A",
         "location_name": "Location 1",
-        "no2": create_pollutant_value(800, "µg/m³", 800, "µg/m³"),
-        "o3": create_pollutant_value(800, "µg/m³", 800, "µg/m³"),
-        "pm2_5": create_pollutant_value(800, "µg/m³", 800, "µg/m³"),
-        "pm10": create_pollutant_value(800, "µg/m³", 800, "µg/m³"),
-        "so2": create_pollutant_value(800, "µg/m³", 800, "µg/m³"),
+        "no2": create_measurement_summary_database_data_pollutant_value(
+            800, "µg/m³", 800, "µg/m³"
+        ),
+        "o3": create_measurement_summary_database_data_pollutant_value(
+            800, "µg/m³", 800, "µg/m³"
+        ),
+        "pm2_5": create_measurement_summary_database_data_pollutant_value(
+            800, "µg/m³", 800, "µg/m³"
+        ),
+        "pm10": create_measurement_summary_database_data_pollutant_value(
+            800, "µg/m³", 800, "µg/m³"
+        ),
+        "so2": create_measurement_summary_database_data_pollutant_value(
+            800, "µg/m³", 800, "µg/m³"
+        ),
     }
 )
 city_a_location_2 = create_in_situ_database_data_with_overrides(
@@ -78,11 +88,21 @@ city_a_location_2 = create_in_situ_database_data_with_overrides(
         ),
         "name": "Test City A",
         "location_name": "Location 2",
-        "no2": create_pollutant_value(123, "µg/m³", 123, "µg/m³"),
-        "o3": create_pollutant_value(123, "µg/m³", 123, "µg/m³"),
-        "pm2_5": create_pollutant_value(50, "µg/m³", 50, "µg/m³"),
-        "pm10": create_pollutant_value(50, "µg/m³", 50, "µg/m³"),
-        "so2": create_pollutant_value(123, "µg/m³", 123, "µg/m³"),
+        "no2": create_measurement_summary_database_data_pollutant_value(
+            123, "µg/m³", 123, "µg/m³"
+        ),
+        "o3": create_measurement_summary_database_data_pollutant_value(
+            123, "µg/m³", 123, "µg/m³"
+        ),
+        "pm2_5": create_measurement_summary_database_data_pollutant_value(
+            50, "µg/m³", 50, "µg/m³"
+        ),
+        "pm10": create_measurement_summary_database_data_pollutant_value(
+            50, "µg/m³", 50, "µg/m³"
+        ),
+        "so2": create_measurement_summary_database_data_pollutant_value(
+            123, "µg/m³", 123, "µg/m³"
+        ),
     }
 )
 
@@ -93,11 +113,21 @@ city_a_location_3 = create_in_situ_database_data_with_overrides(
         ),
         "name": "Test City A",
         "location_name": "Location 3",
-        "no2": create_pollutant_value(220, "µg/m³", 220, "µg/m³"),
-        "o3": create_pollutant_value(220, "µg/m³", 220, "µg/m³"),
-        "pm2_5": create_pollutant_value(20, "µg/m³", 20, "µg/m³"),
-        "pm10": create_pollutant_value(20, "µg/m³", 20, "µg/m³"),
-        "so2": create_pollutant_value(220, "µg/m³", 220, "µg/m³"),
+        "no2": create_measurement_summary_database_data_pollutant_value(
+            220, "µg/m³", 220, "µg/m³"
+        ),
+        "o3": create_measurement_summary_database_data_pollutant_value(
+            220, "µg/m³", 220, "µg/m³"
+        ),
+        "pm2_5": create_measurement_summary_database_data_pollutant_value(
+            20, "µg/m³", 20, "µg/m³"
+        ),
+        "pm10": create_measurement_summary_database_data_pollutant_value(
+            20, "µg/m³", 20, "µg/m³"
+        ),
+        "so2": create_measurement_summary_database_data_pollutant_value(
+            220, "µg/m³", 220, "µg/m³"
+        ),
     }
 )
 
@@ -108,11 +138,21 @@ city_a_location_4 = create_in_situ_database_data_with_overrides(
         ),
         "name": "Test City A",
         "location_name": "Location 4",
-        "no2": create_pollutant_value(11, "µg/m³", 11, "µg/m³"),
-        "o3": create_pollutant_value(11, "µg/m³", 11, "µg/m³"),
-        "pm2_5": create_pollutant_value(11, "µg/m³", 11, "µg/m³"),
-        "pm10": create_pollutant_value(11, "µg/m³", 11, "µg/m³"),
-        "so2": create_pollutant_value(11, "µg/m³", 11, "µg/m³"),
+        "no2": create_measurement_summary_database_data_pollutant_value(
+            11, "µg/m³", 11, "µg/m³"
+        ),
+        "o3": create_measurement_summary_database_data_pollutant_value(
+            11, "µg/m³", 11, "µg/m³"
+        ),
+        "pm2_5": create_measurement_summary_database_data_pollutant_value(
+            11, "µg/m³", 11, "µg/m³"
+        ),
+        "pm10": create_measurement_summary_database_data_pollutant_value(
+            11, "µg/m³", 11, "µg/m³"
+        ),
+        "so2": create_measurement_summary_database_data_pollutant_value(
+            11, "µg/m³", 11, "µg/m³"
+        ),
     }
 )
 
@@ -123,11 +163,21 @@ city_b_location_1 = create_in_situ_database_data_with_overrides(
         ),
         "name": "Test City B",
         "location_name": "Location 1",
-        "no2": create_pollutant_value(400, "µg/m³", 400, "µg/m³"),
-        "o3": create_pollutant_value(400, "µg/m³", 400, "µg/m³"),
-        "pm2_5": create_pollutant_value(101, "µg/m³", 101, "µg/m³"),
-        "pm10": create_pollutant_value(101, "µg/m³", 101, "µg/m³"),
-        "so2": create_pollutant_value(400, "µg/m³", 400, "µg/m³"),
+        "no2": create_measurement_summary_database_data_pollutant_value(
+            400, "µg/m³", 400, "µg/m³"
+        ),
+        "o3": create_measurement_summary_database_data_pollutant_value(
+            400, "µg/m³", 400, "µg/m³"
+        ),
+        "pm2_5": create_measurement_summary_database_data_pollutant_value(
+            101, "µg/m³", 101, "µg/m³"
+        ),
+        "pm10": create_measurement_summary_database_data_pollutant_value(
+            101, "µg/m³", 101, "µg/m³"
+        ),
+        "so2": create_measurement_summary_database_data_pollutant_value(
+            400, "µg/m³", 400, "µg/m³"
+        ),
     }
 )
 
@@ -138,11 +188,21 @@ city_b_location_2 = create_in_situ_database_data_with_overrides(
         ),
         "name": "Test City B",
         "location_name": "Location 2",
-        "no2": create_pollutant_value(200, "µg/m³", 200, "µg/m³"),
-        "o3": create_pollutant_value(200, "µg/m³", 200, "µg/m³"),
-        "pm2_5": create_pollutant_value(2, "µg/m³", 2, "µg/m³"),
-        "pm10": create_pollutant_value(2, "µg/m³", 2, "µg/m³"),
-        "so2": create_pollutant_value(200, "µg/m³", 200, "µg/m³"),
+        "no2": create_measurement_summary_database_data_pollutant_value(
+            200, "µg/m³", 200, "µg/m³"
+        ),
+        "o3": create_measurement_summary_database_data_pollutant_value(
+            200, "µg/m³", 200, "µg/m³"
+        ),
+        "pm2_5": create_measurement_summary_database_data_pollutant_value(
+            2, "µg/m³", 2, "µg/m³"
+        ),
+        "pm10": create_measurement_summary_database_data_pollutant_value(
+            2, "µg/m³", 2, "µg/m³"
+        ),
+        "so2": create_measurement_summary_database_data_pollutant_value(
+            200, "µg/m³", 200, "µg/m³"
+        ),
     }
 )
 

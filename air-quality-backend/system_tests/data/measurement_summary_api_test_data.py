@@ -23,11 +23,21 @@ def create_in_situ_database_data_with_overrides(overrides):
             100109.546875,
             314.317138671875,
         ),
-        "no2": create_pollutant_value(13, "µg/m³", 13, "µg/m³"),
-        "o3": create_pollutant_value(48, "µg/m³", 48, "µg/m³"),
-        "pm2_5": create_pollutant_value(5.8, "µg/m³", 5.8, "µg/m³"),
-        "pm10": create_pollutant_value(15, "µg/m³", 15, "µg/m³"),
-        "so2": create_pollutant_value(9, "µg/m³", 9, "µg/m³"),
+        "no2": create_measurement_summary_database_data_pollutant_value(
+            13, "µg/m³", 13, "µg/m³"
+        ),
+        "o3": create_measurement_summary_database_data_pollutant_value(
+            48, "µg/m³", 48, "µg/m³"
+        ),
+        "pm2_5": create_measurement_summary_database_data_pollutant_value(
+            5.8, "µg/m³", 5.8, "µg/m³"
+        ),
+        "pm10": create_measurement_summary_database_data_pollutant_value(
+            15, "µg/m³", 15, "µg/m³"
+        ),
+        "so2": create_measurement_summary_database_data_pollutant_value(
+            9, "µg/m³", 9, "µg/m³"
+        ),
     }
 
     return {**default_city, **overrides}
@@ -64,23 +74,25 @@ def create_in_situ_database_data(
     }
 
     if no2_value is not None:
-        created_city["no2"] = create_pollutant_value(
+        created_city["no2"] = create_measurement_summary_database_data_pollutant_value(
             no2_value, "µg/m³", no2_value, "µg/m³"
         )
     if o3_value is not None:
-        created_city["o3"] = create_pollutant_value(
+        created_city["o3"] = create_measurement_summary_database_data_pollutant_value(
             o3_value, "µg/m³", o3_value, "µg/m³"
         )
     if pm10_value is not None:
-        created_city["pm10"] = create_pollutant_value(
+        created_city["pm10"] = create_measurement_summary_database_data_pollutant_value(
             pm10_value, "µg/m³", pm10_value, "µg/m³"
         )
     if pm2_5_value is not None:
-        created_city["pm2_5"] = create_pollutant_value(
-            pm2_5_value, "µg/m³", pm2_5_value, "µg/m³"
+        created_city["pm2_5"] = (
+            create_measurement_summary_database_data_pollutant_value(
+                pm2_5_value, "µg/m³", pm2_5_value, "µg/m³"
+            )
         )
     if so2_value is not None:
-        created_city["so2"] = create_pollutant_value(
+        created_city["so2"] = create_measurement_summary_database_data_pollutant_value(
             so2_value, "µg/m³", so2_value, "µg/m³"
         )
 
@@ -108,7 +120,7 @@ def create_metadata_values(
     }
 
 
-def create_pollutant_value(
+def create_measurement_summary_database_data_pollutant_value(
     value: float, unit: str, original_value: float, original_unit: str
 ):
     return {
