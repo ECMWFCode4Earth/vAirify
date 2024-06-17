@@ -7,14 +7,11 @@ services:
       - 27017:27017
     volumes:
       - database:/data/db
-  insitu-etl:
+  etl-insitu:
     image: ghcr.io/ecmwfcode4earth/vairify/vairify-etl-insitu
     container_name: etl-insitu
     depends_on:
       - db
-    build:
-      context: ./air-quality-backend/
-      dockerfile: Dockerfile.insitu
     environment:
       - MONGO_DB_URI=mongodb://mongo:27017/
       - MONGO_DB_NAME=${MONGO_DB_NAME}
@@ -27,9 +24,6 @@ services:
     image: ghcr.io/ecmwfcode4earth/vairify/vairify-etl-forecast
     depends_on:
       - db
-    build: 
-      context: ./air-quality-backend/
-      dockerfile: Dockerfile.forecast
     environment:
       - MONGO_DB_URI=mongodb://mongo:27017/
       - MONGO_DB_NAME=${MONGO_DB_NAME}
