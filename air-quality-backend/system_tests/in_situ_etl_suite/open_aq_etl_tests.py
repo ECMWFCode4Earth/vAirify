@@ -100,10 +100,10 @@ def test__in_situ_etl__stores_all_data_correctly():
     assert stored["location_type"] == "city"
     assert stored["api_source"] == "OpenAQ"
     assert stored["location"]["type"] == "point"
-    assert (stored["location"]["coordinates"][0] ==
-            london_openaq_data[0]["coordinates"]["longitude"])
-    assert (stored["location"]["coordinates"][1] ==
-            london_openaq_data[0]["coordinates"]["latitude"])
+    assert (stored["location"]["coordinates"][0]
+            == london_openaq_data[0]["coordinates"]["longitude"])
+    assert (stored["location"]["coordinates"][1]
+            == london_openaq_data[0]["coordinates"]["latitude"])
 
     assert_pollutant_value(stored["no2"], 1)
     assert_pollutant_value(stored["o3"], 2)
