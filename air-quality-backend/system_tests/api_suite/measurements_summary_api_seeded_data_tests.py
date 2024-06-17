@@ -247,19 +247,19 @@ base_url = Routes.measurement_summary_api_url
 location_type = "city"
 measurement_base_time_string_24_6_12_14_0_0 = format_datetime_as_string(
     datetime.datetime(2024, 6, 12, 14, 0, 0, tzinfo=datetime.timezone.utc),
-    "%Y-%m-%dT%H:%M:%S+00:00",
+    "%Y-%m-%dT%H:%M:%SZ",
 )
 measurement_base_time_string_24_7_20_14_0_0 = format_datetime_as_string(
     datetime.datetime(2024, 7, 20, 14, 0, 0, tzinfo=datetime.timezone.utc),
-    "%Y-%m-%dT%H:%M:%S+00:00",
+    "%Y-%m-%dT%H:%M:%SZ",
 )
 measurement_base_time_string_24_7_20_15_0_0 = format_datetime_as_string(
     datetime.datetime(2024, 7, 20, 15, 0, 0, tzinfo=datetime.timezone.utc),
-    "%Y-%m-%dT%H:%M:%S+00:00",
+    "%Y-%m-%dT%H:%M:%SZ",
 )
 measurement_base_time_string_24_8_20_17_0_0 = format_datetime_as_string(
     datetime.datetime(2024, 8, 20, 17, 0, 0, tzinfo=datetime.timezone.utc),
-    "%Y-%m-%dT%H:%M:%S+00:00",
+    "%Y-%m-%dT%H:%M:%SZ",
 )
 
 measurement_time_range = 90
