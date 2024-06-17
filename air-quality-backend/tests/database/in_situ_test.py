@@ -224,7 +224,7 @@ def test__get_averaged(mock_collection):
         mock_collection.insert_many(documents)
 
         results = get_averaged(
-            datetime(2024, 6, 5, 3, 0), 90, AirQualityLocationType.CITY, {"mean"}
+            datetime(2024, 6, 5, 3, 0), 90, AirQualityLocationType.CITY
         )
         assert results == [
             {

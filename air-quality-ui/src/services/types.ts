@@ -7,11 +7,14 @@ export interface PollutantDataDto {
 
 export interface PollutantAverageDataDto<T> {
   mean: T
-  median: T
 }
 
 type ForecastPollutantDataDto = {
   [P in PollutantType]: PollutantDataDto
+}
+
+type MeasurementPollutantData = {
+  [P in PollutantType]?: number
 }
 
 type SummaryMeasurementPollutantDataDto = {
@@ -25,6 +28,16 @@ export type ForecastResponseDto = {
   location_name: string
   overall_aqi_level: number
 } & ForecastPollutantDataDto
+
+export type MeasurementsResponseDto = {
+  measurement_date: string
+  location_type: LocationType
+  location_name: string
+  api_source: string
+  entity: string
+  sensor_type: string
+  site_name: string
+} & MeasurementPollutantData
 
 export type MeasurementSummaryResponseDto = {
   measurement_base_time: string

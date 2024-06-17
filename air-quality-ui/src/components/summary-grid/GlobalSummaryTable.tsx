@@ -81,9 +81,9 @@ const mapApiRow = (
     ),
   }
   pollutantTypes.forEach((type) => {
-    row.forecast[type] = parseFloat(forecastData[type].value.toFixed(3))
+    row.forecast[type] = parseFloat(forecastData[type].value.toFixed(1))
     const mean = measurementData[type]?.mean.value
-    row.measurements[type] = mean ? parseFloat(mean.toFixed(3)) : undefined
+    row.measurements[type] = mean ? parseFloat(mean.toFixed(1)) : undefined
   })
   return row
 }

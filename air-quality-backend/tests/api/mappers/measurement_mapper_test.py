@@ -15,7 +15,13 @@ def test__map_measurements():
     result = map_measurements(
         [
             create_mock_measurement_document(
-                {"no2": 0.0, "o3": 0.0, "pm10": 0.0, "pm2_5": 0.0, "so2": 0.0}
+                {
+                    "no2": {"value": 0.0},
+                    "o3": {"value": 0.0},
+                    "pm10": {"value": 0.0},
+                    "pm2_5": {"value": 0.0},
+                    "so2": {"value": 0.0},
+                }
             )
         ]
     )
@@ -50,11 +56,11 @@ def test__map_summarized_measurements(m1, m2):
         [
             create_mock_averaged_measurement_document(
                 {
-                    "o3": {"mean": 0.0, "median": 0.1},
-                    "no2": {"mean": None, "median": None},
-                    "so2": {"mean": None, "median": None},
-                    "pm2_5": {"mean": None, "median": None},
-                    "pm10": {"mean": None, "median": None},
+                    "o3": {"mean": 0.0},
+                    "no2": {"mean": None},
+                    "so2": {"mean": None},
+                    "pm2_5": {"mean": None},
+                    "pm10": {"mean": None},
                 }
             )
         ]
@@ -64,10 +70,9 @@ def test__map_summarized_measurements(m1, m2):
             "measurement_base_time": datetime(2024, 6, 4, 0, 0, tzinfo=timezone.utc),
             "location_type": "city",
             "location_name": "City Name",
-            "overall_aqi_level": {"mean": 2.0, "median": 2.0},
+            "overall_aqi_level": {"mean": 2.0},
             "o3": {
                 "mean": {"aqi_level": 1, "value": 0.0},
-                "median": {"aqi_level": 1, "value": 0.1},
             },
         },
     ]
