@@ -1,0 +1,154 @@
+id,city,country,latitude,longitude,timezone
+AE001,Dubai,United Arab Emirates,25.0657,55.17128,Asia/Dubai
+AE002,Abu Dhabi,United Arab Emirates,24.46667,54.36667,Asia/Dubai
+AF001,Kabul,Afghanistan,34.52813,69.17233,Asia/Kabul
+AR001,Buenos Aires,Argentina,-34.61315,-58.37723,America/Argentina/Buenos_Aires
+AR002,Río Gallegos,Argentina,-51.62261,-69.21813,America/Argentina/Rio_Gallegos
+AR003,Córdoba,Argentina,-31.4135,-64.18105,America/Argentina/Cordoba
+AT001,Vienna,Austria,48.20849,16.37208,Europe/Vienna
+AT002,Salzburg,Austria,47.79941,13.04399,Europe/Vienna
+AU001,Perth,Australia,-31.95224,115.8614,Australia/Perth
+AU002,Darwin,Australia,-12.46113,130.84185,Australia/Darwin
+AU003,Adelaide,Australia,-34.92866,138.59863,Australia/Adelaide
+AU004,Sydney,Australia,-33.86785,151.20732,Australia/Sydney
+AU005,Melbourne,Australia,-37.814,144.96332,Australia/Melbourne
+AU006,Canberra,Australia,-35.28346,149.12807,Australia/Sydney
+AU007,Cairns,Australia,-16.92366,145.76613,Australia/Brisbane
+AU008,Brisbane,Australia,-27.46794,153.02809,Australia/Brisbane
+AZ001,Baku,Azerbaijan,40.37767,49.89201,Asia/Baku
+BD001,Dhaka,Bangladesh,23.7104,90.40744,Asia/Dhaka
+BE001,Brussels,Belgium,50.85045,4.34878,Europe/Brussels
+BG001,Sofia,Bulgaria,42.69751,23.32415,Europe/Sofia
+BH001,Bahrain,Bahrain,26.22787,50.58565,Asia/Bahrain
+BO001,La Paz,Bolivia,-16.5,-68.15,America/La_Paz
+BR001,Recife,Brazil,-8.05389,-34.88111,America/Recife
+BR002,São Paulo,Brazil,-23.5475,-46.63611,America/Sao_Paulo
+BR003,Rio de Janeiro,Brazil,-22.90642,-43.18223,America/Sao_Paulo
+BR004,Porto Alegre,Brazil,-30.03283,-51.23019,America/Sao_Paulo
+BR005,Brasília,Brazil,-15.77972,-47.92972,America/Sao_Paulo
+BY001,Minsk,Belarus,53.9,27.56667,Europe/Minsk
+CA001,Montreal,Canada,45.50884,-73.58781,America/Toronto
+CA002,Toronto,Canada,43.70011,-79.4163,America/Toronto
+CA003,Vancouver,Canada,49.24966,-123.11934,America/Vancouver
+CD001,Kinshasa,Democratic Republic of the Congo,-4.32758,15.31357,Africa/Kinshasa
+CH001,Zurich,Switzerland,47.36667,8.55,Europe/Zurich
+CH002,Geneva,Switzerland,46.20222,6.14569,Europe/Zurich
+CI001,Abidjan,Ivory Coast,5.30966,-4.01266,Africa/Abidjan
+CL001,Santiago,Chile,-33.45694,-70.64827,America/Santiago
+CN001,Shanghai,China,31.22222,121.45806,Asia/Shanghai
+CN002,Chongqing,China,29.56278,106.55278,Asia/Shanghai
+CN003,Beijing,China,39.9075,116.39723,Asia/Shanghai
+CN004,Shenyang,China,41.79222,123.43278,Asia/Shanghai
+CO001,Cartagena,Colombia,10.39972,-75.51444,America/Bogota
+CO002,Bogotá,Colombia,4.60971,-74.08175,America/Bogota
+CR001,San José,Costa Rica,9.93333,-84.08333,America/Costa_Rica
+CU001,Havana,Cuba,23.13302,-82.38304,America/Havana
+CZ001,Prague,Czechia,50.08804,14.42076,Europe/Prague
+DE001,Munich,Germany,48.13743,11.57549,Europe/Berlin
+DE002,Frankfurt,Germany,50.11552,8.68417,Europe/Berlin
+DE003,Berlin,Germany,52.52437,13.41053,Europe/Berlin
+DK001,Copenhagen,Denmark,55.67594,12.56553,Europe/Copenhagen
+DO001,Santo Domingo,Dominican Republic,18.47186,-69.89232,America/Santo_Domingo
+DZ001,Algiers,Algeria,36.73225,3.08746,Africa/Algiers
+EC001,Quito,Ecuador,-0.22985,-78.52495,America/Guayaquil
+EC002,Guayaquil,Ecuador,-2.19616,-79.88621,America/Guayaquil
+EG001,Cairo,Egypt,30.06263,31.24967,Africa/Cairo
+ES001,Madrid,Spain,40.4165,-3.70256,Europe/Madrid
+ES002,Barcelona,Spain,41.38879,2.15899,Europe/Madrid
+ET001,Addis Abeba,Ethiopia,9.02497,38.74689,Africa/Addis_Ababa
+FI001,Helsinki,Finland,60.16952,24.93545,Europe/Helsinki
+FR001,Paris,France,48.85341,2.3488,Europe/Paris
+GB001,London,United Kingdom,51.50853,-0.12574,Europe/London
+GB002,Glasgow,United Kingdom,55.86515,-4.25763,Europe/London
+GB003,Belfast,United Kingdom,54.59682,-5.92541,Europe/London
+GE001,Tbilisi,Georgia,41.69411,44.83368,Asia/Tbilisi
+GF001,Cayenne,French Guiana,4.93333,-52.33333,America/Cayenne
+GH001,Accra,Ghana,5.55602,-0.1969,Africa/Accra
+GR001,Athens,Greece,37.98376,23.72784,Europe/Athens
+GT001,Guatemala City,Guatemala,14.64072,-90.51327,America/Guatemala
+HK001,Hong Kong,Hong Kong,22.27832,114.17469,Asia/Hong_Kong
+HN001,Tegucigalpa,Honduras,14.0818,-87.20681,America/Tegucigalpa
+HR001,Zagreb,Croatia,45.81444,15.97798,Europe/Zagreb
+HU001,Budapest,Hungary,47.49835,19.04045,Europe/Budapest
+ID001,Jakarta,Indonesia,-6.21462,106.84513,Asia/Jakarta
+IE001,Dublin,Ireland,53.33306,-6.24889,Europe/Dublin
+IL001,Jerusalem,Israel,31.76904,35.21633,Asia/Jerusalem
+IL002,Tel Aviv-Yafo,Israel,32.08088,34.78057,Asia/Jerusalem
+IN001,New Delhi,India,28.65195,77.23149,Asia/Kolkata
+IN002,Kolkata,India,22.56263,88.36304,Asia/Kolkata
+IN003,Mumbai,India,19.07283,72.88261,Asia/Kolkata
+IR001,Tehran,Iran,35.69439,51.42151,Asia/Tehran
+IT001,Venice,Italy,45.43713,12.33265,Europe/Rome
+IT002,Rome,Italy,41.89193,12.51133,Europe/Rome
+JM001,Kingston,Jamaica,17.99702,-76.79358,America/Jamaica
+JO001,Amman,Jordan,31.95522,35.94503,Asia/Amman
+JP001,Tokyo,Japan,35.6895,139.69171,Asia/Tokyo
+JP002,Osaka,Japan,34.69374,135.50218,Asia/Tokyo
+KE001,Nairobi,Kenya,-1.28333,36.81667,Africa/Nairobi
+KH001,Phnom Penh,Cambodia,11.56245,104.91601,Asia/Phnom_Penh
+KR001,Seoul,South Korea,37.566,126.9784,Asia/Seoul
+KR002,Busan,South Korea,35.10168,129.03004,Asia/Seoul
+KW001,Kuwait City,Kuwait,29.36972,47.97833,Asia/Kuwait
+KZ001,Astana,Kazakhstan,51.1801,71.44598,Asia/Almaty
+LB001,Beirut,Lebanon,33.89332,35.50157,Asia/Beirut
+LK001,Colombo,Sri Lanka,6.93548,79.84868,Asia/Colombo
+LY001,Tripoli,Libya,32.88743,13.18733,Africa/Tripoli
+MM001,Yangon,Myanmar,16.80528,96.15611,Asia/Yangon
+MN001,Ulaanbaatar,Mongolia,47.90771,106.88324,Asia/Ulaanbaatar
+MX001,Cozumel,Mexico,20.50038,-86.94272,America/Cancun
+MX002,Mexico City,Mexico,19.42847,-99.12766,America/Mexico_City
+MX003,Acapulco,Mexico,16.84942,-99.90891,America/Mexico_City
+MX004,Monterrey,Mexico,25.67507,-100.31847,America/Monterrey
+MX005,Guadalajara,Mexico,20.66682,-103.39182,America/Mexico_City
+MY001,Kuala Lumpur,Malaysia,3.1412,101.68653,Asia/Kuala_Lumpur
+NG001,Lagos,Nigeria,6.45407,3.39467,Africa/Lagos
+NG002,Abuja,Nigeria,9.05785,7.49508,Africa/Lagos
+NI001,Managua,Nicaragua,12.13282,-86.2504,America/Managua
+NL001,Amsterdam,Netherlands,52.37403,4.88969,Europe/Amsterdam
+NO001,Oslo,Norway,59.91273,10.74609,Europe/Oslo
+NP001,Kathmandu,Nepal,27.70169,85.3206,Asia/Kathmandu
+NZ001,Wellington,New Zealand,-41.28664,174.77557,Pacific/Auckland
+NZ002,Auckland,New Zealand,-36.84853,174.76349,Pacific/Auckland
+OM001,Muscat,Oman,23.58413,58.40778,Asia/Muscat
+PA001,Panama City,Panama,8.9936,-79.51973,America/Panama
+PE001,Lima,Peru,-12.04318,-77.02824,America/Lima
+PH001,Manila,Philippines,14.6042,120.9822,Asia/Manila
+PK001,Quetta,Pakistan,30.18414,67.00141,Asia/Karachi
+PK002,Karachi,Pakistan,24.8608,67.0104,Asia/Karachi
+PK003,Islamabad,Pakistan,33.72148,73.04329,Asia/Karachi
+PL001,Warsaw,Poland,52.22977,21.01178,Europe/Warsaw
+PR001,San Juan,Puerto Rico,18.46633,-66.10572,America/Puerto_Rico
+PT001,Lisbon,Portugal,38.71667,-9.13333,Europe/Lisbon
+PY001,Asuncion,Paraguay,-25.28646,-57.647,America/Asuncion
+QA001,Doha,Qatar,25.28545,51.53096,Asia/Qatar
+RO001,Bucharest,Romania,44.43225,26.10626,Europe/Bucharest
+RS001,Belgrade,Serbia,44.80401,20.46513,Europe/Belgrade
+RU001,Saint Petersburg,Russia,59.93863,30.31413,Europe/Moscow
+RU002,Moscow,Russia,55.75222,37.61556,Europe/Moscow
+RW001,Kigali,Rwanda,-1.94995,30.05885,Africa/Kigali
+SA001,Riyadh,Saudi Arabia,24.68773,46.72185,Asia/Riyadh
+SG001,Singapore,Singapore,1.28967,103.85007,Asia/Singapore
+SN001,Dakar,Senegal,14.6937,-17.44406,Africa/Dakar
+SV001,San Salvador,El Salvador,13.68935,-89.18718,America/El_Salvador
+SY001,Damascus,Syria,33.5102,36.29128,Asia/Damascus
+TH001,Bangkok,Thailand,13.75398,100.50144,Asia/Bangkok
+TR001,Ankara,Turkey,39.91987,32.85427,Europe/Istanbul
+TR002,Istanbul,Turkey,41.01384,28.94966,Europe/Istanbul
+TW001,Taipei,Taiwan,25.04776,121.53185,Asia/Taipei
+UA001,Kyiv,Ukraine,50.45466,30.5238,Europe/Kiev
+UG001,Kampala,Uganda,0.31628,32.58219,Africa/Kampala
+US001,Washington,United States,38.89511,-77.03637,America/New_York
+US002,Miami,United States,25.77427,-80.19366,America/New_York
+US003,Atlanta,United States,33.749,-84.38798,America/New_York
+US004,Dallas,United States,32.78306,-96.80667,America/Chicago
+US005,Chicago,United States,41.85003,-87.65005,America/Chicago
+US006,New York,United States,40.71427,-74.00597,America/New_York
+US007,Los Angeles,United States,34.05223,-118.24368,America/Los_Angeles
+US008,San Francisco,United States,37.77493,-122.41942,America/Los_Angeles
+UY001,Montevideo,Uruguay,-34.90328,-56.18816,America/Montevideo
+VE001,Caracas,Venezuela,10.48801,-66.87919,America/Caracas
+VN001,Ho Chi Minh City,Vietnam,10.82302,106.62965,Asia/Ho_Chi_Minh
+VN002,Hanoi,Vietnam,21.0245,105.84117,Asia/Ho_Chi_Minh
+ZA001,Johannesburg,South Africa,-26.20227,28.04363,Africa/Johannesburg
+ZA002,Cape Town,South Africa,-33.92584,18.42322,Africa/Johannesburg
+ZW001,Harare,Zimbabwe,-17.82772,31.05337,Africa/Harare
