@@ -102,7 +102,7 @@ def test__required_parameters_provided__verify_response_status_200(payload: dict
         {},
     ],
 )
-def test__required_and_optional_parameter_combinations_missing__verify_response_status_422(
+def test__required_and_optional_parameter_combinations_missing__verify_status_422(
     payload: dict,
 ):
     response = requests.request(
