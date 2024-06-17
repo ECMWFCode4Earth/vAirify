@@ -7,6 +7,7 @@ from requests import Response
 from system_tests.data.measurement_summary_api_test_data import (
     create_in_situ_database_data_with_overrides,
     create_in_situ_database_data,
+    create_pollutant_value,
 )
 from system_tests.utils.api_utilities import (
     format_datetime_as_string,
@@ -55,67 +56,96 @@ city_3_location_1 = create_in_situ_database_data_with_overrides(
 )
 
 # Calculation Test Data
-city_a_location_1 = create_in_situ_database_data(
-    datetime.datetime(2024, 7, 20, 13, 0, 0, tzinfo=datetime.timezone.utc),
-    "Test City A",
-    "Location 1",
-    800,
-    800,
-    800,
-    800,
-    800,
+
+city_a_location_1 = create_in_situ_database_data_with_overrides(
+    {
+        "measurement_date": datetime.datetime(
+            2024, 7, 20, 13, 0, 0, tzinfo=datetime.timezone.utc
+        ),
+        "name": "Test City A",
+        "location_name": "Location 1",
+        "no2": create_pollutant_value(800, "µg/m³", 800, "µg/m³"),
+        "o3": create_pollutant_value(800, "µg/m³", 800, "µg/m³"),
+        "pm2_5": create_pollutant_value(800, "µg/m³", 800, "µg/m³"),
+        "pm10": create_pollutant_value(800, "µg/m³", 800, "µg/m³"),
+        "so2": create_pollutant_value(800, "µg/m³", 800, "µg/m³"),
+    }
 )
-create_in_situ_database_data_with_overrides({})
-city_a_location_2 = create_in_situ_database_data(
-    datetime.datetime(2024, 7, 20, 14, 0, 0, tzinfo=datetime.timezone.utc),
-    "Test City A",
-    "Location 2",
-    123,
-    123,
-    50,
-    50,
-    123,
+city_a_location_2 = create_in_situ_database_data_with_overrides(
+    {
+        "measurement_date": datetime.datetime(
+            2024, 7, 20, 14, 0, 0, tzinfo=datetime.timezone.utc
+        ),
+        "name": "Test City A",
+        "location_name": "Location 2",
+        "no2": create_pollutant_value(123, "µg/m³", 123, "µg/m³"),
+        "o3": create_pollutant_value(123, "µg/m³", 123, "µg/m³"),
+        "pm2_5": create_pollutant_value(50, "µg/m³", 50, "µg/m³"),
+        "pm10": create_pollutant_value(50, "µg/m³", 50, "µg/m³"),
+        "so2": create_pollutant_value(123, "µg/m³", 123, "µg/m³"),
+    }
 )
-city_a_location_3 = create_in_situ_database_data(
-    datetime.datetime(2024, 7, 20, 15, 0, 0, tzinfo=datetime.timezone.utc),
-    "Test City A",
-    "Location 3",
-    220,
-    220,
-    20,
-    20,
-    220,
+
+city_a_location_3 = create_in_situ_database_data_with_overrides(
+    {
+        "measurement_date": datetime.datetime(
+            2024, 7, 20, 15, 0, 0, tzinfo=datetime.timezone.utc
+        ),
+        "name": "Test City A",
+        "location_name": "Location 3",
+        "no2": create_pollutant_value(220, "µg/m³", 220, "µg/m³"),
+        "o3": create_pollutant_value(220, "µg/m³", 220, "µg/m³"),
+        "pm2_5": create_pollutant_value(20, "µg/m³", 20, "µg/m³"),
+        "pm10": create_pollutant_value(20, "µg/m³", 20, "µg/m³"),
+        "so2": create_pollutant_value(220, "µg/m³", 220, "µg/m³"),
+    }
 )
-city_a_location_4 = create_in_situ_database_data(
-    datetime.datetime(2024, 7, 20, 16, 0, 0, tzinfo=datetime.timezone.utc),
-    "Test City A",
-    "Location 1",
-    11,
-    11,
-    11,
-    11,
-    11,
+
+city_a_location_4 = create_in_situ_database_data_with_overrides(
+    {
+        "measurement_date": datetime.datetime(
+            2024, 7, 20, 16, 0, 0, tzinfo=datetime.timezone.utc
+        ),
+        "name": "Test City A",
+        "location_name": "Location 4",
+        "no2": create_pollutant_value(11, "µg/m³", 11, "µg/m³"),
+        "o3": create_pollutant_value(11, "µg/m³", 11, "µg/m³"),
+        "pm2_5": create_pollutant_value(11, "µg/m³", 11, "µg/m³"),
+        "pm10": create_pollutant_value(11, "µg/m³", 11, "µg/m³"),
+        "so2": create_pollutant_value(11, "µg/m³", 11, "µg/m³"),
+    }
 )
-city_b_location_1 = create_in_situ_database_data(
-    datetime.datetime(2024, 7, 20, 13, 30, 0, tzinfo=datetime.timezone.utc),
-    "Test City B",
-    "Location 1",
-    400,
-    400,
-    101,
-    101,
-    400,
+
+city_b_location_1 = create_in_situ_database_data_with_overrides(
+    {
+        "measurement_date": datetime.datetime(
+            2024, 7, 20, 13, 30, 0, tzinfo=datetime.timezone.utc
+        ),
+        "name": "Test City B",
+        "location_name": "Location 1",
+        "no2": create_pollutant_value(400, "µg/m³", 400, "µg/m³"),
+        "o3": create_pollutant_value(400, "µg/m³", 400, "µg/m³"),
+        "pm2_5": create_pollutant_value(101, "µg/m³", 101, "µg/m³"),
+        "pm10": create_pollutant_value(101, "µg/m³", 101, "µg/m³"),
+        "so2": create_pollutant_value(400, "µg/m³", 400, "µg/m³"),
+    }
 )
-city_b_location_2 = create_in_situ_database_data(
-    datetime.datetime(2024, 7, 20, 16, 30, 0, tzinfo=datetime.timezone.utc),
-    "Test City B",
-    "Location 2",
-    200,
-    200,
-    2,
-    2,
-    200,
+
+city_b_location_2 = create_in_situ_database_data_with_overrides(
+    {
+        "measurement_date": datetime.datetime(
+            2024, 7, 20, 16, 30, 0, tzinfo=datetime.timezone.utc
+        ),
+        "name": "Test City B",
+        "location_name": "Location 2",
+        "no2": create_pollutant_value(200, "µg/m³", 200, "µg/m³"),
+        "o3": create_pollutant_value(200, "µg/m³", 200, "µg/m³"),
+        "pm2_5": create_pollutant_value(2, "µg/m³", 2, "µg/m³"),
+        "pm10": create_pollutant_value(2, "µg/m³", 2, "µg/m³"),
+        "so2": create_pollutant_value(200, "µg/m³", 200, "µg/m³"),
+    }
 )
+
 
 city_c_location_1 = create_in_situ_database_data(
     datetime.datetime(2024, 8, 20, 16, 30, 0, tzinfo=datetime.timezone.utc),
@@ -129,6 +159,8 @@ city_c_location_2 = create_in_situ_database_data(
     "Location 2",
     100,
 )
+
+# Expected mean values
 
 expected_mean_no2_city_a_location_1_2_3 = statistics.mean(
     [
