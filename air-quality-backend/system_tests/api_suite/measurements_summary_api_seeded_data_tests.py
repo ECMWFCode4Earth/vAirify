@@ -11,9 +11,9 @@ from system_tests.data.measurement_summary_api_test_data import (
 )
 from system_tests.utils.api_utilities import (
     format_datetime_as_string,
-    seed_api_test_data,
     get_list_of_key_values,
 )
+from system_tests.utils.database_utilities import seed_api_test_data
 from system_tests.utils.cams_utilities import delete_database_data
 from system_tests.utils.routes import Routes
 
