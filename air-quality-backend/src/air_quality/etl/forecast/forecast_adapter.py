@@ -186,14 +186,36 @@ def _convert_data(input_data: xr.Dataset, variable: str):
         min_val = 0
         max_val = 150.
 
-    intervals = [0, 20, 30, 40, 50, 60, 80, 100, 150, 200, 300, 500, 1000]
-
     for tt in range(len(time)):
         start_index = tt * len(lon)
         end_index = (tt + 1) * len(lon)
         normalised_data = _normalise_data(input_data[variable].isel(step=tt) * 1e9, min_val, max_val)
         # normalised_data = _normalize_data_irregular(input_data[variable].isel(step=tt) * 1e9, intervals)
         rgb_data_array[:, start_index:end_index, 0] = np.clip(normalised_data * 255, 0, 255)
+
+    return np.uint8(rgb_data_array)
+
+def _convert_data_wind(input_data: xr.Dataset):
+    """
+    Convert data to numpy array
+    :param input_data:
+    :param variable:
+    :return rgb_data_array:
+    """
+    lat, lon, time = _get_spatial_temporal_dims(input_data)
+
+    rgb_data_array = np.zeros( ( len(lat), len(lon) * len(time), 3 ))
+
+    min_val = -30
+    max_val = 30.
+
+    for tt in range(len(time)):
+        start_index = tt * len(lon)
+        end_index = (tt + 1) * len(lon)
+        normalised_data_U = _normalise_data(input_data["u10"].isel(step=tt), min_val, max_val)
+        normalised_data_V = _normalise_data(input_data["v10"].isel(step=tt), min_val, max_val)
+        rgb_data_array[:, start_index:end_index, 0] = np.clip(normalised_data_U * 255, 0, 255)
+        rgb_data_array[:, start_index:end_index, 1] = np.clip(normalised_data_V * 255, 0, 255)
 
     return np.uint8(rgb_data_array)
 
@@ -213,7 +235,7 @@ def _create_output_directory(forecast_data: ForecastData):
     os.makedirs(output_directory, exist_ok=True)
     return output_directory, forecast_date
 
-def _save_data_textures(rgb_data_array, output_directory, forecast_date, variable):
+def _save_data_textures(rgb_data_array, output_directory, forecast_date, variable, format):
     """
     Save data textures
     :param rgb_data_array:
@@ -221,8 +243,11 @@ def _save_data_textures(rgb_data_array, output_directory, forecast_date, variabl
     :param variable:
     :return:
     """
-    grayscale_array = rgb_data_array.squeeze(axis=2)
-    image = Image.fromarray(grayscale_array, 'L')
+    if ( format == "L" ):
+        image_array = rgb_data_array.squeeze(axis=2)
+    else:
+        image_array = rgb_data_array
+    image = Image.fromarray(image_array, format)
     output_file = f"{output_directory}/{variable}_{forecast_date}_CAMS_global.png"
     image.save(output_file, format='PNG')
 
@@ -238,4 +263,9 @@ def create_data_textures(forecast_data: ForecastData):
         forecast_data_type = convert_to_forecast_data_type(pollutant)
         dataset = forecast_data._get_data_set(forecast_data_type)
         rgb_data_array = _convert_data(dataset, forecast_data_type.value)
-        _save_data_textures(rgb_data_array, output_directory, forecast_date, pollutant.value)
+        _save_data_textures(rgb_data_array, output_directory, forecast_date, pollutant.value, "L")
+
+    # logging.info(f"Creating data texture for 10m WINDS")
+    # rgb_data_array = _convert_data_wind(forecast_data._single_level_data)
+    # _save_data_textures(rgb_data_array, output_directory, forecast_date, 'winds_10m', "RGB")
+
