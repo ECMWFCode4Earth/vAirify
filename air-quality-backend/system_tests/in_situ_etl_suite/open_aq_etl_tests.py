@@ -52,13 +52,13 @@ def test__in_situ_etl__combines_pollutants_for_location_times():
     results = get_database_data(collection_name, query)
     assert len(results) == 2
 
-    assert results[0]["measurement_date"] == parse(date1)
-    assert results[0]["no2"]["value"] == 1
-    assert results[0]["o3"]["value"] == 2
+    date1_res = retrieve_single(results, "measurement_date", parse(date1))
+    assert date1_res["no2"]["value"] == 1
+    assert date1_res["o3"]["value"] == 2
 
-    assert results[1]["measurement_date"] == parse(date2)
-    assert results[1]["no2"]["value"] == 3
-    assert results[1]["o3"]["value"] == 4
+    date2_res = retrieve_single(results, "measurement_date", parse(date2))
+    assert date2_res["no2"]["value"] == 3
+    assert date2_res["o3"]["value"] == 4
 
 
 @mock.patch.dict(
@@ -139,10 +139,12 @@ def test__in_situ_etl__handles_multiple_cities():
 
     results = get_database_data(collection_name, query)
     assert len(results) == 2
-    assert results[0]["name"] == "London"
-    assert results[0]["no2"]["value"] == 123
-    assert results[1]["name"] == "Melbourne"
-    assert results[1]["no2"]["value"] == 456
+
+    london_result = retrieve_single(results, "name", "London")
+    melbourne_result = retrieve_single(results, "name", "Melbourne")
+
+    assert london_result["no2"]["value"] == 123
+    assert melbourne_result["no2"]["value"] == 456
 
 
 @mock.patch.dict(
@@ -187,6 +189,12 @@ def assert_pollutant_value(stored_data: InSituPollutantReading, expected_value: 
     assert stored_data["unit"] == "µg/m³"
     assert stored_data["original_value"] == expected_value
     assert stored_data["original_unit"] == "µg/m³"
+
+
+def retrieve_single(array, element_to_check, value_to_find):
+    results = [x for x in array if x[element_to_check] == value_to_find]
+    assert len(results) == 1
+    return results[0]
 
 
 def create_measurement(
