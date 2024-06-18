@@ -9,7 +9,7 @@ import {
 } from 'react-router-dom'
 
 import Layout from './components/layout/Layout'
-import SingleCity from './components/single-city/SingleCity'
+import { SingleCity } from './components/single-city/SingleCity'
 import GlobalSummary from './components/summary-view/GlobalSummary'
 import { RouteConstants } from './routes'
 

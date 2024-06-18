@@ -1,5 +1,5 @@
 import classes from './LoadingSpinner.module.css'
 
-export const LoadingSpinnerComponent = (): JSX.Element => (
-  <span className={classes['loader']}></span>
+export const LoadingSpinner = (): JSX.Element => (
+  <span data-testid="loading-spinner" className={classes['loader']}></span>
 )

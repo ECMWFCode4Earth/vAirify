@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom'
 
 import { AverageComparisonChart } from './AverageComparisonChart'
 import classes from './SingleCity.module.css'
-import SiteMeasurementsChart from './SiteMeasurementsChart'
+import { SiteMeasurementsChart } from './SiteMeasurementsChart'
 import { ForecastContext } from '../../context'
 import { PollutantType, pollutantTypes } from '../../models'
 import { getForecastData } from '../../services/forecast-data-service'
@@ -18,9 +18,9 @@ import {
   ForecastResponseDto,
   MeasurementsResponseDto,
 } from '../../services/types'
-import { LoadingSpinnerComponent } from '../common/LoadingSpinner'
+import { LoadingSpinner } from '../common/LoadingSpinner'
 
-const SingleCity = () => {
+export const SingleCity = () => {
   const { forecastBaseTime, forecastValidTime } = useContext(ForecastContext)
   const { name: locationName = '' } = useParams()
 
@@ -98,7 +98,7 @@ const SingleCity = () => {
       <section data-testid="main-comparison-chart">
         <AverageComparisonChart isPending={isPendingF} data={processedData} />
       </section>
-      {isPending && <LoadingSpinnerComponent />}
+      {isPending && <LoadingSpinner />}
       {!isPending && (
         <section className={classes['site-measurements']}>
           <h3>Site Measurements</h3>
@@ -112,6 +112,7 @@ const SingleCity = () => {
                 <div
                   className={classes['site-measurements-chart']}
                   key={`site_measurements_chart_${pollutantType}`}
+                  data-testid={`site_measurements_chart_${pollutantType}`}
                 >
                   <SiteMeasurementsChart
                     pollutantType={pollutantType as PollutantType}
@@ -124,5 +125,3 @@ const SingleCity = () => {
     </section>
   )
 }
-
-export default SingleCity
