@@ -33,5 +33,30 @@ services:
       - MONGO_DB_NAME=${MONGO_DB_NAME}
       - CDSAPI_URL=${CDSAPI_URL}
       - CDSAPI_KEY=${CDSAPI_KEY}
+  api:
+    container_name: vairify-api
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+    build:
+      context: ./air-quality-backend/
+      dockerfile: Dockerfile.api
+    environment:
+      - MONGO_DB_URI=mongodb://mongo:27017
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+    entrypoint: 
+      - conda
+      - run
+      - --no-capture-output
+      - -n
+      - air-quality-backend
+      - fastapi
+      - dev
+      - ./src/air_quality/api/main.py
+      - --host
+      - 0.0.0.0
+    volumes:
+      - ./air-quality-backend/src/:/usr/src/app/src/
 volumes:
   database:
