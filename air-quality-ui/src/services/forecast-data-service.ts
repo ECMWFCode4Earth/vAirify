@@ -9,14 +9,23 @@ export const getForecastData = async (
   dateFrom: DateTime,
   dateTo: DateTime,
   baseTime: DateTime,
+  location_name?: string,
   locationType: LocationType = 'city',
 ): Promise<ForecastResponseDto[]> => {
-  const params: Record<string, string> = {
-    location_type: locationType,
-    valid_time_from: dateFrom.toJSDate().toISOString(),
-    valid_time_to: dateTo.toJSDate().toISOString(),
-    base_time: baseTime.toJSDate().toISOString(),
-  }
+  const params: Record<string, string> = location_name
+    ? {
+        location_type: locationType,
+        valid_time_from: dateFrom.toJSDate().toISOString(),
+        valid_time_to: dateTo.toJSDate().toISOString(),
+        base_time: baseTime.toJSDate().toISOString(),
+        location_name: location_name,
+      }
+    : {
+        location_type: locationType,
+        valid_time_from: dateFrom.toJSDate().toISOString(),
+        valid_time_to: dateTo.toJSDate().toISOString(),
+        base_time: baseTime.toJSDate().toISOString(),
+      }
   const url = new URL(`${API_URL}/air-pollutant/forecast`)
   Object.keys(params).forEach((key) =>
     url.searchParams.append(key, params[key]),

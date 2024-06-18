@@ -1,30 +1,21 @@
 import './SingleCity.css'
+import { useQuery } from '@tanstack/react-query'
 import ReactECharts from 'echarts-for-react'
 import { DateTime } from 'luxon'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { getLatestBaseForecastTime } from './HandleTime'
-import { useGetSingleCityForecastData } from './SingleCityQueries'
-import { Measurements } from './SingleCityTypes'
-
-function xAxisFormat(timestamp: string, index: number) {
-  const date = DateTime.fromMillis(parseInt(timestamp), {
-    zone: 'utc',
-  })
-  if (index === 0 || (date.hour === 3 && index !== 1)) {
-    return `${date.toFormat('yyyy-MM-dd HH:mm')}`
-  }
-  return `${date.toFormat('HH:mm')}`
-}
-
-function toolTipFormat(params: { value: [string, number] }) {
-  return `x: ${DateTime.fromMillis(parseInt(params.value[0]), { zone: 'utc' }).toFormat('yyyy-MM-dd HH:mm')}, y: ${params.value[1]}`
-}
+import { toolTipFormat, xAxisFormat } from './formattingFunctions'
+import { getForecastData } from '../../services/forecast-data-service'
+import {
+  getLatestBaseForecastTime,
+  getLatestValidForecastTime,
+} from '../../services/forecast-time-service'
+import { ForecastResponseDto } from '../../services/types'
 
 function SingleCity() {
   const { name } = useParams()
-  const [processedData, setProcessedData] = useState()
+  const [processedData, setProcessedData] = useState<number[][]>()
   const [isLoading, setIsLoading] = useState(true)
 
   let todaysDate = DateTime.now().toUTC()
@@ -36,21 +27,21 @@ function SingleCity() {
     millisecond: 0,
   })
 
-  const requestResult = useGetSingleCityForecastData(
-    getLatestBaseForecastTime(dateFiveDaysAgo).toISO({ includeOffset: false }) +
-      '+00:00',
-    getLatestBaseForecastTime(todaysDate).toISO({ includeOffset: false }) +
-      '+00:00',
-    'city',
-    getLatestBaseForecastTime(dateFiveDaysAgo).toISO({ includeOffset: false }) +
-      '+00:00',
-    name,
-  )
+  const { data } = useQuery({
+    queryKey: ['forecast'],
+    queryFn: () =>
+      getForecastData(
+        getLatestValidForecastTime(dateFiveDaysAgo),
+        getLatestValidForecastTime(todaysDate),
+        getLatestBaseForecastTime(dateFiveDaysAgo),
+        name,
+      ),
+  })
 
   useEffect(() => {
-    if (requestResult.data) {
+    if (data) {
       setProcessedData(
-        requestResult.data.map((measurement: Measurements) => {
+        data.map((measurement: ForecastResponseDto) => {
           return [
             DateTime.fromISO(measurement.valid_time).toMillis(),
             measurement.overall_aqi_level,
@@ -59,10 +50,11 @@ function SingleCity() {
       )
       setIsLoading(false)
     }
-  }, [requestResult.data])
+  }, [data])
 
   const reactEChartOptions = {
     xAxis: {
+      name: 'Time',
       type: 'category',
       max: 'dataMax',
       boundaryGap: false,
@@ -80,6 +72,8 @@ function SingleCity() {
     },
     yAxis: {
       type: 'value',
+      name: 'AQI',
+      max: 6,
     },
     series: [
       {
@@ -93,9 +87,8 @@ function SingleCity() {
       formatter: toolTipFormat,
     },
   }
-
   return (
-    <div className="chart">
+    <div className="chart" data-testid="chart">
       <ReactECharts
         option={reactEChartOptions}
         showLoading={isLoading}
