@@ -169,3 +169,6 @@ air-quality-backend/liquibase/liquibase.properties
 
 # vscode
 .vscode
+
+# data textures
+**/*CAMS_global.png
