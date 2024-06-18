@@ -111,7 +111,7 @@ test_city_2_expected_response_data: dict = {
 }
 
 # API GET request
-base_url = Routes.forecast_api_url
+base_url = Routes.forecast_api_endpoint
 headers = {"accept": "application/json"}
 location_type = "city"
 

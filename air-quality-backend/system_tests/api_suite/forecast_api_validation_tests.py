@@ -8,7 +8,7 @@ from system_tests.utils.api_utilities import (
 from system_tests.data.cities_data import all_cities
 from system_tests.utils.routes import Routes
 
-base_url = Routes.forecast_api_url
+base_url = Routes.forecast_api_endpoint
 headers = {"accept": "application/json"}
 location_type = "city"
 location_name = random.choice(all_cities)

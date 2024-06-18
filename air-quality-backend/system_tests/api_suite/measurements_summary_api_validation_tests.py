@@ -6,7 +6,7 @@ import requests
 from system_tests.utils.api_utilities import format_datetime_as_string
 from system_tests.utils.routes import Routes
 
-base_url = Routes.measurement_summary_api_url
+base_url = Routes.measurements_summary_api_endpoint
 location_type = "city"
 measurement_base_time_string_24_7_20_14_0_0 = format_datetime_as_string(
     datetime.datetime(2024, 7, 20, 14, 0, 0, tzinfo=datetime.timezone.utc),
