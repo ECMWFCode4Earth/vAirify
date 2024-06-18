@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-from typing import TypedDict, NotRequired, Optional, Literal
+from typing import TypedDict, NotRequired, Optional
 
 from bson import ObjectId
 
@@ -45,7 +45,6 @@ class InSituMeasurement(TypedDict):
 
 class PollutantAverages(TypedDict):
     mean: Optional[float]
-    median: Optional[float]
 
 
 class InSituAveragedMeasurement(TypedDict):
@@ -96,7 +95,6 @@ def get_averaged(
     measurement_base_time: datetime,
     measurement_time_range_minutes: int,
     location_type: AirQualityLocationType,
-    averages: set[Literal["mean", "median"]],
 ) -> [InSituAveragedMeasurement]:
     date_from = measurement_base_time - timedelta(
         minutes=measurement_time_range_minutes
@@ -122,20 +120,10 @@ def get_averaged(
 
     for pollutant_type in PollutantType:
         pollutant_name = pollutant_type.value
-        median_key = f"{pollutant_name}_median"
         mean_key = f"{pollutant_name}_mean"
         project_criteria[pollutant_name] = {}
-        if "median" in averages:
-            group_by_criteria[median_key] = {
-                "$median": {
-                    "input": f"${pollutant_name}.value",
-                    "method": "approximate",
-                }
-            }
-            project_criteria[pollutant_name]["median"] = f"${median_key}"
-        if "mean" in averages:
-            group_by_criteria[mean_key] = {"$avg": f"${pollutant_name}.value"}
-            project_criteria[pollutant_name]["mean"] = f"${mean_key}"
+        group_by_criteria[mean_key] = {"$avg": f"${pollutant_name}.value"}
+        project_criteria[pollutant_name]["mean"] = f"${mean_key}"
 
     logging.info(
         "Averaging pollutant measurements with criteria between {} and {}".format(

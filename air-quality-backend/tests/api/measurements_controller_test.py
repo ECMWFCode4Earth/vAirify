@@ -88,7 +88,7 @@ def test__measurements_invalid_query_params__throw_error(field, params, expected
 def test__measurements_applies_appropriate_filters__when_request_valid():
     params = {
         **measurement_request_defaults,
-        "location_names": ["London", "Paris"],
+        "location_name": ["London", "Paris"],
         "api_source": "test",
     }
     with patch(
@@ -184,5 +184,4 @@ def test__summary_applies_appropriate_filters__when_request_valid():
             datetime(2024, 6, 1, 0, 0),
             90,
             AirQualityLocationType.CITY,
-            {"mean", "median"},
         )

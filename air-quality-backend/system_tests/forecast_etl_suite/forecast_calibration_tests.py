@@ -2,7 +2,7 @@ import datetime
 import pytest
 from dotenv import load_dotenv
 
-from system_tests.utils.cities_data import all_cities
+from system_tests.data.cities_data import all_cities
 from system_tests.utils.cams_utilities import (
     get_ecmwf_forecast_to_dict_for_countries,
     get_database_data,
@@ -13,7 +13,7 @@ from system_tests.utils.cams_utilities import (
 load_dotenv(".env-qa")
 
 ecmwf_forecast_file_path = ""  # Path to ECMWF forecast file from air-quality-backend
-ecmwf_locations_file_path = ""  # Path to ECMWF locations file from air-quality-backend
+ecmwf_locations_file_path = "system_tests/forecast_etl_suite/CAMS_locations_V1.csv"
 
 ecmwf_all_data = get_ecmwf_forecast_to_dict_for_countries(
     ecmwf_locations_file_path, ecmwf_forecast_file_path
@@ -21,16 +21,15 @@ ecmwf_all_data = get_ecmwf_forecast_to_dict_for_countries(
 database_all_data = get_database_data({}, "forecast_data")
 
 # Shared test parameters
-test_forecast_base_time = datetime.datetime(2024, 6, 3, 00, 00, 00)
+test_forecast_base_time = datetime.datetime(2024, 6, 17, 00, 00, 00)
 test_forecast_valid_time = datetime.datetime(
-    2024, 6, 3, 6, 00, 00
+    2024, 6, 17, 12, 00, 00
 )  # Set a valid time to test against
 allowed_divergence_percentage = 3
 
 
 @pytest.mark.parametrize("test_city", all_cities)
 def test_compare_ecmwf_o3_with_database_o3(test_city: str):
-
     divergence_percentage = get_forecast_percentage_divergence(
         test_city,
         test_forecast_valid_time,

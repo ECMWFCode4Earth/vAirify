@@ -3,6 +3,9 @@ import os
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, OperationFailure
 
+from air_quality.database.forecasts import Forecast
+from air_quality.database.in_situ import InSituMeasurement
+
 
 def get_database_data(collection_name: str, query):
     uri = os.environ.get("MONGO_DB_URI")
@@ -46,3 +49,13 @@ def delete_database_data(collection_name: str, delete_filter=None):
 
     collection.delete_many(delete_filter)
     client.close()
+
+
+def seed_api_test_data(
+    collection_name: str, test_data_list: list[Forecast | InSituMeasurement]
+):
+    uri = os.environ.get("MONGO_DB_URI")
+    db_name = os.environ.get("MONGO_DB_NAME")
+    client = MongoClient(uri)
+    collection = client[db_name][collection_name]
+    collection.insert_many(test_data_list)

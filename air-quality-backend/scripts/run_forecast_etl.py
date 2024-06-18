@@ -5,12 +5,11 @@ from logging import config
 from dotenv import load_dotenv
 from datetime import datetime
 from air_quality.database.forecasts import insert_data
-
 from air_quality.database.locations import get_locations_by_type, AirQualityLocationType
 from air_quality.etl.forecast.forecast_adapter import transform
 from air_quality.etl.forecast.forecast_dao import fetch_forecast_data
 
-config.fileConfig("../logging.ini")
+config.fileConfig("./logging.ini")
 
 
 def main():
@@ -26,7 +25,7 @@ def main():
         base_date = datetime.strptime(base_date_env, date_format)
 
     logging.info("Extracting pollutant forecast data")
-    extracted_forecast_data = fetch_forecast_data(datetime(2024, 6, 13, 11,59,00,00))
+    extracted_forecast_data = fetch_forecast_data(base_date)
 
     logging.info("Transforming forecast data")
     transformed_forecast_data = transform(extracted_forecast_data, cities)

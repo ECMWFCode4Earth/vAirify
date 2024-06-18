@@ -14,10 +14,14 @@ jest.mock('@tanstack/react-query', () => ({
 jest.mock('../../services/forecast-time-service', () => ({
   getLatestBaseForecastTime: jest
     .fn()
-    .mockImplementation(() => DateTime.fromISO('2024-06-01T00:00:00')),
+    .mockImplementation(() =>
+      DateTime.fromISO('2024-06-01T00:00:00', { zone: 'UTC' }),
+    ),
   getLatestValidForecastTime: jest
     .fn()
-    .mockImplementation(() => DateTime.fromISO('2024-06-01T12:00:00')),
+    .mockImplementation(() =>
+      DateTime.fromISO('2024-06-01T12:00:00', { zone: 'UTC' }),
+    ),
 }))
 
 describe('GlobalSummary component', () => {
@@ -36,7 +40,7 @@ describe('GlobalSummary component', () => {
     render(<GlobalSummary />)
     await waitFor(() => {
       expect(
-        screen.getByText('Forecast Base Time: 2024-06-01 00:00'),
+        screen.getByText('Forecast Base Time: 2024-06-01 00:00 UTC'),
       ).toBeInTheDocument()
     })
   })
@@ -44,7 +48,7 @@ describe('GlobalSummary component', () => {
     render(<GlobalSummary />)
     await waitFor(() => {
       expect(
-        screen.getByText('Forecast Valid Time: 2024-06-01 12:00'),
+        screen.getByText('Forecast Valid Time: 2024-06-01 12:00 UTC'),
       ).toBeInTheDocument()
     })
   })
