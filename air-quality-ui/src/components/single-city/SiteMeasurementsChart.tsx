@@ -1,6 +1,6 @@
 import { EChartsOption } from 'echarts'
 import ReactECharts from 'echarts-for-react'
-import { useMemo } from 'react'
+import { useEffect, useState } from 'react'
 
 import classes from './SiteMeasurementsChart.module.css'
 import { PollutantType, pollutantTypeDisplay } from '../../models'
@@ -14,7 +14,7 @@ interface SiteMeasurementsChartProps {
 
 const getChartOptions = (
   pollutantType: PollutantType,
-  measurementsByStation: Record<string, MeasurementsResponseDto[]>,
+  measurementsBySite: Record<string, MeasurementsResponseDto[]>,
 ): EChartsOption => {
   return {
     xAxis: {
@@ -26,13 +26,18 @@ const getChartOptions = (
       nameGap: 30,
       nameLocation: 'middle',
     },
-    series: Object.entries(measurementsByStation).map(([k, v]) => ({
-      type: 'line',
-      data: v
-        .filter((f) => f[pollutantType] !== undefined)
-        .map((f) => [convertToLocalTime(f.measurement_date), f[pollutantType]]),
-      name: k,
-    })),
+    series: Object.entries(measurementsBySite).map(
+      ([siteName, measurements]) => ({
+        type: 'line',
+        data: measurements
+          .filter((f) => f[pollutantType] !== undefined)
+          .map((f) => [
+            convertToLocalTime(f.measurement_date),
+            f[pollutantType],
+          ]),
+        name: siteName,
+      }),
+    ),
     dataZoom: [
       {
         show: true,
@@ -52,17 +57,27 @@ const getChartOptions = (
 export const SiteMeasurementsChart = (
   props: SiteMeasurementsChartProps,
 ): JSX.Element => {
-  const echartOptions = useMemo(
-    () => getChartOptions(props.pollutantType, props.measurementsBySite),
-    [props.pollutantType, props.measurementsBySite],
+  const [echartOptions, setEchartOptions] = useState<EChartsOption>(
+    getChartOptions(props.pollutantType, props.measurementsBySite),
   )
+  useEffect(() => {
+    const newOptions = getChartOptions(
+      props.pollutantType,
+      props.measurementsBySite,
+    )
+    setEchartOptions(newOptions)
+  }, [props])
 
   return (
     <>
       <label className={classes['chart-label']}>
         {pollutantTypeDisplay[props.pollutantType]}
       </label>
-      <ReactECharts className={classes['chart']} option={echartOptions} />
+      <ReactECharts
+        className={classes['chart']}
+        option={echartOptions}
+        notMerge
+      />
     </>
   )
 }

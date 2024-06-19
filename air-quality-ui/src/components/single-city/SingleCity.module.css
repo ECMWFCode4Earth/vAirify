@@ -1,8 +1,10 @@
 .single-city-container {
     align-items: center;
     display: flex;
+    flex-direction: column;
     min-height: 80vh;
     justify-content: center;
+    padding: 32px 32px;
 }
 
 .site-measurements {
@@ -10,7 +12,10 @@
     display: flex;
     flex-direction: column;
 }
-
-.site-measurements-chart {
-    padding: 32px 32px;
+    
+.selected-sites {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    max-width: 800px;
 }
