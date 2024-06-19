@@ -7,7 +7,9 @@ from air_quality.database.forecasts import Forecast
 from air_quality.database.in_situ import InSituMeasurement
 
 
-def get_database_data(collection_name: str, query):
+def get_database_data(collection_name: str, query_filter=None):
+    if query_filter is None:
+        query_filter = {}
     uri = os.environ.get("MONGO_DB_URI")
     db_name = os.environ.get("MONGO_DB_NAME")
 
@@ -17,7 +19,7 @@ def get_database_data(collection_name: str, query):
     try:
         client = MongoClient(uri, tz_aware=True)
         collection = client[db_name][collection_name]
-        cursor = collection.find(query)
+        cursor = collection.find(query_filter)
         database_dictionary_list = []
 
         for document in cursor:

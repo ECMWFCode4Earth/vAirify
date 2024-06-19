@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 from system_tests.data.cities_data import all_cities
 from system_tests.utils.cams_utilities import (
     get_ecmwf_forecast_to_dict_for_countries,
-    get_database_data,
     get_forecast_percentage_divergence,
 )
+from system_tests.utils.database_utilities import get_database_data
 
 # Test setup
 load_dotenv(".env-qa")
@@ -18,7 +18,7 @@ ecmwf_locations_file_path = "system_tests/forecast_etl_suite/CAMS_locations_V1.c
 ecmwf_all_data = get_ecmwf_forecast_to_dict_for_countries(
     ecmwf_locations_file_path, ecmwf_forecast_file_path
 )
-database_all_data = get_database_data({}, "forecast_data")
+database_all_data = get_database_data("forecast_data")
 
 # Shared test parameters
 test_forecast_base_time = datetime.datetime(2024, 6, 17, 00, 00, 00)
