@@ -49,12 +49,12 @@ describe('SingleCityComponent', () => {
             no2: 1,
             o3: 1,
             so2: 1,
-            location_name: 'location 1',
+            site_name: 'Site 1',
           }),
           mockMeasurementResponseDto({
             pm10: 1,
             pm2_5: 1,
-            location_name: 'location 2',
+            site_name: 'Site 2',
           }),
         ],
         isPending: false,
@@ -74,7 +74,7 @@ describe('SingleCityComponent', () => {
         data: [
           mockMeasurementResponseDto({
             no2: 1,
-            location_name: 'location 1',
+            site_name: 'Site 1',
           }),
         ],
         isPending: false,

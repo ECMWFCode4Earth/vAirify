@@ -2,13 +2,14 @@ import { useQuery } from '@tanstack/react-query'
 import { DateTime } from 'luxon'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import Select, { ActionMeta, OnChangeValue } from 'react-select'
+import Select, { ActionMeta, MultiValue, OnChangeValue } from 'react-select'
 
 import { AverageComparisonChart } from './AverageComparisonChart'
 import classes from './SingleCity.module.css'
 import { SiteMeasurementsChart } from './SiteMeasurementsChart'
 import { ForecastContext } from '../../context'
 import { PollutantType, pollutantTypes } from '../../models'
+import { textToColor } from '../../services/echarts-service'
 import { getForecastData } from '../../services/forecast-data-service'
 import {
   getLatestBaseForecastTime,
@@ -72,8 +73,8 @@ export const SingleCity = () => {
     }
   }, [dataF])
 
-  const [sites, setSites] = useState<SiteOption[]>([])
-  const [selectedSites, setSelectedSites] = useState<SiteOption[]>([])
+  const [sites, setSites] = useState<MultiValue<SiteOption>>([])
+  const [selectedSites, setSelectedSites] = useState<MultiValue<SiteOption>>([])
   useEffect(() => {
     const sites = Array.from(
       data
@@ -97,7 +98,7 @@ export const SingleCity = () => {
         detail.action === 'remove-value' ||
         detail.action === 'select-option'
       ) {
-        setSelectedSites(changeValue as SiteOption[])
+        setSelectedSites(changeValue)
       }
     },
     [],
@@ -130,6 +131,19 @@ export const SingleCity = () => {
         { pm2_5: {}, pm10: {}, no2: {}, o3: {}, so2: {} },
       )
   }, [data, selectedSites])
+
+  const [siteColours, setSiteColours] = useState<Record<string, string>>({})
+  useEffect(() => {
+    const updateColours = async () => {
+      const colorsBySite: Record<string, string> = {}
+      for (const { value } of sites) {
+        const color = await textToColor(value)
+        colorsBySite[value] = color
+      }
+      setSiteColours(colorsBySite)
+    }
+    updateColours()
+  }, [sites])
 
   if (isError) {
     return <>An error occurred</>
@@ -169,6 +183,7 @@ export const SingleCity = () => {
                     <SiteMeasurementsChart
                       pollutantType={pollutantType as PollutantType}
                       measurementsBySite={measurementsBySite}
+                      seriesColoursBySite={siteColours}
                     />
                   </div>
                 ))}
