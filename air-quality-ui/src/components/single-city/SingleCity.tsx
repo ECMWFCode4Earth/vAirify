@@ -168,6 +168,7 @@ export const SingleCity = () => {
                   <div
                     key={`site_measurements_chart_${pollutantType}`}
                     data-testid={`site_measurements_chart_${pollutantType}`}
+                    className={classes['site-measurement-chart']}
                   >
                     <SiteMeasurementsChart
                       pollutantType={pollutantType as PollutantType}
