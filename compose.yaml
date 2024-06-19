@@ -34,7 +34,7 @@ services:
       - CDSAPI_URL=${CDSAPI_URL}
       - CDSAPI_KEY=${CDSAPI_KEY}
   api:
-    container_name: vairify-api
+    container_name: backend-api
     depends_on:
       - db
     ports:
