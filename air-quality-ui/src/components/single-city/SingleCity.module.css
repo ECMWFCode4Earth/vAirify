@@ -7,15 +7,18 @@
     padding: 32px 32px;
 }
 
-.site-measurements {
+.single-city-section {
     align-items: center;
     display: flex;
     flex-direction: column;
+    padding: 32px 0 32px 0;
+    width: 100%;
 }
-    
-.selected-sites {
+
+.site-measurements-section {
     align-items: center;
     display: flex;
     flex-direction: column;
-    max-width: 800px;
+    padding: 32px 0 32px 0;
+    max-width: 800px;   
 }

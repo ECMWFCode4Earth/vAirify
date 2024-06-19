@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQueries } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
 
 import { SingleCity } from './SingleCity'
@@ -7,29 +7,50 @@ import { pollutantTypes } from '../../models'
 import { mockMeasurementResponseDto } from '../../test-util/mock-type-creator'
 
 jest.mock('@tanstack/react-query', () => ({
-  useQuery: jest
-    .fn()
-    .mockReturnValue({ data: [], isPending: false, isError: false }),
+  useQueries: jest.fn().mockReturnValue([
+    { data: [], isPending: false, isError: false },
+    { data: [], isPending: false, isError: false },
+  ]),
 }))
 
 jest.mock('echarts-for-react', () => () => <div>Mock Chart</div>)
 
 describe('SingleCityComponent', () => {
-  it('shows message when loading data errors', async () => {
-    ;(useQuery as jest.Mock).mockReturnValueOnce({
-      isPending: false,
-      isError: true,
-    })
+  it('shows message when loading forecast data errors', async () => {
+    ;(useQueries as jest.Mock).mockReturnValue([
+      { data: [], isPending: false, isError: true },
+      { data: [], isPending: false, isError: false },
+    ])
     render(<SingleCity />)
     await waitFor(() => {
       expect(screen.getByText('An error occurred')).toBeInTheDocument()
     })
   })
-  it('shows spinner when loading data', async () => {
-    ;(useQuery as jest.Mock).mockReturnValueOnce({
-      isPending: true,
-      isError: false,
+  it('shows message when loading measurement data errors', async () => {
+    ;(useQueries as jest.Mock).mockReturnValue([
+      { data: [], isPending: false, isError: false },
+      { data: [], isPending: false, isError: true },
+    ])
+    render(<SingleCity />)
+    await waitFor(() => {
+      expect(screen.getByText('An error occurred')).toBeInTheDocument()
     })
+  })
+  it('shows spinner when loading forecast data', async () => {
+    ;(useQueries as jest.Mock).mockReturnValue([
+      { data: [], isPending: true, isError: false },
+      { data: [], isPending: false, isError: false },
+    ])
+    render(<SingleCity />)
+    await waitFor(() => {
+      expect(screen.getByTestId('loading-spinner')).toBeInTheDocument()
+    })
+  })
+  it('shows spinner when loading measurement data', async () => {
+    ;(useQueries as jest.Mock).mockReturnValue([
+      { data: [], isPending: false, isError: false },
+      { data: [], isPending: true, isError: false },
+    ])
     render(<SingleCity />)
     await waitFor(() => {
       expect(screen.getByTestId('loading-spinner')).toBeInTheDocument()
@@ -43,23 +64,26 @@ describe('SingleCityComponent', () => {
       })
     })
     it('groups data correctly by site for display (all pollutants)', async () => {
-      ;(useQuery as jest.Mock).mockReturnValueOnce({
-        data: [
-          mockMeasurementResponseDto({
-            no2: 1,
-            o3: 1,
-            so2: 1,
-            site_name: 'Site 1',
-          }),
-          mockMeasurementResponseDto({
-            pm10: 1,
-            pm2_5: 1,
-            site_name: 'Site 2',
-          }),
-        ],
-        isPending: false,
-        isError: false,
-      })
+      ;(useQueries as jest.Mock).mockReturnValue([
+        { data: [], isPending: false, isError: false },
+        {
+          data: [
+            mockMeasurementResponseDto({
+              no2: 1,
+              o3: 1,
+              so2: 1,
+              site_name: 'Site 1',
+            }),
+            mockMeasurementResponseDto({
+              pm10: 1,
+              pm2_5: 1,
+              site_name: 'Site 2',
+            }),
+          ],
+          isPending: false,
+          isError: false,
+        },
+      ])
       render(<SingleCity />)
       await waitFor(() => {
         pollutantTypes.forEach((type) => {
@@ -70,16 +94,19 @@ describe('SingleCityComponent', () => {
       })
     })
     it('groups data correctly by site for display (single pollutant)', async () => {
-      ;(useQuery as jest.Mock).mockReturnValueOnce({
-        data: [
-          mockMeasurementResponseDto({
-            no2: 1,
-            site_name: 'Site 1',
-          }),
-        ],
-        isPending: false,
-        isError: false,
-      })
+      ;(useQueries as jest.Mock).mockReturnValue([
+        { data: [], isPending: false, isError: false },
+        {
+          data: [
+            mockMeasurementResponseDto({
+              no2: 1,
+              site_name: 'Site 1',
+            }),
+          ],
+          isPending: false,
+          isError: false,
+        },
+      ])
       render(<SingleCity />)
       await waitFor(() => {
         expect(

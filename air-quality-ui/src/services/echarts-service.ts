@@ -38,25 +38,27 @@ export const textToColor = async (text: string): Promise<string> => {
   const generateHash = async (text: string): Promise<ArrayBuffer> => {
     const encoder = new TextEncoder()
     const data = encoder.encode(text)
-    const hash = await crypto.subtle.digest('SHA-256', data)
-    return hash
+    return await crypto.subtle.digest('SHA-256', data)
   }
 
   // Convert the hash to a hexadecimal string
   const hashToHex = (hash: ArrayBuffer): string => {
-    let hex = ''
-    const hashArray = Array.from(new Uint8Array(hash))
-    hashArray.forEach((byte) => {
-      hex += byte.toString(16).padStart(2, '0')
-    })
-    return hex
+    return Array.from(new Uint8Array(hash))
+      .map((byte) => byte.toString(16).padStart(2, '0'))
+      .join('')
   }
 
   // Main function to generate the color
   return generateHash(text).then((hash) => {
-    const hex = hashToHex(hash)
     // Use the first 6 characters of the hash to form the color code
-    const colorCode = `#${hex.slice(0, 6)}`
-    return colorCode
+    return `#${hashToHex(hash).slice(0, 6)}`
   })
+}
+
+export const xAxisFormat = (timestamp: number, index: number) => {
+  const date = DateTime.fromMillis(timestamp)
+  if (index === 0 || date.hour === 0) {
+    return date.toFormat('dd/MM')
+  }
+  return date.toFormat('HH:mm')
 }

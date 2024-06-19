@@ -1,24 +1,14 @@
 import ReactECharts from 'echarts-for-react'
 
 import classes from './AverageComparisonChart.module.css'
-import { toolTipFormat, xAxisFormat } from './formattingFunctions'
+import { convertToLocalTime, xAxisFormat } from '../../services/echarts-service'
+import { ForecastResponseDto } from '../../services/types'
 
-function getChartOptions(processedData: (string | number)[][] | undefined) {
+function getChartOptions(forecastData?: ForecastResponseDto[]) {
   return {
     xAxis: {
-      name: 'Time',
-      type: 'category',
-      max: 'dataMax',
-      boundaryGap: false,
-      axisTick: {
-        alignWithLabel: true,
-      },
+      type: 'time',
       axisLabel: {
-        showMinLabel: true,
-        showMaxLabel: true,
-        hideOverlap: false,
-        fontSize: 7,
-        rotate: 45,
         formatter: xAxisFormat,
       },
     },
@@ -26,24 +16,28 @@ function getChartOptions(processedData: (string | number)[][] | undefined) {
       type: 'value',
       name: 'AQI',
       max: 6,
+      nameGap: 30,
+      nameLocation: 'middle',
     },
     series: [
       {
-        data: processedData,
+        data: forecastData?.map((f) => [
+          convertToLocalTime(f.valid_time),
+          f.overall_aqi_level,
+        ]),
         type: 'line',
         name: 'Forecast',
       },
     ],
     tooltip: {
-      trigger: 'item',
-      formatter: toolTipFormat,
+      trigger: 'axis',
     },
+    legend: {},
   }
 }
 
 interface AverageComparisonChartProps {
-  data?: (string | number)[][]
-  isPending: boolean
+  forecastData?: ForecastResponseDto[]
 }
 
 export const AverageComparisonChart = (
@@ -52,11 +46,8 @@ export const AverageComparisonChart = (
   return (
     <ReactECharts
       className={classes['chart']}
-      option={getChartOptions(props.data)}
-      showLoading={props.isPending}
-      loadingOption={{
-        text: 'Loading data...',
-      }}
+      option={getChartOptions(props.forecastData)}
+      notMerge
     />
   )
 }

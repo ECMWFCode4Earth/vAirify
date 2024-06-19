@@ -10,13 +10,13 @@ import { MeasurementsResponseDto } from '../../services/types'
 interface SiteMeasurementsChartProps {
   measurementsBySite: Record<string, MeasurementsResponseDto[]>
   pollutantType: PollutantType
-  seriesColoursBySite?: Record<string, string>
+  seriesColorsBySite?: Record<string, string>
 }
 
 const getChartOptions = (
   pollutantType: PollutantType,
   measurementsBySite: Record<string, MeasurementsResponseDto[]>,
-  seriesColoursBySite?: Record<string, string>,
+  seriesColorsBySite?: Record<string, string>,
 ): EChartsOption => {
   return {
     xAxis: {
@@ -38,8 +38,8 @@ const getChartOptions = (
             f[pollutantType]?.toFixed(1),
           ]),
         name: siteName,
-        ...(seriesColoursBySite && {
-          color: seriesColoursBySite[siteName],
+        ...(seriesColorsBySite && {
+          color: seriesColorsBySite[siteName],
         }),
       }),
     ),
@@ -66,14 +66,14 @@ export const SiteMeasurementsChart = (
     getChartOptions(
       props.pollutantType,
       props.measurementsBySite,
-      props.seriesColoursBySite,
+      props.seriesColorsBySite,
     ),
   )
   useEffect(() => {
     const newOptions = getChartOptions(
       props.pollutantType,
       props.measurementsBySite,
-      props.seriesColoursBySite,
+      props.seriesColorsBySite,
     )
     setEchartOptions(newOptions)
   }, [props])

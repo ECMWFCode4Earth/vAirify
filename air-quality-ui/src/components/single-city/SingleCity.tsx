@@ -1,5 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
-import { DateTime } from 'luxon'
+import { useQueries } from '@tanstack/react-query'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import Select, { ActionMeta, MultiValue, OnChangeValue } from 'react-select'
@@ -11,15 +10,8 @@ import { ForecastContext } from '../../context'
 import { PollutantType, pollutantTypes } from '../../models'
 import { textToColor } from '../../services/echarts-service'
 import { getForecastData } from '../../services/forecast-data-service'
-import {
-  getLatestBaseForecastTime,
-  getLatestValidForecastTime,
-} from '../../services/forecast-time-service'
 import { getMeasurements } from '../../services/measurement-data-service'
-import {
-  ForecastResponseDto,
-  MeasurementsResponseDto,
-} from '../../services/types'
+import { MeasurementsResponseDto } from '../../services/types'
 import { LoadingSpinner } from '../common/LoadingSpinner'
 
 interface SiteOption {
@@ -34,50 +26,44 @@ const getSiteName = (measurement: MeasurementsResponseDto): string => {
 export const SingleCity = () => {
   const { forecastBaseTime, forecastValidTime } = useContext(ForecastContext)
   const { name: locationName = '' } = useParams()
-  const { data, isPending, isError } = useQuery({
-    queryKey: ['measurements', locationName],
-    queryFn: () =>
-      getMeasurements(forecastBaseTime, forecastValidTime, 'city', [
-        locationName,
-      ]),
+  const [
+    {
+      data: forecastData,
+      isPending: forecastDataPending,
+      isError: forecastDataError,
+    },
+    {
+      data: measurementData,
+      isPending: measurementDataPending,
+      isError: measurementDataError,
+    },
+  ] = useQueries({
+    queries: [
+      {
+        queryKey: ['forecast', locationName],
+        queryFn: () =>
+          getForecastData(
+            forecastBaseTime,
+            forecastBaseTime.plus({ days: 5 }),
+            forecastBaseTime,
+            locationName,
+          ),
+      },
+      {
+        queryKey: ['measurements', locationName],
+        queryFn: () =>
+          getMeasurements(forecastBaseTime, forecastValidTime, 'city', [
+            locationName,
+          ]),
+      },
+    ],
   })
-
-  const [processedData, setProcessedData] = useState<(string | number)[][]>()
-
-  let todaysDate = DateTime.now().toUTC()
-  let dateFiveDaysAgo = todaysDate.minus({ days: 5 }).toUTC()
-  todaysDate = todaysDate.set({ minute: 0, second: 0, millisecond: 0 })
-  dateFiveDaysAgo = dateFiveDaysAgo.set({
-    minute: 0,
-    second: 0,
-    millisecond: 0,
-  })
-
-  const { data: dataF, isPending: isPendingF } = useQuery({
-    queryKey: ['forecast'],
-    queryFn: () =>
-      getForecastData(
-        getLatestValidForecastTime(dateFiveDaysAgo),
-        getLatestValidForecastTime(todaysDate),
-        getLatestBaseForecastTime(dateFiveDaysAgo),
-        locationName,
-      ),
-  })
-  useEffect(() => {
-    if (dataF) {
-      setProcessedData(
-        dataF.map((measurement: ForecastResponseDto) => {
-          return [measurement.valid_time, measurement.overall_aqi_level]
-        }),
-      )
-    }
-  }, [dataF])
 
   const [sites, setSites] = useState<MultiValue<SiteOption>>([])
   const [selectedSites, setSelectedSites] = useState<MultiValue<SiteOption>>([])
   useEffect(() => {
     const sites = Array.from(
-      data
+      measurementData
         ?.map((measurement) => getSiteName(measurement))
         .reduce((sites, name) => sites.add(name), new Set<string>()) ?? [],
     ).map((name) => ({
@@ -87,7 +73,7 @@ export const SingleCity = () => {
 
     setSites(sites)
     setSelectedSites(sites)
-  }, [data])
+  }, [measurementData])
 
   const onSelectionChange = useCallback(
     (
@@ -105,7 +91,7 @@ export const SingleCity = () => {
   )
 
   const measurementsByPollutantBySite = useMemo(() => {
-    return data
+    return measurementData
       ?.filter((measurement) =>
         selectedSites.find(
           (site) => site && site.value === getSiteName(measurement),
@@ -130,35 +116,38 @@ export const SingleCity = () => {
         },
         { pm2_5: {}, pm10: {}, no2: {}, o3: {}, so2: {} },
       )
-  }, [data, selectedSites])
+  }, [measurementData, selectedSites])
 
-  const [siteColours, setSiteColours] = useState<Record<string, string>>({})
+  const [siteColors, setSiteColors] = useState<Record<string, string>>({})
   useEffect(() => {
-    const updateColours = async () => {
+    const updateColors = async () => {
       const colorsBySite: Record<string, string> = {}
       for (const { value } of sites) {
         const color = await textToColor(value)
         colorsBySite[value] = color
       }
-      setSiteColours(colorsBySite)
+      setSiteColors(colorsBySite)
     }
-    updateColours()
+    updateColors()
   }, [sites])
 
-  if (isError) {
+  if (forecastDataError || measurementDataError) {
     return <>An error occurred</>
   }
 
   return (
     <section className={classes['single-city-container']}>
-      <section data-testid="main-comparison-chart">
-        <AverageComparisonChart isPending={isPendingF} data={processedData} />
-      </section>
-      {isPending && <LoadingSpinner />}
-      {!isPending && (
+      {(forecastDataPending || measurementDataPending) && <LoadingSpinner />}
+      {!(forecastDataPending && measurementDataPending) && (
         <>
-          <section className={classes['selected-sites']}>
-            <h3>Selected Sites</h3>
+          <section
+            data-testid="main-comparison-chart"
+            className={classes['single-city-section']}
+          >
+            <AverageComparisonChart forecastData={forecastData} />
+          </section>
+          <section className={classes['site-measurements-section']}>
+            <h4>Measurement Sites</h4>
             <Select
               isMulti
               options={sites}
@@ -167,7 +156,7 @@ export const SingleCity = () => {
               isClearable={false}
             />
           </section>
-          <section className={classes['site-measurements']}>
+          <section className={classes['site-measurements-section']}>
             <h3>Site Measurements</h3>
             {measurementsByPollutantBySite &&
               Object.entries(measurementsByPollutantBySite)
@@ -183,7 +172,7 @@ export const SingleCity = () => {
                     <SiteMeasurementsChart
                       pollutantType={pollutantType as PollutantType}
                       measurementsBySite={measurementsBySite}
-                      seriesColoursBySite={siteColours}
+                      seriesColorsBySite={siteColors}
                     />
                   </div>
                 ))}
