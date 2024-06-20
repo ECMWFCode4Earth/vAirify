@@ -1,0 +1,7 @@
+.location-link {
+    color: blue;
+    text-decoration: none;
+    &:hover {
+        font-weight: bold;
+    }
+}
