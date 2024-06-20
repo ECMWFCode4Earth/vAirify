@@ -250,7 +250,7 @@ def ensure_forecast_cache():
 
 @mock.patch("urllib3.connectionpool.HTTPConnectionPool._get_conn")
 @mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London"})
-def test__in_situ_etl__timeouts_retry_3_times_then_stop(
+def test__in_situ_etl__timeouts_retry_twice_then_stop(
         mock_get_conn,
         caplog,
         ensure_forecast_cache):
@@ -264,7 +264,7 @@ def test__in_situ_etl__timeouts_retry_3_times_then_stop(
     assert "Response for London contained no results" in caplog.text
     results = get_database_data(collection_name, query)
     assert len(results) == 0
-    assert len(mock_get_conn.return_value.request.mock_calls) == 4
+    assert len(mock_get_conn.return_value.request.mock_calls) == 3
 
 
 @mock.patch("urllib3.connectionpool.HTTPConnectionPool._get_conn")

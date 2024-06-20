@@ -189,7 +189,7 @@ def httpserver_listen_address():
     },
 )
 def test__fetch_in_situ_measurements__retries_408_responses(httpserver: HTTPServer):
-    expected_retries = 3
+    expected_retries = 2
     for index in range(expected_retries):
         httpserver.expect_ordered_request(
             re.compile("^/v2/measurements"), method="GET"
