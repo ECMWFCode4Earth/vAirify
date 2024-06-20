@@ -11,7 +11,7 @@ test("Mocked response breadcrumb", async ({ page }) => {
       await route.fulfill({ json: apiSummary });
     }
   );
-  await page.goto("http://localhost:5173/city/summary");
+  await page.goto("/city/summary");
   await page.getByRole("link", { name: "Kampala" }).click();
   await expect(page.locator("text=Cities")).toBeVisible();
   await expect(page.locator("text=Kampala")).toBeVisible();
