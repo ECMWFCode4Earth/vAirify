@@ -31,7 +31,7 @@ export const apiForecast = [
     valid_time: "2024-06-19T12:00:00Z",
     location_type: "city",
     location_name: "Abu Dhabi",
-    overall_aqi_level: 4,
+    overall_aqi_level: 3,
     no2: {
       aqi_level: 1,
       value: 5.871611751344455,

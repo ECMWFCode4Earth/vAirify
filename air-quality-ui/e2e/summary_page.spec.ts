@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { apiForecast, apiSummary } from "./mocked_api.ts";
 
 test("Title is vAirify", async ({ page }) => {
   await page.goto("http://localhost:5173/city/summary");
@@ -92,4 +93,131 @@ test("Mocked response breadcrumb", async ({ page }) => {
   await page.getByRole("link", { name: "Kampala" }).click();
   await expect(page.locator("text=Cities")).toBeVisible();
   await expect(page.locator("text=Kampala")).toBeVisible();
+});
+
+test("Grid cells should not have more than one decimal place", async ({
+  page,
+}) => {
+  await page.goto("http://localhost:5173/city/summary");
+
+  const gridCells = page.locator(".ag-cell");
+
+  const cellCount = await gridCells.count();
+  console.log(`Number of grid cells: ${cellCount}`);
+
+  for (let i = 0; i < cellCount; i++) {
+    const cellText = await gridCells.nth(i).innerText();
+    if (!/^-?\d+(\.\d{1})?$/.test(cellText)) {
+      throw new Error(
+        `Grid cell ${i + 1} has more than one decimal place: ${cellText}`
+      );
+    }
+  }
+});
+
+test("Default sortation DESC offenders", async ({ page }) => {
+  await page.route("*/**/air-pollutant/forecast*", async (route) => {
+    await route.fulfill({ json: apiForecast });
+  });
+  await page.route(
+    "*/**/air-pollutant/measurements/summary*",
+    async (route) => {
+      await route.fulfill({ json: apiSummary });
+    }
+  );
+  await page.goto("http://localhost:5173/city/summary");
+  const rowElements = page.locator(".ag-row");
+  const rowCount = await rowElements.count();
+  const expectedValues = ["Kampaly", "Abu Dhabi", "Zurich", "2", "3", "3"];
+
+  for (let i = 0; i < rowCount; i++) {
+    const firstCellText = await rowElements
+      .nth(i)
+      .locator(".ag-cell:first-child")
+      .innerText();
+    console.log(`${firstCellText}`);
+    expect(firstCellText).toBe(expectedValues[i]);
+  }
+});
+
+test("City Sortation Ascending", async ({ page }) => {
+  await page.route("*/**/air-pollutant/forecast*", async (route) => {
+    await route.fulfill({ json: apiForecast });
+  });
+  await page.route(
+    "*/**/air-pollutant/measurements/summary*",
+    async (route) => {
+      await route.fulfill({ json: apiSummary });
+    }
+  );
+  await page.goto("http://localhost:5173/city/summary");
+  const rowElements = page.locator(".ag-row");
+  const rowCount = await rowElements.count();
+  await page.locator(".ag-header-cell-label").first().click();
+
+  // assertion
+  const expectedValues = ["Abu Dhabi", "Kampala", "Zurich", "3", "2", "3"];
+  for (let i = 0; i < rowCount; i++) {
+    const firstCellText = await rowElements
+      .nth(i)
+      .locator(".ag-cell:first-child")
+      .innerText();
+    console.log(`${firstCellText}`);
+    expect(firstCellText).toBe(expectedValues[i]);
+  }
+});
+
+test("City Sortation Descending", async ({ page }) => {
+  await page.route("*/**/air-pollutant/forecast*", async (route) => {
+    await route.fulfill({ json: apiForecast });
+  });
+  await page.route(
+    "*/**/air-pollutant/measurements/summary*",
+    async (route) => {
+      await route.fulfill({ json: apiSummary });
+    }
+  );
+  await page.goto("http://localhost:5173/city/summary");
+  const rowElements = page.locator(".ag-row");
+  const rowCount = await rowElements.count();
+  await page.locator(".ag-header-cell-label").first().click();
+  await page.locator(".ag-header-cell-label").first().click();
+  // assertion
+  const expectedValues = ["Zurich", "Kampala", "Abu Dhabi", "3", "2", "3"];
+  for (let i = 0; i < rowCount; i++) {
+    const firstCellText = await rowElements
+      .nth(i)
+      .locator(".ag-cell:first-child")
+      .innerText();
+    console.log(`${firstCellText}`);
+    expect(firstCellText).toBe(expectedValues[i]);
+  }
+});
+
+test("Sort offenders ASC", async ({ page }) => {
+  await page.route("*/**/air-pollutant/forecast*", async (route) => {
+    await route.fulfill({ json: apiForecast });
+  });
+  await page.route(
+    "*/**/air-pollutant/measurements/summary*",
+    async (route) => {
+      await route.fulfill({ json: apiSummary });
+    }
+  );
+  await page.goto("http://localhost:5173/city/summary");
+  const rowElements = page.locator(".ag-row");
+  const rowCount = await rowElements.count();
+  await page.getByRole("columnheader", { name: "Diff" }).click();
+  await page.getByRole("columnheader", { name: "Diff" }).click();
+  await page.waitForTimeout(2000);
+  // assertion
+  const expectedValues = ["BEEM ", "Abu Dhabi", "Kampala", "3", "2", "3"];
+  for (let i = 0; i < rowCount; i++) {
+    const firstCellText = await rowElements
+      .nth(i)
+      .locator(".ag-cell:first-child")
+      .innerText();
+    console.log(`${firstCellText}`);
+    expect(firstCellText).toBe(expectedValues[i]);
+  }
 });
