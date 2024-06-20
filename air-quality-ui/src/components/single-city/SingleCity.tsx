@@ -147,14 +147,27 @@ export const SingleCity = () => {
             <AverageComparisonChart forecastData={forecastData} />
           </section>
           <section className={classes['site-measurements-section']}>
-            <h4>Measurement Sites</h4>
-            <Select
-              isMulti
-              options={sites}
-              value={selectedSites}
-              onChange={onSelectionChange}
-              isClearable={false}
-            />
+            <form
+              className={classes['site-select-form']}
+              data-testid="sites-form"
+            >
+              <label
+                className={classes['site-select-label']}
+                htmlFor="sites-select"
+              >
+                Measurement Sites
+              </label>
+              <Select
+                className={classes['site-select']}
+                inputId="sites-select"
+                isClearable={false}
+                isMulti
+                name="sites-select"
+                onChange={onSelectionChange}
+                options={sites}
+                value={selectedSites}
+              />
+            </form>
           </section>
           <section className={classes['site-measurements-section']}>
             <h3>Site Measurements</h3>

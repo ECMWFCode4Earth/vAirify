@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import { useQueries } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 
 import { SingleCity } from './SingleCity'
 import { pollutantTypes } from '../../models'
@@ -60,6 +60,7 @@ describe('SingleCityComponent', () => {
     it('shows the site measurements section', async () => {
       render(<SingleCity />)
       await waitFor(() => {
+        expect(screen.getByText('Measurement Sites')).toBeInTheDocument()
         expect(screen.getByText('Site Measurements')).toBeInTheDocument()
       })
     })
@@ -119,6 +120,60 @@ describe('SingleCityComponent', () => {
               screen.queryByTestId(`site_measurements_chart_${type}`),
             ).toBeNull()
           })
+      })
+    })
+    describe('site selection', () => {
+      beforeEach(() => {
+        ;(useQueries as jest.Mock).mockReturnValue([
+          { data: [], isPending: false, isError: false },
+          {
+            data: [
+              mockMeasurementResponseDto({
+                no2: 1,
+                o3: 1,
+                so2: 1,
+                site_name: 'Site 1',
+              }),
+              mockMeasurementResponseDto({
+                pm10: 1,
+                pm2_5: 1,
+                site_name: 'Site 2',
+              }),
+            ],
+            isPending: false,
+            isError: false,
+          },
+        ])
+      })
+      it('should select all by default', async () => {
+        render(<SingleCity />)
+        await waitFor(() => {
+          expect(
+            screen.getByRole('button', { name: /Site 1/i }),
+          ).toBeInTheDocument()
+          expect(
+            screen.getByRole('button', { name: /Site 2/i }),
+          ).toBeInTheDocument()
+        })
+      })
+      it('should hide charts when sites are deselected resulting in no measurements', async () => {
+        render(<SingleCity />)
+        await act(async () => {
+          ;(await screen.findByLabelText('Remove Site 1')).click()
+        })
+        await waitFor(() => {
+          expect(screen.queryByRole('button', { name: /Site 1/i })).toBeNull()
+          ;['no2', 'o3', 'so2'].forEach((type) => {
+            expect(
+              screen.queryByTestId(`site_measurements_chart_${type}`),
+            ).toBeNull()
+          })
+          ;['pm2_5', 'pm10'].forEach((type) => {
+            expect(
+              screen.getByTestId(`site_measurements_chart_${type}`),
+            ).toBeInTheDocument()
+          })
+        })
       })
     })
   })

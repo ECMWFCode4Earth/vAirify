@@ -15,21 +15,21 @@ describe('ECharts Service', () => {
     )
   })
   describe('xAxisFormat', () => {
-    it('should display full date 2024-06-13 12:00 if first index', async () => {
+    it('should display date without time (14/06) if first index', async () => {
       const result = xAxisFormat(
         DateTime.fromISO('2024-06-14T12:00:00.000+00:00').toMillis(),
         0,
       )
       expect(result).toEqual('14/06')
     })
-    it('should display time only 12:00 if beyond first index', async () => {
+    it('should display time only time if beyond first index', async () => {
       const result = xAxisFormat(
         DateTime.fromISO('2024-06-14T03:00:00.000').toMillis(),
         1,
       )
       expect(result).toEqual('03:00')
     })
-    it('should display full date if time is 00:00 if beyond first index', async () => {
+    it('should display date without time at start of day if beyond first index', async () => {
       const result = xAxisFormat(
         DateTime.fromISO('2024-06-14T00:00:00.000').toMillis(),
         8,

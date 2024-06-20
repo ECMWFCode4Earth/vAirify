@@ -55,8 +55,16 @@ const createColDefs = (): (ColDef | ColGroupDef)[] => [
   ...pollutantTypes.flatMap((type) => ({
     headerName: `${pollutantTypeDisplay[type]} (µg/m³)`,
     children: [
-      { field: `forecast.${type}`, headerName: `Forecast`, width: 120 },
-      { field: `measurements.${type}`, headerName: `Measured`, width: 120 },
+      {
+        field: `forecast.${type}`,
+        headerName: `Forecast`,
+        width: 120,
+      },
+      {
+        field: `measurements.${type}`,
+        headerName: `Measured`,
+        width: 120,
+      },
     ],
   })),
 ]
