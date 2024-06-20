@@ -1,5 +1,7 @@
 import os
 from datetime import datetime, timezone
+from http.client import HTTPMessage
+from unittest.mock import Mock
 
 import pytest
 from dateutil.parser import parse
@@ -229,6 +231,61 @@ def test__in_situ_etl__calling_actual_api_returns_values_and_stores():
     results = get_database_data(collection_name, query)
     assert results[0]["name"] == "London"
     assert results[-1]["name"] == "London"
+
+
+@mock.patch("urllib3.connectionpool.HTTPConnectionPool._get_conn")
+@mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London"})
+def test__in_situ_etl__timeouts_retry_3_times_then_stop(mock_get_conn):
+    mock_get_conn.return_value.getresponse.return_value = mock_response_for_status(408)
+    query = {"name": "London"}
+    delete_database_data(collection_name, query)
+
+    main()
+
+    results = get_database_data(collection_name, query)
+    assert len(results) == 0
+    assert len(mock_get_conn.return_value.request.mock_calls) == 4
+
+
+@mock.patch("urllib3.connectionpool.HTTPConnectionPool._get_conn")
+@mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London"})
+def test__in_situ_etl__internal_error_fails_without_retry(mock_get_conn):
+    mock_get_conn.return_value.getresponse.return_value = mock_response_for_status(500)
+    query = {"name": "London"}
+    delete_database_data(collection_name, query)
+
+    main()
+
+    results = get_database_data(collection_name, query)
+    assert len(results) == 0
+    assert len(mock_get_conn.return_value.request.mock_calls) == 1
+
+
+@mock.patch("urllib3.connectionpool.HTTPConnectionPool._get_conn")
+@mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London"})
+def test__in_situ_etl__timeout_followed_by_success_returns_correctly(mock_get_conn):
+    mock_get_conn.return_value.getresponse.side_effect = [
+        mock_response_for_status(408),
+        mock_response_for_status(200)
+    ]
+    query = {"name": "London"}
+    delete_database_data(collection_name, query)
+
+    main()
+
+    results = get_database_data(collection_name, query)
+    assert len(results) == 1
+    assert results[0]["no2"]["value"] == 113
+    assert len(mock_get_conn.return_value.request.mock_calls) == 2
+
+
+def mock_response_for_status(status):
+    def stream_response(chunk_size, decode_content):
+        result = str(create_measurement("2024-05-24T13:10:20+00:00", "no2", 113))
+        result = result.replace("'", '"')  # replace single with double quotes
+        return [bytes(f'{{"results": [{result}]}}', 'utf-8')]
+
+    return Mock(status=status, msg=HTTPMessage(), headers={}, stream=stream_response)
 
 
 def assert_pollutant_value(stored_data: InSituPollutantReading, expected_value: float):
