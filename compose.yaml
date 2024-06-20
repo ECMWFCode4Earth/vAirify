@@ -58,5 +58,21 @@ services:
       - 0.0.0.0
     volumes:
       - ./air-quality-backend/src/:/usr/src/app/src/
+  ui:
+    container_name: frontend-ui
+    depends_on:
+      - api
+    ports:
+      - 5173:5173
+    build:
+      context: ./air-quality-ui
+      dockerfile: Dockerfile
+      target: development
+    environment:
+      - VITE_AIR_QUALITY_API_URL=${VITE_AIR_QUALITY_API_URL}
+    volumes:
+      - ./air-quality-ui/:/app/
+      - nodemodules:/app/node_modules
 volumes:
-  database:
+  database: {}
+  nodemodules: {}

@@ -39,5 +39,12 @@ services:
     environment:
       - MONGO_DB_URI=mongodb://mongo:27017
       - MONGO_DB_NAME=${MONGO_DB_NAME}
+  ui:
+    container_name: frontend-ui
+    image: ghcr.io/ecmwfcode4earth/vairify/vairify-frontend
+    depends_on:
+      - api
+    ports:
+      - 8001:80
 volumes:
-  database:
+  database: {}
