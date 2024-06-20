@@ -15,4 +15,12 @@ test("Mocked response breadcrumb", async ({ page }) => {
   await page.getByRole("link", { name: "Kampala" }).click();
   await expect(page.locator("text=Cities")).toBeVisible();
   await expect(page.locator("text=Kampala")).toBeVisible();
+  // Abu Dhabi test
+  await page.getByRole("link", { name: "Abu Dhabi" }).click();
+  await expect(page.locator("text=Cities")).toBeVisible();
+  await expect(page.locator("text=Abu Dhabi")).toBeVisible();
+  // Zurich Test
+  await page.getByRole("link", { name: "Zurich" }).click();
+  await expect(page.locator("text=Cities")).toBeVisible();
+  await expect(page.locator("text=Zurich")).toBeVisible();
 });
