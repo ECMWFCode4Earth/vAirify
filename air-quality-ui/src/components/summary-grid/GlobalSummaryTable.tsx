@@ -26,7 +26,7 @@ interface SummaryRow {
   locationName: string
   forecast: SummaryDetail
   measurements: SummaryDetail
-  aqiDifference: number
+  aqiDifference: string
 }
 
 interface GlobalSummaryTableProps {
@@ -72,7 +72,17 @@ const createGridOptions = (): GridOptions => ({
     type: 'fitCellContents',
   },
 })
-
+function getPerformanceSymbol(
+  forecastAqiLevel: number,
+  measurementAqiLevel: number,
+) {
+  if (forecastAqiLevel > measurementAqiLevel) {
+    return '+'
+  } else if (forecastAqiLevel === measurementAqiLevel) {
+    return
+  }
+  return '-'
+}
 const mapApiRow = (
   forecastData: ForecastResponseDto,
   measurementData: MeasurementSummaryResponseDto,
@@ -86,9 +96,14 @@ const mapApiRow = (
     measurements: {
       aqiLevel: measurementData.overall_aqi_level.mean,
     },
-    aqiDifference: Math.abs(
-      forecastData.overall_aqi_level - measurementData.overall_aqi_level.mean,
-    ),
+    aqiDifference:
+      Math.abs(
+        forecastData.overall_aqi_level - measurementData.overall_aqi_level.mean,
+      ).toString() +
+      getPerformanceSymbol(
+        forecastData.overall_aqi_level,
+        measurementData.overall_aqi_level.mean,
+      ),
   }
   pollutantTypes.forEach((type) => {
     row.forecast[type] = parseFloat(forecastData[type].value.toFixed(1))
@@ -117,7 +132,7 @@ const mapApiResponse = ({
     return []
   })
 }
-//"cell-very-good","cell-good","cell-medium","cell-poor","cell-very-poor","cell-extremely-poor","cell-error"
+
 const GlobalSummaryTable = (
   props: Partial<GlobalSummaryTableProps>,
 ): JSX.Element => {

@@ -9,11 +9,11 @@ export interface PollutantAverageDataDto<T> {
   mean: T
 }
 
-type ForecastPollutantDataDto = {
+export type ForecastPollutantDataDto = {
   [P in PollutantType]: PollutantDataDto
 }
 
-type MeasurementPollutantData = {
+export type MeasurementPollutantData = {
   [P in PollutantType]?: number
 }
 
