@@ -24,7 +24,6 @@ from dotenv import load_dotenv
 from system_tests.utils.file_utilities import write_to_file
 
 open_aq_cache_location = "system_tests/in_situ_etl_suite"
-static_grib_file_location = "system_tests/in_situ_etl_suite/static_forecast_files"
 collection_name = "in_situ_data"
 load_dotenv()
 
