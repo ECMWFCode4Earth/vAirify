@@ -12,6 +12,7 @@ CMD ["npm", "run", "dev"]
 
 FROM development AS build
 
+ARG VITE_AIR_QUALITY_API_URL
 RUN npm run build
 
 FROM nginx:alpine
