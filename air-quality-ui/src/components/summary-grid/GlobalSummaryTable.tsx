@@ -4,6 +4,8 @@ import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { useMemo } from 'react'
 
+import './GridCss.css'
+import { cellRules } from './CellRules'
 import classes from './GlobalSummaryTable.module.css'
 import { LocationCellRenderer } from './LocationCellRenderer'
 import {
@@ -51,8 +53,16 @@ const createColDefs = (): (ColDef | ColGroupDef)[] => [
   ...pollutantTypes.flatMap((type) => ({
     headerName: `${pollutantTypeDisplay[type]} (µg/m³)`,
     children: [
-      { field: `forecast.${type}`, headerName: `Forecast` },
-      { field: `measurements.${type}`, headerName: `Measured` },
+      {
+        field: `forecast.${type}`,
+        headerName: `Forecast`,
+        cellClassRules: cellRules[type],
+      },
+      {
+        field: `measurements.${type}`,
+        headerName: `Measured`,
+        cellClassRules: cellRules[type],
+      },
     ],
   })),
 ]
@@ -107,7 +117,7 @@ const mapApiResponse = ({
     return []
   })
 }
-
+//"cell-very-good","cell-good","cell-medium","cell-poor","cell-very-poor","cell-extremely-poor","cell-error"
 const GlobalSummaryTable = (
   props: Partial<GlobalSummaryTableProps>,
 ): JSX.Element => {

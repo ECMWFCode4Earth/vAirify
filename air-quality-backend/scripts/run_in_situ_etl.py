@@ -9,7 +9,7 @@ from air_quality.database.in_situ import insert_data
 from air_quality.database.locations import get_locations_by_type, AirQualityLocationType
 from air_quality.etl.in_situ.openaq_orchestrator import retrieve_openaq_in_situ_data
 
-config.fileConfig("./logging.ini")
+config.fileConfig("../logging.ini")
 
 
 def main():
