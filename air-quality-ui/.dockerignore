@@ -1,0 +1,14 @@
+**/e2e
+**/node_modules
+**/test
+
+.env
+.dockerignore
+.gitignore
+Dockerfile
+
+eslintrc.cjs
+jest.config.ts
+jest.setup.ts
+playwright.config.ts
+README.md
