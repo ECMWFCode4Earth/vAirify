@@ -262,6 +262,7 @@ def test__in_situ_etl__timeouts_retry_twice_then_stop(
         main()
 
     assert "Response for London contained no results" in caplog.text
+    assert "URL was: https://api.openaq.org//v2/measurements?limit=3000" in caplog.text
     results = get_database_data(collection_name, query)
     assert len(results) == 0
     assert len(mock_get_conn.return_value.request.mock_calls) == 3
@@ -281,6 +282,7 @@ def test__in_situ_etl__internal_error_fails_without_retry(
         main()
 
     assert "Response for London contained no results" in caplog.text
+    assert "URL was: https://api.openaq.org//v2/measurements?limit=3000" in caplog.text
     results = get_database_data(collection_name, query)
     assert len(results) == 0
     assert len(mock_get_conn.return_value.request.mock_calls) == 1
@@ -304,6 +306,8 @@ def test__in_situ_etl__timeout_followed_by_success_returns_correctly(
         main()
 
     assert "Response for London contained no results" not in caplog.text
+    assert ("URL was: https://api.openaq.org//v2/measurements?limit=3000" not in
+            caplog.text)
     results = get_database_data(collection_name, query)
     assert len(results) == 1
     assert results[0]["no2"]["value"] == 113
