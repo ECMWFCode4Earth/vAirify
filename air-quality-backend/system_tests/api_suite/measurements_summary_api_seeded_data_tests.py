@@ -269,7 +269,7 @@ measurement_time_range = 90
 
 
 @pytest.mark.parametrize(
-    "api_parameters, expected_city",
+    "api_parameters, expected_city_names",
     [
         (
             {
@@ -428,22 +428,18 @@ measurement_time_range = 90
     ],
 )
 def test__different_base_times__assert_data_filtered_appropriately(
-    api_parameters: dict, expected_city: str
+    api_parameters: dict, expected_city_names: str
 ):
     load_dotenv(".env-qa")
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
     actual_locations = get_list_of_key_values(response.json(), "location_name")
     actual_locations.sort()
-    if len(actual_locations) > 0:
-        for location in actual_locations:
-            index = actual_locations.index(location)
-            assert location == expected_city[index]
-    else:
-        assert actual_locations == expected_city
+
+    assert actual_locations == expected_city_names
 
 
 @pytest.mark.parametrize(
-    "api_parameters, expected_city",
+    "api_parameters, expected_city_names",
     [
         (
             {
@@ -488,18 +484,14 @@ def test__different_base_times__assert_data_filtered_appropriately(
     ],
 )
 def test__different_measurement_time_range__assert_data_filtered_appropriately(
-    api_parameters: dict, expected_city: str
+    api_parameters: dict, expected_city_names: str
 ):
     load_dotenv(".env-qa")
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
     actual_locations = get_list_of_key_values(response.json(), "location_name")
     actual_locations.sort()
-    if len(actual_locations) > 0:
-        for location in actual_locations:
-            index = actual_locations.index(location)
-            assert location == expected_city[index]
-    else:
-        assert actual_locations == expected_city
+
+    assert actual_locations == expected_city_names
 
 
 @pytest.mark.parametrize(
