@@ -1,44 +1,32 @@
-import { getPollutantIndexLevel } from '../../scripts/AQI/CalculateAQI'
-
-type ForecastPollutantDataDto = {
-  [key: string]: number
-}
-
-type MeasurementPollutantData = {
-  [key: string]: number
+type PollutantDataDto = {
+  [key: string]: {
+    aqiLevel: number
+    value: number
+  }
 }
 
 type Params = {
   column: { colId: string }
   value: number
   data: {
-    aqiDifference: string
-    forecast: ForecastPollutantDataDto
-    measurements: MeasurementPollutantData
+    aqiDifference: number
+    forecast: PollutantDataDto
+    measurements: PollutantDataDto
   }
 }
 
 function colourField(params: Params, lowerLimit: number, upperLimit?: number) {
-  if (!params.value) {
-    return false
-  }
-
-  const columnType: string[] = params.column.colId.split('.')
+  const pollutantType: string = params.column.colId.split('.')[1]
+  if (!params.value || !params.data.measurements[pollutantType]) return false
 
   const aqiDifference = Math.abs(
-    getPollutantIndexLevel(params.data.forecast[columnType[1]], columnType[1]) -
-      getPollutantIndexLevel(
-        params.data.measurements[columnType[1]],
-        columnType[1],
-      ),
+    params.data.forecast[pollutantType].aqiLevel -
+      params.data.measurements[pollutantType].aqiLevel,
   )
-  const overallAQIDiff = parseInt(params.data.aqiDifference.split('')[0])
 
-  if (overallAQIDiff === 0) {
-    return false
-  }
+  if (params.data.aqiDifference === 0) return false
 
-  const aqiMatchesDifference = overallAQIDiff === aqiDifference
+  const aqiMatchesDifference = params.data.aqiDifference === aqiDifference
 
   const isInColourBand =
     params.value >= lowerLimit && (upperLimit ?? params.value)

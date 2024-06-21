@@ -1,4 +1,9 @@
-import { ColDef, ColGroupDef, GridOptions } from 'ag-grid-community'
+import {
+  ColDef,
+  ColGroupDef,
+  GridOptions,
+  ValueFormatterParams,
+} from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
@@ -20,13 +25,18 @@ import {
 
 type SummaryDetail = {
   aqiLevel: number
-} & { [P in PollutantType]?: number }
+} & {
+  [P in PollutantType]?: {
+    aqiLevel: number
+    value: number
+  }
+}
 
 interface SummaryRow {
   locationName: string
   forecast: SummaryDetail
   measurements: SummaryDetail
-  aqiDifference: string
+  aqiDifference: number
 }
 
 interface GlobalSummaryTableProps {
@@ -47,19 +57,29 @@ const createColDefs = (): (ColDef | ColGroupDef)[] => [
     children: [
       { field: 'forecast.aqiLevel', headerName: 'Forecast' },
       { field: 'measurements.aqiLevel', headerName: 'Measured' },
-      { field: 'aqiDifference', headerName: 'Diff', sort: 'desc' },
+      {
+        field: 'aqiDifference',
+        headerName: 'Diff',
+        sort: 'desc',
+        valueFormatter: (params: ValueFormatterParams) => {
+          return `${getPerformanceSymbol(
+            params.data.forecast.aqiLevel,
+            params.data.measurements.aqiLevel,
+          )}${params.data.aqiDifference}`
+        },
+      },
     ],
   },
   ...pollutantTypes.flatMap((type) => ({
     headerName: `${pollutantTypeDisplay[type]} (µg/m³)`,
     children: [
       {
-        field: `forecast.${type}`,
+        field: `forecast.${type}.value`,
         headerName: `Forecast`,
         cellClassRules: cellRules[type],
       },
       {
-        field: `measurements.${type}`,
+        field: `measurements.${type}.value`,
         headerName: `Measured`,
         cellClassRules: cellRules[type],
       },
@@ -75,7 +95,7 @@ const createGridOptions = (): GridOptions => ({
 function getPerformanceSymbol(
   forecastAqiLevel: number,
   measurementAqiLevel: number,
-) {
+): string {
   if (forecastAqiLevel > measurementAqiLevel) {
     return '+'
   } else if (forecastAqiLevel === measurementAqiLevel) {
@@ -96,19 +116,22 @@ const mapApiRow = (
     measurements: {
       aqiLevel: measurementData.overall_aqi_level.mean,
     },
-    aqiDifference:
-      Math.abs(
-        forecastData.overall_aqi_level - measurementData.overall_aqi_level.mean,
-      ).toString() +
-      getPerformanceSymbol(
-        forecastData.overall_aqi_level,
-        measurementData.overall_aqi_level.mean,
-      ),
+    aqiDifference: Math.abs(
+      forecastData.overall_aqi_level - measurementData.overall_aqi_level.mean,
+    ),
   }
   pollutantTypes.forEach((type) => {
-    row.forecast[type] = parseFloat(forecastData[type].value.toFixed(1))
-    const mean = measurementData[type]?.mean.value
-    row.measurements[type] = mean ? parseFloat(mean.toFixed(1)) : undefined
+    row.forecast[type] = {
+      value: parseFloat(forecastData[type].value.toFixed(1)),
+      aqiLevel: forecastData[type]?.aqi_level ?? 0,
+    }
+    const mean = measurementData[type]?.mean
+    if (mean) {
+      row.measurements[type] = {
+        value: parseFloat(mean.value.toFixed(1)),
+        aqiLevel: mean.aqi_level,
+      }
+    }
   })
   return row
 }
