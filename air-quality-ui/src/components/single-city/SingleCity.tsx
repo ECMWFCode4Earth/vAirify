@@ -24,7 +24,7 @@ const getSiteName = (measurement: MeasurementsResponseDto): string => {
 }
 
 export const SingleCity = () => {
-  const { forecastBaseTime, forecastValidTime } = useContext(ForecastContext)
+  const forecastBaseTime = useContext(ForecastContext)
   const { name: locationName = '' } = useParams()
   const [
     {
@@ -52,9 +52,12 @@ export const SingleCity = () => {
       {
         queryKey: ['measurements', locationName],
         queryFn: () =>
-          getMeasurements(forecastBaseTime, forecastValidTime, 'city', [
-            locationName,
-          ]),
+          getMeasurements(
+            forecastBaseTime,
+            forecastBaseTime.plus({ days: 5 }),
+            'city',
+            [locationName],
+          ),
       },
     ],
   })
@@ -138,7 +141,7 @@ export const SingleCity = () => {
   return (
     <section className={classes['single-city-container']}>
       {(forecastDataPending || measurementDataPending) && <LoadingSpinner />}
-      {!(forecastDataPending && measurementDataPending) && (
+      {!forecastDataPending && !measurementDataPending && (
         <>
           <section
             data-testid="main-comparison-chart"

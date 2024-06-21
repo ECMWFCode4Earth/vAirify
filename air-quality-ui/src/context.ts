@@ -1,11 +1,7 @@
 import { createContext } from 'react'
 
-import {
-  getLatestBaseForecastTime,
-  getLatestValidForecastTime,
-} from './services/forecast-time-service'
+import { getLatestBaseForecastTime } from './services/forecast-time-service'
 
-export const ForecastContext = createContext({
-  forecastBaseTime: getLatestBaseForecastTime(),
-  forecastValidTime: getLatestValidForecastTime(),
-})
+export const ForecastContext = createContext(
+  getLatestBaseForecastTime().minus({ hours: 24 }),
+)

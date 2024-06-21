@@ -58,7 +58,11 @@ describe('SingleCityComponent', () => {
   })
   describe('when data loaded', () => {
     it('shows the site measurements section', async () => {
-      render(<SingleCity />)
+      ;(useQueries as jest.Mock).mockReturnValue([
+        { data: [], isPending: false, isError: false },
+        { data: [], isPending: false, isError: false },
+      ]),
+        render(<SingleCity />)
       await waitFor(() => {
         expect(screen.getByText('Measurement Sites')).toBeInTheDocument()
         expect(screen.getByText('Site Measurements')).toBeInTheDocument()
