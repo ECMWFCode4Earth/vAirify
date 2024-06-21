@@ -1,6 +1,6 @@
 import { EChartsOption } from 'echarts'
 import ReactECharts from 'echarts-for-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import classes from './SiteMeasurementsChart.module.css'
 import { PollutantType, pollutantTypeDisplay } from '../../models'
@@ -9,6 +9,7 @@ import { MeasurementsResponseDto } from '../../services/types'
 
 interface SiteMeasurementsChartProps {
   measurementsBySite: Record<string, MeasurementsResponseDto[]>
+  onSiteClick: (siteName: string) => void
   pollutantType: PollutantType
   seriesColorsBySite?: Record<string, string>
 }
@@ -25,7 +26,7 @@ const getChartOptions = (
     yAxis: {
       type: 'value',
       name: 'µg/m³',
-      nameGap: 30,
+      nameGap: 50,
       nameLocation: 'middle',
     },
     series: Object.entries(measurementsBySite).map(
@@ -59,34 +60,57 @@ const getChartOptions = (
   }
 }
 
-export const SiteMeasurementsChart = (
-  props: SiteMeasurementsChartProps,
-): JSX.Element => {
-  const [echartOptions, setEchartOptions] = useState<EChartsOption>(
-    getChartOptions(
-      props.pollutantType,
-      props.measurementsBySite,
-      props.seriesColorsBySite,
-    ),
+export const SiteMeasurementsChart = ({
+  pollutantType,
+  measurementsBySite,
+  seriesColorsBySite,
+  onSiteClick,
+}: SiteMeasurementsChartProps): JSX.Element => {
+  const [eChartOptions, setEchartOptions] = useState<EChartsOption>(
+    getChartOptions(pollutantType, measurementsBySite, seriesColorsBySite),
   )
   useEffect(() => {
     const newOptions = getChartOptions(
-      props.pollutantType,
-      props.measurementsBySite,
-      props.seriesColorsBySite,
+      pollutantType,
+      measurementsBySite,
+      seriesColorsBySite,
     )
     setEchartOptions(newOptions)
-  }, [props])
+  }, [pollutantType, measurementsBySite, seriesColorsBySite])
+
+  const eChartEventHandler = useCallback(
+    ({
+      componentType,
+      componentSubType,
+      seriesName,
+    }: {
+      componentType: string
+      componentSubType: string
+      seriesName?: string
+    }) => {
+      if (
+        componentType === 'series' &&
+        componentSubType === 'line' &&
+        seriesName
+      ) {
+        onSiteClick(seriesName)
+      }
+    },
+    [onSiteClick],
+  )
 
   return (
     <>
       <label className={classes['chart-label']}>
-        {pollutantTypeDisplay[props.pollutantType]}
+        {pollutantTypeDisplay[pollutantType]}
       </label>
       <ReactECharts
         className={classes['chart']}
-        option={echartOptions}
+        onEvents={{
+          click: eChartEventHandler,
+        }}
         notMerge
+        option={eChartOptions}
       />
     </>
   )

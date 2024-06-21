@@ -133,6 +133,11 @@ export const SingleCity = () => {
     }
     updateColors()
   }, [sites])
+  const deselectSite = useCallback((siteName: string) => {
+    setSelectedSites((current) =>
+      current.filter(({ value }) => value !== siteName),
+    )
+  }, [])
 
   if (forecastDataError || measurementDataError) {
     return <>An error occurred</>
@@ -190,6 +195,7 @@ export const SingleCity = () => {
                       pollutantType={pollutantType as PollutantType}
                       measurementsBySite={measurementsBySite}
                       seriesColorsBySite={siteColors}
+                      onSiteClick={deselectSite}
                     />
                   </div>
                 ))}
