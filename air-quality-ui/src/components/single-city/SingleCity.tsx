@@ -192,10 +192,11 @@ export const SingleCity = () => {
                     className={classes['site-measurement-chart']}
                   >
                     <SiteMeasurementsChart
-                      pollutantType={pollutantType as PollutantType}
+                      forecastData={forecastData}
                       measurementsBySite={measurementsBySite}
-                      seriesColorsBySite={siteColors}
                       onSiteClick={deselectSite}
+                      pollutantType={pollutantType as PollutantType}
+                      seriesColorsBySite={siteColors}
                     />
                   </div>
                 ))}
