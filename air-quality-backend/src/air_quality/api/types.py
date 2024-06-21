@@ -38,7 +38,7 @@ class MeasurementDto(TypedDict):
     site_name: str
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class AggregateDataDto(TypedDict, Generic[T]):

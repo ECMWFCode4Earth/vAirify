@@ -12,7 +12,7 @@ measurements_path = "/v2/measurements"
 
 
 def _create_session() -> requests.Session:
-    retry_strategy = Retry(total=3, status_forcelist=[408], raise_on_status=False)
+    retry_strategy = Retry(total=2, status_forcelist=[408], raise_on_status=False)
     adapter = HTTPAdapter(max_retries=retry_strategy)
     session = requests.Session()
     session.mount("http://", adapter)

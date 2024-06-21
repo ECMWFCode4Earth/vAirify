@@ -29,5 +29,22 @@ services:
       - MONGO_DB_NAME=${MONGO_DB_NAME}
       - CDSAPI_URL=${CDSAPI_URL}
       - CDSAPI_KEY=${CDSAPI_KEY}
+  api:
+    container_name: backend-api
+    image: ghcr.io/ecmwfcode4earth/vairify/vairify-backend-api
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+    environment:
+      - MONGO_DB_URI=mongodb://mongo:27017
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+  ui:
+    container_name: frontend-ui
+    image: ghcr.io/ecmwfcode4earth/vairify/vairify-frontend
+    depends_on:
+      - api
+    ports:
+      - 8001:80
 volumes:
-  database:
+  database: {}
