@@ -28,6 +28,7 @@ services:
     build: 
       context: ./air-quality-backend/
       dockerfile: Dockerfile.forecast
+      target: development
     environment:
       - MONGO_DB_URI=mongodb://mongo:27017
       - MONGO_DB_NAME=${MONGO_DB_NAME}
