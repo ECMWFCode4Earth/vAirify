@@ -2,11 +2,12 @@ import { expect, test } from "@playwright/test";
 import { apiForecast, apiSummary } from "./mocked_api.ts";
 
 test("Title is vAirify", async ({ page }) => {
-  await page.goto("http://localhost:5173/city/summary");
+  await page.goto("/city/summary");
   const title = await page.title();
   expect(title).toBe("vAirify");
 });
 
+// Mocked + live env
 test("Header visibility check", async ({ page }) => {
   await page.goto("/city/summary");
 
@@ -33,6 +34,7 @@ test("Header visibility check", async ({ page }) => {
   }
 });
 
+// Mocked + live env
 test("Header text check", async ({ page }) => {
   await page.goto("/city/summary");
 
@@ -56,4 +58,33 @@ test("Header text check", async ({ page }) => {
   );
 });
 
+// Mocked + live env
+test("Cell number format check", async ({ page }) => {
+  await page.route("*/**/air-pollutant/forecast*", async (route) => {
+    await route.fulfill({ json: apiForecast });
+  });
+  await page.route(
+    "*/**/air-pollutant/measurements/summary*",
+    async (route) => {
+      await route.fulfill({ json: apiSummary });
+    }
+  );
+  await page.goto("/city/summary"); // Replace with your app's URL
 
+  const checkNumberFormat = async (text) => {
+    const number = parseFloat(text);
+
+    if (!isNaN(number)) {
+      const decimalPart = text.split(".")[1];
+      if (decimalPart && decimalPart.length > 1) {
+        throw new Error(`Number ${text} has more than one decimal place`);
+      }
+    }
+  };
+  const cells = await page.locator("role=gridcell").all();
+
+  for (const cell of cells) {
+    const cellText = await cell.textContent();
+    await checkNumberFormat(cellText);
+  }
+});
