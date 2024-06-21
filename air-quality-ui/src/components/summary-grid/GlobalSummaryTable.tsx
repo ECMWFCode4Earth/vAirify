@@ -79,7 +79,7 @@ function getPerformanceSymbol(
   if (forecastAqiLevel > measurementAqiLevel) {
     return '+'
   } else if (forecastAqiLevel === measurementAqiLevel) {
-    return
+    return ''
   }
   return '-'
 }

@@ -1,4 +1,4 @@
-import { getPollutantIndexLevel } from './CalculateAQI'
+import { getPollutantIndexLevel } from '../../scripts/AQI/CalculateAQI'
 
 type ForecastPollutantDataDto = {
   [key: string]: number
@@ -32,9 +32,13 @@ function colourField(params: Params, lowerLimit: number, upperLimit?: number) {
         columnType[1],
       ),
   )
+  const overallAQIDiff = parseInt(params.data.aqiDifference.split('')[0])
 
-  const aqiMatchesDifference =
-    parseInt(params.data.aqiDifference) === aqiDifference
+  if (overallAQIDiff === 0) {
+    return false
+  }
+
+  const aqiMatchesDifference = overallAQIDiff === aqiDifference
 
   const isInColourBand =
     params.value >= lowerLimit && (upperLimit ?? params.value)
