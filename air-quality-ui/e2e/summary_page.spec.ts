@@ -7,8 +7,8 @@ test("Title is vAirify", async ({ page }) => {
   expect(title).toBe("vAirify");
 });
 
-test("Experimental header visibility check", async ({ page }) => {
-  await page.goto("http://localhost:5173/city/summary");
+test("Header visibility check", async ({ page }) => {
+  await page.goto("/city/summary");
 
   const headers = [
     { name: "AQI Level", visible: true },
@@ -32,3 +32,28 @@ test("Experimental header visibility check", async ({ page }) => {
     }
   }
 });
+
+test("Header text check", async ({ page }) => {
+  await page.goto("/city/summary");
+
+  const checkColumnHeaderText = async (name, expectedText) => {
+    const header = page.getByRole("columnheader", { name });
+    await header.waitFor({ state: "visible" });
+    await expect(header).toHaveText(expectedText);
+  };
+
+  await checkColumnHeaderText("AQI Level", "AQI Level");
+  await checkColumnHeaderText("PM 2.5 (µg/m³)", "PM 2.5 (µg/m³)");
+  await checkColumnHeaderText("PM 10 (µg/m³)", "PM 10 (µg/m³)");
+  await checkColumnHeaderText(
+    "Nitrogen Dioxide (µg/m³)",
+    "Nitrogen Dioxide (µg/m³)"
+  );
+  await checkColumnHeaderText("Ozone (µg/m³)", "Ozone (µg/m³)");
+  await checkColumnHeaderText(
+    "Sulphur Dioxide (µg/m³)",
+    "Sulphur Dioxide (µg/m³)"
+  );
+});
+
+
