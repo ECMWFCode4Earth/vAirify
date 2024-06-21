@@ -5,6 +5,7 @@ on:
 jobs:
   publish_image:
     runs-on: ubuntu-latest
+    environment: dev
     permissions:
         contents: read
         packages: write
