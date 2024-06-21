@@ -19,8 +19,10 @@ describe('SiteMeasurementChart', () => {
     (pollutantType, expectedLabel) => {
       render(
         <SiteMeasurementsChart
+          forecastData={[]}
           measurementsBySite={{}}
           pollutantType={pollutantType}
+          onSiteClick={() => {}}
         />,
       )
       expect(screen.getByText(expectedLabel)).toBeInTheDocument()
