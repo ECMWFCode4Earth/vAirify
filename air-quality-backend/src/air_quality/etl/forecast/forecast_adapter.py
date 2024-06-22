@@ -11,6 +11,7 @@ import os
 import xarray as xr
 import numpy as np
 from PIL import Image
+from io import BytesIO
 
 class PollutantData(TypedDict):
     values_ug_m3: list[float]
@@ -129,7 +130,7 @@ def _get_dimension_by_attr(dataset, attr_name, attr_value):
     return None
 
 
-def _get_spatial_temporal_dims(dataset):
+def _get_dim_names(dataset):
     """
     Get the latitude, longitude, and time dimensions from the dataset.
     params:
@@ -146,78 +147,48 @@ def _get_spatial_temporal_dims(dataset):
 def _normalise_data(arr, norm_min, norm_max):
     return (arr - norm_min) / (norm_max - norm_min)
 
-def _normalize_data_irregular(arr, intervals):
-    # Ensure the intervals are sorted
-    intervals = np.sort(intervals)
-    num_intervals = len(intervals)
-    
-    # Calculate the normalized values for each interval
-    normalized_values = np.linspace(0, 1, num_intervals)
-    
-    def normalize_value(value):
-        # Find the correct interval for the value
-        for i in range(1, num_intervals):
-            if value <= intervals[i]:
-                return normalized_values[i-1]
-        return 1.0  # If the value is greater than the last interval
 
-    # Vectorize the function for efficiency
-    normalize_vectorized = np.vectorize(normalize_value)
-    return normalize_vectorized(arr)
-
-def _convert_data(input_data: xr.Dataset, variable: str):
+def _convert_data(input_data: xr.Dataset, variable: str) -> np.ndarray:
     """
     Convert data to numpy array
     :param input_data:
     :param variable:
     :return rgb_data_array:
     """
-    lat, lon, time = _get_spatial_temporal_dims(input_data)
+    lat, lon, time = _get_dim_names(input_data)
+    num_lat, num_lon, num_time = len(lat), len(lon), len(time)
 
-    rgb_data_array = np.zeros( ( len(lat), len(lon) * len(time), 1 ))
+    if variable == 'winds_10m':
+        rgb_data_array = np.zeros((num_lat, num_lon * num_time, 3), dtype=np.uint8)
+        units = input_data["u10"].attrs.get('units', 'Unknown')
+    else:
+        rgb_data_array = np.zeros((num_lat, num_lon * num_time, 1), dtype=np.uint8)
+        units = input_data[variable].attrs.get('units', 'Unknown') + ' * 1e-9'
 
-    if variable == 'pm10' or variable == 'pm2p5':
-        min_val = 0
-        max_val = 500.
-    elif variable == 'no2' or variable == 'so2':
-        min_val = 0
-        max_val = 100.
-    elif variable == 'go3':
-        min_val = 0
-        max_val = 150.
+    variable_ranges = {
+        'pm10': (0, 1000.),
+        'pm2p5': (0, 1000.),
+        'no2': (0, 100.),
+        'so2': (0, 100.),
+        'go3': (0, 150.),
+        'winds_10m': (-50, 50.)
+    }
 
-    for tt in range(len(time)):
-        start_index = tt * len(lon)
-        end_index = (tt + 1) * len(lon)
-        normalised_data = _normalise_data(input_data[variable].isel(step=tt) * 1e9, min_val, max_val)
-        # normalised_data = _normalize_data_irregular(input_data[variable].isel(step=tt) * 1e9, intervals)
-        rgb_data_array[:, start_index:end_index, 0] = np.clip(normalised_data * 255, 0, 255)
+    min_val, max_val = variable_ranges.get(variable, (0, 1))
 
-    return np.uint8(rgb_data_array)
+    for tt in range(num_time):
+        start_index = tt * num_lon
+        end_index = (tt + 1) * num_lon
+        if variable == 'winds_10m':
+            normalised_data_U = _normalise_data(input_data["u10"].isel(step=tt), min_val, max_val)
+            normalised_data_V = _normalise_data(input_data["v10"].isel(step=tt), min_val, max_val)
+            rgb_data_array[:, start_index:end_index, 0] = np.clip(normalised_data_U * 255, 0, 255)
+            rgb_data_array[:, start_index:end_index, 1] = np.clip(normalised_data_V * 255, 0, 255)
+        else:
+            normalised_data = _normalise_data(input_data[variable].isel(step=tt) * 1e9, min_val, max_val)
+            rgb_data_array[:, start_index:end_index, 0] = np.clip(normalised_data * 255, 0, 255)
 
-def _convert_data_wind(input_data: xr.Dataset):
-    """
-    Convert data to numpy array
-    :param input_data:
-    :param variable:
-    :return rgb_data_array:
-    """
-    lat, lon, time = _get_spatial_temporal_dims(input_data)
-
-    rgb_data_array = np.zeros( ( len(lat), len(lon) * len(time), 3 ))
-
-    min_val = -30
-    max_val = 30.
-
-    for tt in range(len(time)):
-        start_index = tt * len(lon)
-        end_index = (tt + 1) * len(lon)
-        normalised_data_U = _normalise_data(input_data["u10"].isel(step=tt), min_val, max_val)
-        normalised_data_V = _normalise_data(input_data["v10"].isel(step=tt), min_val, max_val)
-        rgb_data_array[:, start_index:end_index, 0] = np.clip(normalised_data_U * 255, 0, 255)
-        rgb_data_array[:, start_index:end_index, 1] = np.clip(normalised_data_V * 255, 0, 255)
-
-    return np.uint8(rgb_data_array)
+    return rgb_data_array, min_val, max_val, units
 
 
 def _create_output_directory(forecast_data: ForecastData):
@@ -235,21 +206,29 @@ def _create_output_directory(forecast_data: ForecastData):
     os.makedirs(output_directory, exist_ok=True)
     return output_directory, forecast_date
 
-def _save_data_textures(rgb_data_array, output_directory, forecast_date, variable, format):
+def _save_data_textures(rgb_data_array: np.ndarray, output_directory: str, forecast_date: str, variable: str) -> None:
     """
-    Save data textures
-    :param rgb_data_array:
-    :param output_directory:
-    :param variable:
-    :return:
+    Save data textures to disk and convert  to binary data.
+
+    :param rgb_data_array: Numpy array containing the image data
+    :param variable: Variable name to include in the filename
+    :return: Binary data of the image
     """
-    if ( format == "L" ):
-        image_array = rgb_data_array.squeeze(axis=2)
-    else:
+    if variable == 'winds_10m':
         image_array = rgb_data_array
+        format = 'RGB'
+    else:
+        image_array = rgb_data_array.squeeze(axis=2)
+        format = 'L'
+
     image = Image.fromarray(image_array, format)
-    output_file = f"{output_directory}/{variable}_{forecast_date}_CAMS_global.png"
-    image.save(output_file, format='PNG')
+    # output_file = f"{output_directory}/{variable}_{forecast_date}_CAMS_global.png"
+    # image.save(output_file, format='PNG', lossless=True)
+    with BytesIO() as output:
+        image.save(output, format='PNG')
+        binary_data = output.getvalue()
+
+    return binary_data
 
 def create_data_textures(forecast_data: ForecastData):
     """
@@ -258,14 +237,39 @@ def create_data_textures(forecast_data: ForecastData):
     :return:
     """
     output_directory, forecast_date = _create_output_directory(forecast_data)
+    documents = []
+
     for pollutant in PollutantType:
         logging.info(f"Creating data texture for {pollutant.name}")
         forecast_data_type = convert_to_forecast_data_type(pollutant)
         dataset = forecast_data._get_data_set(forecast_data_type)
-        rgb_data_array = _convert_data(dataset, forecast_data_type.value)
-        _save_data_textures(rgb_data_array, output_directory, forecast_date, pollutant.value, "L")
+        rgb_data_array, min_value, max_value, units = _convert_data(dataset, forecast_data_type.value)
+        binary_data = _save_data_textures(rgb_data_array, output_directory, forecast_date, pollutant.value)
 
-    # logging.info(f"Creating data texture for 10m WINDS")
-    # rgb_data_array = _convert_data_wind(forecast_data._single_level_data)
-    # _save_data_textures(rgb_data_array, output_directory, forecast_date, 'winds_10m', "RGB")
+        document = {
+            "forecast_base_time": forecast_date,
+            "variable": pollutant.value,
+            "source": "cams-production",
+            "min_value": min_value,
+            "max_value": max_value,
+            "units": units,
+            "image_data": binary_data
+        }
+        documents.append(document)
 
+
+    logging.info(f"Creating data texture for WINDS")
+    rgb_data_array, min_value, max_value, units = _convert_data(forecast_data._single_level_data, 'winds_10m')
+    binary_data= _save_data_textures(rgb_data_array, output_directory, forecast_date, 'winds_10m')
+
+    document = {
+        "forecast_base_time": forecast_date,
+        "variable": "winds_10m",
+        "source": "cams-production",
+        "min_value": min_value,
+        "max_value": max_value,
+        "units": units,
+        "image_data": binary_data
+    }
+    documents.append(document)
+    return documents

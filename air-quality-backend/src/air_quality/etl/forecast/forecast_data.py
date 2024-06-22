@@ -189,7 +189,6 @@ class ForecastData:
         latitudes = []
         longitudes = []
         for location in locations:
-            print(location)
             latitudes.append(location["latitude"])
             longitudes.append(location["longitude"])
 
@@ -199,9 +198,6 @@ class ForecastData:
             dataset = self._get_data_set(forecast_data_type)
             # Interpolation is called n times, where n = len(pollutant_types),
             # irrespective of len(locations)
-            print(dataset[forecast_data_type.value])
-            print(latitudes)
-            print(longitudes)
             interpolated_data = dataset[forecast_data_type.value].interp(
                 latitude=xr.DataArray(latitudes, dims="points"),
                 longitude=xr.DataArray(longitudes, dims="points"),

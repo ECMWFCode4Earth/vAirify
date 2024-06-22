@@ -45,6 +45,17 @@ def insert_data(data):
         data,
     )
 
+def insert_textures(textures):
+    upsert_data(
+        "textures",
+        [
+            "forecast_base_time",
+            "variable",
+            "source",
+        ],
+        textures,
+    )
+
 
 def delete_data_before(forecast_valid_time: datetime):
     result = get_collection("forecast_data").delete_many(
