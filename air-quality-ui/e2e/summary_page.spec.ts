@@ -32,10 +32,10 @@ test('Header text check', async ({ page }) => {
   await checkColumnHeaderText('PM 10 (µg/m³)', 'PM 10 (µg/m³)')
   const scroller = page.locator('.ag-body-horizontal-scroll-viewport')
   await scroller.evaluate((element: HTMLElement) => {
-    element.scrollLeft = element.scrollWidth;
-  });
+    element.scrollLeft = element.scrollWidth
+  })
   // Optionally, wait for any further actions or assertions after scrolling
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(1000)
   await checkColumnHeaderText(
     'Nitrogen Dioxide (µg/m³)',
     'Nitrogen Dioxide (µg/m³)',
@@ -78,7 +78,9 @@ test('Cell number format check', async ({ page }) => {
   }
 })
 
-test('Kyiv location to be true, regardless of measurement availability', async ({ page }) => {
+test('Kyiv location to be true, regardless of measurement availability', async ({
+  page,
+}) => {
   await page.route('*/**/air-pollutant/forecast*', async (route) => {
     await route.fulfill({ json: apiForecast })
   })
@@ -92,14 +94,14 @@ test('Kyiv location to be true, regardless of measurement availability', async (
   await page.waitForSelector('.ag-root', { state: 'visible' })
   await page.waitForSelector('.ag-header-cell', { state: 'visible' })
 
-  const textQuery = 'Kyiv';
-  const cells = await page.locator('.ag-cell').all();
-  let count = 0;
+  const textQuery = 'Kyiv'
+  const cells = await page.locator('.ag-cell').all()
+  let count = 0
   for (const cell of cells) {
-    const cellText = await cell.innerText();
+    const cellText = await cell.innerText()
     if (cellText.includes(textQuery)) {
-      count++;
+      count++
     }
   }
-  expect(count).toBe(1); 
+  expect(count).toBe(1)
 })
