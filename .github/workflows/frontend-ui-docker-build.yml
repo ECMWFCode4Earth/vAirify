@@ -1,0 +1,27 @@
+name: Build and publish UI docker image
+on:
+  [workflow_dispatch]
+
+jobs:
+  publish_image:
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+        contents: read
+        packages: write
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: lowercase the repository name
+        run: |
+          echo "REPO=${GITHUB_REPOSITORY@L}" >> "${GITHUB_ENV}"
+      - name: login
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN}} | docker login --username ${{ github.actor }} --password-stdin  ghcr.io
+      - name: build
+        run: |
+          cd air-quality-ui
+          docker build . -t ghcr.io/${REPO}/vairify-frontend:latest --build-arg VITE_AIR_QUALITY_API_URL=${{ vars.VAIRIFY_API_URL }}
+      - name: publish
+        run: |
+          docker push ghcr.io/${REPO}/vairify-frontend:latest
