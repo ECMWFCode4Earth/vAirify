@@ -1,55 +1,90 @@
-import { useQueries } from '@tanstack/react-query'
+import { useQueries, useQuery } from '@tanstack/react-query'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-import { useState } from 'react'
+import { DateTime } from 'luxon'
+import { useContext, useMemo } from 'react'
 
 import classes from './GlobalSummary.module.css'
-import { combineApiResult } from './summary-data-mapper'
+import { ForecastContext } from '../../context'
 import { getForecastData } from '../../services/forecast-data-service'
-import {
-  getLatestBaseForecastTime,
-  getLatestValidForecastTime,
-} from '../../services/forecast-time-service'
+import { getValidForecastTimesBetween } from '../../services/forecast-time-service'
 import { getMeasurementSummary } from '../../services/measurement-data-service'
+import {
+  ForecastResponseDto,
+  MeasurementSummaryResponseDto,
+} from '../../services/types'
 import GlobalSummaryTable from '../summary-grid/GlobalSummaryTable'
 
 const GlobalSummary = (): JSX.Element => {
-  const [latestForecastDate] = useState(getLatestBaseForecastTime())
-  const [latestValidDate] = useState(getLatestValidForecastTime())
+  const forecastBaseTime = useContext(ForecastContext)
 
-  const { data, isError } = useQueries({
-    queries: [
-      {
-        queryKey: ['forecast'],
-        queryFn: () =>
-          getForecastData(latestValidDate, latestValidDate, latestForecastDate),
-      },
-      {
-        queryKey: ['summary'],
-        queryFn: () => getMeasurementSummary(latestValidDate),
-      },
-    ],
-    combine: (result) => combineApiResult(result),
+  const { data: forecastData, isError: forecastDataError } = useQuery({
+    queryKey: ['forecast'],
+    queryFn: () =>
+      getForecastData(forecastBaseTime, DateTime.now(), forecastBaseTime).then(
+        (forecastData) =>
+          forecastData.reduce<Record<string, ForecastResponseDto[]>>(
+            (acc, reading) => {
+              const location = reading.location_name
+              if (!acc[location]) {
+                acc[location] = []
+              }
+              acc[location].push(reading)
+              return acc
+            },
+            {},
+          ),
+      ),
   })
 
-  if (isError) {
+  const forecastValidTimeRange = useMemo(
+    () => getValidForecastTimesBetween(forecastBaseTime),
+    [forecastBaseTime],
+  )
+
+  const { data: summarizedMeasurementData, isError: summaryDataError } =
+    useQueries({
+      queries: forecastValidTimeRange.map((validTime) => ({
+        queryKey: ['summary', validTime.toMillis()],
+        queryFn: () => getMeasurementSummary(validTime, 75),
+      })),
+      combine: (results) => {
+        const measurementsByLocation = results
+          .flatMap(({ data }) => data)
+          .reduce<Record<string, MeasurementSummaryResponseDto[]>>(
+            (acc, measurement) => {
+              if (measurement) {
+                const locationName = measurement.location_name
+                if (!acc[locationName]) {
+                  acc[locationName] = []
+                }
+                acc[locationName].push(measurement)
+              }
+              return acc
+            },
+            {},
+          )
+        return { data: measurementsByLocation, isError: false }
+      },
+    })
+
+  if (forecastDataError || summaryDataError) {
     return <span>Error occurred</span>
   }
   return (
     <div className={classes['summary-container']}>
       <div>
         <div>
-          Forecast Base Time:{' '}
-          {latestForecastDate.toFormat('yyyy-MM-dd HH:mm ZZZZ')}
+          Forecast Base Time: {forecastBaseTime.toFormat('dd MMM HH:mm ZZZZ')}
         </div>
-        <div>
-          Forecast Valid Time:{' '}
-          {latestValidDate.toFormat('yyyy-MM-dd HH:mm ZZZZ')}
+        <div data-testid="forecast-valid-range">
+          Forecast Valid Time Range: {forecastBaseTime.toFormat('dd MMM HH:mm')}{' '}
+          - {forecastValidTimeRange.slice(-1)[0]?.toFormat('dd MMM HH:mm ZZZZ')}
         </div>
       </div>
       <GlobalSummaryTable
-        forecast={data.forecast}
-        summarizedMeasurements={data.summarizedMeasurements}
+        forecast={forecastData}
+        summarizedMeasurements={summarizedMeasurementData}
       />
     </div>
   )

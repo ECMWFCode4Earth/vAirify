@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 
+import { fetchJson } from './fetch-common'
 import { ForecastResponseDto } from './types'
 import { LocationType } from '../models'
 
@@ -9,6 +10,7 @@ export const getForecastData = async (
   dateFrom: DateTime,
   dateTo: DateTime,
   baseTime: DateTime,
+  locationName?: string,
   locationType: LocationType = 'city',
 ): Promise<ForecastResponseDto[]> => {
   const params: Record<string, string> = {
@@ -16,16 +18,7 @@ export const getForecastData = async (
     valid_time_from: dateFrom.toJSDate().toISOString(),
     valid_time_to: dateTo.toJSDate().toISOString(),
     base_time: baseTime.toJSDate().toISOString(),
+    ...(locationName && { location_name: locationName }),
   }
-  const url = new URL(`${API_URL}/air-pollutant/forecast`)
-  Object.keys(params).forEach((key) =>
-    url.searchParams.append(key, params[key]),
-  )
-
-  return fetch(url.toString(), {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then((response) => response.json())
+  return fetchJson(`${API_URL}/air-pollutant/forecast`, params)
 }

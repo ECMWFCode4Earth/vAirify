@@ -1,29 +1,16 @@
 import { DateTime } from 'luxon'
 
+import { fetchJson } from './fetch-common'
 import { MeasurementSummaryResponseDto, MeasurementsResponseDto } from './types'
 import { LocationType } from '../models'
 
 const API_URL = import.meta.env.VITE_AIR_QUALITY_API_URL
 
-const queryMeasurements = (
+const queryMeasurements = async (
   urlString: string,
   params: Record<string, string | string[]>,
 ) => {
-  const url = new URL(`${API_URL}/air-pollutant${urlString}`)
-  Object.keys(params).forEach((key) => {
-    const value = params[key]
-    if (typeof value === 'string') {
-      url.searchParams.append(key, value)
-    } else {
-      value.forEach((v) => url.searchParams.append(key, v))
-    }
-  })
-  return fetch(url.toString(), {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then((response) => response.json())
+  return fetchJson(`${API_URL}/air-pollutant${urlString}`, params)
 }
 
 export const getMeasurements = async (

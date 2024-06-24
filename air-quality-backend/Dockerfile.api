@@ -1,0 +1,17 @@
+FROM continuumio/miniconda3
+
+WORKDIR /usr/src/app
+COPY conda/environment.yml .
+RUN conda env create -f environment.yml
+
+SHELL ["conda", "run", "-n", "air-quality-backend", "/bin/bash", "-c"]
+
+COPY pyproject.toml .
+RUN poetry install
+
+COPY src/ ./src
+COPY README.md logging.ini ./
+
+RUN poetry install 
+
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "air-quality-backend", "fastapi", "run", "./src/air_quality/api/main.py", "--root-path", "/api"]
