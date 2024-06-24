@@ -3,17 +3,15 @@ import pytest
 
 from dotenv import load_dotenv
 from ftplib import FTP
-from datetime import datetime, timedelta
-
-from freezegun import freeze_time
+from datetime import datetime, timedelta, timezone
 
 from system_tests.data.cities_data import all_cities
 from system_tests.utils.cams_utilities import (
     get_ecmwf_forecast_to_dict_for_countries,
     get_forecast_percentage_divergence,
 )
-from system_tests.utils.database_utilities import get_database_data
-from scripts.run_forecast_etl import main
+from system_tests.utils.database_utilities import (
+    get_database_data, ensure_forecast_etl_run)
 
 load_dotenv()
 allowed_divergence_percentage = 3
@@ -21,23 +19,19 @@ allowed_divergence_percentage = 3
 
 @pytest.fixture(scope="module")
 def retrieve_test_data():
-    # Let's go back a day, so we know the forecast will have taken place
+    # Let's go back a day, so we know the forecast will be available
     yest = datetime.utcnow() - timedelta(days=1)
-    forecast_base_time = datetime(yest.year, yest.month, yest.day)
+    forecast_base_time = datetime(yest.year, yest.month, yest.day, tzinfo=timezone.utc)
     forecast_valid_time = forecast_base_time + timedelta(hours=12)
 
-    # Get the CNN data to compare against
-    ecmwf_forecast_file_path = retrieve_cnn_data(forecast_base_time)
+    # Get the ECMWF data to compare against
+    ecmwf_forecast_file_path = download_ecmwf_data(forecast_base_time)
     ecmwf_locations_file_path = "system_tests/forecast_etl_suite/CAMS_locations_V1.csv"
     ecmwf_all_data = get_ecmwf_forecast_to_dict_for_countries(
         ecmwf_locations_file_path, ecmwf_forecast_file_path
     )
 
-# TODO - Add a check for there already being stuff there?
-    # Ensure the forecast has been run for the time we're trying
-    with freeze_time(forecast_valid_time):
-        main()
-
+    ensure_forecast_etl_run(forecast_base_time)
     database_all_data = get_database_data("forecast_data")
 
     yield (forecast_base_time,
@@ -48,16 +42,16 @@ def retrieve_test_data():
     os.remove(ecmwf_forecast_file_path)
 
 
-def retrieve_cnn_data(base_forecast_date: datetime):
+def download_ecmwf_data(base_forecast_date: datetime):
     url_date = base_forecast_date.strftime("%Y%m%d%H")
-    cnn_data = f"CAMS_surface_concentration_{url_date}_V1.csv"
+    ecmwf_file = f"CAMS_surface_concentration_{url_date}_V1.csv"
 
     with FTP('bol-ftp.ecmwf.int', user='anonymous') as ftp:
         ftp.cwd('public/cams/products/cams_global_forecast/surface_concentrations')
-        with open(cnn_data, "wb") as file:
-            ftp.retrbinary(f"RETR {cnn_data}", file.write)
+        with open(ecmwf_file, "wb") as file:
+            ftp.retrbinary(f"RETR {ecmwf_file}", file.write)
 
-    return cnn_data
+    return ecmwf_file
 
 
 @pytest.mark.parametrize("test_city", all_cities)
