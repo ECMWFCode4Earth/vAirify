@@ -30,6 +30,12 @@ test('Header text check', async ({ page }) => {
   await checkColumnHeaderText('AQI Level', 'AQI Level')
   await checkColumnHeaderText('PM 2.5 (µg/m³)', 'PM 2.5 (µg/m³)')
   await checkColumnHeaderText('PM 10 (µg/m³)', 'PM 10 (µg/m³)')
+  const scroller = page.locator('.ag-body-horizontal-scroll-viewport')
+  await scroller.evaluate((element: HTMLElement) => {
+    element.scrollLeft = element.scrollWidth;
+  });
+  // Optionally, wait for any further actions or assertions after scrolling
+  await page.waitForTimeout(1000);
   await checkColumnHeaderText(
     'Nitrogen Dioxide (µg/m³)',
     'Nitrogen Dioxide (µg/m³)',
