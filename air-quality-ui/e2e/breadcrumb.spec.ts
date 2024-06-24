@@ -25,5 +25,5 @@ test('Mocked response breadcrumb', async ({ page }) => {
   // Zurich Test
   await page.getByRole('link', { name: 'Zurich' }).click()
   await expect(page.locator('text=Cities')).toBeVisible()
-  await expect(page.locator('text=Zurici')).toBeVisible()
+  await expect(page.locator('text=Zurich')).toBeVisible()
 })
