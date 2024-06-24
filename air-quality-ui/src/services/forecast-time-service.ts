@@ -21,22 +21,23 @@ export const getLatestBaseForecastTime = (from = DateTime.utc()): DateTime => {
   return modelDate
 }
 
-export const getLatestValidForecastTime = (from = DateTime.utc()): DateTime => {
-  const utcDate = from.toUTC()
-  const hour = utcDate.hour
-  const hourIsZero = hour === 0
-  let validForecastHour
-  if (hourIsZero) {
-    validForecastHour = 21
-  } else {
-    validForecastHour = hour % 3 === 0 ? hour - 3 : hour - (hour % 3)
+const getNearestValidForecastTime = (time: DateTime): DateTime => {
+  const utc = time.toUTC()
+  const { hour: utcHour } = utc
+  const validForecastHour =
+    utcHour === 0 || utcHour % 3 === 0 ? utcHour : utcHour - (utcHour % 3)
+  return DateTime.utc(utc.year, utc.month, utc.day, validForecastHour, 0, 0)
+}
+export const getValidForecastTimesBetween = (
+  start: DateTime,
+  end = DateTime.utc(),
+): DateTime[] => {
+  const nearestValidForecastTime = getNearestValidForecastTime(start)
+  const validTimes = []
+  let incrementHours = 0
+  while (nearestValidForecastTime.plus({ hours: incrementHours }) <= end) {
+    validTimes.push(nearestValidForecastTime.plus({ hours: incrementHours }))
+    incrementHours += 3
   }
-  return DateTime.utc(
-    utcDate.year,
-    utcDate.month,
-    utcDate.day,
-    validForecastHour,
-    0,
-    0,
-  ).minus(Duration.fromObject({ days: hourIsZero ? 1 : 0 }))
+  return validTimes
 }
