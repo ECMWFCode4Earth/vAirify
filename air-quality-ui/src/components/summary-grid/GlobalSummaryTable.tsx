@@ -1,7 +1,13 @@
-import { ColDef, ColGroupDef, GridOptions } from 'ag-grid-community'
+import {
+  ColDef,
+  ColGroupDef,
+  GridOptions,
+  ValueFormatterParams,
+} from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
+import { DateTime } from 'luxon'
 import { useMemo } from 'react'
 
 import classes from './GlobalSummaryTable.module.css'
@@ -12,24 +18,28 @@ import {
   pollutantTypes,
 } from '../../models'
 import {
+  ForecastMeasurementComparison,
+  createComparisonData,
+} from '../../services/summary-comparison-service'
+import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,
 } from '../../services/types'
 
 type SummaryDetail = {
-  aqiLevel: number
-} & { [P in PollutantType]?: number }
+  aqiLevel?: number
+} & { [P in PollutantType]?: { value: number; time?: string } }
 
 interface SummaryRow {
   locationName: string
   forecast: SummaryDetail
-  measurements: SummaryDetail
-  aqiDifference: number
+  measurements?: SummaryDetail
+  aqiDifference?: number
 }
 
 interface GlobalSummaryTableProps {
-  forecast: ForecastResponseDto[]
-  summarizedMeasurements: MeasurementSummaryResponseDto[]
+  forecast: Record<string, ForecastResponseDto[]>
+  summarizedMeasurements: Record<string, MeasurementSummaryResponseDto[]>
 }
 
 const createColDefs = (): (ColDef | ColGroupDef)[] => [
@@ -56,14 +66,23 @@ const createColDefs = (): (ColDef | ColGroupDef)[] => [
     headerName: `${pollutantTypeDisplay[type]} (µg/m³)`,
     children: [
       {
-        field: `forecast.${type}`,
+        field: `forecast.${type}.value`,
         headerName: `Forecast`,
         width: 120,
       },
       {
-        field: `measurements.${type}`,
+        field: `measurements.${type}.value`,
         headerName: `Measured`,
         width: 120,
+      },
+      {
+        field: `forecast.${type}.time`,
+        headerName: `Time`,
+        width: 130,
+        valueFormatter: (params: ValueFormatterParams) =>
+          DateTime.fromISO(params.data.forecast[type].time, {
+            zone: 'utc',
+          }).toFormat('dd MMM HH:mm'),
       },
     ],
   })),
@@ -75,75 +94,62 @@ const createGridOptions = (): GridOptions => ({
   },
 })
 
-const mapApiRow = (
-  forecastData: ForecastResponseDto,
-  measurementData: MeasurementSummaryResponseDto,
-): SummaryRow => {
-  const location = forecastData.location_name
+const createSummaryRow = ({
+  locationName,
+  ...data
+}: ForecastMeasurementComparison): SummaryRow => {
   const row: SummaryRow = {
-    locationName: location,
+    locationName,
     forecast: {
-      aqiLevel: forecastData.overall_aqi_level,
+      aqiLevel: data.forecastOverallAqi,
     },
-    measurements: {
-      aqiLevel: measurementData.overall_aqi_level.mean,
-    },
-    aqiDifference: Math.abs(
-      forecastData.overall_aqi_level - measurementData.overall_aqi_level.mean,
-    ),
   }
-  pollutantTypes.forEach((type) => {
-    row.forecast[type] = parseFloat(forecastData[type].value.toFixed(1))
-    const mean = measurementData[type]?.mean.value
-    row.measurements[type] = mean ? parseFloat(mean.toFixed(1)) : undefined
+  pollutantTypes.forEach((pollutantType) => {
+    const { forecastData, measurementData } = data[pollutantType]
+    row.forecast[pollutantType] = {
+      value: parseFloat(forecastData.value.toFixed(1)),
+      time: forecastData.validTime,
+    }
+    if (measurementData) {
+      row.measurements = {
+        ...row.measurements,
+        [pollutantType]: {
+          value: parseFloat(measurementData.value.toFixed(1)),
+        },
+      }
+      const currentDifference = measurementData.aqiLevel - forecastData.aqiLevel
+      if (!row.aqiDifference || currentDifference > row.aqiDifference) {
+        row.aqiDifference = currentDifference
+        row.forecast.aqiLevel = forecastData.aqiLevel
+        row.measurements.aqiLevel = measurementData.aqiLevel
+      }
+    }
   })
   return row
 }
 
-const mapApiResponse = ({
+const GlobalSummaryTable = ({
   forecast,
   summarizedMeasurements,
-}: GlobalSummaryTableProps): SummaryRow[] => {
-  const measurements = summarizedMeasurements.reduce<
-    Record<string, MeasurementSummaryResponseDto>
-  >((acc, result) => {
-    const location = result.location_name
-    acc[location] = result
-    return acc
-  }, {})
-  return forecast.flatMap((forecastData) => {
-    const measurement = measurements?.[forecastData.location_name]
-    if (measurement) {
-      return mapApiRow(forecastData, measurement)
+}: Partial<GlobalSummaryTableProps>): JSX.Element => {
+  const rowData = useMemo(() => {
+    if (!forecast || !summarizedMeasurements) {
+      return null
     }
-    return []
-  })
-}
-
-const GlobalSummaryTable = (
-  props: Partial<GlobalSummaryTableProps>,
-): JSX.Element => {
-  const colDefs = useMemo(() => createColDefs(), [])
-  const data = useMemo(() => {
-    if (props.forecast && props.summarizedMeasurements) {
-      return mapApiResponse({
-        forecast: props.forecast,
-        summarizedMeasurements: props.summarizedMeasurements,
-      })
-    }
-    return null
-  }, [props.forecast, props.summarizedMeasurements])
-  const gridOptions = createGridOptions()
+    return createComparisonData(forecast, summarizedMeasurements).map(
+      (comparisonData) => createSummaryRow(comparisonData),
+    )
+  }, [forecast, summarizedMeasurements])
 
   return (
     <div
-      className={`ag-theme-quartz ${classes['summary-grid-wrapper']} `}
+      className={`ag-theme-quartz ${classes['summary-grid-wrapper']}`}
       data-testid="summary-grid"
     >
       <AgGridReact
-        rowData={data}
-        columnDefs={colDefs}
-        gridOptions={gridOptions}
+        rowData={rowData}
+        columnDefs={createColDefs()}
+        gridOptions={createGridOptions()}
       />
     </div>
   )
