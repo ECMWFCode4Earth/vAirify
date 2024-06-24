@@ -69,7 +69,7 @@ test("Cell number format check", async ({ page }) => {
       await route.fulfill({ json: apiSummary });
     }
   );
-  await page.goto("/city/summary"); // Replace with your app's URL
+  await page.goto("/city/summary");
 
   const checkNumberFormat = async (text) => {
     const number = parseFloat(text);
@@ -81,10 +81,31 @@ test("Cell number format check", async ({ page }) => {
       }
     }
   };
-  const cells = await page.locator("role=gridcell").all();
 
+  const cells = await page.locator("role=gridcell").all();
   for (const cell of cells) {
     const cellText = await cell.textContent();
     await checkNumberFormat(cellText);
+  }
+});
+
+test("Kyiv location to be false", async ({ page }) => {
+  await page.route("*/**/air-pollutant/forecast*", async (route) => {
+    await route.fulfill({ json: apiForecast });
+  });
+  await page.route(
+    "*/**/air-pollutant/measurements/summary*",
+    async (route) => {
+      await route.fulfill({ json: apiSummary });
+    }
+  );
+  await page.goto("/city/summary");
+  const unwantedText = "Kyiv";
+
+  const cells = await page.locator(".ag-cell").all();
+
+  for (const cell of cells) {
+    const cellText = await cell.innerText();
+    expect(cellText).not.toContain(unwantedText);
   }
 });
