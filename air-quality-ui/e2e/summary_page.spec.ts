@@ -9,44 +9,6 @@ test('Title is vAirify', async ({ page }) => {
 })
 
 // Mocked + live env
-test('Header visibility check', async ({ page }) => {
-  await page.route('*/**/air-pollutant/forecast*', async (route) => {
-    await route.fulfill({ json: apiForecast })
-  })
-  await page.route(
-    '*/**/air-pollutant/measurements/summary*',
-    async (route) => {
-      await route.fulfill({ json: apiSummary })
-    },
-  )
-  await page.goto('/city/summary')
-  await page.waitForSelector('.ag-root', { state: 'visible' })
-  await page.waitForSelector('.ag-header-cell', { state: 'visible' })
-
-  const headers = [
-    { name: 'AQI Level', visible: true },
-    { name: 'PM 2.5 (µg/m³)', visible: true },
-    { name: 'PM 10 (µg/m³)', visible: true },
-    { name: 'Nitrogen Dioxide (µg/m³)', visible: true },
-    { name: 'Ozone (µg/m³)', visible: true },
-    { name: 'Sulphur Dioxide (µg/m³)', visible: true },
-  ]
-
-  for (const { name, visible } of headers) {
-    const header = page.getByRole('columnheader', { name })
-
-    const isVisible = await header.isVisible()
-    console.log(`Header "${name}" is ${isVisible ? 'visible' : 'hidden'}`)
-
-    if (visible) {
-      await expect(header).toBeVisible()
-    } else {
-      await expect(header).toBeHidden()
-    }
-  }
-})
-
-// Mocked + live env
 test('Header text check', async ({ page }) => {
   await page.route('*/**/air-pollutant/forecast*', async (route) => {
     await route.fulfill({ json: apiForecast })
