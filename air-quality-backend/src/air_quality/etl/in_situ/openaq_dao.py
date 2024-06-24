@@ -8,7 +8,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-measurements_path = "/v2/measurements"
+measurements_path = "v2/measurements"
 
 
 def _create_session() -> requests.Session:
