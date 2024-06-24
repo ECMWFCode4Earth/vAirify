@@ -137,6 +137,10 @@ date_to_string_24_6_21_16_0_0 = format_datetime_as_string(
 date_to_string_24_7_29_15_0_0 = format_datetime_as_string(
     datetime.datetime(2024, 7, 29, 15, 0, 0), "%Y-%m-%dT%H:%M:%SZ"
 )
+api_source_open_aq = "OpenAQ"
+location_names_test_city_1 = "Test City 1"
+location_names_test_city_2 = "Test City 2"
+location_names_test_city_3 = "Test City 3"
 
 # Test Setup
 load_dotenv(".env-qa")
@@ -192,7 +196,7 @@ seed_api_test_data(
         ),
     ],
 )
-def test__different_measurement_dates__assert_response_location_names_are_correct(
+def test__different_date_from_and_date_to_ranges__assert_response_location_names_are_correct(
     api_parameters: dict, expected_location_names: str
 ):
     load_dotenv(".env-qa")
@@ -238,7 +242,7 @@ def test__different_measurement_dates__assert_response_location_names_are_correc
         ),
     ],
 )
-def test__different_measurement_dates__assert_response_site_names_are_correct(
+def test__different_date_from_and_date_to_ranges__assert_response_site_names_are_correct(
     api_parameters: dict, expected_site_names: str
 ):
     load_dotenv(".env-qa")
@@ -317,7 +321,7 @@ def test__different_measurement_dates__assert_response_site_names_are_correct(
         ),
     ],
 )
-def test__different_measurement_dates__assert_response_measurement_dates_are_correct(
+def test__different_date_from_and_date_to_ranges__assert_response_measurement_dates_are_correct(
     api_parameters: dict, expected_measurement_dates: str
 ):
     load_dotenv(".env-qa")
@@ -329,3 +333,275 @@ def test__different_measurement_dates__assert_response_measurement_dates_are_cor
     actual_measurement_dates.sort()
 
     assert actual_measurement_dates == expected_measurement_dates
+
+
+@pytest.mark.parametrize(
+    "api_parameters, expected_location_names",
+    [
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_name": location_names_test_city_1,
+                "api_source": api_source_open_aq,
+            },
+            [test_city_1_site_1_2024_6_21_15_0_0["name"]],
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_name": location_names_test_city_1,
+            },
+            [test_city_1_site_1_2024_6_21_15_0_0["name"]],
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_name": location_names_test_city_3,
+                "api_source": api_source_open_aq,
+            },
+            [
+                test_city_3_site_1_2024_6_21_14_30_0["name"],
+                test_city_3_site_1_2024_6_21_14_45_0["name"],
+                test_city_3_site_2_2024_6_21_15_30_0["name"],
+            ],
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_name": location_names_test_city_3,
+            },
+            [
+                test_city_3_site_1_2024_6_21_14_30_0["name"],
+                test_city_3_site_1_2024_6_21_14_45_0["name"],
+                test_city_3_site_2_2024_6_21_15_30_0["name"],
+            ],
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_name": [
+                    location_names_test_city_1,
+                    location_names_test_city_2,
+                    location_names_test_city_3,
+                ],
+                "api_source": api_source_open_aq,
+            },
+            [
+                test_city_1_site_1_2024_6_21_15_0_0["name"],
+                test_city_2_site_1_2024_6_21_14_0_0["name"],
+                test_city_2_site_2_2024_6_21_16_0_0["name"],
+                test_city_3_site_1_2024_6_21_14_30_0["name"],
+                test_city_3_site_1_2024_6_21_14_45_0["name"],
+                test_city_3_site_2_2024_6_21_15_30_0["name"],
+            ],
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_name": [
+                    location_names_test_city_1,
+                    location_names_test_city_2,
+                    location_names_test_city_3,
+                ],
+            },
+            [
+                test_city_1_site_1_2024_6_21_15_0_0["name"],
+                test_city_2_site_1_2024_6_21_14_0_0["name"],
+                test_city_2_site_2_2024_6_21_16_0_0["name"],
+                test_city_3_site_1_2024_6_21_14_30_0["name"],
+                test_city_3_site_1_2024_6_21_14_45_0["name"],
+                test_city_3_site_2_2024_6_21_15_30_0["name"],
+            ],
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_name": ["Test City 5"],
+                "api_source": api_source_open_aq,
+            },
+            [],
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_name": ["Test City 5"],
+            },
+            [],
+        ),
+    ],
+)
+def test__different_location_names__assert_response_location_names_are_correct(
+    api_parameters: dict, expected_location_names: str
+):
+    load_dotenv(".env-qa")
+    response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
+
+    actual_location_names = get_list_of_key_values(response.json(), "location_name")
+    actual_location_names.sort()
+
+    assert actual_location_names == expected_location_names
+
+
+@pytest.mark.parametrize(
+    "api_parameters, expected_site_names",
+    [
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_name": location_names_test_city_1,
+                "api_source": api_source_open_aq,
+            },
+            [test_city_1_site_1_2024_6_21_15_0_0["location_name"]],
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_name": location_names_test_city_1,
+            },
+            [test_city_1_site_1_2024_6_21_15_0_0["location_name"]],
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_name": location_names_test_city_3,
+                "api_source": api_source_open_aq,
+            },
+            [
+                test_city_3_site_1_2024_6_21_14_30_0["location_name"],
+                test_city_3_site_1_2024_6_21_14_45_0["location_name"],
+                test_city_3_site_2_2024_6_21_15_30_0["location_name"],
+            ],
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_name": location_names_test_city_3,
+            },
+            [
+                test_city_3_site_1_2024_6_21_14_30_0["location_name"],
+                test_city_3_site_1_2024_6_21_14_45_0["location_name"],
+                test_city_3_site_2_2024_6_21_15_30_0["location_name"],
+            ],
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_name": [
+                    location_names_test_city_1,
+                    location_names_test_city_2,
+                    location_names_test_city_3,
+                ],
+                "api_source": api_source_open_aq,
+            },
+            [
+                test_city_1_site_1_2024_6_21_15_0_0["location_name"],
+                test_city_2_site_1_2024_6_21_14_0_0["location_name"],
+                test_city_2_site_2_2024_6_21_16_0_0["location_name"],
+                test_city_3_site_1_2024_6_21_14_30_0["location_name"],
+                test_city_3_site_1_2024_6_21_14_45_0["location_name"],
+                test_city_3_site_2_2024_6_21_15_30_0["location_name"],
+            ],
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_name": [
+                    location_names_test_city_1,
+                    location_names_test_city_2,
+                    location_names_test_city_3,
+                ],
+            },
+            [
+                test_city_1_site_1_2024_6_21_15_0_0["location_name"],
+                test_city_2_site_1_2024_6_21_14_0_0["location_name"],
+                test_city_2_site_2_2024_6_21_16_0_0["location_name"],
+                test_city_3_site_1_2024_6_21_14_30_0["location_name"],
+                test_city_3_site_1_2024_6_21_14_45_0["location_name"],
+                test_city_3_site_2_2024_6_21_15_30_0["location_name"],
+            ],
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_name": ["Test City 5"],
+                "api_source": api_source_open_aq,
+            },
+            [],
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_name": ["Test City 5"],
+            },
+            [],
+        ),
+    ],
+)
+def test__different_location_names__assert_response_site_names_are_correct(
+    api_parameters: dict, expected_site_names: str
+):
+    load_dotenv(".env-qa")
+    response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
+
+    actual_site_names = get_list_of_key_values(response.json(), "site_name")
+    actual_site_names.sort()
+
+    assert actual_site_names == expected_site_names
+
+
+# @pytest.mark.parametrize(
+#     "api_parameters, expected_response_length",
+#     [
+#         (
+#             {
+#                 "date_from": date_from_string_24_6_21_14_0_0,
+#                 "date_to": date_to_string_24_6_21_16_0_0,
+#                 "location_type": location_type,
+#                 "location_name": location_names_test_city_3,
+#                 "api_source": api_source_open_aq,
+#             },
+#         )
+#     ],
+# )
+# def test__different_api_source__assert_number_of_responses_is_correct(
+#     api_parameters: dict, expected_site_names: str
+# ):
+#     load_dotenv(".env-qa")
+#     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
+#
+#     actual_site_names = get_list_of_key_values(response.json(), "site_name")
+#     actual_site_names.sort()
+#
+#     assert actual_site_names == expected_site_names
