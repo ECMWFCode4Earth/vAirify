@@ -72,7 +72,7 @@ test('Cell number format check', async ({ page }) => {
   }
 })
 
-test('Kyiv location to be false', async ({ page }) => {
+test('Kyiv location to be true, regardless of measurement availability', async ({ page }) => {
   await page.route('*/**/air-pollutant/forecast*', async (route) => {
     await route.fulfill({ json: apiForecast })
   })
@@ -86,10 +86,14 @@ test('Kyiv location to be false', async ({ page }) => {
   await page.waitForSelector('.ag-root', { state: 'visible' })
   await page.waitForSelector('.ag-header-cell', { state: 'visible' })
 
-  const unwantedText = 'Kyiv'
-  const cells = await page.locator('.ag-cell').all()
+  const textQuery = 'Kyiv';
+  const cells = await page.locator('.ag-cell').all();
+  let count = 0;
   for (const cell of cells) {
-    const cellText = await cell.innerText()
-    expect(cellText).not.toContain(unwantedText)
+    const cellText = await cell.innerText();
+    if (cellText.includes(textQuery)) {
+      count++;
+    }
   }
+  expect(count).toBe(1); 
 })
