@@ -70,3 +70,47 @@ def test__required_parameters_missing_or_empty__verify_response_status_422(
     response = requests.request("GET", base_url, params=payload, timeout=5.0)
 
     assert response.status_code == 422
+
+
+@pytest.mark.parametrize(
+    "payload, method",
+    [
+        (
+            {
+                "location_type": location_type,
+                "measurement_base_time": measurement_base_time_string_24_7_20_14_0_0,
+                "measurement_time_range": measurement_time_range,
+            },
+            "POST",
+        ),
+        (
+            {
+                "location_type": location_type,
+                "measurement_base_time": measurement_base_time_string_24_7_20_14_0_0,
+                "measurement_time_range": measurement_time_range,
+            },
+            "PUT",
+        ),
+        (
+            {
+                "location_type": location_type,
+                "measurement_base_time": measurement_base_time_string_24_7_20_14_0_0,
+                "measurement_time_range": measurement_time_range,
+            },
+            "PATCH",
+        ),
+        (
+            {
+                "location_type": location_type,
+                "measurement_base_time": measurement_base_time_string_24_7_20_14_0_0,
+                "measurement_time_range": measurement_time_range,
+            },
+            "DELETE",
+        ),
+    ],
+)
+def test__different_http_request_methods__verify_not_valid(method: str, payload: dict):
+    response = requests.request(method, base_url, params=payload, timeout=5.0)
+
+    assert response.status_code == 406
+    assert not isinstance(response.json(), list)
