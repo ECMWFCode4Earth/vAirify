@@ -1,9 +1,9 @@
 export const apiForecast = [
   {
-    base_time: "2024-06-19T00:00:00Z",
-    valid_time: "2024-06-19T09:00:00Z",
-    location_type: "city",
-    location_name: "Kampala",
+    base_time: '2024-06-19T00:00:00Z',
+    valid_time: '2024-06-19T09:00:00Z',
+    location_type: 'city',
+    location_name: 'Kampala',
     overall_aqi_level: 2,
     no2: {
       aqi_level: 1,
@@ -27,10 +27,10 @@ export const apiForecast = [
     },
   },
   {
-    base_time: "2024-06-19T00:00:00Z",
-    valid_time: "2024-06-19T12:00:00Z",
-    location_type: "city",
-    location_name: "Abu Dhabi",
+    base_time: '2024-06-19T00:00:00Z',
+    valid_time: '2024-06-19T12:00:00Z',
+    location_type: 'city',
+    location_name: 'Abu Dhabi',
     overall_aqi_level: 3,
     no2: {
       aqi_level: 1,
@@ -54,10 +54,10 @@ export const apiForecast = [
     },
   },
   {
-    base_time: "2024-06-19T00:00:00Z",
-    valid_time: "2024-06-19T12:00:00Z",
-    location_type: "city",
-    location_name: "Zurich",
+    base_time: '2024-06-19T00:00:00Z',
+    valid_time: '2024-06-19T12:00:00Z',
+    location_type: 'city',
+    location_name: 'Zurich',
     overall_aqi_level: 3,
     no2: {
       aqi_level: 1,
@@ -82,10 +82,10 @@ export const apiForecast = [
   },
   // City should not show up.
   {
-    base_time: "2024-06-24T00:00:00Z",
-    valid_time: "2024-06-24T09:00:00Z",
-    location_type: "city",
-    location_name: "Kyiv",
+    base_time: '2024-06-24T00:00:00Z',
+    valid_time: '2024-06-24T09:00:00Z',
+    location_type: 'city',
+    location_name: 'Kyiv',
     overall_aqi_level: 2,
     no2: {
       aqi_level: 1,
@@ -108,13 +108,13 @@ export const apiForecast = [
       value: 0.465807542763243,
     },
   },
-];
+]
 
 export const apiSummary = [
   {
-    measurement_base_time: "2024-06-19T09:00:00Z",
-    location_type: "city",
-    location_name: "Kampala",
+    measurement_base_time: '2024-06-19T09:00:00Z',
+    location_type: 'city',
+    location_name: 'Kampala',
     overall_aqi_level: {
       mean: 6,
     },
@@ -126,9 +126,9 @@ export const apiSummary = [
     },
   },
   {
-    measurement_base_time: "2024-06-19T12:00:00Z",
-    location_type: "city",
-    location_name: "Abu Dhabi",
+    measurement_base_time: '2024-06-19T12:00:00Z',
+    location_type: 'city',
+    location_name: 'Abu Dhabi',
     overall_aqi_level: {
       mean: 5,
     },
@@ -140,9 +140,9 @@ export const apiSummary = [
     },
   },
   {
-    measurement_base_time: "2024-06-19T12:00:00Z",
-    location_type: "city",
-    location_name: "Zurich",
+    measurement_base_time: '2024-06-19T12:00:00Z',
+    location_type: 'city',
+    location_name: 'Zurich',
     overall_aqi_level: {
       mean: 2,
     },
@@ -159,4 +159,4 @@ export const apiSummary = [
       },
     },
   },
-];
+]
