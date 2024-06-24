@@ -64,11 +64,68 @@ def test__required_and_optional_parameters_provided__verify_response_status_200(
             "date_from": "",
             "date_to": date_to_string_24_6_21_16_0_0,
             "location_type": location_type,
+            "location_names": location_names,
+            "api_source": api_source,
+        },
+        {
+            "date_from": "",
+            "date_to": date_to_string_24_6_21_16_0_0,
+            "location_type": location_type,
+            "api_source": api_source,
+        },
+        {
+            "date_from": "",
+            "date_to": date_to_string_24_6_21_16_0_0,
+            "location_type": location_type,
+            "location_names": location_names,
+        },
+        {
+            "date_from": "",
+            "date_to": date_to_string_24_6_21_16_0_0,
+            "location_type": location_type,
         },
         {
             "date_from": date_from_string_24_6_21_14_0_0,
             "date_to": "",
             "location_type": location_type,
+            "location_names": location_names,
+            "api_source": api_source,
+        },
+        {
+            "date_from": date_from_string_24_6_21_14_0_0,
+            "date_to": "",
+            "location_type": location_type,
+            "api_source": api_source,
+        },
+        {
+            "date_from": date_from_string_24_6_21_14_0_0,
+            "date_to": "",
+            "location_type": location_type,
+            "location_names": location_names,
+        },
+        {
+            "date_from": date_from_string_24_6_21_14_0_0,
+            "date_to": "",
+            "location_type": location_type,
+        },
+        {
+            "date_from": date_from_string_24_6_21_14_0_0,
+            "date_to": date_to_string_24_6_21_16_0_0,
+            "location_type": "",
+            "location_names": location_names,
+            "api_source": api_source,
+        },
+        {
+            "date_from": date_from_string_24_6_21_14_0_0,
+            "date_to": date_to_string_24_6_21_16_0_0,
+            "location_type": "",
+            "api_source": api_source,
+        },
+        {
+            "date_from": date_from_string_24_6_21_14_0_0,
+            "date_to": date_to_string_24_6_21_16_0_0,
+            "location_type": "",
+            "location_names": location_names,
         },
         {
             "date_from": date_from_string_24_6_21_14_0_0,
@@ -83,10 +140,58 @@ def test__required_and_optional_parameters_provided__verify_response_status_200(
         {
             "date_to": date_to_string_24_6_21_16_0_0,
             "location_type": location_type,
+            "location_names": location_names,
+            "api_source": api_source,
+        },
+        {
+            "date_to": date_to_string_24_6_21_16_0_0,
+            "location_type": location_type,
+            "api_source": api_source,
+        },
+        {
+            "date_to": date_to_string_24_6_21_16_0_0,
+            "location_type": location_type,
+            "location_names": location_names,
+        },
+        {
+            "date_to": date_to_string_24_6_21_16_0_0,
+            "location_type": location_type,
         },
         {
             "date_from": date_from_string_24_6_21_14_0_0,
             "location_type": location_type,
+            "location_names": location_names,
+            "api_source": api_source,
+        },
+        {
+            "date_from": date_from_string_24_6_21_14_0_0,
+            "location_type": location_type,
+            "api_source": api_source,
+        },
+        {
+            "date_from": date_from_string_24_6_21_14_0_0,
+            "location_type": location_type,
+            "location_names": location_names,
+        },
+        {
+            "date_from": date_from_string_24_6_21_14_0_0,
+            "location_type": location_type,
+        },
+        {
+            "date_from": date_from_string_24_6_21_14_0_0,
+            "date_to": date_to_string_24_6_21_16_0_0,
+            "location_names": location_names,
+            "api_source": api_source,
+        },
+        {
+            "date_from": date_from_string_24_6_21_14_0_0,
+            "date_to": date_to_string_24_6_21_16_0_0,
+            "api_source": api_source,
+        },
+        {
+            "date_from": date_from_string_24_6_21_14_0_0,
+            "date_to": date_to_string_24_6_21_16_0_0,
+            "location_names": location_names,
         },
         {
             "date_from": date_from_string_24_6_21_14_0_0,
@@ -101,3 +206,159 @@ def test__required_parameters_missing_or_empty__verify_response_status_422(
     response = requests.request("GET", base_url, params=payload, timeout=5.0)
 
     assert response.status_code == 422
+
+
+@pytest.mark.parametrize(
+    "payload, method",
+    [
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_names": location_names,
+                "api_source": api_source,
+            },
+            "POST",
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_names": location_names,
+                "api_source": api_source,
+            },
+            "PUT",
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_names": location_names,
+                "api_source": api_source,
+            },
+            "PATCH",
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_names": location_names,
+                "api_source": api_source,
+            },
+            "DELETE",
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "api_source": api_source,
+            },
+            "POST",
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "api_source": api_source,
+            },
+            "PUT",
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "api_source": api_source,
+            },
+            "PATCH",
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "api_source": api_source,
+            },
+            "DELETE",
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_names": location_names,
+            },
+            "POST",
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_names": location_names,
+            },
+            "PUT",
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_names": location_names,
+            },
+            "PATCH",
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+                "location_names": location_names,
+            },
+            "DELETE",
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+            },
+            "POST",
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+            },
+            "PUT",
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+            },
+            "PATCH",
+        ),
+        (
+            {
+                "date_from": date_from_string_24_6_21_14_0_0,
+                "date_to": date_to_string_24_6_21_16_0_0,
+                "location_type": location_type,
+            },
+            "DELETE",
+        ),
+    ],
+)
+def test__different_http_request_methods__verify_not_valid(method: str, payload: dict):
+    response = requests.request(method, base_url, params=payload, timeout=5.0)
+
+    assert response.status_code == 405
+    assert not isinstance(response.json(), list)
