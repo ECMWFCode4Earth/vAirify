@@ -1,10 +1,7 @@
 import datetime
-import pprint
-
 import pytest
 import requests
 from dotenv import load_dotenv
-
 from system_tests.data.measurement_summary_api_test_data import (
     create_in_situ_database_data_with_overrides,
 )
@@ -197,7 +194,7 @@ seed_api_test_data(
         ),
     ],
 )
-def test__different_date_from_and_date_to_ranges__assert_response_location_names_are_correct(
+def test__date_from_and_date_to_ranges__assert_response_location_names_are_correct(
     api_parameters: dict, expected_location_names: str
 ):
     load_dotenv(".env-qa")
@@ -243,7 +240,7 @@ def test__different_date_from_and_date_to_ranges__assert_response_location_names
         ),
     ],
 )
-def test__different_date_from_and_date_to_ranges__assert_response_site_names_are_correct(
+def test__date_from_and_date_to_ranges__assert_response_site_names_are_correct(
     api_parameters: dict, expected_site_names: str
 ):
     load_dotenv(".env-qa")
@@ -322,7 +319,7 @@ def test__different_date_from_and_date_to_ranges__assert_response_site_names_are
         ),
     ],
 )
-def test__different_date_from_and_date_to_ranges__assert_response_measurement_dates_are_correct(
+def test__date_from_and_date_to_ranges__assert_response_measurement_dates_are_correct(
     api_parameters: dict, expected_measurement_dates: str
 ):
     load_dotenv(".env-qa")
