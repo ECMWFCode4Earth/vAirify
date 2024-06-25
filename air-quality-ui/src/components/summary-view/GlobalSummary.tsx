@@ -46,7 +46,7 @@ const GlobalSummary = (): JSX.Element => {
     useQueries({
       queries: forecastValidTimeRange.map((validTime) => ({
         queryKey: ['summary', validTime.toMillis()],
-        queryFn: () => getMeasurementSummary(validTime, 75),
+        queryFn: () => getMeasurementSummary(validTime),
       })),
       combine: (results) => {
         const measurementsByLocation = results
