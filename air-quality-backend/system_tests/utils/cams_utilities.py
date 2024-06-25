@@ -33,14 +33,18 @@ def get_ecmwf_forecast_to_dict_for_countries(
 def calculate_database_divergence_from_ecmwf_forecast_values(
     database_ozone_value: float, ecmwf_forecast_ozone_value: float
 ) -> float:
+
+    if ecmwf_forecast_ozone_value == 0:
+        if database_ozone_value <= 0.0001:
+            return 0
+        else:
+            return 100
+
     divergence_percentage = (
         (database_ozone_value - ecmwf_forecast_ozone_value) / ecmwf_forecast_ozone_value
     ) * 100
-    if divergence_percentage < 0:
-        formatted_divergence_percentage = divergence_percentage * -1
-    else:
-        formatted_divergence_percentage = divergence_percentage
-    return formatted_divergence_percentage
+
+    return abs(divergence_percentage)
 
 
 def get_ecmwf_record_for_city_and_valid_time(
