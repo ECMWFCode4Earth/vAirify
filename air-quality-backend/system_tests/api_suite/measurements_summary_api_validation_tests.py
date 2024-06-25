@@ -112,5 +112,5 @@ def test__required_parameters_missing_or_empty__verify_response_status_422(
 def test__different_http_request_methods__verify_not_valid(method: str, payload: dict):
     response = requests.request(method, base_url, params=payload, timeout=5.0)
 
-    assert response.status_code == 406
+    assert response.status_code == 405
     assert not isinstance(response.json(), list)
