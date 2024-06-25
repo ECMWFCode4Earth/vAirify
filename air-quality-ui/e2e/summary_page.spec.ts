@@ -1,47 +1,50 @@
 import { expect, test } from '@playwright/test'
 
 import { apiForecast, apiSummary } from './mocked_api.ts'
+import { VarifySummaryPage } from './vAirify_summary_model.ts'
 
 test('Title is vAirify', async ({ page }) => {
-  await page.goto('/city/summary')
+  const vairifySummaryPage = new VarifySummaryPage(
+    page,
+    apiForecast,
+    apiSummary,
+  )
+  await vairifySummaryPage.gotoSummaryPage()
   const title = await page.title()
   expect(title).toBe('vAirify')
 })
 
 // Mocked + live env
 test('Header text check', async ({ page }) => {
-  await page.route('*/**/air-pollutant/forecast*', async (route) => {
-    await route.fulfill({ json: apiForecast })
-  })
-  await page.route(
-    '*/**/air-pollutant/measurements/summary*',
-    async (route) => {
-      await route.fulfill({ json: apiSummary })
-    },
+  const vairifySummaryPage = new VarifySummaryPage(
+    page,
+    apiForecast,
+    apiSummary,
   )
-  await page.goto('/city/summary')
+  await vairifySummaryPage.setupApiRoutes()
+  await vairifySummaryPage.gotoSummaryPage()
 
-  const checkColumnHeaderText = async (name, expectedText) => {
-    const header = page.getByRole('columnheader', { name })
-    await header.waitFor({ state: 'visible' })
-    await expect(header).toHaveText(expectedText)
-  }
+  await vairifySummaryPage.checkColumnHeaderText('AQI Level', 'AQI Level')
+  await vairifySummaryPage.checkColumnHeaderText(
+    'PM 2.5 (µg/m³)',
+    'PM 2.5 (µg/m³)',
+  )
+  await vairifySummaryPage.checkColumnHeaderText(
+    'PM 10 (µg/m³)',
+    'PM 10 (µg/m³)',
+  )
+  await vairifySummaryPage.scrollToRightmostPosition()
+  await vairifySummaryPage.page.waitForTimeout(1000)
 
-  await checkColumnHeaderText('AQI Level', 'AQI Level')
-  await checkColumnHeaderText('PM 2.5 (µg/m³)', 'PM 2.5 (µg/m³)')
-  await checkColumnHeaderText('PM 10 (µg/m³)', 'PM 10 (µg/m³)')
-  const scroller = page.locator('.ag-body-horizontal-scroll-viewport')
-  await scroller.evaluate((element: HTMLElement) => {
-    element.scrollLeft = element.scrollWidth
-  })
-  // Optionally, wait for any further actions or assertions after scrolling
-  await page.waitForTimeout(1000)
-  await checkColumnHeaderText(
+  await vairifySummaryPage.checkColumnHeaderText(
     'Nitrogen Dioxide (µg/m³)',
     'Nitrogen Dioxide (µg/m³)',
   )
-  await checkColumnHeaderText('Ozone (µg/m³)', 'Ozone (µg/m³)')
-  await checkColumnHeaderText(
+  await vairifySummaryPage.checkColumnHeaderText(
+    'Ozone (µg/m³)',
+    'Ozone (µg/m³)',
+  )
+  await vairifySummaryPage.checkColumnHeaderText(
     'Sulphur Dioxide (µg/m³)',
     'Sulphur Dioxide (µg/m³)',
   )
@@ -49,59 +52,23 @@ test('Header text check', async ({ page }) => {
 
 // Mocked + live env
 test('Cell number format check', async ({ page }) => {
-  await page.route('*/**/air-pollutant/forecast*', async (route) => {
-    await route.fulfill({ json: apiForecast })
-  })
-  await page.route(
-    '*/**/air-pollutant/measurements/summary*',
-    async (route) => {
-      await route.fulfill({ json: apiSummary })
-    },
-  )
-  await page.goto('/city/summary')
-  await page.waitForSelector('.ag-root', { state: 'visible' })
-  await page.waitForSelector('.ag-header-cell', { state: 'visible' })
-
-  const checkNumberFormat = async (text) => {
-    const number = parseFloat(text)
-    if (!isNaN(number)) {
-      const decimalPart = text.split('.')[1]
-      if (decimalPart && decimalPart.length > 1) {
-        throw new Error(`Number ${text} has more than one decimal place`)
-      }
-    }
-  }
-  const cells = await page.locator('role=gridcell').all()
-  for (const cell of cells) {
-    const cellText = await cell.textContent()
-    await checkNumberFormat(cellText)
-  }
+  const varifySummaryPage = new VarifySummaryPage(page, apiForecast, apiSummary)
+  await varifySummaryPage.setupApiRoutes()
+  await varifySummaryPage.gotoSummaryPage()
+  await varifySummaryPage.waitForGridVisible()
+  await varifySummaryPage.checkCellNumberFormat()
 })
 
 test('Kyiv location to be true, regardless of measurement availability', async ({
   page,
 }) => {
-  await page.route('*/**/air-pollutant/forecast*', async (route) => {
-    await route.fulfill({ json: apiForecast })
-  })
-  await page.route(
-    '*/**/air-pollutant/measurements/summary*',
-    async (route) => {
-      await route.fulfill({ json: apiSummary })
-    },
+  const vairifySummaryPage = new VarifySummaryPage(
+    page,
+    apiForecast,
+    apiSummary,
   )
-  await page.goto('/city/summary')
-  await page.waitForSelector('.ag-root', { state: 'visible' })
-  await page.waitForSelector('.ag-header-cell', { state: 'visible' })
-
-  const textQuery = 'Kyiv'
-  const cells = await page.locator('.ag-cell').all()
-  let count = 0
-  for (const cell of cells) {
-    const cellText = await cell.innerText()
-    if (cellText.includes(textQuery)) {
-      count++
-    }
-  }
-  expect(count).toBe(1)
+  await vairifySummaryPage.setupApiRoutes()
+  await vairifySummaryPage.gotoSummaryPage()
+  await vairifySummaryPage.waitForGridVisible()
+  await vairifySummaryPage.checkKyivLocation()
 })
