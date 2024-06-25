@@ -7,10 +7,12 @@ import {
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import './GridCss.css'
-import { cellRules } from './CellRules'
+import Switch from 'react-switch'
+
+import cellRules from './CellRules'
 import classes from './GlobalSummaryTable.module.css'
 import { LocationCellRenderer } from './LocationCellRenderer'
 import {
@@ -22,7 +24,6 @@ import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,
 } from '../../services/types'
-
 type SummaryDetail = {
   aqiLevel: number
 } & {
@@ -44,7 +45,7 @@ interface GlobalSummaryTableProps {
   summarizedMeasurements: MeasurementSummaryResponseDto[]
 }
 
-const createColDefs = (): (ColDef | ColGroupDef)[] => [
+const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
   {
     field: 'locationName',
     headerName: 'City',
@@ -76,12 +77,12 @@ const createColDefs = (): (ColDef | ColGroupDef)[] => [
       {
         field: `forecast.${type}.value`,
         headerName: `Forecast`,
-        cellClassRules: cellRules[type],
+        cellClassRules: cellRules(showAllColoured)[type],
       },
       {
         field: `measurements.${type}.value`,
         headerName: `Measured`,
-        cellClassRules: cellRules[type],
+        cellClassRules: cellRules(showAllColoured)[type],
       },
     ],
   })),
@@ -159,7 +160,11 @@ const mapApiResponse = ({
 const GlobalSummaryTable = (
   props: Partial<GlobalSummaryTableProps>,
 ): JSX.Element => {
-  const colDefs = useMemo(() => createColDefs(), [])
+  const [showAllColoured, setShowAllColoured] = useState<boolean>(true)
+  const colDefs = useMemo(
+    () => createColDefs(showAllColoured),
+    [showAllColoured],
+  )
   const data = useMemo(() => {
     if (props.forecast && props.summarizedMeasurements) {
       return mapApiResponse({
@@ -176,6 +181,13 @@ const GlobalSummaryTable = (
       className={`ag-theme-quartz ${classes['summary-grid-wrapper']} `}
       data-testid="summary-grid"
     >
+      <Switch
+        onChange={() => {
+          if (showAllColoured) setShowAllColoured(false)
+          else setShowAllColoured(true)
+        }}
+        checked={showAllColoured}
+      />
       <AgGridReact
         rowData={data}
         columnDefs={colDefs}
