@@ -1,6 +1,6 @@
 import { type Locator, type Page, expect } from '@playwright/test'
 
-export class VarifySummaryPage {
+export class VairifySummaryPage {
   readonly page: Page
   readonly apiForecast: object
   readonly apiSummary: object
@@ -87,5 +87,44 @@ export class VarifySummaryPage {
       }
     }
     expect(count).toBe(1)
+  }
+
+  async assertGridValues(expectedData: string[][]) {
+    for (let rowIndex = 0; rowIndex < expectedData.length; rowIndex++) {
+      const row = expectedData[rowIndex]
+      for (let colIndex = 0; colIndex < row.length; colIndex++) {
+        const cellLocator = this.page.locator(
+          `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(${colIndex + 1})`,
+        )
+        const cellText = await cellLocator.innerText()
+        expect(cellText.trim()).toBe(row[colIndex])
+      }
+    }
+  }
+  async assertDiffColumn() {
+    const rows = await this.page
+      .locator('.ag-center-cols-container .ag-row')
+      .count()
+
+    for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
+      const forecastCellLocator = this.page.locator(
+        `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(1)`,
+      )
+      const measuredCellLocator = this.page.locator(
+        `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(2)`,
+      )
+      const diffCellLocator = this.page.locator(
+        `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(3)`,
+      )
+
+      const forecastText = await forecastCellLocator.innerText()
+      const measuredText = await measuredCellLocator.innerText()
+      const diffText = await diffCellLocator.innerText()
+
+      const forecast = parseInt(forecastText.trim())
+      const measured = parseInt(measuredText.trim())
+      const diff = parseInt(diffText.trim())
+      expect(diff).toBe(Math.abs(forecast - measured))
+    }
   }
 }
