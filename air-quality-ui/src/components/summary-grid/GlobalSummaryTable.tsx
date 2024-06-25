@@ -9,7 +9,6 @@ import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { DateTime } from 'luxon'
 import { useMemo, useState } from 'react'
-
 import './GridCss.css'
 import Switch from 'react-switch'
 
@@ -29,9 +28,14 @@ import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,
 } from '../../services/types'
+
+import { debug } from 'util'
+
 type SummaryDetail = {
   aqiLevel?: number
-} & { [P in PollutantType]?: { value: number; time?: string } }
+} & {
+  [P in PollutantType]?: { value: number; time?: string; aqiLevel: number }
+}
 
 interface SummaryRow {
   locationName: string
@@ -43,6 +47,15 @@ interface SummaryRow {
 interface GlobalSummaryTableProps {
   forecast: Record<string, ForecastResponseDto[]>
   summarizedMeasurements: Record<string, MeasurementSummaryResponseDto[]>
+}
+
+function getPerformanceSymbol(
+  forecastAQILevel: number,
+  measurementsAQILevel: number,
+) {
+  if (forecastAQILevel > measurementsAQILevel) return '+'
+  else if (forecastAQILevel === measurementsAQILevel) return ''
+  else return '-'
 }
 
 const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
@@ -63,10 +76,13 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         headerName: 'Diff',
         sort: 'desc',
         valueFormatter: (params: ValueFormatterParams) => {
-          return `${getPerformanceSymbol(
-            params.data.forecast.aqiLevel,
-            params.data.measurements.aqiLevel,
-          )}${params.data.aqiDifference}`
+          if (params.data.measurements) {
+            return `${getPerformanceSymbol(
+              params.data.forecast.aqiLevel,
+              params.data.measurements.aqiLevel,
+            )}${params.data.aqiDifference}`
+          }
+          return ''
         },
       },
     ],
@@ -83,6 +99,15 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         field: `measurements.${type}.value`,
         headerName: `Measured`,
         cellClassRules: cellRules(showAllColoured)[type],
+      },
+      {
+        field: `forecast.${type}.time`,
+        headerName: `Time`,
+        width: 130,
+        valueFormatter: (params: ValueFormatterParams) =>
+          DateTime.fromISO(params.data.forecast[type].time, {
+            zone: 'utc',
+          }).toFormat('dd MMM HH:mm'),
       },
     ],
   })),
@@ -104,10 +129,12 @@ const createSummaryRow = ({
       aqiLevel: data.forecastOverallAqi,
     },
   }
+
   pollutantTypes.forEach((pollutantType) => {
     const { forecastData, measurementData } = data[pollutantType]
     row.forecast[pollutantType] = {
       value: parseFloat(forecastData.value.toFixed(1)),
+      aqiLevel: forecastData.aqiLevel,
       time: forecastData.validTime,
     }
     if (measurementData) {
@@ -115,9 +142,12 @@ const createSummaryRow = ({
         ...row.measurements,
         [pollutantType]: {
           value: parseFloat(measurementData.value.toFixed(1)),
+          aqiLevel: measurementData.aqiLevel,
         },
       }
-      const currentDifference = measurementData.aqiLevel - forecastData.aqiLevel
+      const currentDifference = Math.abs(
+        measurementData.aqiLevel - forecastData.aqiLevel,
+      )
       if (!row.aqiDifference || currentDifference > row.aqiDifference) {
         row.aqiDifference = currentDifference
         row.forecast.aqiLevel = forecastData.aqiLevel
@@ -125,6 +155,7 @@ const createSummaryRow = ({
       }
     }
   })
+
   return row
 }
 
@@ -140,7 +171,10 @@ const GlobalSummaryTable = ({
       (comparisonData) => createSummaryRow(comparisonData),
     )
   }, [forecast, summarizedMeasurements])
-  const [showAllColoured, setShowAllColoured] = useState<boolean>(true)
+  const [showAllColoured, setShowAllColoured] = useState<boolean>(false)
+  const columnDefs = createColDefs(showAllColoured)
+  const gridOptions = createGridOptions()
+
   return (
     <div
       className={`ag-theme-quartz ${classes['summary-grid-wrapper']}`}
@@ -155,8 +189,8 @@ const GlobalSummaryTable = ({
       />
       <AgGridReact
         rowData={rowData}
-        columnDefs={createColDefs(showAllColoured)}
-        gridOptions={createGridOptions()}
+        columnDefs={columnDefs}
+        gridOptions={gridOptions}
       />
     </div>
   )

@@ -21,13 +21,15 @@ function colourField(
   lowerLimit: number,
   upperLimit?: number,
 ) {
+  const pollutantType: string = params.column.colId.split('.')[1]
+  if (!params.value) return false
   const isInColourBand =
     params.value >= lowerLimit && (upperLimit ?? params.value)
 
   if (showAllColoured) return isInColourBand
 
-  const pollutantType: string = params.column.colId.split('.')[1]
-  if (!params.value || !params.data.measurements[pollutantType]) return false
+  if (!params.data.measurements || !params.data.measurements[pollutantType])
+    return false
 
   const aqiDifference = Math.abs(
     params.data.forecast[pollutantType].aqiLevel -
