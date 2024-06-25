@@ -13,8 +13,10 @@ from system_tests.utils.api_utilities import (
     format_datetime_as_string,
     get_list_of_key_values,
 )
-from system_tests.utils.database_utilities import seed_api_test_data, \
-    delete_database_data
+from system_tests.utils.database_utilities import (
+    seed_api_test_data,
+    delete_database_data,
+)
 from system_tests.utils.routes import Routes
 
 # Parameter Test Data
@@ -222,7 +224,7 @@ test_city_c_site_2_2024_8_20_17_0_0 = create_in_situ_database_data(
 
 
 # Test Setup
-load_dotenv(".env-qa")
+load_dotenv()
 delete_database_data("in_situ_data")
 seed_api_test_data(
     "in_situ_data",
@@ -430,7 +432,7 @@ measurement_time_range = 90
 def test__different_base_times__assert_data_filtered_appropriately(
     api_parameters: dict, expected_city_names: str
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
     actual_locations = get_list_of_key_values(response.json(), "location_name")
     actual_locations.sort()
@@ -486,7 +488,7 @@ def test__different_base_times__assert_data_filtered_appropriately(
 def test__different_measurement_time_range__assert_data_filtered_appropriately(
     api_parameters: dict, expected_city_names: str
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
     actual_locations = get_list_of_key_values(response.json(), "location_name")
     actual_locations.sort()
@@ -631,7 +633,7 @@ def test__response_contains_correct_pollutant_mean_values(
     expected_test_city_a_so2_mean: float,
     expected_test_city_b_so2_mean: float,
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     api_parameters: dict = {
         "location_type": location_type,
         "measurement_base_time": test_measurement_base_time_string,
@@ -696,7 +698,7 @@ def test__response_contains_correct_pollutant_mean_aqi_level(
     expected_test_city_a_so2_mean_aqi_level: int,
     expected_test_city_b_so2_mean_aqi_level: int,
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     api_parameters: dict = {
         "location_type": location_type,
         "measurement_base_time": test_measurement_base_time_string,
@@ -781,7 +783,7 @@ def test__response_contains_correct_mean_overall_aqi_level(
     expected_test_city_b_mean_overall_aqi: float | None,
     expected_test_city_c_mean_overall_aqi: float | None,
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     api_parameters: dict = {
         "location_type": location_type,
         "measurement_base_time": test_measurement_base_time_string,
@@ -827,7 +829,7 @@ def test__response_contains_correct_mean_overall_aqi_level(
 def test__check_measurement_base_time_in_response_is_correct(
     test_measurement_base_time_string: str,
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     api_parameters: dict = {
         "location_type": location_type,
         "measurement_base_time": test_measurement_base_time_string,

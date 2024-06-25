@@ -141,7 +141,7 @@ location_names_test_city_2 = "Test City 2"
 location_names_test_city_3 = "Test City 3"
 
 # Test Setup
-load_dotenv(".env-qa")
+load_dotenv()
 delete_database_data("in_situ_data")
 seed_api_test_data(
     "in_situ_data",
@@ -197,7 +197,7 @@ seed_api_test_data(
 def test__date_from_and_date_to_ranges__assert_response_location_names_are_correct(
     api_parameters: dict, expected_location_names: str
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
 
     actual_location_names = get_list_of_key_values(response.json(), "location_name")
@@ -243,7 +243,7 @@ def test__date_from_and_date_to_ranges__assert_response_location_names_are_corre
 def test__date_from_and_date_to_ranges__assert_response_site_names_are_correct(
     api_parameters: dict, expected_site_names: str
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
 
     actual_site_names = get_list_of_key_values(response.json(), "site_name")
@@ -322,7 +322,7 @@ def test__date_from_and_date_to_ranges__assert_response_site_names_are_correct(
 def test__date_from_and_date_to_ranges__assert_response_measurement_dates_are_correct(
     api_parameters: dict, expected_measurement_dates: str
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
 
     actual_measurement_dates = get_list_of_key_values(
@@ -447,7 +447,7 @@ def test__date_from_and_date_to_ranges__assert_response_measurement_dates_are_co
 def test__different_location_names__assert_response_location_names_are_correct(
     api_parameters: dict, expected_location_names: str
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
 
     actual_location_names = get_list_of_key_values(response.json(), "location_name")
@@ -570,7 +570,7 @@ def test__different_location_names__assert_response_location_names_are_correct(
 def test__different_location_names__assert_response_site_names_are_correct(
     api_parameters: dict, expected_site_names: str
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
 
     actual_site_names = get_list_of_key_values(response.json(), "site_name")
@@ -624,7 +624,7 @@ def test__different_location_names__assert_response_site_names_are_correct(
 def test__different_api_source__assert_number_of_responses_is_correct(
     api_parameters: dict, expected_site_names: int
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
 
     actual_site_names = get_list_of_key_values(response.json(), "site_name")
@@ -656,7 +656,7 @@ def test__different_api_source__assert_number_of_responses_is_correct(
     ],
 )
 def test__assert_response_keys_and_values_are_correct(api_parameters: dict):
-    load_dotenv(".env-qa")
+    load_dotenv()
     parameters = {
         "date_from": date_string_24_6_21_14_0_0,
         "date_to": date_string_24_6_21_16_0_0,

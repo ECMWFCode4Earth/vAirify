@@ -11,8 +11,10 @@ from system_tests.utils.api_utilities import (
     format_datetime_as_string,
     get_list_of_key_values,
 )
-from system_tests.utils.database_utilities import seed_api_test_data, \
-    delete_database_data
+from system_tests.utils.database_utilities import (
+    seed_api_test_data,
+    delete_database_data,
+)
 from system_tests.utils.routes import Routes
 
 # Test Data
@@ -127,7 +129,7 @@ valid_time_to_string = format_datetime_as_string(
 )
 
 # Test Setup
-load_dotenv(".env-qa")
+load_dotenv()
 delete_database_data("forecast_data")
 seed_api_test_data(
     "forecast_data",
@@ -188,7 +190,7 @@ def test__different_base_times__assert_correct_results_returned(
     parameters: dict,
     expected_cities: list,
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -290,7 +292,7 @@ def test__different_base_times__assert_correct_results_returned(
     ],
 )
 def test__base_time_bva__assert_number_of_results(parameters: dict, expected: int):
-    load_dotenv(".env-qa")
+    load_dotenv()
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -366,7 +368,7 @@ def test__different_valid_time_from_times__assert_correct_results(
     parameters: dict,
     expected_cities: list,
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -470,7 +472,7 @@ def test__different_valid_time_from_times__assert_correct_results(
 def test__valid_time_from_bva__assert_number_of_results(
     parameters: dict, expected: int
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -546,7 +548,7 @@ def test__different_valid_time_to_times__assert_correct_results(
     parameters: dict,
     expected_cities: list,
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -648,7 +650,7 @@ def test__different_valid_time_to_times__assert_correct_results(
     ],
 )
 def test__valid_time_to_bva__assert_number_of_results(parameters: dict, expected: int):
-    load_dotenv(".env-qa")
+    load_dotenv()
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -676,7 +678,7 @@ def test__valid_time_to_bva__assert_number_of_results(parameters: dict, expected
     ),
 )
 def test__results_containing_relevant_base_time(parameters: dict):
-    load_dotenv(".env-qa")
+    load_dotenv()
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -717,7 +719,7 @@ def test__results_containing_relevant_base_time(parameters: dict):
 def test__assert_response_keys_and_values_are_correct(
     parameters: dict, expected_response: list
 ):
-    load_dotenv(".env-qa")
+    load_dotenv()
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
