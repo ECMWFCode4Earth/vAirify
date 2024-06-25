@@ -18,52 +18,52 @@ from system_tests.utils.database_utilities import seed_api_test_data, \
 from system_tests.utils.routes import Routes
 
 # Parameter Test Data
-city_1_location_1 = create_in_situ_database_data_with_overrides(
+test_city_1_site_1_2024_6_11_14_0_0 = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 6, 11, 14, 0, 0, tzinfo=datetime.timezone.utc
         ),
         "name": "Test City 1",
-        "location_name": "Test City 1, Site 1, All keys",
+        "location_name": "Test City 1, Site 1",
     }
 )
-city_2_location_1 = create_in_situ_database_data_with_overrides(
+test_city_2_site_1_2024_6_12_14_0_0 = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 6, 12, 14, 0, 0, tzinfo=datetime.timezone.utc
         ),
         "name": "Test City 2",
-        "location_name": "Test City 2, Site 1, All keys",
+        "location_name": "Test City 2, Site 1",
     }
 )
-city_2_location_2 = create_in_situ_database_data_with_overrides(
+test_city_2_site_2_2024_6_12_15_0_0 = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 6, 12, 15, 0, 0, tzinfo=datetime.timezone.utc
         ),
         "name": "Test City 2",
-        "location_name": "Test City 2, Site 2, All keys",
+        "location_name": "Test City 2, Site 2",
     }
 )
-city_3_location_1 = create_in_situ_database_data_with_overrides(
+test_city_3_site_1_2024_6_12_13_0_0 = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 6, 12, 13, 0, 0, tzinfo=datetime.timezone.utc
         ),
         "name": "Test City 3",
-        "location_name": "Test City 3, Site 1, All keys",
+        "location_name": "Test City 3, Site 1",
     }
 )
 
 # Calculation Test Data
 
-city_a_location_1 = create_in_situ_database_data_with_overrides(
+test_city_a_site_1_2024_7_20_13_0_0 = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 7, 20, 13, 0, 0, tzinfo=datetime.timezone.utc
         ),
         "name": "Test City A",
-        "location_name": "Location 1",
+        "location_name": "Site 1",
         "no2": create_measurement_summary_database_data_pollutant_value(
             800, "µg/m³", 800, "µg/m³"
         ),
@@ -81,13 +81,13 @@ city_a_location_1 = create_in_situ_database_data_with_overrides(
         ),
     }
 )
-city_a_location_2 = create_in_situ_database_data_with_overrides(
+test_city_a_site_2_2024_7_20_14_0_0 = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 7, 20, 14, 0, 0, tzinfo=datetime.timezone.utc
         ),
         "name": "Test City A",
-        "location_name": "Location 2",
+        "location_name": "Site 2",
         "no2": create_measurement_summary_database_data_pollutant_value(
             123, "µg/m³", 123, "µg/m³"
         ),
@@ -106,7 +106,7 @@ city_a_location_2 = create_in_situ_database_data_with_overrides(
     }
 )
 
-city_a_location_3 = create_in_situ_database_data_with_overrides(
+test_city_a_site_3_2024_7_20_15_0_0 = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 7, 20, 15, 0, 0, tzinfo=datetime.timezone.utc
@@ -131,7 +131,7 @@ city_a_location_3 = create_in_situ_database_data_with_overrides(
     }
 )
 
-city_a_location_4 = create_in_situ_database_data_with_overrides(
+test_city_a_site_4_2024_7_20_16_0_0 = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 7, 20, 16, 0, 0, tzinfo=datetime.timezone.utc
@@ -156,7 +156,7 @@ city_a_location_4 = create_in_situ_database_data_with_overrides(
     }
 )
 
-city_b_location_1 = create_in_situ_database_data_with_overrides(
+test_city_b_site_1_2024_7_20_13_30_0 = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 7, 20, 13, 30, 0, tzinfo=datetime.timezone.utc
@@ -181,7 +181,7 @@ city_b_location_1 = create_in_situ_database_data_with_overrides(
     }
 )
 
-city_b_location_2 = create_in_situ_database_data_with_overrides(
+test_city_b_site_2_2024_7_20_16_30_0 = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 7, 20, 16, 30, 0, tzinfo=datetime.timezone.utc
@@ -207,13 +207,13 @@ city_b_location_2 = create_in_situ_database_data_with_overrides(
 )
 
 
-city_c_location_1 = create_in_situ_database_data(
+test_city_c_site_1_2024_8_20_16_30_0 = create_in_situ_database_data(
     datetime.datetime(2024, 8, 20, 16, 30, 0, tzinfo=datetime.timezone.utc),
     "Test City C",
     "Location 1",
     200,
 )
-city_c_location_2 = create_in_situ_database_data(
+test_city_c_site_2_2024_8_20_17_0_0 = create_in_situ_database_data(
     datetime.datetime(2024, 8, 20, 17, 0, 0, tzinfo=datetime.timezone.utc),
     "Test City C",
     "Location 2",
@@ -227,23 +227,23 @@ delete_database_data("in_situ_data")
 seed_api_test_data(
     "in_situ_data",
     [
-        city_1_location_1,
-        city_2_location_1,
-        city_2_location_2,
-        city_3_location_1,
-        city_a_location_1,
-        city_a_location_2,
-        city_a_location_3,
-        city_a_location_4,
-        city_b_location_1,
-        city_b_location_2,
-        city_c_location_1,
-        city_c_location_2,
+        test_city_1_site_1_2024_6_11_14_0_0,
+        test_city_2_site_1_2024_6_12_14_0_0,
+        test_city_2_site_2_2024_6_12_15_0_0,
+        test_city_3_site_1_2024_6_12_13_0_0,
+        test_city_a_site_1_2024_7_20_13_0_0,
+        test_city_a_site_2_2024_7_20_14_0_0,
+        test_city_a_site_3_2024_7_20_15_0_0,
+        test_city_a_site_4_2024_7_20_16_0_0,
+        test_city_b_site_1_2024_7_20_13_30_0,
+        test_city_b_site_2_2024_7_20_16_30_0,
+        test_city_c_site_1_2024_8_20_16_30_0,
+        test_city_c_site_2_2024_8_20_17_0_0,
     ],
 )
 
 # API GET request setup
-base_url = Routes.measurement_summary_api_url
+base_url = Routes.measurements_summary_api_endpoint
 location_type = "city"
 measurement_base_time_string_24_6_12_14_0_0 = format_datetime_as_string(
     datetime.datetime(2024, 6, 12, 14, 0, 0, tzinfo=datetime.timezone.utc),
@@ -269,7 +269,7 @@ measurement_time_range = 90
 
 
 @pytest.mark.parametrize(
-    "api_parameters, expected_city",
+    "api_parameters, expected_city_names",
     [
         (
             {
@@ -428,22 +428,18 @@ measurement_time_range = 90
     ],
 )
 def test__different_base_times__assert_data_filtered_appropriately(
-    api_parameters: dict, expected_city: str
+    api_parameters: dict, expected_city_names: str
 ):
     load_dotenv(".env-qa")
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
     actual_locations = get_list_of_key_values(response.json(), "location_name")
     actual_locations.sort()
-    if len(actual_locations) > 0:
-        for location in actual_locations:
-            index = actual_locations.index(location)
-            assert location == expected_city[index]
-    else:
-        assert actual_locations == expected_city
+
+    assert actual_locations == expected_city_names
 
 
 @pytest.mark.parametrize(
-    "api_parameters, expected_city",
+    "api_parameters, expected_city_names",
     [
         (
             {
@@ -488,18 +484,14 @@ def test__different_base_times__assert_data_filtered_appropriately(
     ],
 )
 def test__different_measurement_time_range__assert_data_filtered_appropriately(
-    api_parameters: dict, expected_city: str
+    api_parameters: dict, expected_city_names: str
 ):
     load_dotenv(".env-qa")
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
     actual_locations = get_list_of_key_values(response.json(), "location_name")
     actual_locations.sort()
-    if len(actual_locations) > 0:
-        for location in actual_locations:
-            index = actual_locations.index(location)
-            assert location == expected_city[index]
-    else:
-        assert actual_locations == expected_city
+
+    assert actual_locations == expected_city_names
 
 
 @pytest.mark.parametrize(
@@ -514,44 +506,44 @@ def test__different_measurement_time_range__assert_data_filtered_appropriately(
             measurement_base_time_string_24_7_20_14_0_0,
             statistics.mean(
                 [
-                    city_a_location_1["no2"]["value"],
-                    city_a_location_2["no2"]["value"],
-                    city_a_location_3["no2"]["value"],
+                    test_city_a_site_1_2024_7_20_13_0_0["no2"]["value"],
+                    test_city_a_site_2_2024_7_20_14_0_0["no2"]["value"],
+                    test_city_a_site_3_2024_7_20_15_0_0["no2"]["value"],
                 ]
             ),
-            city_b_location_1["no2"]["value"],
+            test_city_b_site_1_2024_7_20_13_30_0["no2"]["value"],
             statistics.mean(
                 [
-                    city_a_location_1["o3"]["value"],
-                    city_a_location_2["o3"]["value"],
-                    city_a_location_3["o3"]["value"],
+                    test_city_a_site_1_2024_7_20_13_0_0["o3"]["value"],
+                    test_city_a_site_2_2024_7_20_14_0_0["o3"]["value"],
+                    test_city_a_site_3_2024_7_20_15_0_0["o3"]["value"],
                 ]
             ),
-            city_b_location_1["o3"]["value"],
+            test_city_b_site_1_2024_7_20_13_30_0["o3"]["value"],
             statistics.mean(
                 [
-                    city_a_location_1["pm10"]["value"],
-                    city_a_location_2["pm10"]["value"],
-                    city_a_location_3["pm10"]["value"],
+                    test_city_a_site_1_2024_7_20_13_0_0["pm10"]["value"],
+                    test_city_a_site_2_2024_7_20_14_0_0["pm10"]["value"],
+                    test_city_a_site_3_2024_7_20_15_0_0["pm10"]["value"],
                 ]
             ),
-            city_b_location_1["pm10"]["value"],
+            test_city_b_site_1_2024_7_20_13_30_0["pm10"]["value"],
             statistics.mean(
                 [
-                    city_a_location_1["pm2_5"]["value"],
-                    city_a_location_2["pm2_5"]["value"],
-                    city_a_location_3["pm2_5"]["value"],
+                    test_city_a_site_1_2024_7_20_13_0_0["pm2_5"]["value"],
+                    test_city_a_site_2_2024_7_20_14_0_0["pm2_5"]["value"],
+                    test_city_a_site_3_2024_7_20_15_0_0["pm2_5"]["value"],
                 ]
             ),
-            city_b_location_1["pm2_5"]["value"],
+            test_city_b_site_1_2024_7_20_13_30_0["pm2_5"]["value"],
             statistics.mean(
                 [
-                    city_a_location_1["so2"]["value"],
-                    city_a_location_2["so2"]["value"],
-                    city_a_location_3["so2"]["value"],
+                    test_city_a_site_1_2024_7_20_13_0_0["so2"]["value"],
+                    test_city_a_site_2_2024_7_20_14_0_0["so2"]["value"],
+                    test_city_a_site_3_2024_7_20_15_0_0["so2"]["value"],
                 ]
             ),
-            city_b_location_1["so2"]["value"],
+            test_city_b_site_1_2024_7_20_13_30_0["so2"]["value"],
         ),
         (
             format_datetime_as_string(
@@ -560,67 +552,67 @@ def test__different_measurement_time_range__assert_data_filtered_appropriately(
             ),
             statistics.mean(
                 [
-                    city_a_location_2["no2"]["value"],
-                    city_a_location_3["no2"]["value"],
-                    city_a_location_4["no2"]["value"],
+                    test_city_a_site_2_2024_7_20_14_0_0["no2"]["value"],
+                    test_city_a_site_3_2024_7_20_15_0_0["no2"]["value"],
+                    test_city_a_site_4_2024_7_20_16_0_0["no2"]["value"],
                 ]
             ),
             statistics.mean(
                 [
-                    city_b_location_1["no2"]["value"],
-                    city_b_location_2["no2"]["value"],
+                    test_city_b_site_1_2024_7_20_13_30_0["no2"]["value"],
+                    test_city_b_site_2_2024_7_20_16_30_0["no2"]["value"],
                 ]
             ),
             statistics.mean(
                 [
-                    city_a_location_2["o3"]["value"],
-                    city_a_location_3["o3"]["value"],
-                    city_a_location_4["o3"]["value"],
+                    test_city_a_site_2_2024_7_20_14_0_0["o3"]["value"],
+                    test_city_a_site_3_2024_7_20_15_0_0["o3"]["value"],
+                    test_city_a_site_4_2024_7_20_16_0_0["o3"]["value"],
                 ]
             ),
             statistics.mean(
                 [
-                    city_b_location_1["o3"]["value"],
-                    city_b_location_2["o3"]["value"],
+                    test_city_b_site_1_2024_7_20_13_30_0["o3"]["value"],
+                    test_city_b_site_2_2024_7_20_16_30_0["o3"]["value"],
                 ]
             ),
             statistics.mean(
                 [
-                    city_a_location_2["pm10"]["value"],
-                    city_a_location_3["pm10"]["value"],
-                    city_a_location_4["pm10"]["value"],
+                    test_city_a_site_2_2024_7_20_14_0_0["pm10"]["value"],
+                    test_city_a_site_3_2024_7_20_15_0_0["pm10"]["value"],
+                    test_city_a_site_4_2024_7_20_16_0_0["pm10"]["value"],
                 ]
             ),
             statistics.mean(
                 [
-                    city_b_location_1["pm10"]["value"],
-                    city_b_location_2["pm10"]["value"],
+                    test_city_b_site_1_2024_7_20_13_30_0["pm10"]["value"],
+                    test_city_b_site_2_2024_7_20_16_30_0["pm10"]["value"],
                 ]
             ),
             statistics.mean(
                 [
-                    city_a_location_2["pm2_5"]["value"],
-                    city_a_location_3["pm2_5"]["value"],
-                    city_a_location_4["pm2_5"]["value"],
+                    test_city_a_site_2_2024_7_20_14_0_0["pm2_5"]["value"],
+                    test_city_a_site_3_2024_7_20_15_0_0["pm2_5"]["value"],
+                    test_city_a_site_4_2024_7_20_16_0_0["pm2_5"]["value"],
                 ]
             ),
             statistics.mean(
                 [
-                    city_b_location_1["pm2_5"]["value"],
-                    city_b_location_2["pm2_5"]["value"],
+                    test_city_b_site_1_2024_7_20_13_30_0["pm2_5"]["value"],
+                    test_city_b_site_2_2024_7_20_16_30_0["pm2_5"]["value"],
                 ]
             ),
             statistics.mean(
                 [
-                    city_a_location_2["so2"]["value"],
-                    city_a_location_3["so2"]["value"],
-                    city_a_location_4["so2"]["value"],
+                    test_city_a_site_2_2024_7_20_14_0_0["so2"]["value"],
+                    test_city_a_site_3_2024_7_20_15_0_0["so2"]["value"],
+                    test_city_a_site_4_2024_7_20_16_0_0["so2"]["value"],
                 ]
             ),
             statistics.mean(
                 [
-                    city_b_location_1["so2"]["value"],
-                    city_b_location_2["so2"]["value"],
+                    test_city_b_site_1_2024_7_20_13_30_0["so2"]["value"],
+                    test_city_b_site_2_2024_7_20_16_30_0["so2"]["value"],
                 ]
             ),
         ),

@@ -111,7 +111,7 @@ test_city_2_expected_response_data: dict = {
 }
 
 # API GET request
-base_url = Routes.forecast_api_url
+base_url = Routes.forecast_api_endpoint
 headers = {"accept": "application/json"}
 location_type = "city"
 
@@ -192,12 +192,9 @@ def test__different_base_times__assert_correct_results_returned(
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
-
-    expected = expected_cities
     actual_cities = get_list_of_key_values(response.json(), "location_name")
-    for city in actual_cities:
-        index = actual_cities.index(city)
-        assert city == expected[index]
+
+    assert actual_cities == expected_cities
 
 
 @pytest.mark.parametrize(
@@ -373,11 +370,9 @@ def test__different_valid_time_from_times__assert_correct_results(
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
-    expected = expected_cities
     actual_cities = get_list_of_key_values(response.json(), "location_name")
-    for city in actual_cities:
-        index = actual_cities.index(city)
-        assert city == expected[index]
+
+    assert actual_cities == expected_cities
 
 
 @pytest.mark.parametrize(
@@ -555,11 +550,9 @@ def test__different_valid_time_to_times__assert_correct_results(
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
-    expected = expected_cities
     actual_cities = get_list_of_key_values(response.json(), "location_name")
-    for city in actual_cities:
-        index = actual_cities.index(city)
-        assert city == expected[index]
+
+    assert actual_cities == expected_cities
 
 
 @pytest.mark.parametrize(
