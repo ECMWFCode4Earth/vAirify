@@ -14,4 +14,4 @@ COPY README.md logging.ini ./
 
 RUN poetry install 
 
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "air-quality-backend", "fastapi", "run", "./src/air_quality/api/main.py"]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "air-quality-backend", "fastapi", "run", "./src/air_quality/api/main.py", "--root-path", "/api"]

@@ -12,9 +12,15 @@ import {
   mockMeasurementSummaryResponseDto,
 } from '../../test-util/mock-type-creator'
 
-const forecastData = mockForecastResponseDto()
+const forecastData = mockForecastResponseDto({
+  location_name: 'London',
+  valid_time: '2024-06-21T00:00:00Z',
+  no2: { aqi_level: 1, value: 1 },
+})
 const measurementData = mockMeasurementSummaryResponseDto({
-  no2: { mean: { aqi_level: 5, value: 1 } },
+  location_name: 'London',
+  measurement_base_time: '2024-06-21T00:00:00Z',
+  no2: { mean: { aqi_level: 1, value: 1 } },
 })
 
 const renderGrid = (
@@ -23,8 +29,16 @@ const renderGrid = (
 ) => {
   return render(
     <GlobalSummaryTable
-      forecast={forecast}
-      summarizedMeasurements={measurements}
+      forecast={
+        forecast ? (forecast.length ? { London: forecast } : {}) : undefined
+      }
+      summarizedMeasurements={
+        measurements
+          ? measurements.length
+            ? { London: measurements }
+            : {}
+          : undefined
+      }
     />,
     {
       wrapper: BrowserRouter,
@@ -34,31 +48,31 @@ const renderGrid = (
 
 describe('GlobalSummaryTable component', () => {
   describe('renders the summary table', () => {
-    it('and displays message when data is loading', async () => {
-      renderGrid(undefined, undefined)
+    it('displays message when data is loading', async () => {
+      renderGrid()
       await waitFor(() => {
         expect(screen.getByText('Loading...')).toBeInTheDocument()
       })
     })
-    it('and displays message when no data is available', async () => {
+    it('displays message when no data is available', async () => {
       renderGrid([], [])
       await waitFor(() => {
         expect(screen.getByText('No Rows To Show')).toBeInTheDocument()
       })
     })
-    it('and displays messages when measurements do not exist for a location', async () => {
+    it('displays forecast data even when measurements do not exist for a location', async () => {
       renderGrid([forecastData], [])
       await waitFor(() => {
-        expect(screen.getByText('No Rows To Show')).toBeInTheDocument()
+        expect(screen.getByText('London')).toBeInTheDocument()
       })
     })
-    describe('and when measured and forecast data exist', () => {
+    describe('when measured and forecast data exist', () => {
       beforeEach(() => {
         renderGrid([forecastData], [measurementData])
       })
       it('displays the locations', async () => {
         await waitFor(() => {
-          expect(screen.getByText('Bristol')).toBeInTheDocument()
+          expect(screen.getByText('London')).toBeInTheDocument()
         })
       })
       it('displays the mean aqi difference', async () => {
@@ -72,8 +86,8 @@ describe('GlobalSummaryTable component', () => {
         })
       })
     })
-    it('and displays columns', async () => {
-      renderGrid([], [])
+    it('displays columns', async () => {
+      renderGrid()
       await waitFor(() => {
         expect(screen.getByText('City')).toBeInTheDocument()
         expect(screen.getByText('AQI Level')).toBeInTheDocument()

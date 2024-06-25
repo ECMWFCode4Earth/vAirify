@@ -1,5 +1,8 @@
+import logging
 import os
 from datetime import datetime, timezone
+from http.client import HTTPMessage
+from unittest.mock import Mock
 
 import pytest
 from dateutil.parser import parse
@@ -9,6 +12,7 @@ from freezegun import freeze_time
 
 from air_quality.database.in_situ import InSituMeasurement, InSituPollutantReading
 from air_quality.database.locations import AirQualityLocationType
+from air_quality.etl.forecast.forecast_dao import fetch_forecast_data
 from system_tests.in_situ_etl_suite.open_aq_data_creator import (
     create_open_aq_measurement)
 from system_tests.utils.database_utilities import (
@@ -22,6 +26,18 @@ from system_tests.utils.file_utilities import write_to_file
 open_aq_cache_location = "system_tests/in_situ_etl_suite"
 collection_name = "in_situ_data"
 load_dotenv()
+
+
+@mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London"})
+def test__in_situ_etl__calling_actual_api_returns_values_and_stores():
+    query = {"name": "London"}
+    delete_database_data(collection_name, query)
+
+    main()
+
+    results = get_database_data(collection_name, query)
+    assert results[0]["name"] == "London"
+    assert results[-1]["name"] == "London"
 
 
 @mock.patch.dict(
@@ -219,16 +235,92 @@ def test__in_situ_etl__invalid_data_raises_error_and_does_not_store():
     assert len(results) == 0
 
 
+@pytest.fixture
+def ensure_forecast_cache():
+    with freeze_time("2024-05-25T13:00:00"):
+        # Set up code
+        # Ensure the cached files are present by fetching the grib files
+        single_file = "single_level_16_from_2024-05-24_12.grib"
+        multi_file = "multi_level_16_from_2024-05-24_12.grib"
+        if not os.path.exists(single_file) or not os.path.exists(multi_file):
+            fetch_forecast_data(datetime(2024, 5, 24, 13), 16)
+        yield
+        # Tear down code
+
+
+@mock.patch("urllib3.connectionpool.HTTPConnectionPool._get_conn")
 @mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London"})
-def test__in_situ_etl__calling_actual_api_returns_values_and_stores():
+def test__in_situ_etl__timeouts_retry_twice_then_stop(
+        mock_get_conn,
+        caplog,
+        ensure_forecast_cache):
+    mock_get_conn.return_value.getresponse.return_value = mock_response_for_status(408)
     query = {"name": "London"}
     delete_database_data(collection_name, query)
 
-    main()
+    with caplog.at_level(logging.ERROR):
+        main()
 
+    assert "Response for London contained no results" in caplog.text
+    assert "URL was: https://api.openaq.org/v2/measurements?limit=3000" in caplog.text
     results = get_database_data(collection_name, query)
-    assert results[0]["name"] == "London"
-    assert results[-1]["name"] == "London"
+    assert len(results) == 0
+    assert len(mock_get_conn.return_value.request.mock_calls) == 3
+
+
+@mock.patch("urllib3.connectionpool.HTTPConnectionPool._get_conn")
+@mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London"})
+def test__in_situ_etl__internal_error_fails_without_retry(
+        mock_get_conn,
+        caplog,
+        ensure_forecast_cache):
+    mock_get_conn.return_value.getresponse.return_value = mock_response_for_status(500)
+    query = {"name": "London"}
+    delete_database_data(collection_name, query)
+
+    with caplog.at_level(logging.ERROR):
+        main()
+
+    assert "Response for London contained no results" in caplog.text
+    assert "URL was: https://api.openaq.org/v2/measurements?limit=3000" in caplog.text
+    results = get_database_data(collection_name, query)
+    assert len(results) == 0
+    assert len(mock_get_conn.return_value.request.mock_calls) == 1
+
+
+@mock.patch("urllib3.connectionpool.HTTPConnectionPool._get_conn")
+@mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London"})
+def test__in_situ_etl__timeout_followed_by_success_returns_correctly(
+        mock_get_conn,
+        caplog,
+        ensure_forecast_cache):
+
+    mock_get_conn.return_value.getresponse.side_effect = [
+        mock_response_for_status(408),
+        mock_response_for_status(200)
+    ]
+    query = {"name": "London"}
+    delete_database_data(collection_name, query)
+
+    with caplog.at_level(logging.ERROR):
+        main()
+
+    assert "Response for London contained no results" not in caplog.text
+    assert ("URL was: https://api.openaq.org/v2/measurements?limit=3000" not in
+            caplog.text)
+    results = get_database_data(collection_name, query)
+    assert len(results) == 1
+    assert results[0]["no2"]["value"] == 113
+    assert len(mock_get_conn.return_value.request.mock_calls) == 2
+
+
+def mock_response_for_status(status):
+    def stream_response(chunk_size, decode_content):
+        result = str(create_measurement("2024-05-24T13:10:20+00:00", "no2", 113))
+        result = result.replace("'", '"')  # replace single with double quotes
+        return [bytes(f'{{"results": [{result}]}}', 'utf-8')]
+
+    return Mock(status=status, msg=HTTPMessage(), headers={}, stream=stream_response)
 
 
 def assert_pollutant_value(stored_data: InSituPollutantReading, expected_value: float):
