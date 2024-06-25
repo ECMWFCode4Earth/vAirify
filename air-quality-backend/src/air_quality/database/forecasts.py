@@ -52,6 +52,8 @@ def insert_textures(textures):
             "forecast_base_time",
             "variable",
             "source",
+            "time_start",
+            "time_end"
         ],
         textures,
     )
