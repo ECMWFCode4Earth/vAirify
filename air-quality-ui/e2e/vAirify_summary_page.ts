@@ -77,12 +77,11 @@ export class VairifySummaryPage {
   }
 
   async checkKyivLocation() {
-    const textQuery = 'Kyiv'
     const cells = await this.page.locator('.ag-cell').all()
     let count = 0
     for (const cell of cells) {
       const cellText = await cell.innerText()
-      if (cellText.includes(textQuery)) {
+      if (cellText.includes('Kyiv')) {
         count++
       }
     }

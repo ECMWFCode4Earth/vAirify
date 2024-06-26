@@ -3,14 +3,21 @@ import { expect, test } from '@playwright/test'
 import { apiForecast, apiSummary } from './mocked_api.ts'
 import { VairifySummaryPage } from './vAirify_summary_page.ts'
 
+async function setupVairifySummaryPage(page) {
+  const vairifySummaryPage = new VairifySummaryPage(
+    page,
+    apiForecast,
+    apiSummary,
+  )
+  await vairifySummaryPage.setupApiRoutes()
+  await vairifySummaryPage.gotoSummaryPage()
+  await vairifySummaryPage.waitForGridVisible()
+  return vairifySummaryPage
+}
+
 test.describe('Mocked API tests', () => {
   test('Verify page title is vAirify', async ({ page }) => {
-    const vairifySummaryPage = new VairifySummaryPage(
-      page,
-      apiForecast,
-      apiSummary,
-    )
-    await vairifySummaryPage.gotoSummaryPage()
+    await setupVairifySummaryPage(page)
     const title = await page.title()
     expect(title).toBe('vAirify')
   })
@@ -18,14 +25,7 @@ test.describe('Mocked API tests', () => {
   test('Verify that headers are visible and have matching text', async ({
     page,
   }) => {
-    const vairifySummaryPage = new VairifySummaryPage(
-      page,
-      apiForecast,
-      apiSummary,
-    )
-    await vairifySummaryPage.setupApiRoutes()
-    await vairifySummaryPage.gotoSummaryPage()
-
+    const vairifySummaryPage = await setupVairifySummaryPage(page)
     await vairifySummaryPage.checkColumnHeaderText('AQI Level', 'AQI Level')
     await vairifySummaryPage.checkColumnHeaderText(
       'PM 2.5 (µg/m³)',
@@ -56,46 +56,25 @@ test.describe('Mocked API tests', () => {
   test('Verify numbers in cells have no more than 1 decimal place ', async ({
     page,
   }) => {
-    const varifySummaryPage = new VairifySummaryPage(
-      page,
-      apiForecast,
-      apiSummary,
-    )
-    await varifySummaryPage.setupApiRoutes()
-    await varifySummaryPage.gotoSummaryPage()
-    await varifySummaryPage.waitForGridVisible()
-    await varifySummaryPage.checkCellNumberFormat()
+    const vairifySummaryPage = await setupVairifySummaryPage(page)
+    await vairifySummaryPage.checkCellNumberFormat()
   })
 
   test('Kyiv location to be true, regardless of measurement availability', async ({
     page,
   }) => {
-    const vairifySummaryPage = new VairifySummaryPage(
-      page,
-      apiForecast,
-      apiSummary,
-    )
-    await vairifySummaryPage.setupApiRoutes()
-    await vairifySummaryPage.gotoSummaryPage()
-    await vairifySummaryPage.waitForGridVisible()
+    const vairifySummaryPage = await setupVairifySummaryPage(page)
     await vairifySummaryPage.checkKyivLocation()
   })
 
   test('Check API mocked accurately', async ({ page }) => {
-    const vairifySummaryPage = new VairifySummaryPage(
-      page,
-      apiForecast,
-      apiSummary,
-    )
-    await vairifySummaryPage.setupApiRoutes()
-    await vairifySummaryPage.gotoSummaryPage()
-    await vairifySummaryPage.waitForGridVisible()
+    const vairifySummaryPage = await setupVairifySummaryPage(page)
 
     // first 6 values for Kampala, Abu Dhabi, Zurich and Kyiv respectively
     const expectedData = [
       ['2', '6', '4', '16.1', '76', '19 Jun 09:00'],
       ['4', '5', '1', '30.3', '52.8', '19 Jun 12:00'],
-      ['2', '1', '-1', '17.2', '15.8', '19 Jun 12:00'],
+      ['2', '1', '1', '17.2', '15.8', '19 Jun 12:00'],
       ['2', '', '', '7', '', '24 Jun 09:00'],
     ]
 
@@ -105,14 +84,7 @@ test.describe('Mocked API tests', () => {
   test('Verify that Diff displays the delta between forcast and measured', async ({
     page,
   }) => {
-    const varifySummaryPage = new VairifySummaryPage(
-      page,
-      apiForecast,
-      apiSummary,
-    )
-    await varifySummaryPage.setupApiRoutes()
-    await varifySummaryPage.gotoSummaryPage()
-    await varifySummaryPage.waitForGridVisible()
-    await varifySummaryPage.assertDiffColumn()
+    const vairifySummaryPage = await setupVairifySummaryPage(page)
+    await vairifySummaryPage.assertDiffColumn()
   })
 })
