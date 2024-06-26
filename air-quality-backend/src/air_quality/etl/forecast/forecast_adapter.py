@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from decimal import Decimal
+from typing import List, Dict, Tuple, Optional
 import logging
 from typing import TypedDict
 from .forecast_data import ForecastData, convert_to_forecast_data_type
@@ -115,16 +116,15 @@ def transform(forecast_data: ForecastData, locations: list[AirQualityLocation]) 
     return pollutant_forecast_for_location
 
 
-def _get_dimension_by_attr(dataset, attr_name, attr_value):
+def _get_dimension_by_attr(dataset: xr.Dataset, attr_name: str, attr_value: str) -> Optional[xr.DataArray]:
     """
     Find the dimension by attribute name and value.
-    params:
-        dataset (xarray.Dataset): The dataset to search.
-        attr_name (str): The attribute name to search for.
-        attr_value (str): The attribute value to match.
-
-    return:
-        xarray.DataArray: The matching DataArray if found, otherwise None.
+    
+    :param dataset: The dataset to search.
+    :param attr_name: The attribute name to search for.
+    :param attr_value: The attribute value to match.
+    
+    :return: The matching DataArray if found, otherwise None.
     """
     for var in dataset.variables.values():
         if attr_name in var.attrs and var.attrs[attr_name] == attr_value:
@@ -132,13 +132,13 @@ def _get_dimension_by_attr(dataset, attr_name, attr_value):
     return None
 
 
-def _get_dim_names(dataset):
+def _get_dim_names(dataset: xr.Dataset) -> Tuple[Optional[xr.DataArray], Optional[xr.DataArray], Optional[xr.DataArray]]:
     """
     Get the latitude, longitude, and time dimensions from the dataset.
-    params:
-        dataset (xarray.Dataset): The dataset to search.
-    return:
-        tuple: A tuple containing (latitude, longitude, time) DataArrays.
+    
+    :param dataset: The dataset to search.
+    
+    :return: A tuple containing (latitude, longitude, time) DataArrays.
     """
     lat = _get_dimension_by_attr(dataset, "units", "degrees_north")
     lon = _get_dimension_by_attr(dataset, "units", "degrees_east")
@@ -146,16 +146,18 @@ def _get_dim_names(dataset):
     return lat, lon, time
 
 
-def _normalise_data(arr, norm_min, norm_max):
+def _normalise_data(arr: np.ndarray, norm_min: float, norm_max: float) -> np.ndarray:
     return (arr - norm_min) / (norm_max - norm_min)
 
 
-def _convert_data(input_data: xr.Dataset, variable: str):
+def _convert_data(input_data: xr.Dataset, variable: str) -> Tuple[np.ndarray, float, float, str, int, xr.DataArray]:
     """
-    Convert data to numpy array
-    :param input_data:
-    :param variable:
-    :return rgb_data_array:
+    Convert data to numpy array.
+    
+    :param input_data: The input dataset.
+    :param variable: The variable to convert.
+    
+    :return: A tuple containing the RGB data array, min value, max value, units, number of longitudes, and time vector.
     """
     lat, lon, time = _get_dim_names(input_data)
     num_lat, num_lon, num_time = len(lat), len(lon), len(time)
@@ -172,7 +174,7 @@ def _convert_data(input_data: xr.Dataset, variable: str):
         "pm2p5": (0, 1000.0),
         "no2": (0, 100.0),
         "so2": (0, 100.0),
-        "go3": (0, 150.0),
+        "go3": (0, 500.0),
         "winds_10m": (-50, 50.0),
     }
 
@@ -210,14 +212,16 @@ def _chunk_data_array(
     num_time_steps: int,
     num_lon: int,
     time_vector: xr.DataArray,
-) -> (list, dict):
+) -> Tuple[List[np.ndarray], Dict[int, Dict[str, str]]]:
     """
-    Chunk the rgb_data_array into smaller parts along the num_lon * num_time dimension.
+    Split the rgb_data_array into smaller parts along the num_lon * num_time dimension 
+    for smaller file sizes and faster loading times.
 
     :param rgb_data_array: Input data array with shape (num_lat, num_lon * num_time, channels)
     :param num_time_steps: Number of time steps to use for each chunk
     :param num_lon: Number of longitude points
-    :return: A list of chunked arrays and a dictionary with start and end time stampsfor each chunk
+    :param time_vector: DataArray containing time information for each time step
+    :return: A list of chunked arrays and a dictionary with start and end time stamps for each chunk
     """
     num_lat, total_lon_time, channels = rgb_data_array.shape
     num_total_time_steps = total_lon_time // num_lon
@@ -249,39 +253,46 @@ def _chunk_data_array(
     return chunks, time_steps_dict
 
 
-def _create_output_directory(forecast_data: ForecastData):
+def _create_output_directory(forecast_data: ForecastData) -> Tuple[str, str]:
     """
-    Create output directory for data textures
-    :param forecast_data:
-    :return output_directory:
+    Create output directory for data textures.
+    
+    :param forecast_data: The forecast data object.
+    
+    :return: The output directory path and forecast date.
     """
 
     filename = forecast_data._single_level_data.encoding.get("source", "Unknown source")
-    if filename != "Unknown source":
-        forecast_date = re.search(r"\d{4}-\d{2}-\d{2}_\d{2}", filename).group()
+    forecast_date = re.search(r"\d{4}-\d{2}-\d{2}_\d{2}", filename).group() if filename != "Unknown source" else "Unknown_date"
 
     output_directory = f"/app/data_textures/{forecast_date}"
     if not os.path.exists(output_directory):
-        # fallback to local directory to run outside of docker
         output_directory = f"{os.getcwd()}/data_textures/{forecast_date}"
     os.makedirs(output_directory, exist_ok=True)
     return output_directory, forecast_date
 
 
-def _save_data_textures(
+def _save_data_texture(
     rgb_data_array: np.ndarray,
     output_directory: str,
     forecast_date: str,
     variable: str,
     num_chunk: str,
     total_chunks: str,
-) -> None:
+    file_format: str,
+) -> str:
     """
-    Save data textures to disk and convert  to binary data.
+    Save data textures to disk and convert to binary data.
 
-    :param rgb_data_array: Numpy array containing the image data
-    :param variable: Variable name to include in the filename
-    :return: Binary data of the image
+    :param rgb_data_array: Numpy array containing the image data.
+    :param output_directory: Directory to save the textures.
+    :param forecast_date: Forecast date string.
+    :param variable: Variable name to include in the filename.
+    :param num_chunk: Chunk number.
+    :param total_chunks: Total number of chunks.
+    :param file_format: File format for saving the texture.
+    
+    :return: The path to the saved file.
     """
     if variable == "winds_10m":
         image_array = rgb_data_array
@@ -291,73 +302,57 @@ def _save_data_textures(
         format = "L"
 
     image = Image.fromarray(image_array, format)
-    output_file = f"{output_directory}/{variable}_{forecast_date}_CAMS_global.chunk_{num_chunk}_of_{total_chunks}.webp"
-    image.save(output_file, format="WEBP", lossless=True)
+    output_file = f"{output_directory}/{variable}_{forecast_date}_CAMS_global.chunk_{num_chunk}_of_{total_chunks}.{file_format}"
+    image.save(output_file, format=file_format, lossless=True)
     return output_file
 
 
-def create_data_textures(forecast_data: ForecastData):
+def _process_variable(
+    data: xr.Dataset,
+    data_type: str,
+    variable_name: str,
+    output_directory: str,
+    forecast_date: str
+) -> List[Dict[str, str]]:
     """
-    Create gridded data textures from forecast data for frontend maps
-    :param forecast_data:
-    :return:
+    Process a specific variable and create data textures.
+    
+    :param data: The dataset containing the variable.
+    :param data_type: The type of the data.
+    :param variable_name: The name of the variable.
+    :param output_directory: Directory to save the textures.
+    :param forecast_date: The forecast date.
+    
+    :return: A list of dictionaries containing data texture metadata for database insertion.
     """
-    output_directory, forecast_date = _create_output_directory(forecast_data)
     documents = []
+    chunks_per_texture = 16
+    file_format = "webp"
 
-    for pollutant in PollutantType:
-        logging.info(f"Creating data textures for {pollutant.name}")
-        forecast_data_type = convert_to_forecast_data_type(pollutant)
-        dataset = forecast_data._get_data_set(forecast_data_type)
-        rgb_data_array, min_value, max_value, units, num_lon, time_vector = (
-            _convert_data(dataset, forecast_data_type.value)
-        )
-        chunk_list, chunk_dict = _chunk_data_array(
-            rgb_data_array, 8, num_lon, time_vector
-        )
-
-        for num_chunk, chunk in enumerate(chunk_list):
-            output_file = _save_data_textures(
-                chunk,
-                output_directory,
-                forecast_date,
-                pollutant.value,
-                num_chunk + 1,
-                len(chunk_list),
-            )
-            document = {
-                "forecast_base_time": forecast_date,
-                "variable": pollutant.value,
-                "source": "cams-production",
-                "min_value": min_value,
-                "max_value": max_value,
-                "units": units,
-                "texture_uri": output_file,
-                "time_start": chunk_dict[num_chunk]["time_start"],
-                "time_end": chunk_dict[num_chunk]["time_end"],
-                "chunk": f"{num_chunk+1} of {len(chunk_list)}",
-            }
-            documents.append(document)
-
-    logging.info(f"Creating data textures for WINDS")
     rgb_data_array, min_value, max_value, units, num_lon, time_vector = _convert_data(
-        forecast_data._single_level_data, "winds_10m"
+        data, data_type
     )
-    chunk_list, chunk_dict = _chunk_data_array(rgb_data_array, 8, num_lon, time_vector)
+    chunk_list, chunk_dict = _chunk_data_array(
+        rgb_data_array, chunks_per_texture, num_lon, time_vector
+    )
+
+    # WebP has better compression, but maximum pixel dimension is 16383 x 16383.
+    if ( num_lon * chunks_per_texture ) > 16383:
+        file_format = "png"
 
     for num_chunk, chunk in enumerate(chunk_list):
-        output_file = _save_data_textures(
+        output_file = _save_data_texture(
             chunk,
             output_directory,
             forecast_date,
-            "winds_10m",
+            variable_name,
             num_chunk + 1,
             len(chunk_list),
+            file_format,
         )
-
         document = {
             "forecast_base_time": forecast_date,
-            "variable": "winds_10m",
+            "variable": variable_name,
             "source": "cams-production",
             "min_value": min_value,
             "max_value": max_value,
@@ -368,5 +363,41 @@ def create_data_textures(forecast_data: ForecastData):
             "chunk": f"{num_chunk+1} of {len(chunk_list)}",
         }
         documents.append(document)
-
     return documents
+
+
+def create_data_textures(forecast_data: ForecastData):
+    """
+    Create gridded data textures from forecast data for frontend maps
+    :param forecast_data:
+    :return: List of dictionaries containing data texture metadata for database insertion
+    """
+    output_directory, forecast_date = _create_output_directory(forecast_data)
+    db_metadata = []
+
+    for pollutant in PollutantType:
+        logging.info(f"Creating data textures for {pollutant.name}")
+        forecast_data_type = convert_to_forecast_data_type(pollutant)
+        dataset = forecast_data._get_data_set(forecast_data_type)
+        documents = _process_variable(
+            dataset,
+            forecast_data_type.value,
+            pollutant.value,
+            output_directory,
+            forecast_date,
+        )
+        for document in documents:
+            db_metadata.append(document)
+
+    logging.info(f"Creating data textures for WINDS")
+    documents = _process_variable(
+        forecast_data._single_level_data,
+        "winds_10m",
+        "winds_10m",
+        output_directory,
+        forecast_date,
+    )
+    for document in documents:
+        db_metadata.append(document)
+
+    return db_metadata
