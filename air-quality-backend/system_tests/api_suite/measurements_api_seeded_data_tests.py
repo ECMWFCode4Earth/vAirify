@@ -391,7 +391,7 @@ def test__date_from_and_date_to_ranges__assert_response_measurement_dates_are_co
                 "date_from": date_string_24_6_21_14_0_0,
                 "date_to": date_string_24_6_21_16_0_0,
                 "location_type": location_type,
-                "location_name": location_names_test_city_1,
+                "location_names": location_names_test_city_1,
                 "api_source": api_source_open_aq,
             },
             [test_city_1_site_1_2024_6_21_15_0_0["name"]],
@@ -401,7 +401,7 @@ def test__date_from_and_date_to_ranges__assert_response_measurement_dates_are_co
                 "date_from": date_string_24_6_21_14_0_0,
                 "date_to": date_string_24_6_21_16_0_0,
                 "location_type": location_type,
-                "location_name": location_names_test_city_1,
+                "location_names": location_names_test_city_1,
             },
             [test_city_1_site_1_2024_6_21_15_0_0["name"]],
         ),
@@ -410,7 +410,7 @@ def test__date_from_and_date_to_ranges__assert_response_measurement_dates_are_co
                 "date_from": date_string_24_6_21_14_0_0,
                 "date_to": date_string_24_6_21_16_0_0,
                 "location_type": location_type,
-                "location_name": location_names_test_city_3,
+                "location_names": location_names_test_city_3,
                 "api_source": api_source_open_aq,
             },
             [
@@ -424,7 +424,7 @@ def test__date_from_and_date_to_ranges__assert_response_measurement_dates_are_co
                 "date_from": date_string_24_6_21_14_0_0,
                 "date_to": date_string_24_6_21_16_0_0,
                 "location_type": location_type,
-                "location_name": location_names_test_city_3,
+                "location_names": location_names_test_city_3,
             },
             [
                 test_city_3_site_1_2024_6_21_14_30_0["name"],
@@ -437,7 +437,7 @@ def test__date_from_and_date_to_ranges__assert_response_measurement_dates_are_co
                 "date_from": date_string_24_6_21_14_0_0,
                 "date_to": date_string_24_6_21_16_0_0,
                 "location_type": location_type,
-                "location_name": [
+                "location_names": [
                     location_names_test_city_1,
                     location_names_test_city_2,
                     location_names_test_city_3,
@@ -458,7 +458,7 @@ def test__date_from_and_date_to_ranges__assert_response_measurement_dates_are_co
                 "date_from": date_string_24_6_21_14_0_0,
                 "date_to": date_string_24_6_21_16_0_0,
                 "location_type": location_type,
-                "location_name": [
+                "location_names": [
                     location_names_test_city_1,
                     location_names_test_city_2,
                     location_names_test_city_3,
@@ -478,7 +478,7 @@ def test__date_from_and_date_to_ranges__assert_response_measurement_dates_are_co
                 "date_from": date_string_24_6_21_14_0_0,
                 "date_to": date_string_24_6_21_16_0_0,
                 "location_type": location_type,
-                "location_name": ["Test City 5"],
+                "location_names": ["Test City 5"],
                 "api_source": api_source_open_aq,
             },
             [],
@@ -488,7 +488,7 @@ def test__date_from_and_date_to_ranges__assert_response_measurement_dates_are_co
                 "date_from": date_string_24_6_21_14_0_0,
                 "date_to": date_string_24_6_21_16_0_0,
                 "location_type": location_type,
-                "location_name": ["Test City 5"],
+                "location_names": ["Test City 5"],
             },
             [],
         ),
@@ -514,7 +514,7 @@ def test__different_location_names__assert_response_location_names_are_correct(
                 "date_from": date_string_24_6_21_14_0_0,
                 "date_to": date_string_24_6_21_16_0_0,
                 "location_type": location_type,
-                "location_name": location_names_test_city_1,
+                "location_names": location_names_test_city_1,
                 "api_source": api_source_open_aq,
             },
             [test_city_1_site_1_2024_6_21_15_0_0["location_name"]],
@@ -524,7 +524,7 @@ def test__different_location_names__assert_response_location_names_are_correct(
                 "date_from": date_string_24_6_21_14_0_0,
                 "date_to": date_string_24_6_21_16_0_0,
                 "location_type": location_type,
-                "location_name": location_names_test_city_1,
+                "location_names": location_names_test_city_1,
             },
             [test_city_1_site_1_2024_6_21_15_0_0["location_name"]],
         ),
@@ -533,7 +533,7 @@ def test__different_location_names__assert_response_location_names_are_correct(
                 "date_from": date_string_24_6_21_14_0_0,
                 "date_to": date_string_24_6_21_16_0_0,
                 "location_type": location_type,
-                "location_name": location_names_test_city_3,
+                "location_names": location_names_test_city_3,
                 "api_source": api_source_open_aq,
             },
             [
@@ -547,7 +547,7 @@ def test__different_location_names__assert_response_location_names_are_correct(
                 "date_from": date_string_24_6_21_14_0_0,
                 "date_to": date_string_24_6_21_16_0_0,
                 "location_type": location_type,
-                "location_name": location_names_test_city_3,
+                "location_names": location_names_test_city_3,
             },
             [
                 test_city_3_site_1_2024_6_21_14_30_0["location_name"],
@@ -560,7 +560,7 @@ def test__different_location_names__assert_response_location_names_are_correct(
                 "date_from": date_string_24_6_21_14_0_0,
                 "date_to": date_string_24_6_21_16_0_0,
                 "location_type": location_type,
-                "location_name": [
+                "location_names": [
                     location_names_test_city_1,
                     location_names_test_city_2,
                     location_names_test_city_3,
@@ -581,7 +581,7 @@ def test__different_location_names__assert_response_location_names_are_correct(
                 "date_from": date_string_24_6_21_14_0_0,
                 "date_to": date_string_24_6_21_16_0_0,
                 "location_type": location_type,
-                "location_name": [
+                "location_names": [
                     location_names_test_city_1,
                     location_names_test_city_2,
                     location_names_test_city_3,
@@ -601,7 +601,7 @@ def test__different_location_names__assert_response_location_names_are_correct(
                 "date_from": date_string_24_6_21_14_0_0,
                 "date_to": date_string_24_6_21_16_0_0,
                 "location_type": location_type,
-                "location_name": ["Test City 5"],
+                "location_names": ["Test City 5"],
                 "api_source": api_source_open_aq,
             },
             [],
@@ -611,7 +611,7 @@ def test__different_location_names__assert_response_location_names_are_correct(
                 "date_from": date_string_24_6_21_14_0_0,
                 "date_to": date_string_24_6_21_16_0_0,
                 "location_type": location_type,
-                "location_name": ["Test City 5"],
+                "location_names": ["Test City 5"],
             },
             [],
         ),
@@ -637,7 +637,7 @@ def test__different_location_names__assert_response_site_names_are_correct(
                 "date_from": date_string_24_6_21_16_0_0,
                 "date_to": date_string_24_7_29_15_0_0,
                 "location_type": location_type,
-                "location_name": [
+                "location_names": [
                     location_names_test_city_1,
                     location_names_test_city_2,
                     location_names_test_city_3,
@@ -651,7 +651,7 @@ def test__different_location_names__assert_response_site_names_are_correct(
                 "date_from": date_string_24_6_21_16_0_0,
                 "date_to": date_string_24_7_29_15_0_0,
                 "location_type": location_type,
-                "location_name": [
+                "location_names": [
                     location_names_test_city_1,
                     location_names_test_city_2,
                     location_names_test_city_3,
@@ -690,7 +690,7 @@ def test__different_api_source__assert_number_of_responses_is_correct(
             "date_from": date_string_24_6_21_14_0_0,
             "date_to": date_string_24_6_21_16_0_0,
             "location_type": location_type,
-            "location_name": [
+            "location_names": [
                 location_names_test_city_1,
             ],
             "api_source": api_source_open_aq,
@@ -699,7 +699,7 @@ def test__different_api_source__assert_number_of_responses_is_correct(
             "date_from": date_string_24_6_21_14_0_0,
             "date_to": date_string_24_6_21_16_0_0,
             "location_type": location_type,
-            "location_name": [
+            "location_names": [
                 location_names_test_city_1,
             ],
         },
@@ -711,7 +711,7 @@ def test__assert_response_keys_and_values_are_correct(api_parameters: dict):
         "date_from": date_string_24_6_21_14_0_0,
         "date_to": date_string_24_6_21_16_0_0,
         "location_type": location_type,
-        "location_name": [
+        "location_names": [
             location_names_test_city_1,
         ],
         "api_source": api_source_open_aq,
