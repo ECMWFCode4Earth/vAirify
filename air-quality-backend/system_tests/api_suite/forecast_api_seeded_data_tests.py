@@ -7,6 +7,7 @@ from system_tests.data.forecast_api_test_data import (
     create_forecast_database_data_with_overrides,
     create_forecast_api_database_data_pollutant_value,
 )
+from system_tests.data.measurement_summary_api_test_data import create_location_values
 from system_tests.utils.api_utilities import (
     format_datetime_as_string,
     get_list_of_key_values,
@@ -19,7 +20,7 @@ from system_tests.utils.routes import Routes
 
 # Test Data
 
-test_city_1_input_data = create_forecast_database_data_with_overrides(
+test_city_1_input_data: dict = create_forecast_database_data_with_overrides(
     {
         "forecast_valid_time": datetime.datetime(
             2024, 6, 10, 3, 0, 0, tzinfo=datetime.timezone.utc
@@ -39,7 +40,7 @@ test_city_1_input_data = create_forecast_database_data_with_overrides(
     }
 )
 
-test_city_2_input_data = create_forecast_database_data_with_overrides(
+test_city_2_input_data: dict = create_forecast_database_data_with_overrides(
     {
         "forecast_valid_time": datetime.datetime(
             2024, 6, 12, 0, 0, 0, tzinfo=datetime.timezone.utc
@@ -57,8 +58,7 @@ test_city_2_input_data = create_forecast_database_data_with_overrides(
     }
 )
 
-
-test_city_3_input_data = create_forecast_database_data_with_overrides(
+test_city_3_input_data: dict = create_forecast_database_data_with_overrides(
     {
         "forecast_valid_time": datetime.datetime(
             2024, 6, 10, 15, 0, 0, tzinfo=datetime.timezone.utc
@@ -112,6 +112,29 @@ test_city_2_expected_response_data: dict = {
     "so2": test_city_2_input_data["so2"],
 }
 
+invalid_forecast_document: dict = {
+    "forecast_valid_time": datetime.datetime(
+        2024, 3, 27, 9, 0, 0, tzinfo=datetime.timezone.utc
+    ),
+    "source": datetime.datetime(2024, 6, 10, 3, 0, 0, tzinfo=datetime.timezone.utc),
+    "forecast_base_time": datetime.datetime(
+        2024, 3, 27, 0, 0, 0, tzinfo=datetime.timezone.utc
+    ),
+    "location_type": "city",
+    "name": 3.4,
+    "forecast_range": "",
+    "last_modified_time": "2024/01/06",
+    "location": create_location_values("point", [54.433746, 24.424399]),
+    "no2": create_forecast_api_database_data_pollutant_value("1", "7.79346375328925"),
+    "overall_aqi_level": None,
+    "pm10": create_forecast_api_database_data_pollutant_value(6, 883750432785972),
+    "pm2_5": create_forecast_api_database_data_pollutant_value(-4, -48.76003397454627),
+    "so2": create_forecast_api_database_data_pollutant_value(
+        1, datetime.datetime(2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc)
+    ),
+    "created_time": 5.7,
+}
+
 # API GET request
 base_url = Routes.forecast_api_endpoint
 headers = {"accept": "application/json"}
@@ -133,7 +156,12 @@ load_dotenv()
 delete_database_data("forecast_data")
 seed_api_test_data(
     "forecast_data",
-    [test_city_1_input_data, test_city_2_input_data, test_city_3_input_data],
+    [
+        test_city_1_input_data,
+        test_city_2_input_data,
+        test_city_3_input_data,
+        invalid_forecast_document,
+    ],
 )
 
 
@@ -725,3 +753,26 @@ def test__assert_response_keys_and_values_are_correct(
     )
     response_json = response.json()
     assert response_json == expected_response
+
+
+def test__invalid_document_in_database__assert_500():
+    load_dotenv()
+    parameters: dict = {
+        "base_time": format_datetime_as_string(
+            datetime.datetime(2024, 3, 27, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "%Y-%m-%dT%H:%M:%SZ",
+        ),
+        "valid_time_from": format_datetime_as_string(
+            datetime.datetime(2024, 3, 27, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "%Y-%m-%dT%H:%M:%SZ",
+        ),
+        "valid_time_to": format_datetime_as_string(
+            datetime.datetime(2024, 4, 1, 0, 0, 0, tzinfo=datetime.timezone.utc),
+            "%Y-%m-%dT%H:%M:%SZ",
+        ),
+        "location_type": location_type,
+    }
+    response = requests.request(
+        "GET", base_url, headers=headers, params=parameters, timeout=5.0
+    )
+    assert response.status_code == 500

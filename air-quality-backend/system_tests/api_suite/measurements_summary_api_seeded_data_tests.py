@@ -8,6 +8,8 @@ from system_tests.data.measurement_summary_api_test_data import (
     create_in_situ_database_data_with_overrides,
     create_in_situ_database_data,
     create_measurement_summary_database_data_pollutant_value,
+    create_location_values,
+    create_metadata_values,
 )
 from system_tests.utils.api_utilities import (
     format_datetime_as_string,
@@ -20,7 +22,7 @@ from system_tests.utils.database_utilities import (
 from system_tests.utils.routes import Routes
 
 # Parameter Test Data
-test_city_1_site_1_2024_6_11_14_0_0 = create_in_situ_database_data_with_overrides(
+test_city_1_site_1_2024_6_11_14_0_0: dict = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 6, 11, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -29,7 +31,7 @@ test_city_1_site_1_2024_6_11_14_0_0 = create_in_situ_database_data_with_override
         "location_name": "Test City 1, Site 1",
     }
 )
-test_city_2_site_1_2024_6_12_14_0_0 = create_in_situ_database_data_with_overrides(
+test_city_2_site_1_2024_6_12_14_0_0: dict = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 6, 12, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -38,7 +40,7 @@ test_city_2_site_1_2024_6_12_14_0_0 = create_in_situ_database_data_with_override
         "location_name": "Test City 2, Site 1",
     }
 )
-test_city_2_site_2_2024_6_12_15_0_0 = create_in_situ_database_data_with_overrides(
+test_city_2_site_2_2024_6_12_15_0_0: dict = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 6, 12, 15, 0, 0, tzinfo=datetime.timezone.utc
@@ -47,7 +49,7 @@ test_city_2_site_2_2024_6_12_15_0_0 = create_in_situ_database_data_with_override
         "location_name": "Test City 2, Site 2",
     }
 )
-test_city_3_site_1_2024_6_12_13_0_0 = create_in_situ_database_data_with_overrides(
+test_city_3_site_1_2024_6_12_13_0_0: dict = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 6, 12, 13, 0, 0, tzinfo=datetime.timezone.utc
@@ -59,7 +61,7 @@ test_city_3_site_1_2024_6_12_13_0_0 = create_in_situ_database_data_with_override
 
 # Calculation Test Data
 
-test_city_a_site_1_2024_7_20_13_0_0 = create_in_situ_database_data_with_overrides(
+test_city_a_site_1_2024_7_20_13_0_0: dict = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 7, 20, 13, 0, 0, tzinfo=datetime.timezone.utc
@@ -83,7 +85,7 @@ test_city_a_site_1_2024_7_20_13_0_0 = create_in_situ_database_data_with_override
         ),
     }
 )
-test_city_a_site_2_2024_7_20_14_0_0 = create_in_situ_database_data_with_overrides(
+test_city_a_site_2_2024_7_20_14_0_0: dict = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 7, 20, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -108,7 +110,7 @@ test_city_a_site_2_2024_7_20_14_0_0 = create_in_situ_database_data_with_override
     }
 )
 
-test_city_a_site_3_2024_7_20_15_0_0 = create_in_situ_database_data_with_overrides(
+test_city_a_site_3_2024_7_20_15_0_0: dict = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 7, 20, 15, 0, 0, tzinfo=datetime.timezone.utc
@@ -133,7 +135,7 @@ test_city_a_site_3_2024_7_20_15_0_0 = create_in_situ_database_data_with_override
     }
 )
 
-test_city_a_site_4_2024_7_20_16_0_0 = create_in_situ_database_data_with_overrides(
+test_city_a_site_4_2024_7_20_16_0_0: dict = create_in_situ_database_data_with_overrides(
     {
         "measurement_date": datetime.datetime(
             2024, 7, 20, 16, 0, 0, tzinfo=datetime.timezone.utc
@@ -158,69 +160,110 @@ test_city_a_site_4_2024_7_20_16_0_0 = create_in_situ_database_data_with_override
     }
 )
 
-test_city_b_site_1_2024_7_20_13_30_0 = create_in_situ_database_data_with_overrides(
-    {
-        "measurement_date": datetime.datetime(
-            2024, 7, 20, 13, 30, 0, tzinfo=datetime.timezone.utc
-        ),
-        "name": "Test City B",
-        "location_name": "Location 1",
-        "no2": create_measurement_summary_database_data_pollutant_value(
-            400, "µg/m³", 400, "µg/m³"
-        ),
-        "o3": create_measurement_summary_database_data_pollutant_value(
-            400, "µg/m³", 400, "µg/m³"
-        ),
-        "pm2_5": create_measurement_summary_database_data_pollutant_value(
-            101, "µg/m³", 101, "µg/m³"
-        ),
-        "pm10": create_measurement_summary_database_data_pollutant_value(
-            101, "µg/m³", 101, "µg/m³"
-        ),
-        "so2": create_measurement_summary_database_data_pollutant_value(
-            400, "µg/m³", 400, "µg/m³"
-        ),
-    }
+test_city_b_site_1_2024_7_20_13_30_0: dict = (
+    create_in_situ_database_data_with_overrides(
+        {
+            "measurement_date": datetime.datetime(
+                2024, 7, 20, 13, 30, 0, tzinfo=datetime.timezone.utc
+            ),
+            "name": "Test City B",
+            "location_name": "Location 1",
+            "no2": create_measurement_summary_database_data_pollutant_value(
+                400, "µg/m³", 400, "µg/m³"
+            ),
+            "o3": create_measurement_summary_database_data_pollutant_value(
+                400, "µg/m³", 400, "µg/m³"
+            ),
+            "pm2_5": create_measurement_summary_database_data_pollutant_value(
+                101, "µg/m³", 101, "µg/m³"
+            ),
+            "pm10": create_measurement_summary_database_data_pollutant_value(
+                101, "µg/m³", 101, "µg/m³"
+            ),
+            "so2": create_measurement_summary_database_data_pollutant_value(
+                400, "µg/m³", 400, "µg/m³"
+            ),
+        }
+    )
 )
 
-test_city_b_site_2_2024_7_20_16_30_0 = create_in_situ_database_data_with_overrides(
-    {
-        "measurement_date": datetime.datetime(
-            2024, 7, 20, 16, 30, 0, tzinfo=datetime.timezone.utc
-        ),
-        "name": "Test City B",
-        "location_name": "Location 2",
-        "no2": create_measurement_summary_database_data_pollutant_value(
-            200, "µg/m³", 200, "µg/m³"
-        ),
-        "o3": create_measurement_summary_database_data_pollutant_value(
-            200, "µg/m³", 200, "µg/m³"
-        ),
-        "pm2_5": create_measurement_summary_database_data_pollutant_value(
-            2, "µg/m³", 2, "µg/m³"
-        ),
-        "pm10": create_measurement_summary_database_data_pollutant_value(
-            2, "µg/m³", 2, "µg/m³"
-        ),
-        "so2": create_measurement_summary_database_data_pollutant_value(
-            200, "µg/m³", 200, "µg/m³"
-        ),
-    }
+test_city_b_site_2_2024_7_20_16_30_0: dict = (
+    create_in_situ_database_data_with_overrides(
+        {
+            "measurement_date": datetime.datetime(
+                2024, 7, 20, 16, 30, 0, tzinfo=datetime.timezone.utc
+            ),
+            "name": "Test City B",
+            "location_name": "Location 2",
+            "no2": create_measurement_summary_database_data_pollutant_value(
+                200, "µg/m³", 200, "µg/m³"
+            ),
+            "o3": create_measurement_summary_database_data_pollutant_value(
+                200, "µg/m³", 200, "µg/m³"
+            ),
+            "pm2_5": create_measurement_summary_database_data_pollutant_value(
+                2, "µg/m³", 2, "µg/m³"
+            ),
+            "pm10": create_measurement_summary_database_data_pollutant_value(
+                2, "µg/m³", 2, "µg/m³"
+            ),
+            "so2": create_measurement_summary_database_data_pollutant_value(
+                200, "µg/m³", 200, "µg/m³"
+            ),
+        }
+    )
 )
 
 
-test_city_c_site_1_2024_8_20_16_30_0 = create_in_situ_database_data(
+test_city_c_site_1_2024_8_20_16_30_0: dict = create_in_situ_database_data(
     datetime.datetime(2024, 8, 20, 16, 30, 0, tzinfo=datetime.timezone.utc),
     "Test City C",
     "Location 1",
     200,
 )
-test_city_c_site_2_2024_8_20_17_0_0 = create_in_situ_database_data(
+test_city_c_site_2_2024_8_20_17_0_0: dict = create_in_situ_database_data(
     datetime.datetime(2024, 8, 20, 17, 0, 0, tzinfo=datetime.timezone.utc),
     "Test City C",
     "Location 2",
     100,
 )
+invalid_in_situ_document: dict = {
+    "measurement_date": datetime.datetime(
+        2024, 1, 25, 8, 0, 0, tzinfo=datetime.timezone.utc
+    ),
+    "name": -7,
+    "location_name": "Test In Situ Broken",
+    "api_source": "OpenAQ",
+    "created_time": datetime.datetime(
+        2024, 1, 25, 8, 0, 0, tzinfo=datetime.timezone.utc
+    ),
+    "last_modified_time": datetime.datetime(
+        2024, 1, 25, 8, 0, 0, tzinfo=datetime.timezone.utc
+    ),
+    "location": create_location_values("point", [54.433746, 24.424399]),
+    "location_type": "city",
+    "metadata": create_metadata_values(
+        "Governmental Organization",
+        "reference grade",
+        100109.546875,
+        314.317138671875,
+    ),
+    "no2": create_measurement_summary_database_data_pollutant_value(
+        None, "µg/m³", None, "µg/m³"
+    ),
+    "o3": create_measurement_summary_database_data_pollutant_value(
+        -48, "µg/m³", -48, "µg/m³"
+    ),
+    "pm2_5": create_measurement_summary_database_data_pollutant_value(
+        2345723487589, "µg/m³", 2345723487589, "µg/m³"
+    ),
+    "pm10": create_measurement_summary_database_data_pollutant_value(
+        0.7, "µg/m³", 0.7, "µg/m³"
+    ),
+    "so2": create_measurement_summary_database_data_pollutant_value(
+        None, "µg/m³", None, "µg/m³"
+    ),
+}
 
 
 # Test Setup
@@ -241,6 +284,7 @@ seed_api_test_data(
         test_city_b_site_2_2024_7_20_16_30_0,
         test_city_c_site_1_2024_8_20_16_30_0,
         test_city_c_site_2_2024_8_20_17_0_0,
+        invalid_in_situ_document,
     ],
 )
 
@@ -843,3 +887,16 @@ def test__check_measurement_base_time_in_response_is_correct(
 
     for city in response_json:
         assert city.get("measurement_base_time") == test_measurement_base_time_string
+
+
+def test__invalid_document_in_database__assert_500():
+    load_dotenv()
+    api_parameters: dict = {
+        "location_type": location_type,
+        "measurement_base_time": datetime.datetime(
+            2024, 1, 25, 7, 0, 0, tzinfo=datetime.timezone.utc
+        ),
+        "measurement_time_range": measurement_time_range,
+    }
+    response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
+    assert response.status_code == 500
