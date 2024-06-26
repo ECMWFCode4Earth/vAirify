@@ -35,5 +35,5 @@ def create_forecast_database_data_with_overrides(overrides):
     return {**default_city, **overrides}
 
 
-def create_forecast_api_database_data_pollutant_value(aqi_level: int, value: float):
+def create_forecast_api_database_data_pollutant_value(aqi_level, value):
     return {"aqi_level": aqi_level, "value": value}
