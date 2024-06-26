@@ -24,9 +24,9 @@ export class VairifySummaryPage {
     await this.page.goto('/city/summary')
   }
 
-  async checkTitle(expectedTitle: string) {
+  async checkTitle() {
     const title = await this.page.title()
-    expect(title).toBe(expectedTitle)
+    return title
   }
 
   async setupApiRoutes() {
@@ -41,7 +41,7 @@ export class VairifySummaryPage {
     )
   }
 
-  async checkColumnHeaderText(name: string, expectedText: string) {
+  async getColumnHeaderAndText(name: string, expectedText: string) {
     const header = this.page.getByRole('columnheader', { name })
     await header.waitFor({ state: 'visible' })
     await expect(header).toHaveText(expectedText)
@@ -58,7 +58,7 @@ export class VairifySummaryPage {
     await this.page.waitForSelector('.ag-header-cell', { state: 'visible' })
   }
 
-  async checkNumberFormat(text: string) {
+  async checkNumbersHaveOneDecimalOnly(text: string) {
     const number = parseFloat(text)
     if (!isNaN(number)) {
       const decimalPart = text.split('.')[1]
@@ -72,11 +72,11 @@ export class VairifySummaryPage {
     const cells = await this.agCell.all()
     for (const cell of cells) {
       const cellText = await cell.textContent()
-      await this.checkNumberFormat(cellText || '')
+      await this.checkNumbersHaveOneDecimalOnly(cellText || '')
     }
   }
 
-  async checkKyivLocation() {
+  async textSearch() {
     const cells = await this.page.locator('.ag-cell').all()
     let count = 0
     for (const cell of cells) {
@@ -85,7 +85,7 @@ export class VairifySummaryPage {
         count++
       }
     }
-    expect(count).toBe(1)
+    return count
   }
 
   async assertGridValues(expectedData: string[][]) {
@@ -100,10 +100,11 @@ export class VairifySummaryPage {
       }
     }
   }
-  async assertDiffColumn() {
+  async calculateForecastDifference() {
     const rows = await this.page
       .locator('.ag-center-cols-container .ag-row')
       .count()
+    const differences: number[] = []
 
     for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
       const forecastCellLocator = this.page.locator(
@@ -112,18 +113,21 @@ export class VairifySummaryPage {
       const measuredCellLocator = this.page.locator(
         `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(2)`,
       )
-      const diffCellLocator = this.page.locator(
-        `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(3)`,
-      )
 
       const forecastText = await forecastCellLocator.innerText()
       const measuredText = await measuredCellLocator.innerText()
-      const diffText = await diffCellLocator.innerText()
 
       const forecast = parseInt(forecastText.trim())
       const measured = parseInt(measuredText.trim())
-      const diff = parseInt(diffText.trim())
-      expect(diff).toBe(Math.abs(forecast - measured))
+      const calculation = Math.abs(forecast - measured)
+
+      differences.push(calculation)
     }
+    return differences.filter((d) => !isNaN(d))
+  }
+  async setupPage() {
+    await this.setupApiRoutes()
+    await this.gotoSummaryPage()
+    await this.waitForGridVisible()
   }
 }

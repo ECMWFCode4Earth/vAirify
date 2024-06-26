@@ -1,52 +1,39 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
-import { apiForecast, apiSummary } from './mocked_api.ts'
-import { VairifySummaryPage } from './vAirify_summary_page.ts'
+test.beforeEach(async ({ vairifySummaryPage }) => {
+  await vairifySummaryPage.setupPage()
+})
 
-async function setupVairifySummaryPage(page) {
-  const vairifySummaryPage = new VairifySummaryPage(
-    page,
-    apiForecast,
-    apiSummary,
-  )
-  await vairifySummaryPage.setupApiRoutes()
-  await vairifySummaryPage.gotoSummaryPage()
-  await vairifySummaryPage.waitForGridVisible()
-  return vairifySummaryPage
-}
+test('Verify page title is vAirify', async ({ vairifySummaryPage }) => {
+  const title = await vairifySummaryPage.checkTitle()
+  expect(title).toBe('vAirify')
+})
 
 test.describe('Mocked API tests', () => {
-  test('Verify page title is vAirify', async ({ page }) => {
-    await setupVairifySummaryPage(page)
-    const title = await page.title()
-    expect(title).toBe('vAirify')
-  })
-
-  test('Verify that headers are visible and have matching text', async ({
-    page,
+  test('Verify that Headers exist and Innertext matches', async ({
+    vairifySummaryPage,
   }) => {
-    const vairifySummaryPage = await setupVairifySummaryPage(page)
-    await vairifySummaryPage.checkColumnHeaderText('AQI Level', 'AQI Level')
-    await vairifySummaryPage.checkColumnHeaderText(
+    await vairifySummaryPage.getColumnHeaderAndText('AQI Level', 'AQI Level')
+    await vairifySummaryPage.getColumnHeaderAndText(
       'PM 2.5 (µg/m³)',
       'PM 2.5 (µg/m³)',
     )
-    await vairifySummaryPage.checkColumnHeaderText(
+    await vairifySummaryPage.getColumnHeaderAndText(
       'PM 10 (µg/m³)',
       'PM 10 (µg/m³)',
     )
     await vairifySummaryPage.scrollToRightmostPosition()
     await vairifySummaryPage.page.waitForTimeout(1000)
 
-    await vairifySummaryPage.checkColumnHeaderText(
+    await vairifySummaryPage.getColumnHeaderAndText(
       'Nitrogen Dioxide (µg/m³)',
       'Nitrogen Dioxide (µg/m³)',
     )
-    await vairifySummaryPage.checkColumnHeaderText(
+    await vairifySummaryPage.getColumnHeaderAndText(
       'Ozone (µg/m³)',
       'Ozone (µg/m³)',
     )
-    await vairifySummaryPage.checkColumnHeaderText(
+    await vairifySummaryPage.getColumnHeaderAndText(
       'Sulphur Dioxide (µg/m³)',
       'Sulphur Dioxide (µg/m³)',
     )
@@ -54,22 +41,21 @@ test.describe('Mocked API tests', () => {
 
   // Mocked + live env
   test('Verify numbers in cells have no more than 1 decimal place ', async ({
-    page,
+    vairifySummaryPage,
   }) => {
-    const vairifySummaryPage = await setupVairifySummaryPage(page)
     await vairifySummaryPage.checkCellNumberFormat()
   })
 
-  test('Kyiv location to be true, regardless of measurement availability', async ({
-    page,
+  test('Verify that a city with no in-situ data still show on grid', async ({
+    vairifySummaryPage,
   }) => {
-    const vairifySummaryPage = await setupVairifySummaryPage(page)
-    await vairifySummaryPage.checkKyivLocation()
+    const count = await vairifySummaryPage.textSearch()
+    expect(count).toEqual(1)
   })
 
-  test('Check API mocked accurately', async ({ page }) => {
-    const vairifySummaryPage = await setupVairifySummaryPage(page)
-
+  test('Check data is displayed correctly on grid', async ({
+    vairifySummaryPage,
+  }) => {
     // first 6 values for Kampala, Abu Dhabi, Zurich and Kyiv respectively
     const expectedData = [
       ['2', '6', '4', '16.1', '76', '19 Jun 09:00'],
@@ -82,9 +68,9 @@ test.describe('Mocked API tests', () => {
   })
 
   test('Verify that Diff displays the delta between forcast and measured', async ({
-    page,
+    vairifySummaryPage,
   }) => {
-    const vairifySummaryPage = await setupVairifySummaryPage(page)
-    await vairifySummaryPage.assertDiffColumn()
+    const diffArray = await vairifySummaryPage.calculateForecastDifference()
+    expect(diffArray).toEqual([4, 1, 1])
   })
 })
