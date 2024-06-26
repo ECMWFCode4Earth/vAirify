@@ -1,6 +1,7 @@
 from datetime import datetime
 from unittest.mock import patch
 
+from air_quality.api.types import ApiSource
 import pytest
 from fastapi.testclient import TestClient
 
@@ -88,8 +89,8 @@ def test__measurements_invalid_query_params__throw_error(field, params, expected
 def test__measurements_applies_appropriate_filters__when_request_valid():
     params = {
         **measurement_request_defaults,
-        "location_name": ["London", "Paris"],
-        "api_source": "test",
+        "location_names": ["London", "Paris"],
+        "api_source": "openaq",
     }
     with patch(
         "air_quality.api.measurements_controller.find_by_criteria", return_value=[]
@@ -102,7 +103,7 @@ def test__measurements_applies_appropriate_filters__when_request_valid():
             datetime(2024, 6, 1, 0, 0),
             AirQualityLocationType.CITY,
             ["London", "Paris"],
-            "test",
+            ApiSource.OPENAQ,
         )
 
 
