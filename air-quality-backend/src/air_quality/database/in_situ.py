@@ -1,7 +1,8 @@
 import logging
 from datetime import datetime, timedelta
-from typing import TypedDict, NotRequired, Optional
+from typing import List, TypedDict, NotRequired, Optional
 
+from air_quality.api.types import ApiSource
 from bson import ObjectId
 
 from air_quality.database.locations import AirQualityLocationType
@@ -30,7 +31,7 @@ class InSituMeasurement(TypedDict):
     measurement_date: datetime
     name: str
     location_name: str
-    api_source: str
+    api_source: ApiSource
     created_time: NotRequired[datetime]
     last_modified_time: NotRequired[datetime]
     location: GeoJSONPoint
@@ -73,8 +74,8 @@ def find_by_criteria(
     measurement_date_from: datetime,
     measurement_date_to: datetime,
     location_type: AirQualityLocationType,
-    locations: [str] = None,
-    api_source: str = None,
+    locations: List[str] = None,
+    api_source: ApiSource = None,
 ) -> list[InSituMeasurement]:
     criteria = {
         "measurement_date": {

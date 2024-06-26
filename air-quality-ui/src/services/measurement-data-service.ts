@@ -26,7 +26,7 @@ export const getMeasurements = async (
     location_type: locationType,
   }
   if (locations) {
-    params['location_name'] = locations
+    params['location_names'] = locations
   }
   if (apiSource) {
     params['api_source'] = apiSource
