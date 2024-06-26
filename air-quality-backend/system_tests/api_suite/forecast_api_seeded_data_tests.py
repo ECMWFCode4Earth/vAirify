@@ -218,7 +218,6 @@ def test__different_base_times__assert_correct_results_returned(
     parameters: dict,
     expected_cities: list,
 ):
-    load_dotenv()
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -320,7 +319,6 @@ def test__different_base_times__assert_correct_results_returned(
     ],
 )
 def test__base_time_bva__assert_number_of_results(parameters: dict, expected: int):
-    load_dotenv()
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -396,7 +394,6 @@ def test__different_valid_time_from_times__assert_correct_results(
     parameters: dict,
     expected_cities: list,
 ):
-    load_dotenv()
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -500,7 +497,6 @@ def test__different_valid_time_from_times__assert_correct_results(
 def test__valid_time_from_bva__assert_number_of_results(
     parameters: dict, expected: int
 ):
-    load_dotenv()
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -576,7 +572,6 @@ def test__different_valid_time_to_times__assert_correct_results(
     parameters: dict,
     expected_cities: list,
 ):
-    load_dotenv()
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -678,7 +673,6 @@ def test__different_valid_time_to_times__assert_correct_results(
     ],
 )
 def test__valid_time_to_bva__assert_number_of_results(parameters: dict, expected: int):
-    load_dotenv()
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -706,7 +700,6 @@ def test__valid_time_to_bva__assert_number_of_results(parameters: dict, expected
     ),
 )
 def test__results_containing_relevant_base_time(parameters: dict):
-    load_dotenv()
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -747,7 +740,6 @@ def test__results_containing_relevant_base_time(parameters: dict):
 def test__assert_response_keys_and_values_are_correct(
     parameters: dict, expected_response: list
 ):
-    load_dotenv()
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -756,7 +748,6 @@ def test__assert_response_keys_and_values_are_correct(
 
 
 def test__invalid_document_in_database__assert_500():
-    load_dotenv()
     parameters: dict = {
         "base_time": format_datetime_as_string(
             datetime.datetime(2024, 3, 27, 0, 0, 0, tzinfo=datetime.timezone.utc),

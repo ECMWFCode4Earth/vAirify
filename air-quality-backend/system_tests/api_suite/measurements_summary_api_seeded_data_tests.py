@@ -476,7 +476,6 @@ measurement_time_range = 90
 def test__different_base_times__assert_data_filtered_appropriately(
     api_parameters: dict, expected_city_names: str
 ):
-    load_dotenv()
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
     actual_locations = get_list_of_key_values(response.json(), "location_name")
     actual_locations.sort()
@@ -532,7 +531,6 @@ def test__different_base_times__assert_data_filtered_appropriately(
 def test__different_measurement_time_range__assert_data_filtered_appropriately(
     api_parameters: dict, expected_city_names: str
 ):
-    load_dotenv()
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
     actual_locations = get_list_of_key_values(response.json(), "location_name")
     actual_locations.sort()
@@ -677,7 +675,6 @@ def test__response_contains_correct_pollutant_mean_values(
     expected_test_city_a_so2_mean: float,
     expected_test_city_b_so2_mean: float,
 ):
-    load_dotenv()
     api_parameters: dict = {
         "location_type": location_type,
         "measurement_base_time": test_measurement_base_time_string,
@@ -742,7 +739,6 @@ def test__response_contains_correct_pollutant_mean_aqi_level(
     expected_test_city_a_so2_mean_aqi_level: int,
     expected_test_city_b_so2_mean_aqi_level: int,
 ):
-    load_dotenv()
     api_parameters: dict = {
         "location_type": location_type,
         "measurement_base_time": test_measurement_base_time_string,
@@ -827,7 +823,6 @@ def test__response_contains_correct_mean_overall_aqi_level(
     expected_test_city_b_mean_overall_aqi: float | None,
     expected_test_city_c_mean_overall_aqi: float | None,
 ):
-    load_dotenv()
     api_parameters: dict = {
         "location_type": location_type,
         "measurement_base_time": test_measurement_base_time_string,
@@ -873,7 +868,6 @@ def test__response_contains_correct_mean_overall_aqi_level(
 def test__check_measurement_base_time_in_response_is_correct(
     test_measurement_base_time_string: str,
 ):
-    load_dotenv()
     api_parameters: dict = {
         "location_type": location_type,
         "measurement_base_time": test_measurement_base_time_string,
@@ -890,7 +884,6 @@ def test__check_measurement_base_time_in_response_is_correct(
 
 
 def test__invalid_document_in_database__assert_500():
-    load_dotenv()
     api_parameters: dict = {
         "location_type": location_type,
         "measurement_base_time": datetime.datetime(
