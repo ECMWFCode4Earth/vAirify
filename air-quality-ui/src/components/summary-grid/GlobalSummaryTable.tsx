@@ -117,7 +117,9 @@ const createSummaryRow = ({
           value: parseFloat(measurementData.value.toFixed(1)),
         },
       }
-      const currentDifference = measurementData.aqiLevel - forecastData.aqiLevel
+      const currentDifference = Math.abs(
+        measurementData.aqiLevel - forecastData.aqiLevel,
+      )
       if (!row.aqiDifference || currentDifference > row.aqiDifference) {
         row.aqiDifference = currentDifference
         row.forecast.aqiLevel = forecastData.aqiLevel
