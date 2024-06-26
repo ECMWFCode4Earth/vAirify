@@ -21,7 +21,7 @@ jobs:
       - name: build
         run: |
           cd air-quality-backend
-          docker build . -t ghcr.io/${REPO}/vairify-etl-insitu:latest -f Dockerfile.insitu.cron
+          docker build . -t ghcr.io/${REPO}/vairify-etl-insitu:latest -f Dockerfile.insitu
       - name: publish
         run: |
           docker push ghcr.io/${REPO}/vairify-etl-insitu:latest

@@ -1,8 +1,13 @@
 from datetime import datetime
+from enum import Enum
 
 from typing_extensions import Generic, TypedDict, NotRequired, TypeVar
 
 from air_quality.database.locations import AirQualityLocationType
+
+
+class ApiSource(Enum):
+    OPENAQ = "openaq"
 
 
 class PollutantDataDto(TypedDict):

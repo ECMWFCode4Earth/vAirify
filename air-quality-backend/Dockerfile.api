@@ -6,7 +6,7 @@ RUN conda env create -f environment.yml
 
 SHELL ["conda", "run", "-n", "air-quality-backend", "/bin/bash", "-c"]
 
-COPY pyproject.toml .
+COPY pyproject.toml poetry.lock ./
 RUN poetry install
 
 COPY src/ ./src

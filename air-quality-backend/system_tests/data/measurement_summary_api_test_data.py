@@ -121,7 +121,7 @@ def create_metadata_values(
 
 
 def create_measurement_summary_database_data_pollutant_value(
-    value: float, unit: str, original_value: float, original_unit: str
+    value, unit: str, original_value, original_unit: str
 ):
     return {
         "value": value,
