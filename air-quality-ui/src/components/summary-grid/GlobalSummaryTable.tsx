@@ -8,9 +8,8 @@ import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { DateTime } from 'luxon'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import './GridCss.css'
-import Switch from 'react-switch'
 
 import cellRules from './CellRules'
 import classes from './GlobalSummaryTable.module.css'
@@ -29,8 +28,6 @@ import {
   MeasurementSummaryResponseDto,
 } from '../../services/types'
 
-import { debug } from 'util'
-
 type SummaryDetail = {
   aqiLevel?: number
 } & {
@@ -47,6 +44,7 @@ interface SummaryRow {
 interface GlobalSummaryTableProps {
   forecast: Record<string, ForecastResponseDto[]>
   summarizedMeasurements: Record<string, MeasurementSummaryResponseDto[]>
+  showAllColoured: boolean
 }
 
 function getPerformanceSymbol(
@@ -162,6 +160,7 @@ const createSummaryRow = ({
 const GlobalSummaryTable = ({
   forecast,
   summarizedMeasurements,
+  showAllColoured,
 }: Partial<GlobalSummaryTableProps>): JSX.Element => {
   const rowData = useMemo(() => {
     if (!forecast || !summarizedMeasurements) {
@@ -171,8 +170,12 @@ const GlobalSummaryTable = ({
       (comparisonData) => createSummaryRow(comparisonData),
     )
   }, [forecast, summarizedMeasurements])
-  const [showAllColoured, setShowAllColoured] = useState<boolean>(false)
-  const columnDefs = createColDefs(showAllColoured)
+
+  let columnDefs
+  if (showAllColoured != undefined) {
+    console.log(showAllColoured)
+    columnDefs = createColDefs(showAllColoured)
+  }
   const gridOptions = createGridOptions()
 
   return (
@@ -180,13 +183,6 @@ const GlobalSummaryTable = ({
       className={`ag-theme-quartz ${classes['summary-grid-wrapper']}`}
       data-testid="summary-grid"
     >
-      <Switch
-        onChange={() => {
-          if (showAllColoured) setShowAllColoured(false)
-          else setShowAllColoured(true)
-        }}
-        checked={showAllColoured}
-      />
       <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs}
