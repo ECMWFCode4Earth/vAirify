@@ -80,6 +80,34 @@ export const apiForecast = [
       value: 1.3459434727665889,
     },
   },
+  // City should not show up.
+  {
+    base_time: '2024-06-24T00:00:00Z',
+    valid_time: '2024-06-24T09:00:00Z',
+    location_type: 'city',
+    location_name: 'Kyiv',
+    overall_aqi_level: 2,
+    no2: {
+      aqi_level: 1,
+      value: 0.7852695955767444,
+    },
+    o3: {
+      aqi_level: 2,
+      value: 80.0214446372413,
+    },
+    pm2_5: {
+      aqi_level: 1,
+      value: 7.024702103355023,
+    },
+    pm10: {
+      aqi_level: 1,
+      value: 10.313057730041718,
+    },
+    so2: {
+      aqi_level: 1,
+      value: 0.465807542763243,
+    },
+  },
 ]
 
 export const apiSummary = [
