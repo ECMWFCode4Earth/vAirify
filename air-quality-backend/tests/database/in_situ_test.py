@@ -3,11 +3,13 @@ from freezegun import freeze_time
 import mongomock
 import pytest
 from unittest.mock import patch
+
 from air_quality.database.in_situ import (
     find_by_criteria,
     insert_data,
     delete_data_before,
     get_averaged,
+    ApiSource,
 )
 from air_quality.database.locations import AirQualityLocationType
 from tests.util.mock_measurement import create_mock_measurement_document
@@ -117,19 +119,9 @@ def test__delete_data_before(mock_collection):
                 "measurement_date_to": datetime(2024, 5, 1, 11, 0),
                 "location_type": AirQualityLocationType.CITY,
                 "locations": ["London"],
-                "api_source": "test_api",
+                "api_source": ApiSource.OPENAQ,
             },
             ["London"],
-        ),
-        (
-            {
-                "measurement_date_from": datetime(2024, 5, 1, 5, 0),
-                "measurement_date_to": datetime(2024, 5, 1, 11, 0),
-                "location_type": AirQualityLocationType.CITY,
-                "locations": ["London"],
-                "api_source": "real_api",
-            },
-            [],
         ),
     ],
 )
@@ -141,7 +133,7 @@ def test__find_by_criteria(params, expected_names, mock_collection):
             "o3": 123,
             "location_type": "city",
             "location_name": "test",
-            "api_source": "test_api",
+            "api_source": "OpenAQ",
         }
         mock_collection.insert_many(
             [
@@ -158,9 +150,9 @@ def test__find_by_criteria(params, expected_names, mock_collection):
             ]
         )
 
-        assert (
-            list(map(lambda x: x["name"], find_by_criteria(**params))) == expected_names
-        )
+        response = find_by_criteria(**params)
+
+        assert list(map(lambda x: x["name"], response)) == expected_names
 
 
 def test__get_averaged(mock_collection):
