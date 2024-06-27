@@ -26,6 +26,26 @@ export class VairifySummaryPage {
     this.zurichBtn = this.page.getByRole('link', { name: 'Zurich' })
     this.citiesBtn = this.page.getByRole('link', { name: 'Cities' })
   }
+  async clickButton(buttonName: string) {
+    switch (buttonName) {
+      case 'Cities': {
+        await this.citiesBtn.click()
+        break
+      }
+      case 'Kampala': {
+        await this.kampalaBtn.click()
+        break
+      }
+      case 'Abu Dhabi': {
+        await this.abuDhabiBtn.click()
+        break
+      }
+      case 'Zurich': {
+        await this.zurichBtn.click()
+        break
+      }
+    }
+  }
 
   async gotoSummaryPage() {
     await this.page.goto('/city/summary')
