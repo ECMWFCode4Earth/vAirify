@@ -2,8 +2,6 @@ import { type Locator, type Page } from '@playwright/test'
 
 export class VairifyCityPage {
   readonly page: Page
-  readonly apiForecast: object
-  readonly apiSummary: object
   readonly title: Locator
   readonly scroller: Locator
 
