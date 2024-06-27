@@ -15,10 +15,6 @@ export class VairifyCityPage {
     this.page = page
     this.title = this.page.locator('title')
     this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')
-    this.citiesBtn = this.page.getByRole('link', { name: 'Cities' })
-    this.kampalaText = this.page.locator('text=Kampala')
-    this.abuDhabiText = this.page.locator('text=Abu Dhabi')
-    this.zurichText = this.page.locator('text=Kampala')
   }
 
   textFinder(textToFind: string) {

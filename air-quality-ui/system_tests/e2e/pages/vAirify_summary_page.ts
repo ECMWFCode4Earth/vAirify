@@ -21,10 +21,6 @@ export class VairifySummaryPage {
     this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')
     this.agCell = this.page.locator('role=gridcell')
     this.allCells = this.page.locator('[role=gridcell]')
-    this.kampalaBtn = this.page.getByRole('link', { name: 'Kampala' })
-    this.abuDhabiBtn = this.page.getByRole('link', { name: 'Abu Dhabi' })
-    this.zurichBtn = this.page.getByRole('link', { name: 'Zurich' })
-    this.citiesBtn = this.page.getByRole('link', { name: 'Cities' })
   }
   async clickButton(buttonName: string) {
     await this.page.getByRole('link', { name: buttonName }).click()
