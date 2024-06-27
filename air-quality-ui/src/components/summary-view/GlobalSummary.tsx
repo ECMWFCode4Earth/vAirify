@@ -14,7 +14,7 @@ import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,
 } from '../../services/types'
-import GlobalSummaryTable from '../summary-grid/GlobalSummaryTable'
+import GlobalSummaryTable from '../summary-grid/table/GlobalSummaryTable'
 
 const GlobalSummary = (): JSX.Element => {
   const forecastBaseTime = useContext(ForecastContext)

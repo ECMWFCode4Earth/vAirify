@@ -9,24 +9,25 @@ import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { DateTime } from 'luxon'
 import { useMemo } from 'react'
-import './GridCss.css'
+import '../cell/cell-rules/GridCss.css'
 
-import cellRules from './CellRules'
 import classes from './GlobalSummaryTable.module.css'
-import { LocationCellRenderer } from './LocationCellRenderer'
+import sortAQIComparator from './sorting/SortingAQIFunction'
 import {
   PollutantType,
   pollutantTypeDisplay,
   pollutantTypes,
-} from '../../models'
+} from '../../../models'
 import {
   ForecastMeasurementComparison,
   createComparisonData,
-} from '../../services/summary-comparison-service'
+} from '../../../services/summary-comparison-service'
 import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,
-} from '../../services/types'
+} from '../../../services/types'
+import cellRules from '../cell/cell-rules/CellRules'
+import { LocationCellRenderer } from '../cell/location-cell-renderer/LocationCellRenderer'
 
 type SummaryDetail = {
   aqiLevel?: number
@@ -38,7 +39,7 @@ interface SummaryRow {
   locationName: string
   forecast: SummaryDetail
   measurements?: SummaryDetail
-  aqiDifference?: number
+  aqiDifference?: string
 }
 
 interface GlobalSummaryTableProps {
@@ -100,15 +101,13 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         sort: 'desc',
         maxWidth: maxWidth,
         cellClass: 'cell-format',
-        valueFormatter: (params: ValueFormatterParams) => {
-          if (params.data.measurements) {
-            return `${getPerformanceSymbol(
-              params.data.forecast.aqiLevel,
-              params.data.measurements.aqiLevel,
-            )}${params.data.aqiDifference}`
+        valueFormatter: (params: ValueFormatterParams): string => {
+          if (!params.data.measurements) {
+            return '-'
           }
-          return '-'
+          return params.data.aqiDifference
         },
+        comparator: sortAQIComparator,
       },
     ],
   },
@@ -183,11 +182,17 @@ const createSummaryRow = ({
           aqiLevel: measurementData.aqiLevel,
         },
       }
-      const currentDifference = Math.abs(
+      const numericalDiffrence = Math.abs(
         measurementData.aqiLevel - forecastData.aqiLevel,
       )
-      if (!row.aqiDifference || currentDifference > row.aqiDifference) {
-        row.aqiDifference = currentDifference
+      const currentDifferenceWithSymbol =
+        getPerformanceSymbol(forecastData.aqiLevel, measurementData.aqiLevel) +
+        numericalDiffrence
+      if (
+        !row.aqiDifference ||
+        numericalDiffrence > parseInt(row.aqiDifference.split('')[1])
+      ) {
+        row.aqiDifference = currentDifferenceWithSymbol
         row.forecast.aqiLevel = forecastData.aqiLevel
         row.measurements.aqiLevel = measurementData.aqiLevel
       }

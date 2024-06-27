@@ -6,11 +6,11 @@ import GlobalSummaryTable from './GlobalSummaryTable'
 import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,
-} from '../../services/types'
+} from '../../../services/types'
 import {
   mockForecastResponseDto,
   mockMeasurementSummaryResponseDto,
-} from '../../test-util/mock-type-creator'
+} from '../../../test-util/mock-type-creator'
 
 const forecastData = mockForecastResponseDto({
   location_name: 'London',
