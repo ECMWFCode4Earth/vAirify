@@ -20,4 +20,8 @@ export class VairifyCityPage {
     this.abuDhabiText = this.page.locator('text=Abu Dhabi')
     this.zurichText = this.page.locator('text=Kampala')
   }
+
+  textFinder(textToFind: string) {
+    return this.page.getByText(textToFind)
+  }
 }

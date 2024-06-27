@@ -1,4 +1,4 @@
-import { expect, test } from './fixtures'
+import { expect, test } from '../utils/fixtures'
 
 test.beforeEach(async ({ vairifySummaryPage }) => {
   await vairifySummaryPage.setupPage()

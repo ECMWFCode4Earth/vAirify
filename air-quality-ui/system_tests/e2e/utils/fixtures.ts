@@ -1,8 +1,8 @@
 import { test as base } from '@playwright/test'
 
 import { apiForecast, apiSummary } from './mocked_api'
-import { VairifyCityPage } from './vAirify_city_page'
-import { VairifySummaryPage } from './vAirify_summary_page'
+import { VairifyCityPage } from '../pages/vAirify_city_page'
+import { VairifySummaryPage } from '../pages/vAirify_summary_page'
 
 type Fixtures = {
   vairifySummaryPage: VairifySummaryPage
