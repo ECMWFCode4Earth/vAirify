@@ -90,7 +90,7 @@ def test__measurements_applies_appropriate_filters__when_request_valid():
     params = {
         **measurement_request_defaults,
         "location_names": ["London", "Paris"],
-        "api_source": "openaq",
+        "api_source": "OpenAQ",
     }
     with patch(
         "air_quality.api.measurements_controller.find_by_criteria", return_value=[]

@@ -8,8 +8,8 @@ from air_quality.api.mappers.measurements_mapper import (
     map_measurements,
     map_summarized_measurements,
 )
-from air_quality.api.types import ApiSource, MeasurementSummaryDto, MeasurementDto
-from air_quality.database.in_situ import get_averaged, find_by_criteria
+from air_quality.api.types import MeasurementSummaryDto, MeasurementDto
+from air_quality.database.in_situ import ApiSource, get_averaged, find_by_criteria
 from air_quality.database.locations import AirQualityLocationType
 
 router = APIRouter()

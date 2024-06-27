@@ -103,12 +103,12 @@ describe('Measurement Data Service', () => {
         dateTo,
         'city',
         [],
-        'openaq',
+        'OpenAQ',
       )
 
       expect(result).toEqual([])
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringMatching('&api_source=openaq'),
+        expect.stringMatching('&api_source=OpenAQ'),
         expect.anything(),
       )
     })
