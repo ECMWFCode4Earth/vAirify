@@ -47,6 +47,8 @@ interface GlobalSummaryTableProps {
   showAllColoured: boolean
 }
 
+const maxWidth = 115
+
 function getPerformanceSymbol(
   forecastAQILevel: number,
   measurementsAQILevel: number,
@@ -55,24 +57,49 @@ function getPerformanceSymbol(
   else if (forecastAQILevel === measurementsAQILevel) return ''
   else return '-'
 }
-
+function insertEmptyValueDash(value: number | undefined): string {
+  if (value === undefined) return '-'
+  return value.toString()
+}
 const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
   {
     field: 'locationName',
     headerName: 'City',
+    headerClass: 'cell-header-format',
+    cellClass: 'cell-format',
     pinned: true,
     filter: true,
     cellRenderer: LocationCellRenderer,
   },
   {
     headerName: 'AQI Level',
+    headerClass: 'cell-header-format',
     children: [
-      { field: 'forecast.aqiLevel', headerName: 'Forecast' },
-      { field: 'measurements.aqiLevel', headerName: 'Measured' },
+      {
+        field: 'forecast.aqiLevel',
+        headerName: 'Forecast',
+        headerClass: 'cell-header-format',
+        maxWidth: maxWidth,
+        cellClass: 'cell-format',
+        valueFormatter: (params: ValueFormatterParams) =>
+          insertEmptyValueDash(params.value),
+      },
+      {
+        field: 'measurements.aqiLevel',
+        headerName: 'Measured',
+        headerClass: 'cell-header-format',
+        maxWidth: maxWidth,
+        cellClass: 'cell-format',
+        valueFormatter: (params: ValueFormatterParams) =>
+          insertEmptyValueDash(params.value),
+      },
       {
         field: 'aqiDifference',
         headerName: 'Diff',
+        headerClass: 'cell-header-format',
         sort: 'desc',
+        maxWidth: maxWidth,
+        cellClass: 'cell-format',
         valueFormatter: (params: ValueFormatterParams) => {
           if (params.data.measurements) {
             return `${getPerformanceSymbol(
@@ -80,28 +107,41 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
               params.data.measurements.aqiLevel,
             )}${params.data.aqiDifference}`
           }
-          return ''
+          return '-'
         },
       },
     ],
   },
   ...pollutantTypes.flatMap((type) => ({
     headerName: `${pollutantTypeDisplay[type]} (µg/m³)`,
+    headerClass: 'cell-header-format',
     children: [
       {
         field: `forecast.${type}.value`,
         headerName: `Forecast`,
+        headerClass: 'cell-header-format',
+        cellClass: 'cell-format',
         cellClassRules: cellRules(showAllColoured)[type],
+        maxWidth: maxWidth,
+        valueFormatter: (params: ValueFormatterParams) =>
+          insertEmptyValueDash(params.value),
       },
       {
         field: `measurements.${type}.value`,
         headerName: `Measured`,
+        headerClass: 'cell-header-format',
+        cellClass: 'cell-format',
         cellClassRules: cellRules(showAllColoured)[type],
+        maxWidth: maxWidth,
+        valueFormatter: (params: ValueFormatterParams) =>
+          insertEmptyValueDash(params.value),
       },
       {
         field: `forecast.${type}.time`,
         headerName: `Time`,
-        width: 130,
+        headerClass: 'cell-header-format',
+        maxWidth: maxWidth,
+        cellClass: 'cell-format',
         valueFormatter: (params: ValueFormatterParams) =>
           DateTime.fromISO(params.data.forecast[type].time, {
             zone: 'utc',
@@ -173,7 +213,6 @@ const GlobalSummaryTable = ({
 
   let columnDefs
   if (showAllColoured != undefined) {
-    console.log(showAllColoured)
     columnDefs = createColDefs(showAllColoured)
   }
   const gridOptions = createGridOptions()

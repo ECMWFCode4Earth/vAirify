@@ -1,42 +1,34 @@
-.cell-very-good{
+.cell-header-format{
+    justify-content: center;
+}
+
+.cell-format{
     text-align: center;
     font-weight: bold;
-    color:white;
+}
+
+.cell-very-good{
     background-color: #37ac56;
 }
 .cell-good{
-    text-align: center;
-    font-weight: bold;
-    color:white;
     background-color: #9bd444;
 }
 .cell-medium{
-    text-align: center;
-    font-weight: bold;
-    color:white;
     background-color: #f1d208;
 }
 .cell-poor{
-    text-align: center;
-    font-weight: bold;
-    color:white;
     background-color: #ffbb01;
 }
 .cell-very-poor{
-    text-align: center;
-    font-weight: bold;
-    color:white;
     background-color: #ff8c00;
 }
 .cell-extremely-poor{
-    text-align: center;
-    font-weight: bold;
-    color:white;
     background-color: #ed0f05;
 }
 .cell-error{
-    text-align: center;
-    font-weight: bold;
     color:white;
     background-color: #200100;
+}
+.empty-cell{
+    background-color:#ebebeb;
 }

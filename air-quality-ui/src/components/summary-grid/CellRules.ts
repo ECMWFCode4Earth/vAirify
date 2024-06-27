@@ -60,6 +60,8 @@ export default function cellRules(showAllColoured: boolean) {
         colourField(showAllColoured, params, 75, 800),
       'cell-error': (params: Params) =>
         colourField(showAllColoured, params, 800),
+      'empty-cell': (params: Params) =>
+        params.value === undefined && showAllColoured,
     },
 
     pm10: {
@@ -77,6 +79,8 @@ export default function cellRules(showAllColoured: boolean) {
         colourField(showAllColoured, params, 150, 1200),
       'cell-error': (params: Params) =>
         colourField(showAllColoured, params, 1200),
+      'empty-cell': (params: Params) =>
+        params.value === undefined && showAllColoured,
     },
 
     so2: {
@@ -94,6 +98,8 @@ export default function cellRules(showAllColoured: boolean) {
         colourField(showAllColoured, params, 750, 1250),
       'cell-error': (params: Params) =>
         colourField(showAllColoured, params, 1250),
+      'empty-cell': (params: Params) =>
+        params.value === undefined && showAllColoured,
     },
 
     no2: {
@@ -111,6 +117,8 @@ export default function cellRules(showAllColoured: boolean) {
         colourField(showAllColoured, params, 340, 1000),
       'cell-error': (params: Params) =>
         colourField(showAllColoured, params, 1000),
+      'empty-cell': (params: Params) =>
+        params.value === undefined && showAllColoured,
     },
 
     o3: {
@@ -128,6 +136,8 @@ export default function cellRules(showAllColoured: boolean) {
         colourField(showAllColoured, params, 380, 800),
       'cell-error': (params: Params) =>
         colourField(showAllColoured, params, 800),
+      'empty-cell': (params: Params) =>
+        params.value === undefined && showAllColoured,
     },
   }
 }

@@ -79,8 +79,8 @@ const GlobalSummary = (): JSX.Element => {
       <div className={`ag-theme-quartz ${classes['switch-div']}`}>
         <label className={`ag-theme-quartz ${classes['switch-label']}`}>
           {showAllColoured
-            ? 'Showing all coloured by api colour'
-            : 'Showing coloured if impacting overall diffrence'}
+            ? 'Highlight all AQI values'
+            : 'Highlight primary AQI values'}
         </label>
         <Switch
           onChange={() => {
