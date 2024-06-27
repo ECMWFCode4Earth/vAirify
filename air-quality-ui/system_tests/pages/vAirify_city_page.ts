@@ -6,10 +6,6 @@ export class VairifyCityPage {
   readonly apiSummary: object
   readonly title: Locator
   readonly scroller: Locator
-  readonly citiesBtn: Locator
-  readonly kampalaText: Locator
-  readonly abuDhabiText: Locator
-  readonly zurichText: Locator
 
   constructor(page: Page) {
     this.page = page

@@ -8,10 +8,6 @@ export class VairifySummaryPage {
   readonly scroller: Locator
   readonly agCell: Locator
   readonly allCells: Locator
-  readonly kampalaBtn: Locator
-  readonly abuDhabiBtn: Locator
-  readonly zurichBtn: Locator
-  readonly citiesBtn: Locator
 
   constructor(page: Page, apiForecast: object, apiSummary: object) {
     this.page = page
