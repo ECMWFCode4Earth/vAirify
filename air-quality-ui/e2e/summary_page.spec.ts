@@ -48,7 +48,7 @@ test.describe('Mocked API tests', () => {
   test('Verify that a city with no in-situ data still show on grid', async ({
     vairifySummaryPage,
   }) => {
-    const count = await vairifySummaryPage.textSearch()
+    const count = await vairifySummaryPage.textCellSearch('Kyiv')
     expect(count).toEqual(1)
   })
 

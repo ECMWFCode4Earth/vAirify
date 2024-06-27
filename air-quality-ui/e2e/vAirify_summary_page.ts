@@ -27,24 +27,7 @@ export class VairifySummaryPage {
     this.citiesBtn = this.page.getByRole('link', { name: 'Cities' })
   }
   async clickButton(buttonName: string) {
-    switch (buttonName) {
-      case 'Cities': {
-        await this.citiesBtn.click()
-        break
-      }
-      case 'Kampala': {
-        await this.kampalaBtn.click()
-        break
-      }
-      case 'Abu Dhabi': {
-        await this.abuDhabiBtn.click()
-        break
-      }
-      case 'Zurich': {
-        await this.zurichBtn.click()
-        break
-      }
-    }
+    await this.page.getByRole('link', { name: buttonName }).click()
   }
 
   async gotoSummaryPage() {
@@ -103,12 +86,12 @@ export class VairifySummaryPage {
     }
   }
 
-  async textSearch() {
+  async textCellSearch(searchText: string) {
     const cells = await this.page.locator('.ag-cell').all()
     let count = 0
     for (const cell of cells) {
       const cellText = await cell.innerText()
-      if (cellText.includes('Kyiv')) {
+      if (cellText.includes(searchText)) {
         count++
       }
     }
