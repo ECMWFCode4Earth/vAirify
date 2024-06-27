@@ -5,7 +5,7 @@ test.beforeEach(async ({ vairifySummaryPage }) => {
 })
 
 test('Verify page title is vAirify', async ({ vairifySummaryPage }) => {
-  const title = await vairifySummaryPage.checkTitle()
+  const title = await vairifySummaryPage.getTitle()
   expect(title).toBe('vAirify')
 })
 
@@ -39,7 +39,6 @@ test.describe('Mocked API tests', () => {
     )
   })
 
-  // Mocked + live env
   test('Verify numbers in cells have no more than 1 decimal place ', async ({
     vairifySummaryPage,
   }) => {

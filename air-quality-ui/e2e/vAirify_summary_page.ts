@@ -8,6 +8,10 @@ export class VairifySummaryPage {
   readonly scroller: Locator
   readonly agCell: Locator
   readonly allCells: Locator
+  readonly kampalaBtn: Locator
+  readonly abuDhabiBtn: Locator
+  readonly zurichBtn: Locator
+  readonly citiesBtn: Locator
 
   constructor(page: Page, apiForecast: object, apiSummary: object) {
     this.page = page
@@ -16,15 +20,18 @@ export class VairifySummaryPage {
     this.title = this.page.locator('title')
     this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')
     this.agCell = this.page.locator('role=gridcell')
-
     this.allCells = this.page.locator('[role=gridcell]')
+    this.kampalaBtn = this.page.getByRole('link', { name: 'Kampala' })
+    this.abuDhabiBtn = this.page.getByRole('link', { name: 'Abu Dhabi' })
+    this.zurichBtn = this.page.getByRole('link', { name: 'Zurich' })
+    this.citiesBtn = this.page.getByRole('link', { name: 'Cities' })
   }
 
   async gotoSummaryPage() {
     await this.page.goto('/city/summary')
   }
 
-  async checkTitle() {
+  async getTitle() {
     const title = await this.page.title()
     return title
   }
@@ -100,6 +107,7 @@ export class VairifySummaryPage {
       }
     }
   }
+
   async calculateForecastDifference() {
     const rows = await this.page
       .locator('.ag-center-cols-container .ag-row')
@@ -125,6 +133,7 @@ export class VairifySummaryPage {
     }
     return differences.filter((d) => !isNaN(d))
   }
+
   async setupPage() {
     await this.setupApiRoutes()
     await this.gotoSummaryPage()
