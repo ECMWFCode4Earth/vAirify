@@ -12,7 +12,7 @@ import { useMemo } from 'react'
 import '../cell/cell-rules/GridCss.css'
 
 import classes from './GlobalSummaryTable.module.css'
-import sortAQIComparator from './sorting/SortingAQIFunction'
+import sortAQIComparator from './sorting/SortingAQIComparator'
 import {
   PollutantType,
   pollutantTypeDisplay,

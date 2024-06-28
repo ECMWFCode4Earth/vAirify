@@ -1,4 +1,4 @@
-export type PollutantDataDto = {
+export type PollutantData = {
   [key: string]: {
     aqiLevel: number
     value: number
@@ -7,11 +7,11 @@ export type PollutantDataDto = {
 
 export type Params = {
   column: { colId: string }
-  value: number
+  value: number | undefined
   data: {
     aqiDifference: string
-    forecast: PollutantDataDto
-    measurements: PollutantDataDto
+    forecast: PollutantData
+    measurements: PollutantData | undefined
   }
 }
 
@@ -20,14 +20,22 @@ export default function colourCell(
   params: Params,
   lowerLimit: number,
   upperLimit?: number,
-) {
+): boolean {
   const pollutantType: string = params.column.colId.split('.')[1]
   if (!params.value) return false
-  const isInColourBand =
-    params.value >= lowerLimit && (upperLimit ?? params.value)
+
+  if (upperLimit === undefined && showAllColoured) {
+    return params.value >= lowerLimit
+  }
+
+  let isInColourBand
+  if (upperLimit === undefined) {
+    isInColourBand = params.value >= lowerLimit
+  } else {
+    isInColourBand = params.value >= lowerLimit && params.value <= upperLimit
+  }
 
   if (showAllColoured) return isInColourBand
-
   if (!params.data.measurements || !params.data.measurements[pollutantType])
     return false
 
