@@ -379,7 +379,7 @@ def test__in_situ_etl__does_not_convert_ugm3_():
 def test__in_situ_etl__converts_ppm_to_ugm3():
     query = {"name": "Berlin"}
     delete_database_data(collection_name, query)
-    location_berlin = "Berlin"
+    location_berlin = "berlin"
     unit_ppm = "ppm"
     berlin_file = f"{open_aq_cache_location}/Berlin_2024062613_2024062713.json"
     date_utc = "2024-06-26T13:10:20+00:00"
