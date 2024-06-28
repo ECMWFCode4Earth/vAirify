@@ -3,7 +3,7 @@
 import colourCell from './ColourCell'
 
 describe('Colour Cell', () => {
-  it('The most impactful forecast and measurement pairs are coloured', () => {
+  it('The most impactful forecast and measurement pairs are coloured when showAllColoured is false', () => {
     const params = {
       column: { colId: 'forecast.pm2_5' },
       value: 5,
@@ -27,7 +27,7 @@ describe('Colour Cell', () => {
     expect(result).toBeTruthy()
   })
 
-  it('The least impactful forecast and measurement pairs are not coloured', () => {
+  it('The least impactful forecast and measurement pairs are not coloured when showAllColoured is false', () => {
     const params = {
       column: { colId: 'forecast.pm2_5' },
       value: 1.0,
