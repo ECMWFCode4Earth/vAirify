@@ -314,10 +314,12 @@ def test__in_situ_etl__timeout_followed_by_success_returns_correctly(
 def test__in_situ_etl__does_not_convert_ugm3_():
     query = {"name": "Paris"}
     delete_database_data(collection_name, query)
+    paris_file = f"{open_aq_cache_location}/Paris_2024062613_2024062713.json"
 
     location_paris = "paris"
+    latitude_paris = 48.85341
+    longitude_paris = 2.3488
     unit_ugm3 = "µg/m³"
-    paris_file = f"{open_aq_cache_location}/Paris_2024062613_2024062713.json"
     date_utc = "2024-06-26T13:10:20+00:00"
     paris_openaq_data = [
         create_measurement(
@@ -326,6 +328,8 @@ def test__in_situ_etl__does_not_convert_ugm3_():
             1000,
             location_paris,
             unit_ugm3,
+            longitude_paris,
+            latitude_paris,
         ),
         create_measurement(
             date_utc,
@@ -333,6 +337,8 @@ def test__in_situ_etl__does_not_convert_ugm3_():
             1000,
             location_paris,
             unit_ugm3,
+            longitude_paris,
+            latitude_paris,
         ),
         create_measurement(
             date_utc,
@@ -340,6 +346,8 @@ def test__in_situ_etl__does_not_convert_ugm3_():
             1000,
             location_paris,
             unit_ugm3,
+            longitude_paris,
+            latitude_paris,
         ),
         create_measurement(
             date_utc,
@@ -347,6 +355,8 @@ def test__in_situ_etl__does_not_convert_ugm3_():
             1000,
             location_paris,
             unit_ugm3,
+            longitude_paris,
+            latitude_paris,
         ),
         create_measurement(
             date_utc,
@@ -354,6 +364,8 @@ def test__in_situ_etl__does_not_convert_ugm3_():
             1000,
             location_paris,
             unit_ugm3,
+            longitude_paris,
+            latitude_paris,
         ),
     ]
 
@@ -379,10 +391,14 @@ def test__in_situ_etl__does_not_convert_ugm3_():
 def test__in_situ_etl__converts_ppm_to_ugm3():
     query = {"name": "Berlin"}
     delete_database_data(collection_name, query)
-    location_berlin = "berlin"
-    unit_ppm = "ppm"
     berlin_file = f"{open_aq_cache_location}/Berlin_2024062613_2024062713.json"
+
+    location_berlin = "berlin"
+    latitude_berlin = 52.52437
+    longitude_berlin = 13.41053
+    unit_ppm = "ppm"
     date_utc = "2024-06-26T13:10:20+00:00"
+
     berlin_openaq_data = [
         create_measurement(
             date_utc,
@@ -390,6 +406,8 @@ def test__in_situ_etl__converts_ppm_to_ugm3():
             1000,
             location_berlin,
             unit_ppm,
+            longitude_berlin,
+            latitude_berlin,
         ),
         create_measurement(
             date_utc,
@@ -397,6 +415,8 @@ def test__in_situ_etl__converts_ppm_to_ugm3():
             1000,
             location_berlin,
             unit_ppm,
+            longitude_berlin,
+            latitude_berlin,
         ),
         create_measurement(
             date_utc,
@@ -404,6 +424,8 @@ def test__in_situ_etl__converts_ppm_to_ugm3():
             1000,
             location_berlin,
             unit_ppm,
+            longitude_berlin,
+            latitude_berlin,
         ),
         create_measurement(
             date_utc,
@@ -411,6 +433,8 @@ def test__in_situ_etl__converts_ppm_to_ugm3():
             1000,
             location_berlin,
             unit_ppm,
+            longitude_berlin,
+            latitude_berlin,
         ),
         create_measurement(
             date_utc,
@@ -418,6 +442,8 @@ def test__in_situ_etl__converts_ppm_to_ugm3():
             1000,
             location_berlin,
             unit_ppm,
+            longitude_berlin,
+            latitude_berlin,
         ),
     ]
 
@@ -428,7 +454,7 @@ def test__in_situ_etl__converts_ppm_to_ugm3():
     results = get_database_data(collection_name, query)
     stored: InSituMeasurement = results[0]
 
-    assert_pollutant_value(stored["no2"], 1000, "µg/m³", 1000, "ppm")
+    assert_pollutant_value(stored["no2"], 1845833.186980411, "µg/m³", 1000, "ppm")
     assert_pollutant_value(stored["o3"], 1000, "µg/m³", 1000, "ppm")
     assert_pollutant_value(stored["so2"], 1000, "µg/m³", 1000, "ppm")
     assert_pollutant_value(stored["pm2_5"], 1000, "µg/m³", 1000, "ppm")
@@ -469,6 +495,8 @@ def create_measurement(
     value: float,
     location: str = "london",
     unit: str = "µg/m³",
+    longitude: float = 1111,
+    latitude: float = 1112,
 ):
     overrides = {
         "location": f"{location}_test_station",
@@ -476,5 +504,6 @@ def create_measurement(
         "value": value,
         "unit": unit,
         "parameter": pollutant,
+        "coordinates": {"longitude": longitude, "latitude": latitude},
     }
     return create_open_aq_measurement(overrides)
