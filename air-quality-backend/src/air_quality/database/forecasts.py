@@ -47,7 +47,7 @@ def insert_data(data):
 
 def insert_textures(textures):
     upsert_data(
-        "textures",
+        "data_textures",
         [
             "forecast_base_time",
             "variable",
