@@ -2,6 +2,7 @@ from datetime import datetime
 
 from typing_extensions import Generic, TypedDict, NotRequired, TypeVar
 
+from air_quality.database.in_situ import ApiSource
 from air_quality.database.locations import AirQualityLocationType
 
 
@@ -27,7 +28,7 @@ class MeasurementDto(TypedDict):
     measurement_date: datetime
     location_type: AirQualityLocationType
     location_name: str
-    api_source: str
+    api_source: ApiSource
     no2: NotRequired[float]
     o3: NotRequired[float]
     pm2_5: NotRequired[float]

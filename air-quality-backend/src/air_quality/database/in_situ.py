@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime, timedelta
-from typing import TypedDict, NotRequired, Optional
+from enum import Enum
+from typing import List, TypedDict, NotRequired, Optional
 
 from bson import ObjectId
 
@@ -9,6 +10,10 @@ from .mongo_db_operations import get_collection, upsert_data, GeoJSONPoint
 from ..aqi.pollutant_type import PollutantType
 
 collection_name = "in_situ_data"
+
+
+class ApiSource(Enum):
+    OPENAQ = "OpenAQ"
 
 
 class InSituMetadata(TypedDict, total=False):
@@ -30,7 +35,7 @@ class InSituMeasurement(TypedDict):
     measurement_date: datetime
     name: str
     location_name: str
-    api_source: str
+    api_source: ApiSource
     created_time: NotRequired[datetime]
     last_modified_time: NotRequired[datetime]
     location: GeoJSONPoint
@@ -73,8 +78,8 @@ def find_by_criteria(
     measurement_date_from: datetime,
     measurement_date_to: datetime,
     location_type: AirQualityLocationType,
-    locations: [str] = None,
-    api_source: str = None,
+    locations: List[str] = None,
+    api_source: ApiSource = None,
 ) -> list[InSituMeasurement]:
     criteria = {
         "measurement_date": {
@@ -86,7 +91,7 @@ def find_by_criteria(
     if locations is not None:
         criteria["name"] = {"$in": locations}
     if api_source is not None:
-        criteria["api_source"] = api_source
+        criteria["api_source"] = api_source.value
     logging.info(f"Querying collection with criteria: {criteria}")
     return list(get_collection(collection_name).find(criteria))
 

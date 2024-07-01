@@ -7,7 +7,7 @@ from air_quality.aqi.pollutant_type import (
     PollutantType,
     pollutants_with_molecular_weight,
 )
-from air_quality.database.in_situ import InSituMeasurement
+from air_quality.database.in_situ import InSituMeasurement, ApiSource
 from air_quality.etl.common.unit_converter import convert_ppm_to_mgm3
 from air_quality.etl.forecast.forecast_data import ForecastData, ForecastDataType
 
@@ -32,7 +32,7 @@ def _create_document(
     measurement, city_name: str, location_type: AirQualityLocationType
 ) -> InSituMeasurement:
     return {
-        "api_source": "OpenAQ",
+        "api_source": ApiSource.OPENAQ.value,
         "measurement_date": datetime.strptime(
             measurement["date"]["utc"], "%Y-%m-%dT%H:%M:%S%z"
         ),
