@@ -75,3 +75,4 @@ def test__run_forecast_etl__forecast_time_in_environment_uses(
         mock_insert.assert_called_with(transformed_forecast_data)
         mock_textures.assert_called_with(forecast_data)
         mock_insert_textures.assert_called_with(textures)
+        
