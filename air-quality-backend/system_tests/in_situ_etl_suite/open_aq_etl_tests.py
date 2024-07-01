@@ -285,7 +285,6 @@ def test__in_situ_etl__internal_error_fails_without_retry(
 def test__in_situ_etl__timeout_followed_by_success_returns_correctly(
     mock_get_conn, caplog, ensure_forecast_cache
 ):
-
     mock_get_conn.return_value.getresponse.side_effect = [
         mock_response_for_status(408),
         mock_response_for_status(200),
@@ -380,58 +379,102 @@ def test__in_situ_etl__converts_ppm_to_ugm3():
     assert_pollutant_value(stored["no2"], 1845833.186980411, "µg/m³", 1000, "ppm")
     assert_pollutant_value(stored["o3"], 1925668.1802881924, "µg/m³", 1000, "ppm")
     assert_pollutant_value(stored["so2"], 2570365.8398138434, "µg/m³", 1000, "ppm")
-    assert_pollutant_value(stored["pm2_5"], 1000, "µg/m³", 1000, "µg/m³")
-    assert_pollutant_value(stored["pm10"], 1000, "µg/m³", 1000, "µg/m³")
+    assert_pollutant_value(stored["pm2_5"], 1000, "µg/m³", 1000, "ppm")
+    assert_pollutant_value(stored["pm10"], 1000, "µg/m³", 1000, "ppm")
 
 
-# def test__calculate_ppm_to_ugm3_conversion__assert_correct():
-#     query = {"name": "Sydney"}
-#     delete_database_data(collection_name, query)
-#     sydney_file = f"{open_aq_cache_location}/Sydney_2024062613_2024062713.json"
-#
-#     location_sydney = "sydney"
-#     latitude_sydney = -33.86785
-#     longitude_sydney = 151.20732
-#     unit_ppm = "ppm"
-#     date_utc = "2024-06-26T13:10:20+00:00"
-#
-#     sydney_openaq_data = [
-#         create_measurement(
-#             date_utc,
-#             "no2",
-#             1000,
-#             location_sydney,
-#             unit_ppm,
-#             longitude_sydney,
-#             latitude_sydney,
-#         ),
-#         create_measurement(
-#             date_utc,
-#             "o3",
-#             1000,
-#             location_sydney,
-#             unit_ppm,
-#             longitude_sydney,
-#             latitude_sydney,
-#         ),
-#         create_measurement(
-#             date_utc,
-#             "so2",
-#             1000,
-#             location_sydney,
-#             unit_ppm,
-#             longitude_sydney,
-#             latitude_sydney,
-#         ),
-#     ]
-#
-#     write_to_file(sydney_openaq_data, sydney_file)
-#     main()
-#     os.remove(sydney_file)
-#
-#     results = get_database_data(collection_name, query)
-#     stored: InSituMeasurement = results[0]
-#     pprint.pprint(stored)
+@mock.patch.dict(
+    os.environ,
+    {"OPEN_AQ_CITIES": "Berlin", "OPEN_AQ_CACHE": open_aq_cache_location},
+)
+@freeze_time("2024-06-27T13:00:00")
+def test__ppm_to_ugm3_calculation_from_estimated_temp_and_pressure():
+    query = {"name": "Berlin"}
+    delete_database_data(collection_name, query)
+    berlin_file = f"{open_aq_cache_location}/Berlin_2024062613_2024062713.json"
+
+    location_berlin = "berlin"
+    latitude_berlin = 52.52437
+    longitude_berlin = 13.41053
+    unit_ppm = "ppm"
+    date_utc = "2024-06-26T13:10:20+00:00"
+
+    berlin_openaq_data = [
+        create_measurement(
+            date_utc,
+            "no2",
+            1000,
+            location_berlin,
+            unit_ppm,
+            longitude_berlin,
+            latitude_berlin,
+        ),
+        create_measurement(
+            date_utc,
+            "o3",
+            1000,
+            location_berlin,
+            unit_ppm,
+            longitude_berlin,
+            latitude_berlin,
+        ),
+        create_measurement(
+            date_utc,
+            "so2",
+            1000,
+            location_berlin,
+            unit_ppm,
+            longitude_berlin,
+            latitude_berlin,
+        ),
+        create_measurement(
+            date_utc,
+            "pm25",
+            1000,
+            location_berlin,
+            unit_ppm,
+            longitude_berlin,
+            latitude_berlin,
+        ),
+        create_measurement(
+            date_utc,
+            "pm10",
+            1000,
+            location_berlin,
+            unit_ppm,
+            longitude_berlin,
+            latitude_berlin,
+        ),
+    ]
+
+    write_to_file(berlin_openaq_data, berlin_file)
+    main()
+    os.remove(berlin_file)
+
+    results = get_database_data(collection_name, query)
+    stored: InSituMeasurement = results[0]
+
+    estimated_surface_pressure_hpa = (
+        stored["metadata"]["estimated_surface_pressure_pa"] / 100
+    )
+    estimated_temperature_k = stored["metadata"]["estimated_temperature_k"]
+    molecular_volume = (
+        22.41
+        * (estimated_temperature_k / 273)
+        * (1013 / estimated_surface_pressure_hpa)
+    )
+    expected_no2_ugm3 = convert_ppm_to_ugm3(
+        stored["no2"]["original_value"], 46.01, molecular_volume
+    )
+    expected_so2_ugm3 = convert_ppm_to_ugm3(
+        stored["so2"]["original_value"], 64.07, molecular_volume
+    )
+    expected_o3_ugm3 = convert_ppm_to_ugm3(
+        stored["o3"]["original_value"], 48, molecular_volume
+    )
+    assert expected_no2_ugm3 == stored["no2"]["value"]
+    assert expected_so2_ugm3 == stored["so2"]["value"]
+    assert expected_o3_ugm3 == stored["o3"]["value"]
 
 
 def mock_response_for_status(status):
@@ -441,6 +484,15 @@ def mock_response_for_status(status):
         return [bytes(f'{{"results": [{result}]}}', "utf-8")]
 
     return Mock(status=status, msg=HTTPMessage(), headers={}, stream=stream_response)
+
+
+def convert_ppm_to_ugm3(
+    ppm_original_value,
+    molecular_weight_g_mol: float,
+    molecular_volume: float,
+):
+    pollutant_ppb_value = ppm_original_value * 1000
+    return pollutant_ppb_value * (molecular_weight_g_mol / molecular_volume)
 
 
 def assert_pollutant_value(
