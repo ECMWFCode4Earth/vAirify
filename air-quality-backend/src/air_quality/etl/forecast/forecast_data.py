@@ -63,6 +63,7 @@ def convert_longitude(dataset: xr.Dataset) -> xr.Dataset:
         )
     )
     converted_data = converted_data.sortby("longitude")
+    converted_data["longitude"].attrs["units"] = "degrees_east"
     return converted_data
 
 
@@ -225,4 +226,5 @@ class ForecastData:
         return self._single_level_data["valid_time"].values
 
     def get_time_value(self) -> int:
+        print(self._single_level_data["time"].values)
         return int(self._single_level_data["time"].values)

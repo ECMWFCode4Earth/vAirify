@@ -43,6 +43,8 @@ def get_single_level_request_body(request_details: CamsRequestDetails) -> dict:
         "particulate_matter_10um",
         "particulate_matter_2.5um",
         "surface_pressure",
+        "10m_u_component_of_wind",
+        "10m_v_component_of_wind",
     ]
     return base_request
 

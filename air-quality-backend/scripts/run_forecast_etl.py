@@ -4,9 +4,9 @@ from logging import config
 
 from dotenv import load_dotenv
 from datetime import datetime
-from air_quality.database.forecasts import insert_data
+from air_quality.database.forecasts import insert_data, insert_textures
 from air_quality.database.locations import get_locations_by_type, AirQualityLocationType
-from air_quality.etl.forecast.forecast_adapter import transform
+from air_quality.etl.forecast.forecast_adapter import transform, create_data_textures
 from air_quality.etl.forecast.forecast_dao import fetch_forecast_data
 
 config.fileConfig("./logging.ini")
@@ -32,6 +32,12 @@ def main():
 
     logging.info("Persisting forecast data")
     insert_data(transformed_forecast_data)
+
+    logging.info("Creating forecast data textures")
+    textures = create_data_textures(extracted_forecast_data)
+
+    logging.info("Persisting forecast data textures")
+    insert_textures(textures)
 
 
 if __name__ == "__main__":
