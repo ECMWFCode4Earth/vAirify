@@ -1,0 +1,34 @@
+.cell-header-format{
+    justify-content: center;
+}
+
+.cell-format{
+    text-align: center;
+    font-weight: bold;
+}
+
+.cell-very-good{
+    background-color: #37ac56;
+}
+.cell-good{
+    background-color: #9bd444;
+}
+.cell-medium{
+    background-color: #f1d208;
+}
+.cell-poor{
+    background-color: #ffbb01;
+}
+.cell-very-poor{
+    background-color: #ff8c00;
+}
+.cell-extremely-poor{
+    background-color: #ed0f05;
+}
+.cell-error{
+    color:white;
+    background-color: #000000;
+}
+.empty-cell{
+    background-color:#ebebeb;
+}

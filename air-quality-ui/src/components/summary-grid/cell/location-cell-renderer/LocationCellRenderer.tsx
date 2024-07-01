@@ -2,7 +2,7 @@ import { ICellRendererParams } from 'ag-grid-community'
 import { Link } from 'react-router-dom'
 
 import classes from './LocationCellRenderer.module.css'
-import { RouteConstants } from '../../routes'
+import { RouteConstants } from '../../../../routes'
 
 export const LocationCellRenderer = (
   props: Pick<ICellRendererParams, 'value'>,
