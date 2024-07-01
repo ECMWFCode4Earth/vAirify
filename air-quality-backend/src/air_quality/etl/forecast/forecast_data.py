@@ -226,4 +226,5 @@ class ForecastData:
         return self._single_level_data["valid_time"].values
 
     def get_time_value(self) -> int:
+        print(self._single_level_data["time"].values)
         return int(self._single_level_data["time"].values)

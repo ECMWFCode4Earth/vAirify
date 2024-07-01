@@ -151,6 +151,8 @@ def _get_dim_names(
 
 
 def _normalise_data(arr: np.ndarray, norm_min: float, norm_max: float) -> np.ndarray:
+    if norm_min == norm_max:
+        return np.zeros_like(arr)
     return (arr - norm_min) / (norm_max - norm_min)
 
 
@@ -186,15 +188,17 @@ def _convert_data(
 
     min_val, max_val = variable_ranges.get(variable, (0, 1))
 
+    time_dim = time.dims[0]  # Extract the dimension name as a string
+
     for tt in range(num_time):
         start_index = tt * num_lon
         end_index = (tt + 1) * num_lon
         if variable == "winds_10m":
             normalised_data_U = _normalise_data(
-                input_data["u10"].isel(step=tt), min_val, max_val
+                input_data["u10"].isel({time_dim: tt}), min_val, max_val
             )
             normalised_data_V = _normalise_data(
-                input_data["v10"].isel(step=tt), min_val, max_val
+                input_data["v10"].isel({time_dim: tt}), min_val, max_val
             )
             rgb_data_array[:, start_index:end_index, 0] = np.clip(
                 normalised_data_U * 255, 0, 255
@@ -204,7 +208,7 @@ def _convert_data(
             )
         else:
             normalised_data = _normalise_data(
-                input_data[variable].isel(step=tt) * 1e9, min_val, max_val
+                input_data[variable].isel({time_dim: tt}) * 1e9, min_val, max_val
             )
             rgb_data_array[:, start_index:end_index, 0] = np.clip(
                 normalised_data * 255, 0, 255
@@ -234,6 +238,9 @@ def _chunk_data_array(
 
     chunks = []
     time_steps_dict = {}
+
+    if num_time_steps <= 0 or num_time_steps > num_total_time_steps:
+        num_time_steps = num_total_time_steps
 
     for i in range(0, num_total_time_steps, num_time_steps):
         start_time_step = i
@@ -268,12 +275,9 @@ def _create_output_directory(forecast_data: ForecastData) -> Tuple[str, str]:
     :return: The output directory path and forecast date.
     """
 
-    filename = forecast_data._single_level_data.encoding.get("source", "Unknown source")
-    forecast_date = (
-        re.search(r"\d{4}-\d{2}-\d{2}_\d{2}", filename).group()
-        if filename != "Unknown source"
-        else "Unknown_date"
-    )
+    forecast_date = datetime.fromtimestamp(
+        forecast_data.get_time_value(), timezone.utc
+    ).strftime("%Y-%m-%d_%H")
 
     output_directory = f"/app/data_textures/{forecast_date}"
     if not os.path.exists(output_directory):
