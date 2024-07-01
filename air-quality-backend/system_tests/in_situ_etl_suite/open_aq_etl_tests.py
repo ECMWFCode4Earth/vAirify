@@ -306,9 +306,6 @@ def test__in_situ_etl__timeout_followed_by_success_returns_correctly(
     assert len(mock_get_conn.return_value.request.mock_calls) == 2
 
 
-
-
-
 @mock.patch.dict(
     os.environ,
     {"OPEN_AQ_CITIES": "Berlin", "OPEN_AQ_CACHE": open_aq_cache_location},
