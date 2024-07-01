@@ -14,9 +14,18 @@ cities = [create_test_city("Test", 90, 90)]
 forecast_data = ForecastData(single_level_data_set, multi_level_data_set)
 transformed_forecast_data = []
 textures = [
-    {"forecast_base_time": "2024-05-24T11:12:13", "variable": "pm10", "texture_uri": "path/to/texture1"},
-    {"forecast_base_time": "2024-05-24T11:12:13", "variable": "pm2_5", "texture_uri": "path/to/texture2"}
+    {
+        "forecast_base_time": "2024-05-24T11:12:13",
+        "variable": "pm10",
+        "texture_uri": "path/to/texture1",
+    },
+    {
+        "forecast_base_time": "2024-05-24T11:12:13",
+        "variable": "pm2_5",
+        "texture_uri": "path/to/texture2",
+    },
 ]
+
 
 @patch("scripts.run_forecast_etl.insert_data")
 @patch("scripts.run_forecast_etl.transform")
@@ -27,7 +36,13 @@ textures = [
 @patch("os.environ.get")
 @freeze_time("2024-05-24T11:12:13")
 def test__run_forecast_etl__no_forecast_time_in_environment_uses_now(
-    mock_os, mock_insert_textures, mock_textures , mock_locations, mock_fetch, mock_transform, mock_insert
+    mock_os,
+    mock_insert_textures,
+    mock_textures,
+    mock_locations,
+    mock_fetch,
+    mock_transform,
+    mock_insert,
 ):
     with patch("scripts.run_forecast_etl.config.fileConfig"):
         mock_os.return_value = None
@@ -47,6 +62,7 @@ def test__run_forecast_etl__no_forecast_time_in_environment_uses_now(
         mock_textures.assert_called_with(forecast_data)
         mock_insert_textures.assert_called_with(textures)
 
+
 @patch("scripts.run_forecast_etl.insert_data")
 @patch("scripts.run_forecast_etl.transform")
 @patch("scripts.run_forecast_etl.fetch_forecast_data")
@@ -56,7 +72,13 @@ def test__run_forecast_etl__no_forecast_time_in_environment_uses_now(
 @patch("os.environ.get")
 @freeze_time("2024-05-24T11:12:13")
 def test__run_forecast_etl__forecast_time_in_environment_uses(
-    mock_os, mock_insert_textures, mock_textures, mock_locations, mock_fetch, mock_transform, mock_insert
+    mock_os,
+    mock_insert_textures,
+    mock_textures,
+    mock_locations,
+    mock_fetch,
+    mock_transform,
+    mock_insert,
 ):
     with patch("scripts.run_forecast_etl.config.fileConfig"):
         mock_os.return_value = "2024-06-01 17"
@@ -75,4 +97,3 @@ def test__run_forecast_etl__forecast_time_in_environment_uses(
         mock_insert.assert_called_with(transformed_forecast_data)
         mock_textures.assert_called_with(forecast_data)
         mock_insert_textures.assert_called_with(textures)
-        

@@ -184,7 +184,7 @@ def test__convert_data():
         (
             20,
             1,
-        ),  # Edge case: num_time_steps is greater than total time steps, should default to 1 chunk
+        ),  # Edge case: should default to 1 chunk
     ],
 )
 def test__chunk_data_array(num_time_steps, expected_num_chunks):
@@ -254,9 +254,9 @@ def test__save_data_texture(mock_save):
         file_format,
     )
 
-    assert (
-        output_file
-        == f"{output_directory}/{variable}_{forecast_date}_CAMS_global.chunk_{num_chunk}_of_{total_chunks}.{file_format}"
+    assert output_file == (
+        f"{output_directory}/{variable}_{forecast_date}_CAMS_global."
+        f"chunk_{num_chunk}_of_{total_chunks}.{file_format}"
     )
     mock_save.assert_called_once()
 
@@ -335,7 +335,7 @@ def test_create_data_textures(mock_process_variable, mock_create_output_director
     db_metadata = create_data_textures(mock_forecast_data)
 
     mock_create_output_directory.assert_called_once_with(mock_forecast_data)
-    assert mock_process_variable.call_count == len(PollutantType) + 1  # All pollutants + WINDS
+    assert mock_process_variable.call_count == len(PollutantType) + 1
 
     expected_num_docs = (
         len(PollutantType) * len(mock_process_variable.return_value)

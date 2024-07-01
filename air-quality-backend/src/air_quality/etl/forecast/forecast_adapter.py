@@ -7,7 +7,6 @@ from .forecast_data import ForecastData, convert_to_forecast_data_type
 from air_quality.database.locations import AirQualityLocation
 from air_quality.aqi import calculator as aqi_calculator
 from air_quality.aqi.pollutant_type import PollutantType
-import re
 import os
 import xarray as xr
 import numpy as np
@@ -165,7 +164,8 @@ def _convert_data(
     :param input_data: The input dataset.
     :param variable: The variable to convert.
 
-    :return: A tuple containing the RGB data array, min value, max value, units, number of longitudes, and time vector.
+    :return: A tuple containing the RGB data array, min value, max value, units, number
+    of longitudes, and time vector.
     """
     lat, lon, time = _get_dim_names(input_data)
     num_lat, num_lon, num_time = len(lat), len(lon), len(time)
@@ -227,11 +227,12 @@ def _chunk_data_array(
     Split the rgb_data_array into smaller parts along the num_lon * num_time dimension
     for smaller file sizes and faster loading times.
 
-    :param rgb_data_array: Input data array with shape (num_lat, num_lon * num_time, channels)
+    :param rgb_data_array: array with shape (num_lat, num_lon * num_time, channels)
     :param num_time_steps: Number of time steps to use for each chunk
     :param num_lon: Number of longitude points
     :param time_vector: DataArray containing time information for each time step
-    :return: A list of chunked arrays and a dictionary with start and end time stamps for each chunk
+    :return: A list of chunked arrays and a dictionary with start and end time
+    stamps for each chunk
     """
     num_lat, total_lon_time, channels = rgb_data_array.shape
     num_total_time_steps = total_lon_time // num_lon
@@ -316,7 +317,10 @@ def _save_data_texture(
         format = "L"
 
     image = Image.fromarray(image_array, format)
-    output_file = f"{output_directory}/{variable}_{forecast_date}_CAMS_global.chunk_{num_chunk}_of_{total_chunks}.{file_format}"
+    output_file = (
+        f"{output_directory}/{variable}_{forecast_date}_CAMS_global."
+        f"chunk_{num_chunk}_of_{total_chunks}.{file_format}"
+    )
     image.save(output_file, format=file_format, lossless=True)
     return output_file
 
@@ -337,7 +341,7 @@ def _process_variable(
     :param output_directory: Directory to save the textures.
     :param forecast_date: The forecast date.
 
-    :return: A list of dictionaries containing data texture metadata for database insertion.
+    :return: A list of dictionaries containing data texture metadata for database.
     """
     documents = []
     chunks_per_texture = 16
@@ -384,7 +388,7 @@ def create_data_textures(forecast_data: ForecastData):
     """
     Create gridded data textures from forecast data for frontend maps
     :param forecast_data:
-    :return: List of dictionaries containing data texture metadata for database insertion
+    :return: List of dictionaries containing data texture metadata for database
     """
     output_directory, forecast_date = _create_output_directory(forecast_data)
     db_metadata = []
@@ -403,7 +407,7 @@ def create_data_textures(forecast_data: ForecastData):
         for document in documents:
             db_metadata.append(document)
 
-    logging.info(f"Creating data textures for WINDS")
+    logging.info("Creating data textures for WINDS")
     documents = _process_variable(
         forecast_data._single_level_data,
         "winds_10m",
