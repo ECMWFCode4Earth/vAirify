@@ -397,6 +397,7 @@ def test__in_situ_etl__converts_ppm_to_ugm3():
     latitude_berlin = 52.52437
     longitude_berlin = 13.41053
     unit_ppm = "ppm"
+    unit_ugm3 = "µg/m³"
     date_utc = "2024-06-26T13:10:20+00:00"
 
     berlin_openaq_data = [
@@ -432,7 +433,7 @@ def test__in_situ_etl__converts_ppm_to_ugm3():
             "pm25",
             1000,
             location_berlin,
-            unit_ppm,
+            unit_ugm3,
             longitude_berlin,
             latitude_berlin,
         ),
@@ -441,7 +442,7 @@ def test__in_situ_etl__converts_ppm_to_ugm3():
             "pm10",
             1000,
             location_berlin,
-            unit_ppm,
+            unit_ugm3,
             longitude_berlin,
             latitude_berlin,
         ),
@@ -455,10 +456,10 @@ def test__in_situ_etl__converts_ppm_to_ugm3():
     stored: InSituMeasurement = results[0]
 
     assert_pollutant_value(stored["no2"], 1845833.186980411, "µg/m³", 1000, "ppm")
-    assert_pollutant_value(stored["o3"], 1000, "µg/m³", 1000, "ppm")
-    assert_pollutant_value(stored["so2"], 1000, "µg/m³", 1000, "ppm")
-    assert_pollutant_value(stored["pm2_5"], 1000, "µg/m³", 1000, "ppm")
-    assert_pollutant_value(stored["pm10"], 1000, "µg/m³", 1000, "ppm")
+    assert_pollutant_value(stored["o3"], 1925668.1802881924, "µg/m³", 1000, "ppm")
+    assert_pollutant_value(stored["so2"], 2570365.8398138434, "µg/m³", 1000, "ppm")
+    assert_pollutant_value(stored["pm2_5"], 1000, "µg/m³", 1000, "µg/m³")
+    assert_pollutant_value(stored["pm10"], 1000, "µg/m³", 1000, "µg/m³")
 
 
 def mock_response_for_status(status):
