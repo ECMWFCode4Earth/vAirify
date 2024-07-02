@@ -21,6 +21,17 @@ required_pollutant_data = {
 
 
 def measurement_is_valid(measurement):
+    pollutant = required_pollutant_data[measurement["parameter"]]
+    if (
+        pollutant not in pollutants_with_molecular_weight()
+        and measurement["unit"] == "ppm"
+    ):
+        logging.info(
+            f"Unsupported unit found for pollutant without "
+            f"molecular weight {measurement['unit']}"
+        )
+        return False
+
     valid_unit = measurement["unit"] in ["µg/m³", "ppm"]
     if not valid_unit:
         logging.info(f"Unsupported unit found {measurement['unit']}")
