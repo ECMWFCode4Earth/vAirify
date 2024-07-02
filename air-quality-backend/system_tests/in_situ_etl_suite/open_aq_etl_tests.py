@@ -373,7 +373,7 @@ def test__convert_ppm_to_ugm3_and_store__only_no2_so2_o3():
 
     write_to_file(berlin_openaq_data, berlin_file)
 
-    # run in situ ETL process, use created file as cached response from OpenAQ for Berlin
+    # run in situ ETL process, use file as cached response from OpenAQ for Berlin
     main()
     os.remove(berlin_file)
 
