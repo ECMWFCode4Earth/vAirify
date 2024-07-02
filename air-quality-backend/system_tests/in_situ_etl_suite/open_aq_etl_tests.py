@@ -310,7 +310,9 @@ def test__in_situ_etl__timeout_followed_by_success_returns_correctly(
     {"OPEN_AQ_CITIES": "Berlin", "OPEN_AQ_CACHE": open_aq_cache_location},
 )
 @freeze_time("2024-06-27T13:00:00")
-def test__in_situ_etl__converts_ppm_to_ugm3():
+def test__convert_ppm_to_ugm3_and_store__only_no2_so2_o3():
+
+    # delete Berlin data, set up test data in file for Berlin
     query = {"name": "Berlin"}
     delete_database_data(collection_name, query)
     berlin_file = f"{open_aq_cache_location}/Berlin_2024062613_2024062713.json"
@@ -370,16 +372,17 @@ def test__in_situ_etl__converts_ppm_to_ugm3():
     ]
 
     write_to_file(berlin_openaq_data, berlin_file)
+
+    # run in situ ETL process, use created file as cached response from OpenAQ for Berlin
     main()
     os.remove(berlin_file)
 
+    # investigating data stored for Berlin
     results = get_database_data(collection_name, query)
     stored: InSituMeasurement = results[0]
-
-    estimated_surface_pressure_hpa = (
-        stored["metadata"]["estimated_surface_pressure_pa"] / 100
-    )
+    estimated_surface_pressure_pa = stored["metadata"]["estimated_surface_pressure_pa"]
     estimated_temperature_k = stored["metadata"]["estimated_temperature_k"]
+    estimated_surface_pressure_hpa = estimated_surface_pressure_pa / 100
     molecular_volume = (
         22.41
         * (estimated_temperature_k / 273)
@@ -394,18 +397,14 @@ def test__in_situ_etl__converts_ppm_to_ugm3():
     expected_so2_ugm3 = convert_ppm_to_ugm3(
         stored["so2"]["original_value"], 64.07, molecular_volume
     )
-    # expected_pm2_5_ugm3 = convert_ppm_to_ugm3(
-    #     stored["pm2_5"]["original_value"], 64.07, molecular_volume
-    # )
-    # expected_pm10_ugm3 = convert_ppm_to_ugm3(
-    #     stored["pm10"]["original_value"], 64.07, molecular_volume
-    # )
 
+    assert estimated_surface_pressure_pa == 100599.76759705569
+    assert estimated_temperature_k == 301.556091512509
     assert_pollutant_value(stored["no2"], expected_no2_ugm3, "µg/m³", 1000, "ppm")
     assert_pollutant_value(stored["o3"], expected_o3_ugm3, "µg/m³", 1000, "ppm")
     assert_pollutant_value(stored["so2"], expected_so2_ugm3, "µg/m³", 1000, "ppm")
-    # assert_pollutant_value(stored["pm2_5"], expected_pm2_5_ugm3, "µg/m³", 1000, "ppm")
-    # assert_pollutant_value(stored["pm10"], expected_pm10_ugm3, "µg/m³", 1000, "ppm")
+    assert "pm10" not in stored
+    assert "pm2_5" not in stored
 
 
 def mock_response_for_status(status):
