@@ -155,6 +155,18 @@ def test__transform_city__negative_value_filtered_out():
     assert result == []
 
 
+def test__transform_city__large_error_value_filtered_out():
+    measurement = create_mock_open_aq_response(
+        {
+            "parameter": "so2",
+            "value": 9999.0,
+        }
+    )
+
+    result = transform_city({"city": city, "measurements": [measurement]})
+    assert result == []
+
+
 @pytest.mark.parametrize("pollutant", ["pm10", "pm25"])
 def test__transform_city__ppm_value_for_pm_pollutant_filtered_out(pollutant):
 
