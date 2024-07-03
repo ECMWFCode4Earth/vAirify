@@ -159,7 +159,7 @@ def test__transform_city__large_error_value_filtered_out():
     measurement = create_mock_open_aq_response(
         {
             "parameter": "so2",
-            "value": 9001.0,
+            "value": 9999.0,
         }
     )
 

@@ -36,7 +36,7 @@ def measurement_is_valid(measurement):
     if not valid_unit:
         logging.info(f"Unsupported unit found {measurement['unit']}")
 
-    return valid_unit and measurement["value"] > 0 and measurement["value"] < 9999
+    return valid_unit and measurement["value"] > 0 and measurement["value"] != 9999
 
 
 def _create_document(
