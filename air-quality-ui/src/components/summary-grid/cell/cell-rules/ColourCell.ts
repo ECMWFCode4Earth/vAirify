@@ -15,39 +15,61 @@ export type Params = {
   }
 }
 
+type AqiValues = {
+  currentFieldAqiValue: number
+  otherFieldAqiValue: number
+}
+
+function fetchAqiValue(params: Params): AqiValues {
+  const columnDetails = params.column.colId.split('.')
+  const isForecastField = columnDetails[0] === 'forecast'
+  const forecastAQIValue = params.data.forecast[columnDetails[1]].aqiLevel
+  let measurementAqiValue = -1
+
+  if (params.data.measurements && params.data.measurements[columnDetails[1]]) {
+    measurementAqiValue = params.data.measurements[columnDetails[1]].aqiLevel
+  }
+
+  if (isForecastField) {
+    return {
+      currentFieldAqiValue: forecastAQIValue,
+      otherFieldAqiValue: measurementAqiValue,
+    }
+  }
+
+  return {
+    currentFieldAqiValue: measurementAqiValue,
+    otherFieldAqiValue: forecastAQIValue,
+  }
+}
+
 export default function colourCell(
   showAllColoured: boolean,
   params: Params,
-  lowerLimit: number,
-  upperLimit?: number,
+  targetAqiValue: number,
 ): boolean {
-  const pollutantType: string = params.column.colId.split('.')[1]
-  if (!params.value) return false
-
-  if (upperLimit === undefined && showAllColoured) {
-    return params.value >= lowerLimit
-  }
-
-  let isInColourBand
-  if (upperLimit === undefined) {
-    isInColourBand = params.value >= lowerLimit
-  } else {
-    isInColourBand = params.value >= lowerLimit && params.value <= upperLimit
-  }
-
-  if (showAllColoured) return isInColourBand
-  if (!params.data.measurements || !params.data.measurements[pollutantType])
+  const aqiValues = fetchAqiValue(params)
+  if (!params.value || aqiValues.currentFieldAqiValue === -1) {
     return false
+  }
+
+  const isInColourBand = targetAqiValue === aqiValues.currentFieldAqiValue
+  if (showAllColoured) {
+    return isInColourBand
+  }
+
+  if (aqiValues.otherFieldAqiValue === -1) {
+    return false
+  }
 
   const aqiDifference = Math.abs(
-    params.data.forecast[pollutantType].aqiLevel -
-      params.data.measurements[pollutantType].aqiLevel,
+    aqiValues.currentFieldAqiValue - aqiValues.otherFieldAqiValue,
   )
-
-  if (params.data.aqiDifference === '0') return false
+  if (params.data.aqiDifference === '0') {
+    return false
+  }
 
   const aqiMatchesDifference =
     parseInt(params.data.aqiDifference.split('')[1]) === aqiDifference
-
   return aqiMatchesDifference ? isInColourBand : false
 }

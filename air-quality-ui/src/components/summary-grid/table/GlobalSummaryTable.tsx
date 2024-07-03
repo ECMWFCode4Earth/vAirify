@@ -9,7 +9,7 @@ import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { DateTime } from 'luxon'
 import { useMemo } from 'react'
-import '../cell/cell-rules/GridCss.css'
+import '../cell/cell-rules/GridRules.css'
 
 import classes from './GlobalSummaryTable.module.css'
 import sortAQIComparator from './sorting/SortingAQIComparator'
@@ -54,12 +54,18 @@ function getPerformanceSymbol(
   forecastAQILevel: number,
   measurementsAQILevel: number,
 ) {
-  if (forecastAQILevel > measurementsAQILevel) return '+'
-  else if (forecastAQILevel === measurementsAQILevel) return ''
-  else return '-'
+  if (forecastAQILevel > measurementsAQILevel) {
+    return '+'
+  } else if (forecastAQILevel === measurementsAQILevel) {
+    return ''
+  } else {
+    return '-'
+  }
 }
 function insertEmptyValueDash(value: number | undefined): string {
-  if (value === undefined) return '-'
+  if (value === undefined) {
+    return '-'
+  }
   return value.toString()
 }
 const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
@@ -182,15 +188,15 @@ const createSummaryRow = ({
           aqiLevel: measurementData.aqiLevel,
         },
       }
-      const numericalDiffrence = Math.abs(
+      const numericalDifference = Math.abs(
         measurementData.aqiLevel - forecastData.aqiLevel,
       )
       const currentDifferenceWithSymbol =
         getPerformanceSymbol(forecastData.aqiLevel, measurementData.aqiLevel) +
-        numericalDiffrence
+        numericalDifference
       if (
         !row.aqiDifference ||
-        numericalDiffrence > parseInt(row.aqiDifference.split('')[1])
+        numericalDifference > parseInt(row.aqiDifference.split('')[1])
       ) {
         row.aqiDifference = currentDifferenceWithSymbol
         row.forecast.aqiLevel = forecastData.aqiLevel
@@ -211,6 +217,8 @@ const GlobalSummaryTable = ({
     if (!forecast || !summarizedMeasurements) {
       return null
     }
+    console.log(forecast)
+    console.log(summarizedMeasurements)
     return createComparisonData(forecast, summarizedMeasurements).map(
       (comparisonData) => createSummaryRow(comparisonData),
     )

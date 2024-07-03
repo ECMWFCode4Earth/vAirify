@@ -6,7 +6,7 @@ describe('Sorting AQI comparator', () => {
   each([
     ['0', '+1', -1],
     ['+1', '0', 1],
-    ['0', '0', -1],
+    ['0', '0', 0],
     [undefined, '+1', -1],
     ['+1', undefined, 1],
     ['0', undefined, 1],

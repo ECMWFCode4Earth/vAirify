@@ -1,5 +1,3 @@
-//import each from 'jest-each'
-
 import colourCell from './ColourCell'
 
 describe('Colour Cell', () => {
@@ -23,7 +21,7 @@ describe('Colour Cell', () => {
         },
       },
     }
-    const result = colourCell(false, params, 0, 10)
+    const result = colourCell(false, params, 1)
     expect(result).toBeTruthy()
   })
 
@@ -47,7 +45,7 @@ describe('Colour Cell', () => {
         },
       },
     }
-    const result = colourCell(false, params, 0, 10)
+    const result = colourCell(false, params, 1)
     expect(result).toBeFalsy()
   })
 
@@ -71,56 +69,8 @@ describe('Colour Cell', () => {
         },
       },
     }
-    const result = colourCell(false, params, 0, 10)
+    const result = colourCell(false, params, 1)
     expect(result).toBeFalsy()
-  })
-
-  it('if contains only lower bounds return true if above that value, and if showAllColoured is false', () => {
-    const params = {
-      column: { colId: 'forecast.pm2_5' },
-      value: 8000,
-      data: {
-        aqiDifference: '+5',
-        forecast: {
-          pm2_5: {
-            value: 8000,
-            aqiLevel: 6,
-          },
-        },
-        measurements: {
-          pm2_5: {
-            value: 1,
-            aqiLevel: 1,
-          },
-        },
-      },
-    }
-    const result = colourCell(false, params, 800)
-    expect(result).toBeTruthy()
-  })
-
-  it('if contains only lower bounds return true if above that value, and if showAllColoured is true', () => {
-    const params = {
-      column: { colId: 'forecast.pm2_5' },
-      value: 8000,
-      data: {
-        aqiDifference: '-5',
-        forecast: {
-          pm2_5: {
-            value: 8000,
-            aqiLevel: 6,
-          },
-        },
-        measurements: {
-          pm2_5: {
-            value: 1,
-            aqiLevel: 1,
-          },
-        },
-      },
-    }
-    const result = colourCell(true, params, 800)
-    expect(result).toBeTruthy()
   })
 
   it('if showAllColoured is true, colour all cells regardless of impact', () => {
@@ -143,7 +93,7 @@ describe('Colour Cell', () => {
         },
       },
     }
-    const result = colourCell(true, params, 0, 10)
+    const result = colourCell(true, params, 1)
     expect(result).toBeTruthy()
   })
 
@@ -162,7 +112,7 @@ describe('Colour Cell', () => {
         measurements: undefined,
       },
     }
-    const result = colourCell(true, params, 0, 10)
+    const result = colourCell(true, params, 1)
     expect(result).toBeFalsy()
   })
 
@@ -181,7 +131,7 @@ describe('Colour Cell', () => {
         measurements: {},
       },
     }
-    const result = colourCell(true, params, 0, 10)
+    const result = colourCell(true, params, 1)
     expect(result).toBeFalsy()
   })
 })
