@@ -45,32 +45,31 @@ describe('GlobalSummary component', () => {
       expect(screen.getByText('Error occurred')).toBeInTheDocument()
     })
   })
-  // it('shows forecast base time', async () => {
-  //   render(<GlobalSummary />)
-  //   await waitFor(() => {
-  //     expect(
-  //       screen.getByText('Forecast Base Time: 01 Jun 03:00 UTC'),
-  //     ).toBeInTheDocument()
-  //   })
-  // })
-  // it('shows forecast valid time range', async () => {
-  //   render(<GlobalSummary />)
-  //   await waitFor(() => {
-  //     expect(screen.getByTestId('forecast-valid-range')).toHaveTextContent(
-  //       'Forecast Valid Time Range: 01 Jun 03:00 - 01 Jun 15:00 UTC',
-  //     )
-  //   })
-  // })
-  // it('shows the summary table', async () => {
-  //   render(<GlobalSummary />)
-  //   await waitFor(() => {
-  //     expect(screen.getByTestId('summary-grid')).toBeInTheDocument()
-  //   })
-  // })
+  it('shows forecast base time', async () => {
+    render(<GlobalSummary />)
+    await waitFor(() => {
+      expect(
+        screen.getByText('Forecast Base Time: 01 Jun 03:00 UTC'),
+      ).toBeInTheDocument()
+    })
+  })
+  it('shows forecast valid time range', async () => {
+    render(<GlobalSummary />)
+    await waitFor(() => {
+      expect(screen.getByTestId('forecast-valid-range')).toHaveTextContent(
+        'Forecast Valid Time Range: 01 Jun 03:00 - 01 Jun 15:00 UTC',
+      )
+    })
+  })
+  it('shows the summary table', async () => {
+    render(<GlobalSummary />)
+    await waitFor(() => {
+      expect(screen.getByTestId('summary-grid')).toBeInTheDocument()
+    })
+  })
 
   it('When switch is clicked change to highlight primary AQI values mode', async () => {
-    ;(useQuery as jest.Mock).mockReturnValueOnce({
-      data: {
+    let useQueryData = {
         Dubai: [
           {
             base_time: '2024-06-02T03:00:00Z',
@@ -97,11 +96,9 @@ describe('GlobalSummary component', () => {
             o3: { aqi_level: 1, value: 13.584082735635388 },
           },
         ],
-      },
-      isError: false,
-    })
-    ;(useQueries as jest.Mock).mockReturnValueOnce({
-      data: {
+      }
+
+    let useQueriesData = {
         Dubai: [
           {
             measurement_base_time: '2024-06-01T03:00:00Z',
@@ -118,9 +115,12 @@ describe('GlobalSummary component', () => {
             so2: { mean: { aqi_level: 1, value: 24.650014087573723 } },
           },
         ],
-      },
-      isError: false,
-    })
+      }
+
+    jest.mock('@tanstack/react-query', () => ({
+      useQuery: jest.fn().mockReturnValue({ data: useQueryData, isError: false }),
+      useQueries: jest.fn().mockReturnValue({ data: useQueriesData, isError: false }),
+    }))
     render(<GlobalSummary />)
     await waitFor(() => {
       expect(screen.getByDisplayValue('24.650014087573723')).toHaveClass('ddd')
