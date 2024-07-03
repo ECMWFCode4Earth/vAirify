@@ -6,8 +6,14 @@ export class VairifyCityPage {
   readonly scroller: Locator
   readonly apiForecastAqi: object
   readonly aqiChart: Locator
+  readonly chartSelector: string
+  readonly toolbarNavigation: Locator
 
-  constructor(page: Page, apiForecastAqi: object) {
+  constructor(
+    page: Page,
+    apiForecastAqi: object,
+    chartSelector: string = '#chart',
+  ) {
     this.page = page
     this.title = this.page.locator('title')
     this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')
@@ -15,10 +21,18 @@ export class VairifyCityPage {
     this.aqiChart = this.page
       .getByTestId('main-comparison-chart')
       .locator('canvas')
+    this.chartSelector = chartSelector
+    this.toolbarNavigation = this.page.getByLabel(
+      'Toolbar with site navigation',
+    )
   }
 
   textFinder(textToFind: string) {
     return this.page.getByText(textToFind)
+  }
+
+  toolbarTextFinder(textToFind: string) {
+    return this.toolbarNavigation.getByText(textToFind)
   }
 
   async setupRioDeJaneiroRoute() {
@@ -39,4 +53,12 @@ export class VairifyCityPage {
     await this.gotoRioCityPage()
     await this.waitForGraphVisible()
   }
+  // async waitForChartLoad(): Promise<void> {
+  //   await this.page.evaluate((selector: string) => {
+  //     return new Promise<void>((resolve) => {
+  //       const chart = (echarts as any).getInstanceByDom(document.querySelector(selector) as HTMLElement);
+  //       chart.on('finished', resolve);
+  //     });
+  //   }, this.chartSelector);
+  //   }
 }

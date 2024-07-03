@@ -1,7 +1,7 @@
 export const apiForecastAqi = [
   {
     base_time: '2024-07-01T00:00:00Z',
-    valid_time: '2024-07-01T03:00:00Z',
+    valid_time: '2024-07-01T00:00:00Z',
     location_type: 'city',
     location_name: 'Rio de Janeiro',
     overall_aqi_level: 2.0,

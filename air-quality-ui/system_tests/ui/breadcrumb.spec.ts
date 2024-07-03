@@ -7,17 +7,16 @@ test('Mocked response breadcrumb', async ({
   await vairifySummaryPage.setupPage()
 
   await vairifySummaryPage.clickButton('Kampala')
-  await expect(vairifyCityPage.textFinder('Cities')).toBeVisible()
-  await expect(vairifyCityPage.textFinder('Kampala')).toBeVisible()
+  await expect(
+    vairifyCityPage.toolbarTextFinder('Cities/Kampala'),
+  ).toBeVisible()
   await vairifySummaryPage.clickButton('Cities')
 
   await vairifySummaryPage.clickButton('Abu Dhabi')
-  await expect(vairifyCityPage.textFinder('Cities')).toBeVisible()
-  await expect(vairifyCityPage.textFinder('Abu Dhabi')).toBeVisible()
+  await expect(vairifyCityPage.textFinder('Cities/Abu Dhabi')).toBeVisible()
   await vairifySummaryPage.clickButton('Cities')
 
   await vairifySummaryPage.clickButton('Zurich')
-  await expect(vairifyCityPage.textFinder('Cities')).toBeVisible()
-  await expect(vairifyCityPage.textFinder('Zurich')).toBeVisible()
+  await expect(vairifyCityPage.textFinder('Cities/Zurich')).toBeVisible()
   await vairifySummaryPage.clickButton('Cities')
 })
