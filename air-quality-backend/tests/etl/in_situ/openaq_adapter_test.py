@@ -1,14 +1,18 @@
 from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 
+import pytest
+
 from air_quality.aqi.pollutant_type import PollutantType
 from air_quality.etl.forecast.forecast_data import ForecastDataType
 from air_quality.etl.in_situ.openaq_adapter import (
     transform_city,
     enrich_with_forecast_data,
 )
-from .mock_openaq_data import create_measurement
-from ...util.mock_measurement import create_mock_measurement_document
+from ...util.mock_measurement import (
+    create_mock_measurement_document,
+    create_mock_open_aq_response,
+)
 
 city = {"name": "Dublin", "latitude": 53.350140, "longitude": -6.266155, "type": "city"}
 
@@ -18,23 +22,46 @@ def test__transform_city__multiple_sites_in_city():
         {
             "city": city,
             "measurements": [
-                create_measurement(
-                    (1, "Dublin 1", 0.0, 0.0),
-                    "2024-04-21T00:00:00+00:00",
-                    "so2",
-                    14.0,
+                create_mock_open_aq_response(
+                    {
+                        "location": "Dublin 1",
+                        "parameter": "so2",
+                        "value": 14.0,
+                        "date": {
+                            "utc": "2024-04-21T00:00:00+00:00",
+                            "local": "2024-04-21T01:00:00+01:00",
+                        },
+                    }
                 ),
-                create_measurement(
-                    (1, "Dublin 2", 1.0, 1.0),
-                    "2024-04-21T00:00:00+00:00",
-                    "so2",
-                    11.0,
+                create_mock_open_aq_response(
+                    {
+                        "location": "Dublin 2",
+                        "parameter": "so2",
+                        "value": 11.0,
+                        "coordinates": {
+                            "latitude": 1.0,
+                            "longitude": 1.0,
+                        },
+                        "date": {
+                            "utc": "2024-04-21T00:00:00+00:00",
+                            "local": "2024-04-21T01:00:00+01:00",
+                        },
+                    }
                 ),
-                create_measurement(
-                    (1, "Dublin 2", 1.0, 1.0),
-                    "2024-04-21T03:00:00+00:00",
-                    "so2",
-                    12.0,
+                create_mock_open_aq_response(
+                    {
+                        "location": "Dublin 2",
+                        "parameter": "so2",
+                        "value": 12.0,
+                        "coordinates": {
+                            "latitude": 1.0,
+                            "longitude": 1.0,
+                        },
+                        "date": {
+                            "utc": "2024-04-21T03:00:00+00:00",
+                            "local": "2024-04-21T04:00:00+01:00",
+                        },
+                    }
                 ),
             ],
         }
@@ -108,62 +135,81 @@ def test__transform_city__multiple_sites_in_city():
 
 def test__transform_city__invalid_unit_filtered_out():
 
-    measurement = create_measurement(
-        (1, "Dublin 1", 0.0, 0.0), "2024-04-21T00:00:00+00:00", "so2", 14.0
+    measurement = create_mock_open_aq_response(
+        {"parameter": "so2", "value": 14.0, "unit": "invalid"}
     )
-    measurement["unit"] = "invalid"
 
     result = transform_city({"city": city, "measurements": [measurement]})
     assert result == []
 
 
 def test__transform_city__negative_value_filtered_out():
-
-    measurement = create_measurement(
-        (1, "Dublin 1", 0.0, 0.0),
-        "2024-04-21T00:00:00+00:00",
-        "so2",
-        -14.0,
+    measurement = create_mock_open_aq_response(
+        {
+            "parameter": "so2",
+            "value": -14.0,
+        }
     )
 
     result = transform_city({"city": city, "measurements": [measurement]})
     assert result == []
 
 
+def test__transform_city__large_error_value_filtered_out():
+    measurement = create_mock_open_aq_response(
+        {
+            "parameter": "so2",
+            "value": 9999.0,
+        }
+    )
+
+    result = transform_city({"city": city, "measurements": [measurement]})
+    assert result == []
+
+
+@pytest.mark.parametrize("pollutant", ["pm10", "pm25"])
+def test__transform_city__ppm_value_for_pm_pollutant_filtered_out(pollutant):
+
+    measurement = create_mock_open_aq_response(
+        {"parameter": pollutant, "value": 14.0, "unit": "ppm"}
+    )
+
+    result = transform_city({"city": city, "measurements": [measurement]})
+    assert result == []
+
+
+@pytest.mark.parametrize("pollutant", ["no2", "so2", "o3"])
+def test__transform_city__ppm_value_for_non_pm_pollutant_not_filtered_out(pollutant):
+
+    measurement = create_mock_open_aq_response(
+        {"parameter": pollutant, "value": 14.0, "unit": "ppm"}
+    )
+
+    result = transform_city({"city": city, "measurements": [measurement]})
+    assert len(result) == 1
+
+
 def test__transform_city__all_five_pollutants():
+
+    test_co_ords = {"latitude": 53.34187500024688, "longitude": -6.2140750004382745}
     result = transform_city(
         {
             "city": city,
             "measurements": [
-                create_measurement(
-                    (1, "Dublin 1", 53.34187500024688, -6.2140750004382745),
-                    "2024-04-21T00:00:00+00:00",
-                    "no2",
-                    1.0,
+                create_mock_open_aq_response(
+                    {"parameter": "no2", "value": 1.0, "coordinates": test_co_ords}
                 ),
-                create_measurement(
-                    (1, "Dublin 1", 53.34187500024688, -6.2140750004382745),
-                    "2024-04-21T00:00:00+00:00",
-                    "o3",
-                    2.0,
+                create_mock_open_aq_response(
+                    {"parameter": "o3", "value": 2.0, "coordinates": test_co_ords}
                 ),
-                create_measurement(
-                    (1, "Dublin 1", 53.34187500024688, -6.2140750004382745),
-                    "2024-04-21T00:00:00+00:00",
-                    "so2",
-                    3.0,
+                create_mock_open_aq_response(
+                    {"parameter": "so2", "value": 3.0, "coordinates": test_co_ords}
                 ),
-                create_measurement(
-                    (1, "Dublin 1", 53.34187500024688, -6.2140750004382745),
-                    "2024-04-21T00:00:00+00:00",
-                    "pm10",
-                    4.0,
+                create_mock_open_aq_response(
+                    {"parameter": "pm10", "value": 4.0, "coordinates": test_co_ords}
                 ),
-                create_measurement(
-                    (1, "Dublin 1", 53.34187500024688, -6.2140750004382745),
-                    "2024-04-21T00:00:00+00:00",
-                    "pm25",
-                    5.0,
+                create_mock_open_aq_response(
+                    {"parameter": "pm25", "value": 5.0, "coordinates": test_co_ords}
                 ),
             ],
         }
@@ -173,7 +219,7 @@ def test__transform_city__all_five_pollutants():
             "api_source": "OpenAQ",
             "name": "Dublin",
             "location_type": "city",
-            "location_name": "Dublin 1",
+            "location_name": "Dublin measurement station",
             "location": {
                 "coordinates": (-6.2140750004382745, 53.34187500024688),
                 "type": "point",

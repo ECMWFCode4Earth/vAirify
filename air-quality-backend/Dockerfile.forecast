@@ -34,4 +34,4 @@ RUN curl -fsSLO "$SUPERCRONIC_URL" \
 
 COPY cron/crontab.forecast crontab
 
-CMD [ "/usr/local/bin/supercronic", "./crontab" ]
+CMD [ "/usr/local/bin/supercronic", "-passthrough-logs", "./crontab" ]
