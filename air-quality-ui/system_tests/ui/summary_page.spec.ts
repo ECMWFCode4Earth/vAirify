@@ -1,5 +1,25 @@
 import { expect, test } from '../utils/fixtures'
 
+test('Verify the correct API calls are triggered for a given forecast base time and current time', async ({
+  page,
+  vairifySummaryPage,
+}) => {
+  const requestArray: { [key: string]: string } = {}
+
+  page.on('request', (request) => {
+    const requestMethod: string = request.method()
+    const requestUrl: string = request.url()
+    if (
+      requestMethod === 'GET' &&
+      requestUrl.includes(`http://localhost:8000/air-pollutant/forecast`)
+    ) {
+      requestArray['url'] = requestUrl
+    }
+  })
+  await vairifySummaryPage.goTo()
+  console.log(requestArray)
+})
+
 test.describe('No Mocking', () => {
   test.beforeEach(async ({ vairifySummaryPage }) => {
     await vairifySummaryPage.goTo()
@@ -8,16 +28,6 @@ test.describe('No Mocking', () => {
   test('Verify page title is vAirify', async ({ vairifySummaryPage }) => {
     const title = await vairifySummaryPage.getTitle()
     expect(title).toBe('vAirify')
-  })
-
-  test('Verify the correct API calls are triggered for a given forecast base time and current time', async ({
-    page,
-    vairifySummaryPage,
-  }) => {
-    page.on('request', (request) =>
-      console.log('>>', request.method(), request.url()),
-    )
-    vairifySummaryPage.goTo()
   })
 })
 
