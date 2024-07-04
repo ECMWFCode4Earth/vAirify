@@ -1,7 +1,10 @@
 import { expect, test } from '../utils/fixtures'
 
 test.beforeEach(async ({ vairifySummaryPage }) => {
-  await vairifySummaryPage.setupPage()
+  await vairifySummaryPage.setupPage(
+    vairifySummaryPage.apiForecast,
+    vairifySummaryPage.apiSummary
+  )
 })
 
 test('Verify page title is vAirify', async ({ vairifySummaryPage }) => {
@@ -16,26 +19,26 @@ test.describe('Mocked API tests', () => {
     await vairifySummaryPage.getColumnHeaderAndText('AQI Level', 'AQI Level')
     await vairifySummaryPage.getColumnHeaderAndText(
       'PM 2.5 (µg/m³)',
-      'PM 2.5 (µg/m³)',
+      'PM 2.5 (µg/m³)'
     )
     await vairifySummaryPage.getColumnHeaderAndText(
       'PM 10 (µg/m³)',
-      'PM 10 (µg/m³)',
+      'PM 10 (µg/m³)'
     )
     await vairifySummaryPage.scrollToRightmostPosition()
     await vairifySummaryPage.page.waitForTimeout(1000)
 
     await vairifySummaryPage.getColumnHeaderAndText(
       'Nitrogen Dioxide (µg/m³)',
-      'Nitrogen Dioxide (µg/m³)',
+      'Nitrogen Dioxide (µg/m³)'
     )
     await vairifySummaryPage.getColumnHeaderAndText(
       'Ozone (µg/m³)',
-      'Ozone (µg/m³)',
+      'Ozone (µg/m³)'
     )
     await vairifySummaryPage.getColumnHeaderAndText(
       'Sulphur Dioxide (µg/m³)',
-      'Sulphur Dioxide (µg/m³)',
+      'Sulphur Dioxide (µg/m³)'
     )
   })
 

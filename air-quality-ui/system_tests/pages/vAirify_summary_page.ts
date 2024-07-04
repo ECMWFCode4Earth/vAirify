@@ -31,18 +31,6 @@ export class VairifySummaryPage {
     return title
   }
 
-  async setupApiRoutes() {
-    await this.page.route('*/**/air-pollutant/forecast*', async (route) => {
-      await route.fulfill({ json: this.apiForecast })
-    })
-    await this.page.route(
-      '*/**/air-pollutant/measurements/summary*',
-      async (route) => {
-        await route.fulfill({ json: this.apiSummary })
-      },
-    )
-  }
-
   async getColumnHeaderAndText(name: string, expectedText: string) {
     const header = this.page.getByRole('columnheader', { name })
     await header.waitFor({ state: 'visible' })
@@ -95,7 +83,7 @@ export class VairifySummaryPage {
       const row = expectedData[rowIndex]
       for (let colIndex = 0; colIndex < row.length; colIndex++) {
         const cellLocator = this.page.locator(
-          `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(${colIndex + 1})`,
+          `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(${colIndex + 1})`
         )
         const cellText = await cellLocator.innerText()
         expect(cellText.trim()).toBe(row[colIndex])
@@ -111,10 +99,10 @@ export class VairifySummaryPage {
 
     for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
       const forecastCellLocator = this.page.locator(
-        `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(1)`,
+        `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(1)`
       )
       const measuredCellLocator = this.page.locator(
-        `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(2)`,
+        `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(2)`
       )
 
       const forecastText = await forecastCellLocator.innerText()
@@ -129,8 +117,24 @@ export class VairifySummaryPage {
     return differences.filter((d) => !isNaN(d))
   }
 
-  async setupPage() {
-    await this.setupApiRoutes()
+  async setupApiRoute(endpointUrl: string, mockedAPIResponse: object) {
+    await this.page.route(endpointUrl, async (route) => {
+      await route.fulfill({ json: mockedAPIResponse })
+    })
+  }
+
+  async setupPage(
+    mockedForecastResponse: object,
+    mockedMeasurementSummaryResponse: object
+  ) {
+    await this.setupApiRoute(
+      '*/**/air-pollutant/forecast*',
+      mockedForecastResponse
+    )
+    await this.setupApiRoute(
+      '*/**/air-pollutant/measurements/summary*',
+      mockedMeasurementSummaryResponse
+    )
     await this.gotoSummaryPage()
     await this.waitForGridVisible()
   }
