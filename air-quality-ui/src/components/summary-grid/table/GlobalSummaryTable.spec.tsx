@@ -17,14 +17,14 @@ const forecastDataOne = mockForecastResponseDto({
   valid_time: '2024-06-25T00:00:00Z',
   base_time: '2024-06-25T00:00:00Z',
   overall_aqi_level: 1,
-  so2: { aqi_level: 1, value: 1 },
+  so2: { aqi_level: 1, value: 1.7 },
 })
 const measurementDataOne = mockMeasurementSummaryResponseDto({
   location_name: 'London',
   measurement_base_time: '2024-06-25T00:00:00Z',
   location_type: 'city',
   overall_aqi_level: { mean: 1 },
-  so2: { mean: { aqi_level: 1, value: 1 } },
+  so2: { mean: { aqi_level: 1, value: 1.2 } },
 })
 
 const forecastDataTwo = mockForecastResponseDto({
@@ -59,23 +59,37 @@ const measurementDataThree = mockMeasurementSummaryResponseDto({
   no2: { mean: { aqi_level: 6, value: 600 } },
 })
 
+const forecastDataFour = mockForecastResponseDto({
+  location_name: 'Seoul',
+  base_time: '2024-06-19T00:00:00Z',
+  valid_time: '2024-06-19T00:00:00Z',
+  overall_aqi_level: 1,
+  no2: { aqi_level: 1, value: 1.1 },
+  so2: { aqi_level: 1, value: 1.2 },
+  pm2_5: { aqi_level: 1, value: 1.3 },
+  pm10: { aqi_level: 1, value: 1.4 },
+  o3: { aqi_level: 1, value: 1.5 },
+})
+
+const measurementDataFour = mockMeasurementSummaryResponseDto({
+  location_name: 'Seoul',
+  measurement_base_time: '2024-06-19T00:00:00Z',
+  location_type: 'city',
+  overall_aqi_level: { mean: 6 },
+  no2: { mean: { aqi_level: 6, value: 600 } },
+  so2: { mean: { aqi_level: 1, value: 3.6 } },
+})
+
 const renderGrid = (
-  forecast?: ForecastResponseDto[],
-  measurements?: MeasurementSummaryResponseDto[],
+  forecast: Record<string, ForecastResponseDto[]> | undefined,
+  measurements: Record<string, MeasurementSummaryResponseDto[]> | undefined,
+  showAllColoured: boolean,
 ) => {
   return render(
     <GlobalSummaryTable
-      forecast={
-        forecast ? (forecast.length ? { London: forecast } : {}) : undefined
-      }
-      summarizedMeasurements={
-        measurements
-          ? measurements.length
-            ? { London: measurements }
-            : {}
-          : undefined
-      }
-      showAllColoured={false}
+      forecast={forecast}
+      summarizedMeasurements={measurements}
+      showAllColoured={showAllColoured}
     />,
     {
       wrapper: BrowserRouter,
@@ -86,19 +100,19 @@ const renderGrid = (
 describe('GlobalSummaryTable component', () => {
   describe('renders the summary table', () => {
     it('displays message when data is loading', async () => {
-      renderGrid()
+      renderGrid(undefined, undefined, true)
       await waitFor(() => {
         expect(screen.getByText('Loading...')).toBeInTheDocument()
       })
     })
     it('displays message when no data is available', async () => {
-      renderGrid([], [])
+      renderGrid({}, {}, true)
       await waitFor(() => {
         expect(screen.getByText('No Rows To Show')).toBeInTheDocument()
       })
     })
     it('displays forecast data even when measurements do not exist for a location', async () => {
-      renderGrid([forecastDataOne], [])
+      renderGrid({ London: [forecastDataOne] }, { London: [] }, true)
       await waitFor(() => {
         expect(screen.getByText('London')).toBeInTheDocument()
       })
@@ -107,40 +121,85 @@ describe('GlobalSummaryTable component', () => {
   describe('when measured and forecast data exist', () => {
     it('displays the locations', async () => {
       renderGrid(
-        [forecastDataOne, forecastDataTwo, forecastDataThree],
-        [measurementDataOne, measurementDataTwo, measurementDataThree],
+        {
+          London: [forecastDataOne],
+          Dakar: [forecastDataTwo],
+          Baku: [forecastDataThree],
+        },
+        {
+          London: [measurementDataOne],
+          Dakar: [measurementDataTwo],
+          Baku: [measurementDataThree],
+        },
+        true,
       )
       await waitFor(() => {
         expect(screen.getByText('London')).toBeInTheDocument()
       })
     })
     it('displays the mean aqi difference', async () => {
-      renderGrid([forecastDataOne], [measurementDataOne])
+      renderGrid(
+        { London: [forecastDataOne] },
+        { London: [measurementDataOne] },
+        true,
+      )
       await waitFor(() => {
         expect(screen.getByText('0')).toBeInTheDocument()
       })
     })
     it('displays + infront of the mean aqi difference if forecast aqi is greater than measurement aqi', async () => {
-      renderGrid([forecastDataTwo], [measurementDataTwo])
+      renderGrid(
+        { Dakar: [forecastDataTwo] },
+        { Dakar: [measurementDataTwo] },
+        true,
+      )
       await waitFor(() => {
         expect(screen.getByText('+5')).toBeInTheDocument()
       })
     })
     it('displays - infront of the mean aqi difference if forecast aqi is smaller than measurement aqi', async () => {
-      renderGrid([forecastDataThree], [measurementDataThree])
+      renderGrid(
+        { Baku: [forecastDataThree] },
+        { Baku: [measurementDataThree] },
+        true,
+      )
       await waitFor(() => {
         expect(screen.getByText('-5')).toBeInTheDocument()
       })
     })
     it('displays rounded values', async () => {
-      renderGrid([forecastDataOne], [measurementDataOne])
+      renderGrid(
+        { London: [forecastDataOne] },
+        { London: [measurementDataOne] },
+        true,
+      )
       await waitFor(() => {
         expect(screen.getByText('5.1')).toBeInTheDocument()
       })
     })
+    it('when showAllColoured is true cell should be highlighted', async () => {
+      renderGrid(
+        { Seoul: [forecastDataFour] },
+        { Seoul: [measurementDataFour] },
+        true,
+      )
+      await waitFor(() => {
+        expect(screen.getByText('3.6')).toHaveClass('cell-very-good')
+      })
+    })
+    it('when showAllColoured is false cell should not be highlighted', async () => {
+      renderGrid(
+        { Seoul: [forecastDataFour] },
+        { Seoul: [measurementDataFour] },
+        false,
+      )
+      await waitFor(() => {
+        expect(screen.getByText('3.6')).not.toHaveClass('cell-very-good')
+      })
+    })
   })
   it('displays columns', async () => {
-    renderGrid()
+    renderGrid(undefined, undefined, true)
     await waitFor(() => {
       expect(screen.getByText('City')).toBeInTheDocument()
       expect(screen.getByText('AQI Level')).toBeInTheDocument()
