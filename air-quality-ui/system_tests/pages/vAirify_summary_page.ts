@@ -27,8 +27,10 @@ export class VairifySummaryPage {
     await this.page.getByRole('link', { name: buttonName }).click()
   }
 
-  async gotoSummaryPage() {
+  async goTo() {
     await this.page.goto('/city/summary')
+    await this.page.waitForSelector('.ag-root', { state: 'visible' })
+    await this.page.waitForSelector('.ag-header-cell', { state: 'visible' })
   }
 
   async getTitle() {
@@ -46,11 +48,6 @@ export class VairifySummaryPage {
     await this.scroller.evaluate((element: HTMLElement) => {
       element.scrollLeft = element.scrollWidth
     })
-  }
-
-  async waitForGridVisible() {
-    await this.page.waitForSelector('.ag-root', { state: 'visible' })
-    await this.page.waitForSelector('.ag-header-cell', { state: 'visible' })
   }
 
   async checkNumbersHaveOneDecimalOnly(text: string) {
@@ -128,7 +125,7 @@ export class VairifySummaryPage {
     })
   }
 
-  async setupPage(
+  async setupPageWithMockData(
     mockedForecastResponse: object,
     mockedMeasurementSummaryResponse: object,
   ) {
@@ -140,7 +137,6 @@ export class VairifySummaryPage {
       '*/**/air-pollutant/measurements/summary*',
       mockedMeasurementSummaryResponse,
     )
-    await this.gotoSummaryPage()
-    await this.waitForGridVisible()
+    await this.goTo()
   }
 }

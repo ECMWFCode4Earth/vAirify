@@ -4,7 +4,7 @@ test('Mocked response breadcrumb', async ({
   vairifySummaryPage,
   vairifyCityPage,
 }) => {
-  await vairifySummaryPage.setupPage(
+  await vairifySummaryPage.setupPageWithMockData(
     vairifySummaryPage.mockedForecastResponse,
     vairifySummaryPage.mockedMeasurementSummaryResponse,
   )
