@@ -42,7 +42,7 @@ interface SummaryRow {
   aqiDifference?: string
 }
 
-interface GlobalSummaryTableProps {
+export interface GlobalSummaryTableProps {
   forecast: Record<string, ForecastResponseDto[]>
   summarizedMeasurements: Record<string, MeasurementSummaryResponseDto[]>
   showAllColoured: boolean

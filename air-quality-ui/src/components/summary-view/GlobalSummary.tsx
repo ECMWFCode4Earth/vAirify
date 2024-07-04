@@ -73,7 +73,6 @@ const GlobalSummary = (): JSX.Element => {
   if (forecastDataError || summaryDataError) {
     return <span>Error occurred</span>
   }
-  debugger
   return (
     <div>
       <div className={`ag-theme-quartz ${classes['switch-div']}`}>

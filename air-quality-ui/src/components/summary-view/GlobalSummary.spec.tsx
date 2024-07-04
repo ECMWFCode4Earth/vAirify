@@ -4,6 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { DateTime } from 'luxon'
 
 import GlobalSummary from './GlobalSummary'
+import { GlobalSummaryTableProps } from '../summary-grid/table/GlobalSummaryTable'
 
 jest.mock('@tanstack/react-query', () => ({
   useQuery: jest.fn().mockReturnValue({ data: {}, isError: false }),
@@ -23,6 +24,13 @@ jest.mock('../../services/forecast-time-service', () => ({
       DateTime.fromISO('2024-06-01T15:00:00', { zone: 'UTC' }),
     ]),
 }))
+
+const mockGridSummaryTable = jest.fn().mockReturnValue(<>mock grid</>)
+jest.mock(
+  '../summary-grid/table/GlobalSummaryTable',
+  () => (props: Partial<GlobalSummaryTableProps>) =>
+    mockGridSummaryTable(props),
+)
 
 describe('GlobalSummary component', () => {
   it('shows message when loading forecast data errors', async () => {
@@ -64,66 +72,29 @@ describe('GlobalSummary component', () => {
   it('shows the summary table', async () => {
     render(<GlobalSummary />)
     await waitFor(() => {
-      expect(screen.getByTestId('summary-grid')).toBeInTheDocument()
+      expect(screen.getByText('mock grid')).toBeInTheDocument()
     })
   })
 
   it('When switch is clicked change to highlight primary AQI values mode', async () => {
-    let useQueryData = {
-        Dubai: [
-          {
-            base_time: '2024-06-02T03:00:00Z',
-            valid_time: '2024-06-02T03:00:00Z',
-            location_type: 'city',
-            location_name: 'Dubai',
-            overall_aqi_level: 6.0,
-            no2: { aqi_level: 1, value: 13.584082735635388 },
-            so2: { aqi_level: 1, value: 13.584082735635388 },
-            pm2_5: { aqi_level: 1, value: 13.584082735635388 },
-            pm10: { aqi_level: 1, value: 13.584082735635388 },
-            o3: { aqi_level: 1, value: 13.584082735635388 },
-          },
-          {
-            base_time: '2024-06-01T03:00:00Z',
-            valid_time: '2024-06-01T06:00:00Z',
-            location_type: 'city',
-            location_name: 'Dubai',
-            overall_aqi_level: 6.0,
-            no2: { aqi_level: 1, value: 13.584082735635388 },
-            so2: { aqi_level: 1, value: 13.584082735635388 },
-            pm2_5: { aqi_level: 1, value: 13.584082735635388 },
-            pm10: { aqi_level: 1, value: 13.584082735635388 },
-            o3: { aqi_level: 1, value: 13.584082735635388 },
-          },
-        ],
-      }
-
-    let useQueriesData = {
-        Dubai: [
-          {
-            measurement_base_time: '2024-06-01T03:00:00Z',
-            location_type: 'city',
-            location_name: 'Dubai',
-            overall_aqi_level: { mean: 6.0 },
-            no2: { mean: { aqi_level: 1, value: 13.584082735635388 } },
-          },
-          {
-            measurement_base_time: '2024-06-01T06:00:00Z',
-            location_type: 'city',
-            location_name: 'Dubai',
-            overall_aqi_level: { mean: 6.0 },
-            so2: { mean: { aqi_level: 1, value: 24.650014087573723 } },
-          },
-        ],
-      }
-
-    jest.mock('@tanstack/react-query', () => ({
-      useQuery: jest.fn().mockReturnValue({ data: useQueryData, isError: false }),
-      useQueries: jest.fn().mockReturnValue({ data: useQueriesData, isError: false }),
-    }))
     render(<GlobalSummary />)
     await waitFor(() => {
-      expect(screen.getByDisplayValue('24.650014087573723')).toHaveClass('ddd')
+      expect(mockGridSummaryTable).toHaveBeenCalledWith({
+        forecast: {},
+        summarizedMeasurements: {},
+        showAllColoured: true,
+      })
+    })
+  })
+
+  it('When switch is clicked change to highlight primary AQI values mode', async () => {
+    render(<GlobalSummary />)
+    await waitFor(() => {
+      expect(mockGridSummaryTable).toHaveBeenCalledWith({
+        forecast: {},
+        summarizedMeasurements: {},
+        showAllColoured: true,
+      })
     })
   })
 })
