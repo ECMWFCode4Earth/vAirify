@@ -217,8 +217,6 @@ const GlobalSummaryTable = ({
     if (!forecast || !summarizedMeasurements) {
       return null
     }
-    console.log(forecast)
-    console.log(summarizedMeasurements)
     return createComparisonData(forecast, summarizedMeasurements).map(
       (comparisonData) => createSummaryRow(comparisonData),
     )

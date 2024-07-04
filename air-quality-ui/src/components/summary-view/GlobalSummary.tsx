@@ -82,6 +82,7 @@ const GlobalSummary = (): JSX.Element => {
             : 'Highlight primary AQI values'}
         </label>
         <Switch
+          data-testid="aqi-highlight-switch"
           onChange={() => {
             if (showAllColoured) setShowAllColoured(false)
             else setShowAllColoured(true)

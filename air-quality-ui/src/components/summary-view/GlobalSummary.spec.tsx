@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import { useQueries, useQuery } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import { DateTime } from 'luxon'
 
 import GlobalSummary from './GlobalSummary'
@@ -76,7 +76,7 @@ describe('GlobalSummary component', () => {
     })
   })
 
-  it('When switch is clicked change to highlight primary AQI values mode', async () => {
+  it('showAllColours variable to passed to GridSummaryTable set to true by default', async () => {
     render(<GlobalSummary />)
     await waitFor(() => {
       expect(mockGridSummaryTable).toHaveBeenCalledWith({
@@ -87,13 +87,16 @@ describe('GlobalSummary component', () => {
     })
   })
 
-  it('When switch is clicked change to highlight primary AQI values mode', async () => {
+  it('showAllColours variable to passed to GridSummaryTable set to false when switch is clicked', async () => {
     render(<GlobalSummary />)
+    await act(async () => {
+      ;(await screen.getByTestId('aqi-highlight-switch')).click()
+    })
     await waitFor(() => {
       expect(mockGridSummaryTable).toHaveBeenCalledWith({
         forecast: {},
         summarizedMeasurements: {},
-        showAllColoured: true,
+        showAllColoured: false,
       })
     })
   })
