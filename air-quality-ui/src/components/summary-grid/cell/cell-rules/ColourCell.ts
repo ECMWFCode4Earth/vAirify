@@ -70,6 +70,6 @@ export default function colourCell(
   }
 
   const aqiMatchesDifference =
-    parseInt(params.data.aqiDifference.split('')[1]) === aqiDifference
+    Math.abs(parseInt(params.data.aqiDifference)) === aqiDifference
   return aqiMatchesDifference ? isInColourBand : false
 }

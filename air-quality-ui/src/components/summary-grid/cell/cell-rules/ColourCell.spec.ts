@@ -49,7 +49,7 @@ describe('Colour Cell', () => {
     expect(result).toBeFalsy()
   })
 
-  it('if showAllColoured is false and there is no diffrence between overall aqi diff and forecast measurement aqi diff return false', () => {
+  it('if showAllColoured is false and there is no difference between overall aqi diff and forecast measurement aqi diff return false', () => {
     const params = {
       column: { colId: 'forecast.pm2_5' },
       value: 1,
@@ -116,7 +116,7 @@ describe('Colour Cell', () => {
     expect(result).toBeFalsy()
   })
 
-  it('if the polutant is not found in measurements object return false', () => {
+  it('if the pollutant is not found in measurements object return false', () => {
     const params = {
       column: { colId: 'forecast.pm2_5' },
       value: undefined,
