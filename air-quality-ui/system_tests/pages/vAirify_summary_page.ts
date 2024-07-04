@@ -83,7 +83,7 @@ export class VairifySummaryPage {
       const row = expectedData[rowIndex]
       for (let colIndex = 0; colIndex < row.length; colIndex++) {
         const cellLocator = this.page.locator(
-          `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(${colIndex + 1})`
+          `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(${colIndex + 1})`,
         )
         const cellText = await cellLocator.innerText()
         expect(cellText.trim()).toBe(row[colIndex])
@@ -99,10 +99,10 @@ export class VairifySummaryPage {
 
     for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
       const forecastCellLocator = this.page.locator(
-        `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(1)`
+        `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(1)`,
       )
       const measuredCellLocator = this.page.locator(
-        `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(2)`
+        `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(2)`,
       )
 
       const forecastText = await forecastCellLocator.innerText()
@@ -125,15 +125,15 @@ export class VairifySummaryPage {
 
   async setupPage(
     mockedForecastResponse: object,
-    mockedMeasurementSummaryResponse: object
+    mockedMeasurementSummaryResponse: object,
   ) {
     await this.setupApiRoute(
       '*/**/air-pollutant/forecast*',
-      mockedForecastResponse
+      mockedForecastResponse,
     )
     await this.setupApiRoute(
       '*/**/air-pollutant/measurements/summary*',
-      mockedMeasurementSummaryResponse
+      mockedMeasurementSummaryResponse,
     )
     await this.gotoSummaryPage()
     await this.waitForGridVisible()

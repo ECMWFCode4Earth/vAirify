@@ -6,7 +6,7 @@ test('Mocked response breadcrumb', async ({
 }) => {
   await vairifySummaryPage.setupPage(
     vairifySummaryPage.apiForecast,
-    vairifySummaryPage.apiSummary
+    vairifySummaryPage.apiSummary,
   )
   await vairifySummaryPage.clickButton('Kampala')
   await expect(vairifyCityPage.textFinder('Cities')).toBeVisible()
