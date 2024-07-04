@@ -1,4 +1,4 @@
-export const apiForecast = [
+export const mockedForecastResponse = [
   {
     base_time: '2024-06-19T00:00:00Z',
     valid_time: '2024-06-19T09:00:00Z',
@@ -110,7 +110,7 @@ export const apiForecast = [
   },
 ]
 
-export const apiSummary = [
+export const mockedMeasurementSummaryResponse = [
   {
     measurement_base_time: '2024-06-19T09:00:00Z',
     location_type: 'city',

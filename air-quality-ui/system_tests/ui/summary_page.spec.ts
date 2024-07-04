@@ -2,8 +2,8 @@ import { expect, test } from '../utils/fixtures'
 
 test.beforeEach(async ({ vairifySummaryPage }) => {
   await vairifySummaryPage.setupPage(
-    vairifySummaryPage.apiForecast,
-    vairifySummaryPage.apiSummary,
+    vairifySummaryPage.mockedForecastResponse,
+    vairifySummaryPage.mockedMeasurementSummaryResponse,
   )
 })
 
@@ -12,7 +12,7 @@ test('Verify page title is vAirify', async ({ vairifySummaryPage }) => {
   expect(title).toBe('vAirify')
 })
 
-test.describe('Mocked API tests', () => {
+test.describe('Table Structure', () => {
   test('Verify that Headers exist and Innertext matches', async ({
     vairifySummaryPage,
   }) => {
@@ -47,7 +47,9 @@ test.describe('Mocked API tests', () => {
   }) => {
     await vairifySummaryPage.checkCellNumberFormat()
   })
+})
 
+test.describe('Table Data Validation', () => {
   test('Verify that a city with no in-situ data still show on grid', async ({
     vairifySummaryPage,
   }) => {

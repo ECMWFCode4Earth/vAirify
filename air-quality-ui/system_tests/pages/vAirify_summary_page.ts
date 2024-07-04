@@ -2,17 +2,22 @@ import { type Locator, type Page, expect } from '@playwright/test'
 
 export class VairifySummaryPage {
   readonly page: Page
-  readonly apiForecast: object
-  readonly apiSummary: object
+  readonly mockedForecastResponse: object
+  readonly mockedMeasurementSummaryResponse: object
   readonly title: Locator
   readonly scroller: Locator
   readonly agCell: Locator
   readonly allCells: Locator
 
-  constructor(page: Page, apiForecast: object, apiSummary: object) {
+  constructor(
+    page: Page,
+    mockedForecastResponse: object,
+    mockedMeasurementSummaryResponse: object,
+  ) {
     this.page = page
-    this.apiForecast = apiForecast
-    this.apiSummary = apiSummary
+    this.mockedForecastResponse = mockedForecastResponse
+
+    this.mockedMeasurementSummaryResponse = mockedMeasurementSummaryResponse
     this.title = this.page.locator('title')
     this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')
     this.agCell = this.page.locator('role=gridcell')
