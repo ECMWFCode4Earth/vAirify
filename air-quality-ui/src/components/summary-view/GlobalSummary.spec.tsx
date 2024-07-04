@@ -1,13 +1,14 @@
 import '@testing-library/jest-dom'
 import { useQueries, useQuery } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import { DateTime } from 'luxon'
 
 import GlobalSummary from './GlobalSummary'
+import { GlobalSummaryTableProps } from '../summary-grid/table/GlobalSummaryTable'
 
 jest.mock('@tanstack/react-query', () => ({
-  useQuery: jest.fn().mockReturnValue({ data: [], isError: false }),
-  useQueries: jest.fn().mockReturnValue({ data: [], isError: false }),
+  useQuery: jest.fn().mockReturnValue({ data: {}, isError: false }),
+  useQueries: jest.fn().mockReturnValue({ data: {}, isError: false }),
 }))
 
 jest.mock('../../services/forecast-time-service', () => ({
@@ -23,6 +24,13 @@ jest.mock('../../services/forecast-time-service', () => ({
       DateTime.fromISO('2024-06-01T15:00:00', { zone: 'UTC' }),
     ]),
 }))
+
+const mockGridSummaryTable = jest.fn().mockReturnValue(<>mock grid</>)
+jest.mock(
+  '../summary-grid/table/GlobalSummaryTable',
+  () => (props: Partial<GlobalSummaryTableProps>) =>
+    mockGridSummaryTable(props),
+)
 
 describe('GlobalSummary component', () => {
   it('shows message when loading forecast data errors', async () => {
@@ -64,7 +72,32 @@ describe('GlobalSummary component', () => {
   it('shows the summary table', async () => {
     render(<GlobalSummary />)
     await waitFor(() => {
-      expect(screen.getByTestId('summary-grid')).toBeInTheDocument()
+      expect(screen.getByText('mock grid')).toBeInTheDocument()
+    })
+  })
+
+  it('showAllColours variable to passed to GridSummaryTable set to true by default', async () => {
+    render(<GlobalSummary />)
+    await waitFor(() => {
+      expect(mockGridSummaryTable).toHaveBeenCalledWith({
+        forecast: {},
+        summarizedMeasurements: {},
+        showAllColoured: true,
+      })
+    })
+  })
+
+  it('showAllColours variable to passed to GridSummaryTable set to false when switch is clicked', async () => {
+    render(<GlobalSummary />)
+    await act(async () => {
+      ;(await screen.getByTestId('aqi-highlight-switch')).click()
+    })
+    await waitFor(() => {
+      expect(mockGridSummaryTable).toHaveBeenCalledWith({
+        forecast: {},
+        summarizedMeasurements: {},
+        showAllColoured: false,
+      })
     })
   })
 })
