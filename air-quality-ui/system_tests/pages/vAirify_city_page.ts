@@ -27,6 +27,10 @@ export class VairifyCityPage {
     )
   }
 
+  async captureChartScreenshot() {
+    return await this.aqiChart.screenshot();
+  }
+
   textFinder(textToFind: string) {
     return this.page.getByText(textToFind)
   }
