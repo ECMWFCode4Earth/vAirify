@@ -17,13 +17,13 @@ import {
 import GlobalSummaryTable from '../summary-grid/table/GlobalSummaryTable'
 
 const GlobalSummary = (): JSX.Element => {
-  const { forecastBaseDate: forecastBaseTime } = useForecastContext()
+  const { forecastBaseDate } = useForecastContext()
   const [showAllColoured, setShowAllColoured] = useState<boolean>(true)
 
   const { data: forecastData, isError: forecastDataError } = useQuery({
-    queryKey: ['forecast'],
+    queryKey: [forecastBaseDate],
     queryFn: () =>
-      getForecastData(forecastBaseTime, DateTime.now(), forecastBaseTime).then(
+      getForecastData(forecastBaseDate, DateTime.now(), forecastBaseDate).then(
         (forecastData) =>
           forecastData.reduce<Record<string, ForecastResponseDto[]>>(
             (acc, reading) => {
@@ -40,8 +40,8 @@ const GlobalSummary = (): JSX.Element => {
   })
 
   const forecastValidTimeRange = useMemo(
-    () => getValidForecastTimesBetween(forecastBaseTime),
-    [forecastBaseTime],
+    () => getValidForecastTimesBetween(forecastBaseDate),
+    [forecastBaseDate],
   )
 
   const { data: summarizedMeasurementData, isError: summaryDataError } =
@@ -93,11 +93,11 @@ const GlobalSummary = (): JSX.Element => {
       <div className={classes['summary-container']}>
         <div>
           <div>
-            Forecast Base Time: {forecastBaseTime.toFormat('dd MMM HH:mm ZZZZ')}
+            Forecast Base Time: {forecastBaseDate.toFormat('dd MMM HH:mm ZZZZ')}
           </div>
           <div data-testid="forecast-valid-range">
             Forecast Valid Time Range:{' '}
-            {forecastBaseTime.toFormat('dd MMM HH:mm')} -{' '}
+            {forecastBaseDate.toFormat('dd MMM HH:mm')} -{' '}
             {forecastValidTimeRange.slice(-1)[0]?.toFormat('dd MMM HH:mm ZZZZ')}
           </div>
         </div>
