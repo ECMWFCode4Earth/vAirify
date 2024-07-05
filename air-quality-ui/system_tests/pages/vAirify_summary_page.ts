@@ -161,4 +161,32 @@ export class VairifySummaryPage {
     })
     return requestArray
   }
+
+  async calculateExpectedForcastBaseTimeFromSystemDate(
+    mockDatetimeNow: Date,
+  ): Promise<Date> {
+    const time24HrsAgoMilliseconds =
+      mockDatetimeNow.getTime() - 24 * 60 * 60 * 1000
+    const datetime24HrsAgo = new Date(time24HrsAgoMilliseconds)
+    const hours24HrsAgo = datetime24HrsAgo.getUTCHours()
+    const expectedForecastBaseTime: Date = datetime24HrsAgo
+
+    if (22 > hours24HrsAgo && hours24HrsAgo >= 10) {
+      expectedForecastBaseTime.setUTCHours(0)
+    } else {
+      expectedForecastBaseTime.setUTCHours(12)
+    }
+    return expectedForecastBaseTime
+  }
+
+  async calculateExpectedVolumeofRequests(
+    mockDatetimeNow: Date,
+    expectedForecastBaseTime: Date,
+  ): Promise<number> {
+    const diffMs =
+      mockDatetimeNow.getTime() - expectedForecastBaseTime.getTime()
+    const diffHrs = diffMs / (1000 * 60 * 60)
+    const threeHrIncrements = Math.floor(diffHrs / 3)
+    return threeHrIncrements + 1
+  }
 }

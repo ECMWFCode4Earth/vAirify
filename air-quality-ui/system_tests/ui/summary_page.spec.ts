@@ -26,19 +26,18 @@ test('Verify on page load the measurement summary API is called proportionately'
   const mockDatetimeNow = new Date('2024-06-10T17:00:00Z')
   await page.clock.setFixedTime(mockDatetimeNow)
 
-  const time24HrsAgoMilliseconds =
-    mockDatetimeNow.getTime() - 24 * 60 * 60 * 1000
-  const datetime24HrsAgo = new Date(time24HrsAgoMilliseconds)
-  const hours24HrsAgo = datetime24HrsAgo.getUTCHours()
-  const expectedForecastBaseTime: Date = datetime24HrsAgo
+  const expectedForecastBaseTime: Date =
+    await vairifySummaryPage.calculateExpectedForcastBaseTimeFromSystemDate(
+      mockDatetimeNow,
+    )
 
-  if (22 > hours24HrsAgo && hours24HrsAgo >= 10) {
-    expectedForecastBaseTime.setUTCHours(0)
-  } else {
-    expectedForecastBaseTime.setUTCHours(12)
-  }
+  const expectedNumberofRequests =
+    await vairifySummaryPage.calculateExpectedVolumeofRequests(
+      mockDatetimeNow,
+      expectedForecastBaseTime,
+    )
   await vairifySummaryPage.goTo()
-  expect(requestArray.length).toEqual(14)
+  expect(requestArray.length).toEqual(expectedNumberofRequests)
 })
 
 test.describe('No Mocking', () => {
