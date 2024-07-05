@@ -1,18 +1,20 @@
 import { DateTime } from 'luxon'
 import { createContext, useContext, useState } from 'react'
 
-import { getLatestBaseForecastTime } from './services/forecast-time-service'
+import {
+  getLatestBaseForecastTime,
+  getNearestValidForecastTime,
+} from './services/forecast-time-service'
 
 type ForecastContextType = {
   forecastBaseDate: DateTime
   setForecastBaseDate: (arg: DateTime) => void
+  maxInSituDate: DateTime
 }
 
 const ForecastContext = createContext<ForecastContextType | undefined>(
   undefined,
 )
-
-// forecastContextBaseTime: getLatestBaseForecastTime().minus({ hours: 24 })
 
 export const useForecastContext = () =>
   useContext(ForecastContext) as ForecastContextType
@@ -27,9 +29,15 @@ export const ForecastContextProvider = (props) => {
   ) => {
     setForecastBaseDateState(value)
   }
+  const maxInSituDate: ForecastContextType['maxInSituDate'] = DateTime.min(
+    getNearestValidForecastTime(DateTime.utc()),
+    forecastBaseDate.plus({ days: 3 }),
+  )
 
   return (
-    <ForecastContext.Provider value={{ forecastBaseDate, setForecastBaseDate }}>
+    <ForecastContext.Provider
+      value={{ forecastBaseDate, setForecastBaseDate, maxInSituDate }}
+    >
       {props.children}
     </ForecastContext.Provider>
   )
