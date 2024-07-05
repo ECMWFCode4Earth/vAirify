@@ -21,6 +21,7 @@ def map_measurement(measurement: InSituMeasurement) -> MeasurementDto:
         "entity": measurement["metadata"]["entity"],
         "sensor_type": measurement["metadata"]["sensor_type"],
         "site_name": measurement["location_name"],
+        "site_coordinates": measurement["location"]["coordinates"],
     }
 
 

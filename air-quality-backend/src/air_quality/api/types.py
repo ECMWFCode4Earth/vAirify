@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from typing_extensions import Generic, TypedDict, NotRequired, TypeVar
+from typing_extensions import Generic, TypedDict, NotRequired, TypeVar, Tuple
 
 from air_quality.database.in_situ import ApiSource
 from air_quality.database.locations import AirQualityLocationType
@@ -16,6 +16,7 @@ class ForecastDto(TypedDict):
     valid_time: datetime
     location_type: AirQualityLocationType
     location_name: str
+    location_coordinates: Tuple[float, float]
     overall_aqi_level: float
     no2: PollutantDataDto
     o3: PollutantDataDto
@@ -37,6 +38,7 @@ class MeasurementDto(TypedDict):
     entity: NotRequired[str]
     sensor_type: NotRequired[str]
     site_name: str
+    site_coordinates: Tuple[float, float]
 
 
 T = TypeVar("T")

@@ -26,6 +26,7 @@ export type ForecastResponseDto = {
   valid_time: string
   location_type: LocationType
   location_name: string
+  location_coordinates: [number, number]
   overall_aqi_level: number
 } & ForecastPollutantDataDto
 
@@ -37,6 +38,7 @@ export type MeasurementsResponseDto = {
   entity: string
   sensor_type: string
   site_name: string
+  site_coordinates: [number, number]
 } & MeasurementPollutantData
 
 export type MeasurementSummaryResponseDto = {

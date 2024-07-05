@@ -5,6 +5,7 @@ import Select, { ActionMeta, MultiValue, OnChangeValue } from 'react-select'
 
 import { AverageComparisonChart } from './AverageComparisonChart'
 import classes from './SingleCity.module.css'
+import { SiteMap } from './SiteMap'
 import { SiteMeasurementsChart } from './SiteMeasurementsChart'
 import { ForecastContext } from '../../context'
 import { PollutantType, pollutantTypes } from '../../models'
@@ -14,16 +15,17 @@ import { getMeasurements } from '../../services/measurement-data-service'
 import { MeasurementsResponseDto } from '../../services/types'
 import { LoadingSpinner } from '../common/LoadingSpinner'
 
-interface SiteOption {
+export interface SiteOption {
   value: string
   label: string
+  location: [number, number]
 }
 
 const getSiteName = (measurement: MeasurementsResponseDto): string => {
   return measurement.site_name.replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
-export const SingleCity = () => {
+export const SingleCity = (): JSX.Element => {
   const forecastBaseTime = useContext(ForecastContext)
   const { name: locationName = '' } = useParams()
   const [
@@ -66,13 +68,18 @@ export const SingleCity = () => {
   const [selectedSites, setSelectedSites] = useState<MultiValue<SiteOption>>([])
   useEffect(() => {
     const sites = Array.from(
-      measurementData
-        ?.map((measurement) => getSiteName(measurement))
-        .reduce((sites, name) => sites.add(name), new Set<string>()) ?? [],
-    ).map((name) => ({
-      value: name,
-      label: name,
-    }))
+      (measurementData || [])
+        ?.reduce((map, measurement) => {
+          const siteName = getSiteName(measurement)
+          map.set(siteName, {
+            value: siteName,
+            label: siteName,
+            location: measurement.site_coordinates,
+          })
+          return map
+        }, new Map<string, SiteOption>())
+        .values(),
+    )
 
     setSites(sites)
     setSelectedSites(sites)
@@ -165,6 +172,20 @@ export const SingleCity = () => {
               >
                 Measurement Sites
               </label>
+              {forecastData.length && (
+                <SiteMap
+                  latitude={forecastData[0].location_coordinates[1]}
+                  longitude={forecastData[0].location_coordinates[0]}
+                  sites={sites.map((site) => ({
+                    latitude: site.location[1],
+                    longitude: site.location[0],
+                    name: site.label,
+                    selected: !!selectedSites.find(
+                      (s) => s.value === site.value,
+                    ),
+                  }))}
+                ></SiteMap>
+              )}
               <Select
                 className={classes['site-select']}
                 inputId="sites-select"
