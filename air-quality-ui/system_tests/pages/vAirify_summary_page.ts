@@ -181,12 +181,17 @@ export class VairifySummaryPage {
 
   async calculateExpectedVolumeofRequests(
     mockDatetimeNow: Date,
-    expectedForecastBaseTime: Date,
   ): Promise<number> {
-    const diffMs =
+    const expectedForecastBaseTime =
+      await this.calculateExpectedForcastBaseTimeFromSystemDate(mockDatetimeNow)
+
+    // Difference between time now and base time
+    const timeDifferentialMs =
       mockDatetimeNow.getTime() - expectedForecastBaseTime.getTime()
-    const diffHrs = diffMs / (1000 * 60 * 60)
-    const threeHrIncrements = Math.floor(diffHrs / 3)
+    const timeDifferentialHours = timeDifferentialMs / (1000 * 60 * 60)
+    const threeHrIncrements = Math.floor(timeDifferentialHours / 3)
+
+    // There will be 1 request when there is 0 difference
     return threeHrIncrements + 1
   }
 }

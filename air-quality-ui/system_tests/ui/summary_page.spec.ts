@@ -1,43 +1,40 @@
 import { expect, test } from '../utils/fixtures'
 
-test('Verify on page load the forecast API is called once', async ({
-  page,
-  vairifySummaryPage,
-}) => {
-  const requestArray: string[] =
-    await vairifySummaryPage.captureNetworkRequests(
-      page,
-      'GET',
-      'http://localhost:8000/air-pollutant/forecast',
-    )
-  await vairifySummaryPage.goTo()
-  expect(requestArray.length).toEqual(1)
-})
-test('Verify on page load the measurement summary API is called proportionately', async ({
-  page,
-  vairifySummaryPage,
-}) => {
-  const requestArray: string[] =
-    await vairifySummaryPage.captureNetworkRequests(
-      page,
-      'GET',
-      'http://localhost:8000/air-pollutant/measurements/summary',
-    )
-  const mockDatetimeNow = new Date('2024-06-10T17:00:00Z')
-  await page.clock.setFixedTime(mockDatetimeNow)
+test.describe('Quantity of API calls', () => {
+  test('Verify on page load the forecast API is called once', async ({
+    page,
+    vairifySummaryPage,
+  }) => {
+    const requestArray: string[] =
+      await vairifySummaryPage.captureNetworkRequests(
+        page,
+        'GET',
+        'http://localhost:8000/air-pollutant/forecast',
+      )
+    await vairifySummaryPage.goTo()
+    expect(requestArray.length).toEqual(1)
+  })
 
-  const expectedForecastBaseTime: Date =
-    await vairifySummaryPage.calculateExpectedForcastBaseTimeFromSystemDate(
-      mockDatetimeNow,
-    )
+  test('Verify on page load the measurement summary API is called proportionately', async ({
+    page,
+    vairifySummaryPage,
+  }) => {
+    const requestArray: string[] =
+      await vairifySummaryPage.captureNetworkRequests(
+        page,
+        'GET',
+        'http://localhost:8000/air-pollutant/measurements/summary',
+      )
+    const mockDatetimeNow = new Date('2024-06-10T20:00:00Z')
+    await page.clock.setFixedTime(mockDatetimeNow)
 
-  const expectedNumberofRequests =
-    await vairifySummaryPage.calculateExpectedVolumeofRequests(
-      mockDatetimeNow,
-      expectedForecastBaseTime,
-    )
-  await vairifySummaryPage.goTo()
-  expect(requestArray.length).toEqual(expectedNumberofRequests)
+    const expectedNumberofRequests =
+      await vairifySummaryPage.calculateExpectedVolumeofRequests(
+        mockDatetimeNow,
+      )
+    await vairifySummaryPage.goTo()
+    expect(requestArray.length).toEqual(expectedNumberofRequests)
+  })
 })
 
 test.describe('No Mocking', () => {
