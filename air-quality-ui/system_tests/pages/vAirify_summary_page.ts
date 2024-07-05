@@ -139,4 +139,26 @@ export class VairifySummaryPage {
     )
     await this.goTo()
   }
+
+  async captureNetworkRequests(
+    page: Page,
+    expectedRequestMethod: string,
+    expectedRequestUrl: string,
+  ): Promise<string[]> {
+    const requestArray: string[] = []
+    page.on('request', (request) => {
+      const requestUrl: string = request.url()
+      console.log(request.method())
+      console.log(expectedRequestMethod)
+      console.log(requestUrl)
+      console.log(expectedRequestUrl)
+      if (
+        request.method() === expectedRequestMethod &&
+        requestUrl.includes(expectedRequestUrl)
+      ) {
+        requestArray.push(requestUrl)
+      }
+    })
+    return requestArray
+  }
 }

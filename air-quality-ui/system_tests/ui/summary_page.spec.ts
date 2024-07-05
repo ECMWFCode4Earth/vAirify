@@ -1,23 +1,51 @@
 import { expect, test } from '../utils/fixtures'
 
-test('Verify the correct API calls are triggered for a given forecast base time and current time', async ({
+test('Verify on page load the forecast API is called once', async ({
   page,
   vairifySummaryPage,
 }) => {
-  const requestArray: { [key: string]: string } = {}
-
-  page.on('request', (request) => {
-    const requestMethod: string = request.method()
-    const requestUrl: string = request.url()
-    if (
-      requestMethod === 'GET' &&
-      requestUrl.includes(`http://localhost:8000/air-pollutant/forecast`)
-    ) {
-      requestArray['url'] = requestUrl
-    }
-  })
+  const requestArray: string[] =
+    await vairifySummaryPage.captureNetworkRequests(
+      page,
+      'GET',
+      'http://localhost:8000/air-pollutant/forecast',
+    )
   await vairifySummaryPage.goTo()
-  console.log(requestArray)
+  expect(requestArray.length).toEqual(1)
+})
+test('Verify on page load the measurement summary API is called proportionately', async ({
+  page,
+  vairifySummaryPage,
+}) => {
+  const requestArray: string[] =
+    await vairifySummaryPage.captureNetworkRequests(
+      page,
+      'GET',
+      'http://localhost:8000/air-pollutant/measurements/summary',
+    )
+
+  // const datetimeNow: Date = new Date()
+  // const time24HrsAgoMilliseconds = datetimeNow.getTime() - 24 * 60 * 60 * 1000
+  // const datetime24HrsAgo = new Date(time24HrsAgoMilliseconds)
+  // const hours24HrsAgo = datetime24HrsAgo.getUTCHours()
+
+  // console.log(datetimeNow)
+  // console.log(datetime24HrsAgo)
+  // console.log(hours24HrsAgo)
+
+  // const expectedForecastBaseTime: Date = datetime24HrsAgo
+
+  // if (22 > hours24HrsAgo && hours24HrsAgo >= 10) {
+  //   expectedForecastBaseTime.setUTCHours(10)
+  // } else {
+  //   expectedForecastBaseTime.setUTCHours(22)
+  // }
+
+  // console.log(expectedForecastBaseTime)
+  await vairifySummaryPage.goTo()
+  expect(requestArray.length).toEqual(12)
+
+  // expect(requestArray.length).toEqual(14)
 })
 
 test.describe('No Mocking', () => {
