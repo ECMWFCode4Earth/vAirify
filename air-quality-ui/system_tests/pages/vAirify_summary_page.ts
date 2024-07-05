@@ -140,7 +140,7 @@ export class VairifySummaryPage {
     await this.goTo()
   }
 
-  async captureNetworkRequests(
+  async captureNetworkRequestsAsArray(
     page: Page,
     expectedRequestMethod: string,
     expectedRequestUrl: string,
@@ -148,10 +148,6 @@ export class VairifySummaryPage {
     const requestArray: string[] = []
     page.on('request', (request) => {
       const requestUrl: string = request.url()
-      console.log(request.method())
-      console.log(expectedRequestMethod)
-      console.log(requestUrl)
-      console.log(expectedRequestUrl)
       if (
         request.method() === expectedRequestMethod &&
         requestUrl.includes(expectedRequestUrl)
@@ -162,7 +158,7 @@ export class VairifySummaryPage {
     return requestArray
   }
 
-  async calculateExpectedForcastBaseTimeFromSystemDate(
+  async calculateExpectedForcastBaseTimeFromDate(
     mockDatetimeNow: Date,
   ): Promise<Date> {
     const time24HrsAgoMilliseconds =
@@ -183,7 +179,7 @@ export class VairifySummaryPage {
     mockDatetimeNow: Date,
   ): Promise<number> {
     const expectedForecastBaseTime =
-      await this.calculateExpectedForcastBaseTimeFromSystemDate(mockDatetimeNow)
+      await this.calculateExpectedForcastBaseTimeFromDate(mockDatetimeNow)
 
     // Difference between time now and base time
     const timeDifferentialMs =
@@ -193,5 +189,14 @@ export class VairifySummaryPage {
 
     // There will be 1 request when there is 0 difference
     return threeHrIncrements + 1
+  }
+
+  async getExpectedRequestForecastBaseTime(
+    mockSystemDate: Date,
+  ): Promise<string> {
+    const expectedForecastBaseTimeDate =
+      await this.calculateExpectedForcastBaseTimeFromDate(mockSystemDate)
+    const isoDate = expectedForecastBaseTimeDate.toISOString()
+    return encodeURIComponent(isoDate)
   }
 }

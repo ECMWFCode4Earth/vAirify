@@ -1,39 +1,105 @@
 import { expect, test } from '../utils/fixtures'
 
-test.describe('Quantity of API calls', () => {
-  test('Verify on page load the forecast API is called once', async ({
+test.describe('Default to correct forecast base time', () => {
+  test('System time 11AM, assert forecast base time 00:00 (day-1)', async ({
     page,
     vairifySummaryPage,
   }) => {
+    const mockSystemDate: Date = new Date('2024-07-03T11:00:00Z')
+    await page.clock.setFixedTime(mockSystemDate)
+
     const requestArray: string[] =
-      await vairifySummaryPage.captureNetworkRequests(
+      await vairifySummaryPage.captureNetworkRequestsAsArray(
         page,
         'GET',
         'http://localhost:8000/air-pollutant/forecast',
       )
     await vairifySummaryPage.goTo()
-    expect(requestArray.length).toEqual(1)
-  })
 
-  test('Verify on page load the measurement summary API is called proportionately', async ({
-    page,
-    vairifySummaryPage,
-  }) => {
-    const requestArray: string[] =
-      await vairifySummaryPage.captureNetworkRequests(
+    const expectedRequestForecastBaseTime =
+      await vairifySummaryPage.getExpectedRequestForecastBaseTime(
+        mockSystemDate,
+      )
+    expect(requestArray[0]).toContain(
+      `base_time=${expectedRequestForecastBaseTime}`,
+    )
+    // expect(
+    //   page.locator("//div[@class='_summary-container_pb9bs_1']/div[1]/div[1]"),
+    // ).toContainText('02 Jul 00:00 UTC')
+  })
+})
+
+test.describe('On page load', () => {
+  const mockDatetimeNow: Date = new Date('2024-06-10T20:00:00Z')
+
+  test.describe('forecast endpoint', () => {
+    let requestArray: string[]
+    test.beforeEach(async ({ page, vairifySummaryPage }) => {
+      requestArray = await vairifySummaryPage.captureNetworkRequestsAsArray(
+        page,
+        'GET',
+        'http://localhost:8000/air-pollutant/forecast',
+      )
+      await page.clock.setFixedTime(mockDatetimeNow)
+      await vairifySummaryPage.goTo()
+    })
+    test('Verify on page load the forecast API is called once', async () => {
+      expect(requestArray.length).toEqual(1)
+    })
+
+    test('Verify on page load the forecast API call has correct base time', async () => {
+      expect(requestArray[0]).toContain(
+        'base_time=2024-06-09T00%3A00%3A00.000Z',
+      )
+    })
+  })
+  test.describe('measurements/summary endpoint', () => {
+    let requestArray: string[]
+
+    test.beforeEach(async ({ page, vairifySummaryPage }) => {
+      requestArray = await vairifySummaryPage.captureNetworkRequestsAsArray(
         page,
         'GET',
         'http://localhost:8000/air-pollutant/measurements/summary',
       )
-    const mockDatetimeNow = new Date('2024-06-10T20:00:00Z')
-    await page.clock.setFixedTime(mockDatetimeNow)
+      await page.clock.setFixedTime(mockDatetimeNow)
+      await vairifySummaryPage.goTo()
+    })
 
-    const expectedNumberofRequests =
-      await vairifySummaryPage.calculateExpectedVolumeofRequests(
-        mockDatetimeNow,
-      )
-    await vairifySummaryPage.goTo()
-    expect(requestArray.length).toEqual(expectedNumberofRequests)
+    test('Verify on page load the measurement summary API is called proportionately', async ({
+      vairifySummaryPage,
+    }) => {
+      const expectedNumberofRequests =
+        await vairifySummaryPage.calculateExpectedVolumeofRequests(
+          mockDatetimeNow,
+        )
+      expect(requestArray.length).toEqual(expectedNumberofRequests)
+    })
+
+    test('Verify on page load the measurement summary API calls have correct measurement base times', async () => {
+      const expectedMeasurementBaseTimeArray = [
+        '2024-06-09T00%3A00%3A00.000Z',
+        '2024-06-09T03%3A00%3A00.000Z',
+        '2024-06-09T06%3A00%3A00.000Z',
+        '2024-06-09T09%3A00%3A00.000Z',
+        '2024-06-09T12%3A00%3A00.000Z',
+        '2024-06-09T15%3A00%3A00.000Z',
+        '2024-06-09T18%3A00%3A00.000Z',
+        '2024-06-09T21%3A00%3A00.000Z',
+        '2024-06-10T00%3A00%3A00.000Z',
+        '2024-06-10T03%3A00%3A00.000Z',
+        '2024-06-10T06%3A00%3A00.000Z',
+        '2024-06-10T09%3A00%3A00.000Z',
+        '2024-06-10T12%3A00%3A00.000Z',
+        '2024-06-10T15%3A00%3A00.000Z',
+        '2024-06-10T18%3A00%3A00.000Z',
+      ]
+      for (const request in requestArray) {
+        expect(requestArray[request]).toContain(
+          `measurement_base_time=${expectedMeasurementBaseTimeArray[request]}`,
+        )
+      }
+    })
   })
 })
 
