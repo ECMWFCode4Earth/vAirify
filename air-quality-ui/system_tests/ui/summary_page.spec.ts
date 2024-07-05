@@ -23,29 +23,22 @@ test('Verify on page load the measurement summary API is called proportionately'
       'GET',
       'http://localhost:8000/air-pollutant/measurements/summary',
     )
+  const mockDatetimeNow = new Date('2024-06-10T17:00:00Z')
+  await page.clock.setFixedTime(mockDatetimeNow)
 
-  // const datetimeNow: Date = new Date()
-  // const time24HrsAgoMilliseconds = datetimeNow.getTime() - 24 * 60 * 60 * 1000
-  // const datetime24HrsAgo = new Date(time24HrsAgoMilliseconds)
-  // const hours24HrsAgo = datetime24HrsAgo.getUTCHours()
+  const time24HrsAgoMilliseconds =
+    mockDatetimeNow.getTime() - 24 * 60 * 60 * 1000
+  const datetime24HrsAgo = new Date(time24HrsAgoMilliseconds)
+  const hours24HrsAgo = datetime24HrsAgo.getUTCHours()
+  const expectedForecastBaseTime: Date = datetime24HrsAgo
 
-  // console.log(datetimeNow)
-  // console.log(datetime24HrsAgo)
-  // console.log(hours24HrsAgo)
-
-  // const expectedForecastBaseTime: Date = datetime24HrsAgo
-
-  // if (22 > hours24HrsAgo && hours24HrsAgo >= 10) {
-  //   expectedForecastBaseTime.setUTCHours(10)
-  // } else {
-  //   expectedForecastBaseTime.setUTCHours(22)
-  // }
-
-  // console.log(expectedForecastBaseTime)
+  if (22 > hours24HrsAgo && hours24HrsAgo >= 10) {
+    expectedForecastBaseTime.setUTCHours(0)
+  } else {
+    expectedForecastBaseTime.setUTCHours(12)
+  }
   await vairifySummaryPage.goTo()
-  expect(requestArray.length).toEqual(12)
-
-  // expect(requestArray.length).toEqual(14)
+  expect(requestArray.length).toEqual(14)
 })
 
 test.describe('No Mocking', () => {
