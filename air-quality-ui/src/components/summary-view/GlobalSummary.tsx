@@ -2,10 +2,10 @@ import { useQueries, useQuery } from '@tanstack/react-query'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { DateTime } from 'luxon'
-import { useContext, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import classes from './GlobalSummary.module.css'
-import { ForecastContext } from '../../context'
+import { useForecastContext } from '../../context'
 import { getForecastData } from '../../services/forecast-data-service'
 import { getValidForecastTimesBetween } from '../../services/forecast-time-service'
 import { getMeasurementSummary } from '../../services/measurement-data-service'
@@ -16,7 +16,7 @@ import {
 import GlobalSummaryTable from '../summary-grid/GlobalSummaryTable'
 
 const GlobalSummary = (): JSX.Element => {
-  const forecastBaseTime = useContext(ForecastContext)
+  const { forecastBaseDate: forecastBaseTime } = useForecastContext()
 
   const { data: forecastData, isError: forecastDataError } = useQuery({
     queryKey: ['forecast'],
