@@ -60,7 +60,7 @@ def ensure_forecast_cache():
             single_file = "single_level_16_from_2024-05-24_12.grib"
             multi_file = "multi_level_16_from_2024-05-24_12.grib"
             if not os.path.exists(single_file) or not os.path.exists(multi_file):
-                fetch_forecast_data(datetime(2024, 5, 24, 13, 14, 15), 16)
+                fetch_forecast_data(datetime(2024, 5, 24, 12), 16)
         yield
         # Remove any cached files
         remove_file("single_level_16_from_2024-05-24_12.grib")
