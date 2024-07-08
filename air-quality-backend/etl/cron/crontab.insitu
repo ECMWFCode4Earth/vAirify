@@ -1,0 +1,1 @@
+0 */1 * * * conda run --no-capture-output -n air-quality-backend python "/app/src/run_in_situ_etl.py"

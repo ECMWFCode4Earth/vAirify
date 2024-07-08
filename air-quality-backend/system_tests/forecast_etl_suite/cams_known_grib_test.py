@@ -1,12 +1,16 @@
 from datetime import timezone, datetime
 import pytest
-from scripts.run_forecast_etl import main
+import system_tests.context  # noqa: F401
+
+from etl.src.run_forecast_etl import main
 import os
 from dotenv import load_dotenv
 from unittest import mock
 
-from system_tests.utils.database_utilities import delete_database_data, \
-    get_database_data
+from system_tests.utils.database_utilities import (
+    delete_database_data,
+    get_database_data,
+)
 
 load_dotenv()
 
@@ -100,6 +104,7 @@ def test__extreme_longitudes__to_assert_exact_values(
     # Check if the expected dictionary is a subset of the one stored in the db
     _assert_dictionary_subset(expected_values, stored_results[0])
 
+
 # aqi values
 
 
@@ -116,8 +121,9 @@ def test__individual_aqi_levels_are_between_1_and_6(setup_data):
     pollutant_keys = ["no2", "so2", "o3", "pm10", "pm2_5"]
     for document in dict_result:
         for key in pollutant_keys:
-            assert 1 <= document[key]["aqi_level"] <= 6, \
-                f"{key} {document[key]['aqi_level']} is out of range"
+            assert (
+                1 <= document[key]["aqi_level"] <= 6
+            ), f"{key} {document[key]['aqi_level']} is out of range"
 
 
 def test__overall_aqi_level_is_highest_value_of_individual_pollutant_aqi_levels(
@@ -159,8 +165,9 @@ def test__created_time_exists(setup_data):
 # Helper function to assert if a subset dictionary is contained within a superset
 def _assert_dictionary_subset(subset: dict, superset: dict):
     dict_items = [(k, v) for k, v in subset.items() if isinstance(subset[k], dict)]
-    non_dict_items = \
-        [(k, v) for k, v in subset.items() if not isinstance(subset[k], dict)]
+    non_dict_items = [
+        (k, v) for k, v in subset.items() if not isinstance(subset[k], dict)
+    ]
 
     assert all(superset.get(key, None) == val for key, val in non_dict_items)
     for key, value in dict_items:

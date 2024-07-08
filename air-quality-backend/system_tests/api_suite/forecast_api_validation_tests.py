@@ -2,6 +2,7 @@ import datetime
 import random
 import pytest
 import requests
+import system_tests.context  # noqa: F401
 from system_tests.utils.api_utilities import (
     format_datetime_as_string,
 )

@@ -55,7 +55,7 @@ services:
       - air-quality-backend
       - fastapi
       - dev
-      - ./src/air_quality/api/main.py
+      - ./api/src/main.py
       - --host
       - 0.0.0.0
     volumes:

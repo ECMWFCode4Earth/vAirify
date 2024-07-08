@@ -1,21 +1,21 @@
 FROM continuumio/miniconda3 AS development
 
 WORKDIR /app
-COPY conda/environment.yml .
+COPY etl/conda/environment.yml .
 RUN conda env create -f environment.yml
 
 SHELL ["conda", "run", "-n", "air-quality-backend", "/bin/bash", "-c"]
 
-COPY pyproject.toml poetry.lock ./
+COPY etl/pyproject.toml etl/poetry.lock ./
 RUN poetry install
 
-COPY src/ ./src
-COPY scripts/run_in_situ_etl.py ./scripts/run_in_situ_etl.py
-COPY README.md logging.ini ./
+COPY etl/src/ ./etl/src
+COPY shared/src ./shared/src
+COPY README.md etl/logging.ini ./
 
 RUN poetry install 
 
-CMD ["conda", "run", "--no-capture-output", "-n", "air-quality-backend", "python", "scripts/run_in_situ_etl.py"]
+CMD ["conda", "run", "--no-capture-output", "-n", "air-quality-backend", "python", "etl/src/run_in_situ_etl.py"]
 
 FROM development AS cron
 
@@ -32,6 +32,6 @@ RUN curl -fsSLO "$SUPERCRONIC_URL" \
  && mv "$SUPERCRONIC" "/usr/local/bin/${SUPERCRONIC}" \
  && ln -s "/usr/local/bin/${SUPERCRONIC}" /usr/local/bin/supercronic
 
-COPY cron/crontab.insitu crontab
+COPY etl/cron/crontab.insitu crontab
 
 CMD [ "/usr/local/bin/supercronic", "-passthrough-logs", "./crontab" ]

@@ -1,17 +1,17 @@
 FROM continuumio/miniconda3
 
-WORKDIR /usr/src/app
-COPY conda/environment.yml .
+WORKDIR /app
+COPY api/conda/environment.yml .
 RUN conda env create -f environment.yml
 
 SHELL ["conda", "run", "-n", "air-quality-backend", "/bin/bash", "-c"]
 
-COPY pyproject.toml poetry.lock ./
+COPY api/pyproject.toml api/poetry.lock ./
 RUN poetry install
 
-COPY src/ ./src
-COPY README.md logging.ini ./
-
+COPY api/src/ ./api/src
+COPY shared/src ./shared/src
+COPY api/README.md api/logging.ini ./
 RUN poetry install 
 
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "air-quality-backend", "fastapi", "run", "./src/air_quality/api/main.py", "--root-path", "/api"]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "air-quality-backend", "fastapi", "run", "./api/src/main.py", "--root-path", "/api"]
