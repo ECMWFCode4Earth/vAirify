@@ -38,8 +38,8 @@ def test__grib_cache__file_not_stored_when_not_set_to_cache(setup_grib_cache_tes
         main()
 
     # File has not been cached
-    assert os.path.exists(single_filename) == False
-    assert os.path.exists(multi_filename) == False
+    assert not os.path.exists(single_filename)
+    assert not os.path.exists(multi_filename)
 
     # Data has been stored
     stored_data = get_database_data("forecast_data", query)
@@ -56,8 +56,8 @@ def test__grib_cache__file_not_stored_by_default(setup_grib_cache_tests):
         main()
 
     # File has not been cached
-    assert os.path.exists(single_filename) == False
-    assert os.path.exists(multi_filename) == False
+    assert not os.path.exists(single_filename)
+    assert not os.path.exists(multi_filename)
 
     # Data has been stored
     stored_data = get_database_data("forecast_data", query)
@@ -75,8 +75,8 @@ def test__grib_cache__file_stored_when_set_to_cache(setup_grib_cache_tests):
         main()
 
     # File has been cached
-    assert os.path.isfile(single_filename) == True
-    assert os.path.isfile(multi_filename) == True
+    assert os.path.isfile(single_filename)
+    assert os.path.isfile(multi_filename)
 
     # Data has been stored
     stored_data = get_database_data("forecast_data", query)
