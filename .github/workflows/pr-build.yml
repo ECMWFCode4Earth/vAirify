@@ -12,7 +12,8 @@ jobs:
     permissions:
         pull-requests: read
     outputs:
-      backend: ${{ steps.filter.outputs.backend }}
+      backend-etl: ${{ steps.filter.outputs.backend-etl }}
+      backend-api: ${{ steps.filter.outputs.backend-api }}
       ui:  ${{ steps.filter.outputs.ui }}
     steps:
     - name: Checkout code
@@ -21,14 +22,17 @@ jobs:
       id: filter
       with:
         filters: |
-          backend:
-            - 'air-quality-backend/**'
+          backend-etl:
+            - 'air-quality-backend/etl/**'
+          backend-api:
+            - 'air-quality-backend/api/**'
           ui:
             - 'air-quality-ui/**'
 
-  pr-checks-backend:
+
+  pr-checks-backend-etl:
     needs: detect-change-scope
-    if: ${{ needs.detect-change-scope.outputs.backend == 'true' }}
+    if: ${{ needs.detect-change-scope.outputs.backend-etl == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -44,30 +48,76 @@ jobs:
         uses: conda-incubator/setup-miniconda@v3
         with:
           channels: conda-forge
-          environment-file: air-quality-backend/conda/environment.yml
+          environment-file: air-quality-backend/etl/conda/environment.yml
           auto-activate-base: false
           activate-environment: pr-env
 
       - name: Get Dependencies
         run: poetry install
-        working-directory: ./air-quality-backend
+        working-directory: ./air-quality-backend/etl
         
       - name: Run lint check
         run: python -m flake8 --append-config .flake8
-        working-directory: ./air-quality-backend
+        working-directory: ./air-quality-backend/etl
 
       - name: Run unit tests
         run: python -m pytest --cov=src/air_quality --cov=scripts --cov-report= tests
-        working-directory: ./air-quality-backend
+        working-directory: ./air-quality-backend/etl
 
       - name: Convert to report 
         run: coverage xml
-        working-directory: ./air-quality-backend
+        working-directory: ./air-quality-backend/etl
 
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1
         with:
-            coverageFile: ./air-quality-backend/coverage.xml
+            coverageFile: ./air-quality-backend/etl/coverage.xml
+            token: ${{ secrets.GITHUB_TOKEN }}
+            thresholdAll: 0.8
+            thresholdModified: 0
+
+  pr-checks-backend-api:
+    needs: detect-change-scope
+    if: ${{ needs.detect-change-scope.outputs.backend-api == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: 'air-quality-backend'
+          sparse-checkout-cone-mode: false
+
+      - name: Setup miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          channels: conda-forge
+          environment-file: air-quality-backend/api/conda/environment.yml
+          auto-activate-base: false
+          activate-environment: pr-env
+
+      - name: Get Dependencies
+        run: poetry install
+        working-directory: ./air-quality-backend/api
+        
+      - name: Run lint check
+        run: python -m flake8 --append-config .flake8
+        working-directory: ./air-quality-backend/api
+
+      - name: Run unit tests
+        run: python -m pytest --cov=src/air_quality --cov=scripts --cov-report= tests
+        working-directory: ./air-quality-backend/api
+
+      - name: Convert to report 
+        run: coverage xml
+        working-directory: ./air-quality-backend/api
+
+      - name: Code Coverage Report
+        uses: orgoro/coverage@v3.1
+        with:
+            coverageFile: ./air-quality-backend/api/coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
             thresholdAll: 0.8
             thresholdModified: 0.9
