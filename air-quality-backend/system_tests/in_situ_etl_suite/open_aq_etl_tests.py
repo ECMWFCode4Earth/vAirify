@@ -52,18 +52,19 @@ def remove_file(filename: str):
 
 @pytest.fixture(scope="module")
 def ensure_forecast_cache():
-    with freeze_time("2024-05-25T13:00:00"):
+    # With a time of 2024-05-25 13:14:15 our GRIB files will be for 2024-05-24 12:00:00
+    with freeze_time("2024-05-25T13:14:15"):
         with mock.patch.dict(os.environ, {"STORE_GRIB_FILES": "True"}):
             # Set up code
             # Ensure the cached files are present by fetching the grib files
             single_file = "single_level_16_from_2024-05-24_12.grib"
             multi_file = "multi_level_16_from_2024-05-24_12.grib"
             if not os.path.exists(single_file) or not os.path.exists(multi_file):
-                fetch_forecast_data(datetime(2024, 5, 24, 13), 16)
+                fetch_forecast_data(datetime(2024, 5, 24, 13, 14, 15), 16)
         yield
         # Remove any cached files
         remove_file("single_level_16_from_2024-05-24_12.grib")
-        remove_file("multi_level_16_from_2024-06-26_12.grib")
+        remove_file("multi_level_16_from_2024-05-24_12.grib")
 
 
 @mock.patch.dict(
@@ -78,8 +79,8 @@ def test__in_situ_etl__combines_pollutants_for_location_times(ensure_forecast_ca
     query = {"name": "London"}
     delete_database_data(collection_name, query)
 
-    date1 = "2024-05-24T13:10:20+00:00"
-    date2 = "2024-05-25T13:10:20+00:00"
+    date1 = "2024-05-24T13:14:15+00:00"
+    date2 = "2024-05-25T13:14:15+00:00"
     london_file = f"{open_aq_cache_location}/London_2024052413_2024052513.json"
 
     london_data = [
@@ -117,7 +118,7 @@ def test__in_situ_etl__stores_all_data_correctly(ensure_forecast_cache):
     query = {"name": "London"}
     delete_database_data(collection_name, query)
 
-    date1 = "2024-05-24T13:10:20+00:00"
+    date1 = "2024-05-24T13:14:15+00:00"
     london_file = f"{open_aq_cache_location}/London_2024052413_2024052513.json"
 
     london_openaq_data = [
@@ -172,7 +173,7 @@ def test__in_situ_etl__handles_multiple_cities(ensure_forecast_cache):
     query = {"name": {"$in": ["London", "Melbourne"]}}
     delete_database_data(collection_name, query)
 
-    date1 = "2024-05-24T13:10:20+00:00"
+    date1 = "2024-05-24T13:14:15+00:00"
     london_file = f"{open_aq_cache_location}/London_2024052413_2024052513.json"
     melbourne_file = f"{open_aq_cache_location}/Melbourne_2024052413_2024052513.json"
 
@@ -206,7 +207,7 @@ def test__in_situ_etl__handles_multiple_cities(ensure_forecast_cache):
 def test__in_situ_etl__updates_existing_data(ensure_forecast_cache):
     query = {"name": "London"}
     delete_database_data(collection_name, query)
-    date1 = "2024-05-24T13:10:20+00:00"
+    date1 = "2024-05-24T13:14:15+00:00"
 
     existing_measurement: InSituMeasurement = {
         "name": "London",
@@ -237,7 +238,7 @@ def test__in_situ_etl__updates_existing_data(ensure_forecast_cache):
     assert len(results) == 1
     assert results[0]["no2"]["value"] == 116
     assert results[0]["last_modified_time"] == datetime(
-        2024, 5, 25, 13, 0, tzinfo=timezone.utc
+        2024, 5, 25, 13, 14, 15, tzinfo=timezone.utc
     )
 
 
