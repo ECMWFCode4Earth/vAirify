@@ -61,7 +61,7 @@ jobs:
         working-directory: ./air-quality-backend/etl
 
       - name: Run unit tests
-        run: python -m pytest --cov=src/air_quality --cov=scripts --cov-report= tests
+        run: python -m pytest --cov=src --cov-report= tests
         working-directory: ./air-quality-backend/etl
 
       - name: Convert to report 
@@ -107,7 +107,7 @@ jobs:
         working-directory: ./air-quality-backend/api
 
       - name: Run unit tests
-        run: python -m pytest --cov=src/air_quality --cov=scripts --cov-report= tests
+        run: python -m pytest --cov=src --cov-report= tests
         working-directory: ./air-quality-backend/api
 
       - name: Convert to report 
