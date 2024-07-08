@@ -44,12 +44,37 @@ def test__in_situ_etl__calling_actual_api_returns_values_and_stores():
     assert results[-1]["name"] == "London"
 
 
+def remove_file(filename: str):
+    if os.path.exists(filename):
+        logging.info(f"Test removing cached file '{filename}'")
+        os.remove(filename)
+
+
+@pytest.fixture(scope="module")
+def ensure_forecast_cache():
+    with freeze_time("2024-05-25T13:00:00"):
+        with mock.patch.dict(os.environ, {"STORE_GRIB_FILES": "True"}):
+            # Set up code
+            # Ensure the cached files are present by fetching the grib files
+            single_file = "single_level_16_from_2024-05-24_12.grib"
+            multi_file = "multi_level_16_from_2024-05-24_12.grib"
+            if not os.path.exists(single_file) or not os.path.exists(multi_file):
+                fetch_forecast_data(datetime(2024, 5, 24, 13), 16)
+        yield
+        # Remove any cached files
+        remove_file("single_level_16_from_2024-05-24_12.grib")
+        remove_file("multi_level_16_from_2024-06-26_12.grib")
+
+
 @mock.patch.dict(
     os.environ,
-    {"OPEN_AQ_CITIES": "London", "OPEN_AQ_CACHE": open_aq_cache_location},
+    {
+        "OPEN_AQ_CITIES": "London",
+        "OPEN_AQ_CACHE": open_aq_cache_location,
+        "STORE_GRIB_FILES": "True"
+    },
 )
-@freeze_time("2024-05-25T13:00:00")
-def test__in_situ_etl__combines_pollutants_for_location_times():
+def test__in_situ_etl__combines_pollutants_for_location_times(ensure_forecast_cache):
     query = {"name": "London"}
     delete_database_data(collection_name, query)
 
@@ -82,10 +107,13 @@ def test__in_situ_etl__combines_pollutants_for_location_times():
 
 @mock.patch.dict(
     os.environ,
-    {"OPEN_AQ_CITIES": "London", "OPEN_AQ_CACHE": open_aq_cache_location},
+    {
+        "OPEN_AQ_CITIES": "London",
+        "OPEN_AQ_CACHE": open_aq_cache_location,
+        "STORE_GRIB_FILES": "True"
+    },
 )
-@freeze_time("2024-05-25T13:00:00")
-def test__in_situ_etl__stores_all_data_correctly():
+def test__in_situ_etl__stores_all_data_correctly(ensure_forecast_cache):
     query = {"name": "London"}
     delete_database_data(collection_name, query)
 
@@ -134,10 +162,13 @@ def test__in_situ_etl__stores_all_data_correctly():
 
 @mock.patch.dict(
     os.environ,
-    {"OPEN_AQ_CITIES": "London,Melbourne", "OPEN_AQ_CACHE": open_aq_cache_location},
+    {
+        "OPEN_AQ_CITIES": "London,Melbourne",
+        "OPEN_AQ_CACHE": open_aq_cache_location,
+        "STORE_GRIB_FILES": "True"
+    },
 )
-@freeze_time("2024-05-25T13:00:00")
-def test__in_situ_etl__handles_multiple_cities():
+def test__in_situ_etl__handles_multiple_cities(ensure_forecast_cache):
     query = {"name": {"$in": ["London", "Melbourne"]}}
     delete_database_data(collection_name, query)
 
@@ -166,10 +197,13 @@ def test__in_situ_etl__handles_multiple_cities():
 
 @mock.patch.dict(
     os.environ,
-    {"OPEN_AQ_CITIES": "London", "OPEN_AQ_CACHE": open_aq_cache_location},
+    {
+        "OPEN_AQ_CITIES": "London",
+        "OPEN_AQ_CACHE": open_aq_cache_location,
+        "STORE_GRIB_FILES": "True"
+    },
 )
-@freeze_time("2024-05-25T13:00:00+0000")
-def test__in_situ_etl__updates_existing_data():
+def test__in_situ_etl__updates_existing_data(ensure_forecast_cache):
     query = {"name": "London"}
     delete_database_data(collection_name, query)
     date1 = "2024-05-24T13:10:20+00:00"
@@ -209,10 +243,14 @@ def test__in_situ_etl__updates_existing_data():
 
 @mock.patch.dict(
     os.environ,
-    {"OPEN_AQ_CITIES": "London", "OPEN_AQ_CACHE": open_aq_cache_location},
+    {
+        "OPEN_AQ_CITIES": "London",
+        "OPEN_AQ_CACHE": open_aq_cache_location,
+        "STORE_GRIB_FILES": "True"
+    },
 )
-@freeze_time("2024-05-25T13:00:00")
-def test__in_situ_etl__invalid_data_raises_error_and_does_not_store():
+def test__in_situ_etl__invalid_data_raises_error_and_does_not_store(
+        ensure_forecast_cache):
     query = {"name": "London"}
     delete_database_data(collection_name, query)
 
@@ -229,21 +267,8 @@ def test__in_situ_etl__invalid_data_raises_error_and_does_not_store():
     assert len(results) == 0
 
 
-@pytest.fixture
-def ensure_forecast_cache():
-    with freeze_time("2024-05-25T13:00:00"):
-        # Set up code
-        # Ensure the cached files are present by fetching the grib files
-        single_file = "single_level_16_from_2024-05-24_12.grib"
-        multi_file = "multi_level_16_from_2024-05-24_12.grib"
-        if not os.path.exists(single_file) or not os.path.exists(multi_file):
-            fetch_forecast_data(datetime(2024, 5, 24, 13), 16)
-        yield
-        # Tear down code
-
-
 @mock.patch("urllib3.connectionpool.HTTPConnectionPool._get_conn")
-@mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London"})
+@mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London", "STORE_GRIB_FILES": "True"})
 def test__in_situ_etl__timeouts_retry_twice_then_stop(
     mock_get_conn, caplog, ensure_forecast_cache
 ):
@@ -262,7 +287,7 @@ def test__in_situ_etl__timeouts_retry_twice_then_stop(
 
 
 @mock.patch("urllib3.connectionpool.HTTPConnectionPool._get_conn")
-@mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London"})
+@mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London", "STORE_GRIB_FILES": "True"})
 def test__in_situ_etl__internal_error_fails_without_retry(
     mock_get_conn, caplog, ensure_forecast_cache
 ):
@@ -281,7 +306,7 @@ def test__in_situ_etl__internal_error_fails_without_retry(
 
 
 @mock.patch("urllib3.connectionpool.HTTPConnectionPool._get_conn")
-@mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London"})
+@mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London", "STORE_GRIB_FILES": "True"})
 def test__in_situ_etl__timeout_followed_by_success_returns_correctly(
     mock_get_conn, caplog, ensure_forecast_cache
 ):
@@ -307,7 +332,10 @@ def test__in_situ_etl__timeout_followed_by_success_returns_correctly(
 
 @mock.patch.dict(
     os.environ,
-    {"OPEN_AQ_CITIES": "Berlin", "OPEN_AQ_CACHE": open_aq_cache_location},
+    {
+        "OPEN_AQ_CITIES": "Berlin",
+        "OPEN_AQ_CACHE": open_aq_cache_location
+    },
 )
 @freeze_time("2024-06-27T13:00:00")
 def test__convert_ppm_to_ugm3_and_store__only_no2_so2_o3():
