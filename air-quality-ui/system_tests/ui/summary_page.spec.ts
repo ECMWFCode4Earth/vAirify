@@ -1,31 +1,50 @@
 import { expect, test } from '../utils/fixtures'
 
-test.describe('Default to correct forecast base time', () => {
-  test('System time 11AM, assert forecast base time 00:00 (day-1)', async ({
-    page,
-    vairifySummaryPage,
-  }) => {
-    const mockSystemDate: Date = new Date('2024-07-03T11:00:00Z')
-    await page.clock.setFixedTime(mockSystemDate)
+test.describe('BVA - Default to correct forecast base time', () => {
+  ;[
+    {
+      dateTime: '2024-07-03T10:00:00Z',
+      expectedForecastBaseTime: '02 Jul 00:00 UTC',
+    },
+    {
+      dateTime: '2024-07-03T09:59:00Z',
+      expectedForecastBaseTime: '01 Jul 12:00 UTC',
+    },
+    {
+      dateTime: '2024-07-03T21:59:00Z',
+      expectedForecastBaseTime: '02 Jul 00:00 UTC',
+    },
+    {
+      dateTime: '2024-07-03T22:00:00Z',
+      expectedForecastBaseTime: '02 Jul 12:00 UTC',
+    },
+  ].forEach(({ dateTime, expectedForecastBaseTime }) => {
+    test(`System time ${dateTime}, assert forecast base time ${expectedForecastBaseTime}`, async ({
+      page,
+      vairifySummaryPage,
+    }) => {
+      const mockSystemDate: Date = new Date(dateTime)
+      await page.clock.setFixedTime(mockSystemDate)
 
-    const requestArray: string[] =
-      await vairifySummaryPage.captureNetworkRequestsAsArray(
-        page,
-        'GET',
-        'http://localhost:8000/air-pollutant/forecast',
-      )
-    await vairifySummaryPage.goTo()
+      const requestArray: string[] =
+        await vairifySummaryPage.captureNetworkRequestsAsArray(
+          page,
+          'GET',
+          'http://localhost:8000/air-pollutant/forecast',
+        )
+      await vairifySummaryPage.goTo()
 
-    const expectedRequestForecastBaseTime =
-      await vairifySummaryPage.getExpectedRequestForecastBaseTime(
-        mockSystemDate,
+      const expectedRequestForecastBaseTime =
+        await vairifySummaryPage.getExpectedRequestForecastBaseTime(
+          mockSystemDate,
+        )
+      expect(requestArray[0]).toContain(
+        `base_time=${expectedRequestForecastBaseTime}`,
       )
-    expect(requestArray[0]).toContain(
-      `base_time=${expectedRequestForecastBaseTime}`,
-    )
-    // expect(
-    //   page.locator("//div[@class='_summary-container_pb9bs_1']/div[1]/div[1]"),
-    // ).toContainText('02 Jul 00:00 UTC')
+      await expect(vairifySummaryPage.forecastBaseTimeText).toContainText(
+        `Forecast Base Time: ${expectedForecastBaseTime}`,
+      )
+    })
   })
 })
 
@@ -47,9 +66,16 @@ test.describe('On page load', () => {
       expect(requestArray.length).toEqual(1)
     })
 
-    test('Verify on page load the forecast API call has correct base time', async () => {
+    test('Verify on page load the forecast API call has correct base time', async ({
+      vairifySummaryPage,
+    }) => {
+      const expectedRequestForecastBaseTime =
+        await vairifySummaryPage.getExpectedRequestForecastBaseTime(
+          mockDatetimeNow,
+        )
+      console.log(expectedRequestForecastBaseTime)
       expect(requestArray[0]).toContain(
-        'base_time=2024-06-09T00%3A00%3A00.000Z',
+        `base_time=${expectedRequestForecastBaseTime}`,
       )
     })
   })

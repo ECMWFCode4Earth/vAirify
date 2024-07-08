@@ -8,6 +8,7 @@ export class VairifySummaryPage {
   readonly scroller: Locator
   readonly agCell: Locator
   readonly allCells: Locator
+  readonly forecastBaseTimeText: Locator
 
   constructor(
     page: Page,
@@ -22,6 +23,9 @@ export class VairifySummaryPage {
     this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')
     this.agCell = this.page.locator('role=gridcell')
     this.allCells = this.page.locator('[role=gridcell]')
+    this.forecastBaseTimeText = this.page.locator(
+      "//div[@class='_summary-container_1n5zu_1']/div[1]/div[1]",
+    )
   }
   async clickButton(buttonName: string) {
     await this.page.getByRole('link', { name: buttonName }).click()
@@ -167,11 +171,23 @@ export class VairifySummaryPage {
     const hours24HrsAgo = datetime24HrsAgo.getUTCHours()
     const expectedForecastBaseTime: Date = datetime24HrsAgo
 
-    if (22 > hours24HrsAgo && hours24HrsAgo >= 10) {
+    expectedForecastBaseTime.setMinutes(0)
+    expectedForecastBaseTime.setSeconds(0)
+    expectedForecastBaseTime.setMilliseconds(0)
+
+    if (10 > hours24HrsAgo) {
+      // go back another day
+      const time48HrsAgoMilliseconds =
+        mockDatetimeNow.getTime() - 24 * 60 * 60 * 1000 * 2
+      const datetime48HrsAgo = new Date(time48HrsAgoMilliseconds)
+      expectedForecastBaseTime.setUTCDate(datetime48HrsAgo.getUTCDate())
+      expectedForecastBaseTime.setUTCHours(12)
+    } else if (22 > hours24HrsAgo && hours24HrsAgo >= 10) {
       expectedForecastBaseTime.setUTCHours(0)
     } else {
       expectedForecastBaseTime.setUTCHours(12)
     }
+
     return expectedForecastBaseTime
   }
 
