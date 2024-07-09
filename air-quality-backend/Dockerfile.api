@@ -14,4 +14,4 @@ COPY shared/src ./shared/src
 COPY api/README.md api/logging.ini ./
 RUN poetry install 
 
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "air-quality-backend", "fastapi", "run", "./api/src/main.py", "--root-path", "/api"]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "air-quality-backend", "PYTHONPATH=.", "fastapi", "run", "./api/src/main.py", "--root-path", "/api"]
