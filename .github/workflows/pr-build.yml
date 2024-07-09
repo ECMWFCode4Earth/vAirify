@@ -71,7 +71,7 @@ jobs:
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1
         with:
-            coverageFile: ./air-quality-backend/etl/coverage.xml
+            coverageFile: ./air-quality-backend/coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
             thresholdAll: 0.8
             thresholdModified: 0
@@ -117,7 +117,7 @@ jobs:
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1
         with:
-            coverageFile: ./air-quality-backend/api/coverage.xml
+            coverageFile: ./air-quality-backend/coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
             thresholdAll: 0.8
             thresholdModified: 0.9
