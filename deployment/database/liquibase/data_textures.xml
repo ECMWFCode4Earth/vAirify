@@ -12,7 +12,7 @@
     <mongodb:createCollection collectionName="data_textures"/>
     <mongodb:createIndex collectionName="data_textures">
       <mongodb:keys>
-        { forecast_base_time: 1, tim_start: 1, tim_end: 1, texture_uri: 1, source: 1 }
+        { forecast_base_time: 1, time_start: 1, time_end: 1, texture_uri: 1, source: 1 }
       </mongodb:keys>
       <mongodb:options>
         {unique: true, name: "uniq_texture_idx"}
