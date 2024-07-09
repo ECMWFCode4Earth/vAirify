@@ -1,6 +1,5 @@
 import logging
 import os
-import system_tests.context  # noqa: F401
 from datetime import datetime, timezone
 from http.client import HTTPMessage
 from unittest.mock import Mock
@@ -73,7 +72,7 @@ def ensure_forecast_cache():
     {
         "OPEN_AQ_CITIES": "London",
         "OPEN_AQ_CACHE": open_aq_cache_location,
-        "STORE_GRIB_FILES": "True"
+        "STORE_GRIB_FILES": "True",
     },
 )
 def test__in_situ_etl__combines_pollutants_for_location_times(ensure_forecast_cache):
@@ -112,7 +111,7 @@ def test__in_situ_etl__combines_pollutants_for_location_times(ensure_forecast_ca
     {
         "OPEN_AQ_CITIES": "London",
         "OPEN_AQ_CACHE": open_aq_cache_location,
-        "STORE_GRIB_FILES": "True"
+        "STORE_GRIB_FILES": "True",
     },
 )
 def test__in_situ_etl__stores_all_data_correctly(ensure_forecast_cache):
@@ -167,7 +166,7 @@ def test__in_situ_etl__stores_all_data_correctly(ensure_forecast_cache):
     {
         "OPEN_AQ_CITIES": "London,Melbourne",
         "OPEN_AQ_CACHE": open_aq_cache_location,
-        "STORE_GRIB_FILES": "True"
+        "STORE_GRIB_FILES": "True",
     },
 )
 def test__in_situ_etl__handles_multiple_cities(ensure_forecast_cache):
@@ -202,7 +201,7 @@ def test__in_situ_etl__handles_multiple_cities(ensure_forecast_cache):
     {
         "OPEN_AQ_CITIES": "London",
         "OPEN_AQ_CACHE": open_aq_cache_location,
-        "STORE_GRIB_FILES": "True"
+        "STORE_GRIB_FILES": "True",
     },
 )
 def test__in_situ_etl__updates_existing_data(ensure_forecast_cache):
@@ -248,11 +247,12 @@ def test__in_situ_etl__updates_existing_data(ensure_forecast_cache):
     {
         "OPEN_AQ_CITIES": "London",
         "OPEN_AQ_CACHE": open_aq_cache_location,
-        "STORE_GRIB_FILES": "True"
+        "STORE_GRIB_FILES": "True",
     },
 )
 def test__in_situ_etl__invalid_data_raises_error_and_does_not_store(
-        ensure_forecast_cache):
+    ensure_forecast_cache,
+):
     query = {"name": "London"}
     delete_database_data(collection_name, query)
 
@@ -334,10 +334,7 @@ def test__in_situ_etl__timeout_followed_by_success_returns_correctly(
 
 @mock.patch.dict(
     os.environ,
-    {
-        "OPEN_AQ_CITIES": "Berlin",
-        "OPEN_AQ_CACHE": open_aq_cache_location
-    },
+    {"OPEN_AQ_CITIES": "Berlin", "OPEN_AQ_CACHE": open_aq_cache_location},
 )
 @freeze_time("2024-06-27T13:00:00")
 def test__convert_ppm_to_ugm3_and_store__only_no2_so2_o3():

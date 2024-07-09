@@ -1,7 +1,6 @@
 import os
 from unittest import mock
 import pytest
-import system_tests.context  # noqa: F401
 
 from dotenv import load_dotenv
 from ftplib import FTP
