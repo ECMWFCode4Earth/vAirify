@@ -17,7 +17,6 @@ export class VairifySummaryPage {
   ) {
     this.page = page
     this.mockedForecastResponse = mockedForecastResponse
-
     this.mockedMeasurementSummaryResponse = mockedMeasurementSummaryResponse
     this.title = this.page.locator('title')
     this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')

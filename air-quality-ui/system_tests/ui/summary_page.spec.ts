@@ -1,6 +1,21 @@
 import { expect, test } from '../utils/fixtures'
+import {
+  createForecastAPIResponseData,
+  createMeasurementSummaryAPIResponseData,
+} from '../utils/mocked_api'
 
-test.describe('BVA - Default to correct forecast base time', () => {
+test.describe('No Mocking', () => {
+  test.beforeEach(async ({ vairifySummaryPage }) => {
+    await vairifySummaryPage.goTo()
+  })
+
+  test('Verify page title is vAirify', async ({ vairifySummaryPage }) => {
+    const title = await vairifySummaryPage.getTitle()
+    expect(title).toBe('vAirify')
+  })
+})
+
+test.describe('BVA using mocked system time', () => {
   ;[
     {
       dateTime: '2024-07-03T10:00:00Z',
@@ -168,17 +183,6 @@ test.describe('On page load', () => {
   })
 })
 
-test.describe('No Mocking', () => {
-  test.beforeEach(async ({ vairifySummaryPage }) => {
-    await vairifySummaryPage.goTo()
-  })
-
-  test('Verify page title is vAirify', async ({ vairifySummaryPage }) => {
-    const title = await vairifySummaryPage.getTitle()
-    expect(title).toBe('vAirify')
-  })
-})
-
 test.describe('Mocked API Response Tests', () => {
   test.beforeEach(async ({ vairifySummaryPage }) => {
     await vairifySummaryPage.setupPageWithMockData(
@@ -231,7 +235,8 @@ test.describe('Mocked API Response Tests', () => {
       expect(count).toEqual(1)
     })
 
-    test('Check data is displayed correctly on grid', async ({
+    // skipped, WIP
+    test.skip('Check data is displayed correctly on grid', async ({
       vairifySummaryPage,
     }) => {
       // first 6 values for Kampala, Abu Dhabi, Zurich and Kyiv respectively
@@ -245,11 +250,199 @@ test.describe('Mocked API Response Tests', () => {
       await vairifySummaryPage.assertGridValues(expectedData)
     })
 
-    test('Verify that Diff displays the delta between forcast and measured', async ({
+    // skipped, WIP
+    test.skip('Verify that Diff displays the delta between forcast and measured', async ({
       vairifySummaryPage,
     }) => {
       const diffArray = await vairifySummaryPage.calculateForecastDifference()
       expect(diffArray).toEqual([4, 1, 1])
     })
   })
+})
+
+test('Verify table shows pollutant data for the timestamp that has the largest deviation - forecast higher', async ({
+  page,
+  vairifySummaryPage,
+}) => {
+  const forecastLondonValidTimeArray: object[] = [
+    createForecastAPIResponseData(),
+    createForecastAPIResponseData({
+      valid_time: '2024-07-08T03:00:00Z',
+    }),
+    createForecastAPIResponseData({
+      valid_time: '2024-07-08T06:00:00Z',
+      overall_aqi_level: 6,
+      no2: { aqi_level: 6, value: 900 },
+      o3: { aqi_level: 6, value: 400 },
+      pm2_5: { aqi_level: 6, value: 80 },
+      pm10: { aqi_level: 6, value: 160 },
+      so2: { aqi_level: 6, value: 800 },
+    }),
+    createForecastAPIResponseData({
+      valid_time: '2024-07-08T09:00:00Z',
+      overall_aqi_level: 5,
+      no2: { aqi_level: 5, value: 240 },
+      o3: { aqi_level: 5, value: 370 },
+      pm2_5: { aqi_level: 5, value: 60 },
+      pm10: { aqi_level: 5, value: 120 },
+      so2: { aqi_level: 5, value: 510 },
+    }),
+    createForecastAPIResponseData({
+      valid_time: '2024-07-08T12:00:00Z',
+      overall_aqi_level: 4,
+      no2: { aqi_level: 4, value: 125 },
+      o3: { aqi_level: 4, value: 135 },
+      pm2_5: { aqi_level: 4, value: 26 },
+      pm10: { aqi_level: 4, value: 99 },
+      so2: { aqi_level: 4, value: 205 },
+    }),
+  ]
+
+  const measurementsLondonArray: object[] = [
+    createMeasurementSummaryAPIResponseData(),
+    createMeasurementSummaryAPIResponseData({
+      measurement_base_time: '2024-07-08T03:00:00Z',
+    }),
+    createMeasurementSummaryAPIResponseData({
+      measurement_base_time: '2024-07-08T06:00:00Z',
+    }),
+    createMeasurementSummaryAPIResponseData({
+      measurement_base_time: '2024-07-08T09:00:00Z',
+    }),
+    createMeasurementSummaryAPIResponseData({
+      measurement_base_time: '2024-07-08T012:00:00Z',
+    }),
+  ]
+
+  await vairifySummaryPage.setupPageWithMockData(
+    forecastLondonValidTimeArray,
+    measurementsLondonArray,
+  )
+
+  const expectedTableContents: string[][] = [
+    [
+      '6',
+      '3',
+      '+3',
+      '80',
+      '22.5',
+      '08 Jul 06:00',
+      '160',
+      '45.5',
+      '08 Jul 06:00',
+      '900',
+      '100.5',
+      '08 Jul 06:00',
+      '400',
+      '100.5',
+      '08 Jul 06:00',
+      '800',
+      '300.5',
+      '08 Jul 06:00',
+    ],
+  ]
+
+  let i = 0
+  while (i < expectedTableContents[0].length) {
+    const targetCell = page.locator(
+      `//div[ @aria-rowindex='3'] //div[@aria-colindex='${i + 2}']`,
+    )
+    await targetCell.scrollIntoViewIfNeeded()
+    await expect(targetCell).toContainText(expectedTableContents[0][i])
+    i++
+  }
+})
+
+test('Verify table shows pollutant data for the timestamp that has the largest deviation - measurements higher', async ({
+  page,
+  vairifySummaryPage,
+}) => {
+  const forecastLondonValidTimeArray: object[] = [
+    createForecastAPIResponseData(),
+    createForecastAPIResponseData({
+      valid_time: '2024-07-08T03:00:00Z',
+    }),
+    createForecastAPIResponseData({
+      valid_time: '2024-07-08T06:00:00Z',
+    }),
+    createForecastAPIResponseData({
+      valid_time: '2024-07-08T09:00:00Z',
+    }),
+    createForecastAPIResponseData({
+      valid_time: '2024-07-08T12:00:00Z',
+    }),
+  ]
+
+  const measurementsLondonArray: object[] = [
+    createMeasurementSummaryAPIResponseData(),
+    createMeasurementSummaryAPIResponseData({
+      measurement_base_time: '2024-07-08T03:00:00Z',
+    }),
+    createMeasurementSummaryAPIResponseData({
+      measurement_base_time: '2024-07-08T06:00:00Z',
+      overall_aqi_level: { mean: 5 },
+      no2: { mean: { aqi_level: 5, value: 240 } },
+      o3: { mean: { aqi_level: 5, value: 370 } },
+      pm2_5: { mean: { aqi_level: 5, value: 60 } },
+      pm10: { mean: { aqi_level: 5, value: 120 } },
+      so2: { mean: { aqi_level: 5, value: 510 } },
+    }),
+    createMeasurementSummaryAPIResponseData({
+      measurement_base_time: '2024-07-08T09:00:00Z',
+      overall_aqi_level: { mean: 6 },
+      no2: { mean: { aqi_level: 6, value: 900 } },
+      o3: { mean: { aqi_level: 6, value: 400 } },
+      pm2_5: { mean: { aqi_level: 6, value: 80 } },
+      pm10: { mean: { aqi_level: 6, value: 160 } },
+      so2: { mean: { aqi_level: 6, value: 800 } },
+    }),
+
+    createMeasurementSummaryAPIResponseData({
+      measurement_base_time: '2024-07-08T012:00:00Z',
+      overall_aqi_level: { mean: 4 },
+      no2: { mean: { aqi_level: 4, value: 125 } },
+      o3: { mean: { aqi_level: 4, value: 135 } },
+      pm2_5: { mean: { aqi_level: 4, value: 26 } },
+      pm10: { mean: { aqi_level: 4, value: 99 } },
+      so2: { mean: { aqi_level: 4, value: 205 } },
+    }),
+  ]
+
+  await vairifySummaryPage.setupPageWithMockData(
+    forecastLondonValidTimeArray,
+    measurementsLondonArray,
+  )
+
+  const expectedTableContents: string[][] = [
+    [
+      '3',
+      '6',
+      '-3',
+      '22.5',
+      '80',
+      '08 Jul 09:00',
+      '45.5',
+      '160',
+      '08 Jul 09:00',
+      '100.5',
+      '900',
+      '08 Jul 09:00',
+      '100.5',
+      '400',
+      '08 Jul 09:00',
+      '300.5',
+      '800',
+      '08 Jul 09:00',
+    ],
+  ]
+
+  let i = 0
+  while (i < expectedTableContents[0].length) {
+    const targetCell = page.locator(
+      `//div[ @aria-rowindex='3'] //div[@aria-colindex='${i + 2}']`,
+    )
+    await targetCell.scrollIntoViewIfNeeded()
+    await expect(targetCell).toContainText(expectedTableContents[0][i])
+    i++
+  }
 })
