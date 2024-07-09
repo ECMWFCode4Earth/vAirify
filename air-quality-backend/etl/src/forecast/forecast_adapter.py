@@ -13,6 +13,7 @@ import numpy as np
 from PIL import Image
 import pandas as pd
 
+
 class PollutantData(TypedDict):
     values_ug_m3: list[float]
     aqi_values: list[int]

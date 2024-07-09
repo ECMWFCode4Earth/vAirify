@@ -29,6 +29,7 @@ textures = [
     },
 ]
 
+
 @patch("etl.scripts.run_forecast_etl.insert_data")
 @patch("etl.scripts.run_forecast_etl.transform")
 @patch("etl.scripts.run_forecast_etl.fetch_forecast_data")
@@ -63,6 +64,7 @@ def test__run_forecast_etl__no_forecast_time_in_environment_uses_now(
         mock_insert.assert_called_with(transformed_forecast_data)
         mock_textures.assert_called_with(forecast_data)
         mock_insert_textures.assert_called_with(textures)
+
 
 @patch("etl.scripts.run_forecast_etl.insert_data")
 @patch("etl.scripts.run_forecast_etl.transform")

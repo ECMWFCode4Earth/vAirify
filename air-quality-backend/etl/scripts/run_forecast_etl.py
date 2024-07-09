@@ -40,5 +40,6 @@ def main():
     logging.info("Persisting forecast data textures")
     insert_textures(textures)
 
+
 if __name__ == "__main__":
     main()
