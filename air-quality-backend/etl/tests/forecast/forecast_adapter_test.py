@@ -307,11 +307,11 @@ def test__process_variable(mock_makedirs):
 
 
 @patch(
-    "air_quality.etl.forecast.forecast_adapter._create_output_directory",
+    "etl.src.forecast.forecast_adapter._create_output_directory",
     return_value=("test_output", "2024-09-01_00"),
 )
 @patch(
-    "air_quality.etl.forecast.forecast_adapter._process_variable",
+    "etl.src.forecast.forecast_adapter._process_variable",
     return_value=[
         {
             "texture_uri": "test_uri",
