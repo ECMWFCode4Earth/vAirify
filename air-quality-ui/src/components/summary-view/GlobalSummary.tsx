@@ -14,13 +14,18 @@ import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,
 } from '../../services/types'
+import { LoadingSpinner } from '../common/LoadingSpinner'
 import GlobalSummaryTable from '../summary-grid/table/GlobalSummaryTable'
 
 const GlobalSummary = (): JSX.Element => {
   const { forecastBaseDate, maxInSituDate } = useForecastContext()
   const [showAllColoured, setShowAllColoured] = useState<boolean>(true)
 
-  const { data: forecastData, isError: forecastDataError } = useQuery({
+  const {
+    data: forecastData,
+    isPending: forecastPending,
+    isError: forecastDataError,
+  } = useQuery({
     queryKey: [forecastBaseDate],
     queryFn: () =>
       getForecastData(forecastBaseDate, DateTime.now(), forecastBaseDate).then(
@@ -43,70 +48,83 @@ const GlobalSummary = (): JSX.Element => {
     return getValidForecastTimesBetween(forecastBaseDate, maxInSituDate)
   }, [forecastBaseDate, maxInSituDate])
 
-  const { data: summarizedMeasurementData, isError: summaryDataError } =
-    useQueries({
-      queries: forecastValidTimeRange.map((validTime) => ({
-        queryKey: ['summary', validTime.toMillis()],
-        queryFn: () => getMeasurementSummary(validTime),
-      })),
-      combine: (results) => {
-        const measurementsByLocation = results
-          .flatMap(({ data }) => data)
-          .reduce<Record<string, MeasurementSummaryResponseDto[]>>(
-            (acc, measurement) => {
-              if (measurement) {
-                const locationName = measurement.location_name
-                if (!acc[locationName]) {
-                  acc[locationName] = []
-                }
-                acc[locationName].push(measurement)
+  const {
+    data: summarizedMeasurementData,
+    isPending: summaryPending,
+    isError: summaryDataError,
+  } = useQueries({
+    queries: forecastValidTimeRange.map((validTime) => ({
+      queryKey: ['summary', validTime.toMillis()],
+      queryFn: () => getMeasurementSummary(validTime),
+    })),
+    combine: (results) => {
+      const measurementsByLocation = results
+        .flatMap(({ data }) => data)
+        .reduce<Record<string, MeasurementSummaryResponseDto[]>>(
+          (acc, measurement) => {
+            if (measurement) {
+              const locationName = measurement.location_name
+              if (!acc[locationName]) {
+                acc[locationName] = []
               }
-              return acc
-            },
-            {},
-          )
-        return { data: measurementsByLocation, isError: false }
-      },
-    })
+              acc[locationName].push(measurement)
+            }
+            return acc
+          },
+          {},
+        )
+      return { data: measurementsByLocation, isError: false, isPending: false }
+    },
+  })
 
   if (forecastDataError || summaryDataError) {
     return <span>Error occurred</span>
   }
   return (
-    <div>
-      <div className={`ag-theme-quartz ${classes['switch-div']}`}>
-        <label className={`ag-theme-quartz ${classes['switch-label']}`}>
-          {showAllColoured
-            ? 'Highlight all AQI values'
-            : 'Highlight primary AQI values'}
-        </label>
-        <Switch
-          data-testid="aqi-highlight-switch"
-          onChange={() => {
-            if (showAllColoured) setShowAllColoured(false)
-            else setShowAllColoured(true)
-          }}
-          checked={showAllColoured}
-        />
-      </div>
-      <div className={classes['summary-container']}>
+    <>
+      {(forecastPending || summaryPending) && (
+        <span className={classes['loading-container']}>
+          <LoadingSpinner />
+        </span>
+      )}
+      {!forecastPending && !summaryPending && (
         <div>
-          <div>
-            Forecast Base Time: {forecastBaseDate.toFormat('dd MMM HH:mm ZZZZ')}
+          <div className={`ag-theme-quartz ${classes['switch-div']}`}>
+            <label className={`ag-theme-quartz ${classes['switch-label']}`}>
+              {showAllColoured
+                ? 'Highlight all AQI values'
+                : 'Highlight primary AQI values'}
+            </label>
+            <Switch
+              data-testid="aqi-highlight-switch"
+              onChange={() => {
+                if (showAllColoured) setShowAllColoured(false)
+                else setShowAllColoured(true)
+              }}
+              checked={showAllColoured}
+            />
           </div>
-          <div data-testid="forecast-valid-range">
-            Forecast Valid Time Range:{' '}
-            {forecastBaseDate.toFormat('dd MMM HH:mm')} -{' '}
-            {maxInSituDate.toFormat('dd MMM HH:mm ZZZZ')}
+          <div className={classes['summary-container']}>
+            <div>
+              <div>
+                Forecast Base Time:{' '}
+                {forecastBaseDate.toFormat('dd MMM HH:mm ZZZZ')}
+              </div>
+              <div data-testid="forecast-valid-range">
+                Forecast Valid Time Range:{' '}
+                {forecastBaseDate.toFormat('dd MMM HH:mm')} -{' '}
+                {maxInSituDate.toFormat('dd MMM HH:mm ZZZZ')}
+              </div>
+            </div>
+            <GlobalSummaryTable
+              forecast={forecastData}
+              summarizedMeasurements={summarizedMeasurementData}
+              showAllColoured={showAllColoured}
+            />
           </div>
         </div>
-        <GlobalSummaryTable
-          forecast={forecastData}
-          summarizedMeasurements={summarizedMeasurementData}
-          showAllColoured={showAllColoured}
-        />
-      </div>
-    </div>
+      )}
+    </>
   )
 }
 

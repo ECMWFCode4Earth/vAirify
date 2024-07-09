@@ -1,6 +1,14 @@
 .summary-container {
     padding: 32px;
 }
+
+.loading-container {
+    align-items: center;
+    display: flex;
+    min-height: 80vh;
+    justify-content: center;
+}
+
 .switch-div{
     display:block;
     float:right;
