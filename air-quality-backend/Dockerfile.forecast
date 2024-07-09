@@ -10,12 +10,13 @@ COPY etl/pyproject.toml etl/poetry.lock ./
 RUN poetry install
 
 COPY etl/src/ ./etl/src
+COPY etl/scripts/ ./etl/scripts
 COPY shared/src ./shared/src
 COPY README.md etl/logging.ini ./
 
 RUN poetry install 
 
-CMD ["conda", "run", "--no-capture-output", "-n", "air-quality-backend", "python", "etl/src/run_forecast_etl.py"]
+CMD ["conda", "run", "--no-capture-output", "-n", "air-quality-backend", "PYTHONPATH=.", "python3", "etl/scripts/run_forecast_etl.py"]
 
 FROM development AS cron
 

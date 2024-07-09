@@ -1,1 +1,1 @@
-10 10,22 * * * conda run --no-capture-output -n air-quality-backend python "/app/src/run_forecast_etl.py"
+10 10,22 * * * conda run --no-capture-output -n air-quality-backend PYTHONPATH=/app python3 /app/etl/scripts/run_forecast_etl.py
