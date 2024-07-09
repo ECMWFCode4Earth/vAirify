@@ -1,8 +1,7 @@
 from datetime import timezone, datetime
 import pytest
-import system_tests.context  # noqa: F401
 
-from etl.src.run_forecast_etl import main
+from etl.scripts.run_forecast_etl import main
 import os
 from dotenv import load_dotenv
 from unittest import mock

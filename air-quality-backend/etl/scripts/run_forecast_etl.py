@@ -1,13 +1,12 @@
 import logging
 import os
 
-import context  # noqa: F401 - required to access shared files
 from logging import config
 
 from dotenv import load_dotenv
 from datetime import datetime
-from forecast.forecast_adapter import transform
-from forecast.forecast_dao import fetch_forecast_data
+from etl.src.forecast.forecast_adapter import transform
+from etl.src.forecast.forecast_dao import fetch_forecast_data
 from shared.src.database.locations import get_locations_by_type, AirQualityLocationType
 from shared.src.database.forecasts import insert_data
 

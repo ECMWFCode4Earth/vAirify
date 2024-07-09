@@ -7,7 +7,7 @@ from unittest.mock import patch, Mock, mock_open
 import pytest
 from pytest_httpserver import HTTPServer
 
-from src.in_situ.openaq_dao import (
+from etl.src.in_situ.openaq_dao import (
     fetch_in_situ_measurements,
     measurements_path,
 )
@@ -23,8 +23,8 @@ def test__fetch_in_situ_measurements__no_cities_returns_empty():
     assert result == {}
 
 
-@patch("src.in_situ.openaq_dao.urlencode")
-@patch("src.in_situ.openaq_dao.requests.Session.get")
+@patch("etl.src.in_situ.openaq_dao.urlencode")
+@patch("etl.src.in_situ.openaq_dao.requests.Session.get")
 def test__fetch_in_situ_measurements__correct_url_params_encoded(
     requests_patch, urlencode_patch
 ):
@@ -52,8 +52,8 @@ def test__fetch_in_situ_measurements__correct_url_params_encoded(
     )
 
 
-@patch("src.in_situ.openaq_dao.urlencode")
-@patch("src.in_situ.openaq_dao.requests.Session.get")
+@patch("etl.src.in_situ.openaq_dao.urlencode")
+@patch("etl.src.in_situ.openaq_dao.requests.Session.get")
 @mock.patch.dict(
     os.environ,
     {"OPEN_AQ_API_URL": "test_url", "OPEN_AQ_API_KEY": "test_api_key"},
@@ -75,7 +75,7 @@ def test__fetch_in_situ_measurements__correct_url_called(
     )
 
 
-@patch("src.in_situ.openaq_dao.requests.Session.get")
+@patch("etl.src.in_situ.openaq_dao.requests.Session.get")
 def test__fetch_in_situ_measurements__single_city_without_measurements(requests_patch):
     response_mock = Mock()
     response_mock.json.return_value = {"results": []}
@@ -88,7 +88,7 @@ def test__fetch_in_situ_measurements__single_city_without_measurements(requests_
     assert result["London"]["measurements"] == []
 
 
-@patch("src.in_situ.openaq_dao.requests.Session.get")
+@patch("etl.src.in_situ.openaq_dao.requests.Session.get")
 def test__fetch_in_situ_measurements__single_city_multiple_measurements(requests_patch):
     response_mock = Mock()
     response_mock.json.return_value = {"results": [100, 200]}
@@ -101,7 +101,7 @@ def test__fetch_in_situ_measurements__single_city_multiple_measurements(requests
     assert result["London"]["measurements"] == [100, 200]
 
 
-@patch("src.in_situ.openaq_dao.requests.Session.get")
+@patch("etl.src.in_situ.openaq_dao.requests.Session.get")
 def test__fetch_in_situ_measurements__single_city_too_many_measurements(requests_patch):
     response_mock = Mock()
 
@@ -116,7 +116,7 @@ def test__fetch_in_situ_measurements__single_city_too_many_measurements(requests
     assert result["London"]["measurements"] == results
 
 
-@patch("src.in_situ.openaq_dao.requests.Session.get")
+@patch("etl.src.in_situ.openaq_dao.requests.Session.get")
 def test__fetch_in_situ_measurements__multiple_cities(requests_patch):
     response_mock = Mock()
     response_mock.json.return_value = {"results": []}
@@ -154,7 +154,7 @@ def test__fetch_in_situ_measurements__cache_supplied_reads_from_cache(
         mock_path_exists.assert_called_with(expected_file_name)
 
 
-@patch("src.in_situ.openaq_dao.requests.Session.get")
+@patch("etl.src.in_situ.openaq_dao.requests.Session.get")
 @patch("os.path.exists")
 @patch.dict(os.environ, {"OPEN_AQ_CACHE": "test_cache"})
 def test__fetch_in_situ_measurements__cache_supplied_but_no_file_for_city_calls_api(

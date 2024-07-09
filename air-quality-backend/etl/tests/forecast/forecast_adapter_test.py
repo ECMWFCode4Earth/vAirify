@@ -1,11 +1,10 @@
 from datetime import datetime, timezone
-from ..context import shared  # noqa: F401
 
 import pytest
 from cerberus import Validator
 
 from shared.src.database.locations import AirQualityLocationType
-from src.forecast.forecast_adapter import (
+from etl.src.forecast.forecast_adapter import (
     ForecastData,
     transform,
 )

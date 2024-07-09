@@ -4,8 +4,8 @@ from unittest.mock import Mock, patch
 import pytest
 
 from shared.src.aqi.pollutant_type import PollutantType
-from src.forecast.forecast_data import ForecastDataType
-from src.in_situ.openaq_adapter import (
+from etl.src.forecast.forecast_data import ForecastDataType
+from etl.src.in_situ.openaq_adapter import (
     transform_city,
     enrich_with_forecast_data,
 )
@@ -263,7 +263,7 @@ def test__transform_city__all_five_pollutants():
     ]
 
 
-@patch("src.in_situ.openaq_adapter.pollutants_with_molecular_weight")
+@patch("etl.src.in_situ.openaq_adapter.pollutants_with_molecular_weight")
 def test__enrich_with_forecast_data__forecast_data_called_correctly_and_enriched(
     pollutants_patch,
 ):
@@ -285,7 +285,7 @@ def test__enrich_with_forecast_data__forecast_data_called_correctly_and_enriched
     assert result[0]["metadata"]["estimated_temperature_k"] == 135
 
 
-@patch("src.in_situ.openaq_adapter.pollutants_with_molecular_weight")
+@patch("etl.src.in_situ.openaq_adapter.pollutants_with_molecular_weight")
 def test__enrich_with_forecast_data__non_present_pollutant_ignored(pollutants_patch):
     in_situ_measurement = create_mock_measurement_document({})
 
@@ -302,7 +302,7 @@ def test__enrich_with_forecast_data__non_present_pollutant_ignored(pollutants_pa
     assert PollutantType.OZONE.value not in result[0]
 
 
-@patch("src.in_situ.openaq_adapter.pollutants_with_molecular_weight")
+@patch("etl.src.in_situ.openaq_adapter.pollutants_with_molecular_weight")
 def test__enrich_with_forecast_data__pollutant_without_ppm_ignored(pollutants_patch):
     in_situ_measurement = create_mock_measurement_document(
         {
@@ -331,8 +331,8 @@ def test__enrich_with_forecast_data__pollutant_without_ppm_ignored(pollutants_pa
     assert result[0]["o3"]["original_unit"] == "test2"
 
 
-@patch("src.in_situ.openaq_adapter.pollutants_with_molecular_weight")
-@patch("src.in_situ.openaq_adapter.convert_ppm_to_mgm3")
+@patch("etl.src.in_situ.openaq_adapter.pollutants_with_molecular_weight")
+@patch("etl.src.in_situ.openaq_adapter.convert_ppm_to_mgm3")
 def test__enrich_with_forecast_data__pollutant_with_ppm_converted(
     converter_patch, pollutants_patch
 ):

@@ -1,4 +1,3 @@
-import context  # noqa: F401 - required to access shared files
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import logging

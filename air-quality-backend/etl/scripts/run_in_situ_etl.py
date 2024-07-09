@@ -1,6 +1,5 @@
 import logging
 import os
-import context  # noqa: F401 - required to access shared files
 
 from datetime import datetime
 from logging import config
@@ -9,7 +8,7 @@ from dotenv import load_dotenv
 
 from shared.src.database.in_situ import insert_data
 from shared.src.database.locations import get_locations_by_type, AirQualityLocationType
-from in_situ.openaq_orchestrator import retrieve_openaq_in_situ_data
+from etl.src.in_situ.openaq_orchestrator import retrieve_openaq_in_situ_data
 
 config.fileConfig("./logging.ini")
 

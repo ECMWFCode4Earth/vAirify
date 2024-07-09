@@ -1,12 +1,11 @@
 from unittest.mock import patch
-from ..context import shared  # noqa: F401
 import pytest
 
 from shared.src.aqi.pollutant_type import PollutantType
-from src.common.unit_converter import convert_ppm_to_mgm3
+from etl.src.common.unit_converter import convert_ppm_to_mgm3
 
 
-@patch("src.common.unit_converter.get_molecular_weight")
+@patch("etl.src.common.unit_converter.get_molecular_weight")
 @pytest.mark.parametrize(
     "ppm_value, molecular_weight, pressure_pa, temperature_k, expected",
     [

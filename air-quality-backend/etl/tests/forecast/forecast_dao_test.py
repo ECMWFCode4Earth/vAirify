@@ -7,7 +7,7 @@ from unittest.mock import call, patch
 
 from freezegun import freeze_time
 
-from src.forecast.forecast_dao import (
+from etl.src.forecast.forecast_dao import (
     CamsRequestDetails,
     fetch_forecast_data,
     align_to_cams_publish_time,

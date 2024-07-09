@@ -5,7 +5,7 @@ from multiprocessing.pool import ThreadPool
 from datetime import datetime, timedelta
 
 from shared.src.database.in_situ import InSituMeasurement
-from forecast.forecast_dao import (
+from ..forecast.forecast_dao import (
     fetch_forecast_data,
     CAMS_FORECAST_INTERVAL_HOURS,
 )

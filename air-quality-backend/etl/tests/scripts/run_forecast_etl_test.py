@@ -1,12 +1,11 @@
-from ..context import shared  # noqa: F401
 from datetime import datetime
 from unittest.mock import patch
 
 from freezegun import freeze_time
 
 from shared.src.database.locations import AirQualityLocationType
-from src.forecast.forecast_data import ForecastData
-from src.run_forecast_etl import main
+from etl.src.forecast.forecast_data import ForecastData
+from etl.scripts.run_forecast_etl import main
 from shared.tests.util.mock_forecast_data import (
     single_level_data_set,
     multi_level_data_set,
@@ -19,16 +18,16 @@ forecast_data = ForecastData(single_level_data_set, multi_level_data_set)
 transformed_forecast_data = []
 
 
-@patch("src.run_forecast_etl.insert_data")
-@patch("src.run_forecast_etl.transform")
-@patch("src.run_forecast_etl.fetch_forecast_data")
-@patch("src.run_forecast_etl.get_locations_by_type")
+@patch("etl.scripts.run_forecast_etl.insert_data")
+@patch("etl.scripts.run_forecast_etl.transform")
+@patch("etl.scripts.run_forecast_etl.fetch_forecast_data")
+@patch("etl.scripts.run_forecast_etl.get_locations_by_type")
 @patch("os.environ.get")
 @freeze_time("2024-05-24T11:12:13")
 def test__run_forecast_etl__no_forecast_time_in_environment_uses_now(
     mock_os, mock_locations, mock_fetch, mock_transform, mock_insert
 ):
-    with patch("run_forecast_etl.config.fileConfig"):
+    with patch("etl.scripts.run_forecast_etl.config.fileConfig"):
         mock_os.return_value = None
         mock_locations.return_value = cities
         mock_fetch.return_value = forecast_data
@@ -44,16 +43,16 @@ def test__run_forecast_etl__no_forecast_time_in_environment_uses_now(
         mock_insert.assert_called_with(transformed_forecast_data)
 
 
-@patch("src.run_forecast_etl.insert_data")
-@patch("src.run_forecast_etl.transform")
-@patch("src.run_forecast_etl.fetch_forecast_data")
-@patch("src.run_forecast_etl.get_locations_by_type")
+@patch("etl.scripts.run_forecast_etl.insert_data")
+@patch("etl.scripts.run_forecast_etl.transform")
+@patch("etl.scripts.run_forecast_etl.fetch_forecast_data")
+@patch("etl.scripts.run_forecast_etl.get_locations_by_type")
 @patch("os.environ.get")
 @freeze_time("2024-05-24T11:12:13")
 def test__run_forecast_etl__forecast_time_in_environment_uses(
     mock_os, mock_locations, mock_fetch, mock_transform, mock_insert
 ):
-    with patch("run_forecast_etl.config.fileConfig"):
+    with patch("etl.scripts.run_forecast_etl.config.fileConfig"):
         mock_os.return_value = "2024-06-01 17"
         mock_locations.return_value = cities
         mock_fetch.return_value = forecast_data

@@ -5,7 +5,7 @@ import xarray
 
 from shared.src.aqi.pollutant_type import PollutantType
 from shared.src.database.locations import AirQualityLocation, AirQualityLocationType
-from src.forecast.forecast_data import (
+from etl.src.forecast.forecast_data import (
     convert_east_only_longitude_to_east_west,
     is_single_level,
     convert_to_forecast_data_type,

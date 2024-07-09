@@ -8,8 +8,8 @@ from shared.src.aqi.pollutant_type import (
     pollutants_with_molecular_weight,
 )
 from shared.src.database.in_situ import InSituMeasurement, ApiSource
-from common.unit_converter import convert_ppm_to_mgm3
-from forecast.forecast_data import ForecastData, ForecastDataType
+from ..common.unit_converter import convert_ppm_to_mgm3
+from ..forecast.forecast_data import ForecastData, ForecastDataType
 
 required_pollutant_data = {
     "o3": PollutantType.OZONE,
