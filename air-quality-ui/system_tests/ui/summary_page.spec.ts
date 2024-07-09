@@ -242,19 +242,21 @@ test.describe('Mocked API Response Tests', () => {
         location_name: 'Kampala',
         overall_aqi_level: { mean: 6 },
         pm2_5: { mean: { aqi_level: 6, value: 76 } },
+        pm10: { mean: { aqi_level: 2, value: 26.087666551144732 } },
       }),
       createMeasurementSummaryAPIResponseData({
         measurement_base_time: '2024-06-19T12:00:00Z',
         location_name: 'Abu Dhabi',
         overall_aqi_level: { mean: 5 },
         pm2_5: { mean: { aqi_level: 5, value: 52.75 } },
+        pm10: { mean: { aqi_level: 4, value: 58.25755291558235 } },
       }),
       createMeasurementSummaryAPIResponseData({
         measurement_base_time: '2024-06-19T12:00:00Z',
         location_name: 'Zurich',
         overall_aqi_level: { mean: 2 },
         pm2_5: { mean: { aqi_level: 2, value: 15.764618078867594 } },
-        pm10: { mean: { aqi_level: 1, value: 16.039256008466086 } },
+        pm10: { mean: { aqi_level: 2, value: 31.71802172436572 } },
       }),
     ]
     await vairifySummaryPage.setupPageWithMockData(
@@ -307,14 +309,13 @@ test.describe('Mocked API Response Tests', () => {
       expect(count).toEqual(1)
     })
 
-    // skipped, WIP
-    test.skip('Check data is displayed correctly on grid', async ({
+    test('Check data is displayed correctly on grid', async ({
       vairifySummaryPage,
     }) => {
       // first 6 values for Kampala, Abu Dhabi, Zurich and Kyiv respectively
       const expectedData = [
-        ['2', '6', '4', '16.1', '76', '19 Jun 09:00'],
-        ['4', '5', '1', '30.3', '52.8', '19 Jun 12:00'],
+        ['2', '6', '-4', '16.1', '76', '19 Jun 09:00'],
+        ['4', '5', '-1', '30.3', '52.8', '19 Jun 12:00'],
         ['2', '1', '1', '17.2', '15.8', '19 Jun 12:00'],
         ['2', '', '', '7', '', '24 Jun 09:00'],
       ]
@@ -322,12 +323,11 @@ test.describe('Mocked API Response Tests', () => {
       await vairifySummaryPage.assertGridValues(expectedData)
     })
 
-    // skipped, WIP
-    test.skip('Verify that Diff displays the delta between forcast and measured', async ({
+    test('Verify that Diff displays the delta between forcast and measured', async ({
       vairifySummaryPage,
     }) => {
       const diffArray = await vairifySummaryPage.calculateForecastDifference()
-      expect(diffArray).toEqual([4, 1, 1])
+      expect(diffArray).toEqual([-4, -1, 1])
     })
   })
 })
