@@ -24,6 +24,7 @@ VARIABLE_RANGES = {
     WIND_10M: (-50, 50.0),
 }
 
+
 class PollutantData(TypedDict):
     values_ug_m3: list[float]
     aqi_values: list[int]
