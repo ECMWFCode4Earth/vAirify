@@ -171,7 +171,7 @@ test.describe('On page load', () => {
 
     test('Verify on page load the measurement summary API calls have measurement_time_range of 90', async () => {
       for (const request in requestArray) {
-        expect(requestArray[request]).toContain('measurement_time_range=91')
+        expect(requestArray[request]).toContain('measurement_time_range=90')
       }
     })
 
