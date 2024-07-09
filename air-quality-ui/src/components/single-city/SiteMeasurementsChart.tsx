@@ -172,7 +172,6 @@ export const SiteMeasurementsChart = ({
 
   return (
     <>
-      <p>Zoom percent is {zoomPercent}</p>
       <label className={classes['chart-label']}>
         {pollutantTypeDisplay[pollutantType]}
       </label>
