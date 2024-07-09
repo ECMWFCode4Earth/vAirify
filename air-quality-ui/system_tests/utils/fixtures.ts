@@ -1,9 +1,5 @@
 import { test as base } from '@playwright/test'
 
-import {
-  mockedForecastResponse,
-  mockedMeasurementSummaryResponse,
-} from './mocked_api'
 import { VairifyCityPage } from '../pages/vAirify_city_page'
 import { VairifySummaryPage } from '../pages/vAirify_summary_page'
 
@@ -13,13 +9,7 @@ type Fixtures = {
 }
 const test = base.extend<Fixtures>({
   vairifySummaryPage: async ({ page }, use) => {
-    await use(
-      new VairifySummaryPage(
-        page,
-        mockedForecastResponse,
-        mockedMeasurementSummaryResponse,
-      ),
-    )
+    await use(new VairifySummaryPage(page))
   },
   vairifyCityPage: async ({ page }, use) => {
     await use(new VairifyCityPage(page))
