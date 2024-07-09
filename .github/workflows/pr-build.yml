@@ -61,12 +61,12 @@ jobs:
         working-directory: ./air-quality-backend/etl
 
       - name: Run unit tests
-        run: python -m pytest --cov=src --cov-report= tests
-        working-directory: ./air-quality-backend/etl
+        run: python -m pytest --cov=src --cov-report= etl/tests
+        working-directory: ./air-quality-backend/
 
       - name: Convert to report 
         run: coverage xml
-        working-directory: ./air-quality-backend/etl
+        working-directory: ./air-quality-backend/
 
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1
@@ -107,12 +107,12 @@ jobs:
         working-directory: ./air-quality-backend/api
 
       - name: Run unit tests
-        run: python -m pytest --cov=src --cov-report= tests
-        working-directory: ./air-quality-backend/api
+        run: python -m pytest --cov=src --cov-report= api/tests
+        working-directory: ./air-quality-backend/
 
       - name: Convert to report 
         run: coverage xml
-        working-directory: ./air-quality-backend/api
+        working-directory: ./air-quality-backend/
 
       - name: Code Coverage Report
         uses: orgoro/coverage@v3.1
