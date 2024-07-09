@@ -1,3 +1,5 @@
+import os
+from unittest import mock
 import pytest
 
 from datetime import datetime
@@ -19,6 +21,12 @@ from tests.util.mock_forecast_data import single_level_data_set, multi_level_dat
 def mock_open_dataset():
     with patch("xarray.open_dataset") as mock_open:
         yield mock_open
+
+
+@pytest.fixture
+def mock_os_remove():
+    with patch("os.remove") as mock_os:
+        yield mock_os
 
 
 def test__get_single_level_request_body():
@@ -196,6 +204,7 @@ def test__align_to_cams_publish_time__requested_future_base_time_raises_error():
         align_to_cams_publish_time(requested_time)
 
 
+@mock.patch.dict(os.environ, {"STORE_GRIB_FILES": "True"})
 def test_fetch_forecast_data_returns_forecast_data(mocker, mock_open_dataset):
     mock_cdsapi_client = mocker.Mock()
     mocker.patch("cdsapi.Client", return_value=mock_cdsapi_client)
@@ -221,3 +230,54 @@ def test_fetch_forecast_data_returns_forecast_data(mocker, mock_open_dataset):
     )
     assert forecast_data._single_level_data == single_level_data_set
     assert forecast_data._multi_level_data == multi_level_data_set
+
+
+@mock.patch.dict(os.environ, {"STORE_GRIB_FILES": "True"})
+def test_fetch_forecast_data_does_not_remove_grib_files_when_configured(
+    mocker, mock_open_dataset
+):
+    mock_cdsapi_client = mocker.Mock()
+    mock_os_remove = mocker.Mock()
+    mocker.patch("cdsapi.Client", return_value=mock_cdsapi_client)
+    mocker.patch("os.remove", return_value=mock_os_remove)
+    mock_open_dataset.side_effect = [single_level_data_set, multi_level_data_set]
+
+    fetch_forecast_data(datetime(2024, 5, 20, 0))
+
+    mock_os_remove.assert_not_called()
+
+
+@mock.patch.dict(os.environ, {"STORE_GRIB_FILES": "False"})
+def test_fetch_forecast_data_does_remove_grib_files_when_configured(
+    mocker, mock_open_dataset, mock_os_remove
+):
+    mock_cdsapi_client = mocker.Mock()
+    mocker.patch("cdsapi.Client", return_value=mock_cdsapi_client)
+    mock_open_dataset.side_effect = [single_level_data_set, multi_level_data_set]
+
+    fetch_forecast_data(datetime(2024, 5, 20, 0))
+
+    mock_os_remove.assert_has_calls(
+        [
+            call("single_level_41_from_2024-05-20_00.grib"),
+            call("multi_level_41_from_2024-05-20_00.grib"),
+        ]
+    )
+
+
+@mock.patch.dict(os.environ, {})
+def test_fetch_forecast_data_does_remove_grib_files_by_default(
+    mocker, mock_open_dataset, mock_os_remove
+):
+    mock_cdsapi_client = mocker.Mock()
+    mocker.patch("cdsapi.Client", return_value=mock_cdsapi_client)
+    mock_open_dataset.side_effect = [single_level_data_set, multi_level_data_set]
+
+    fetch_forecast_data(datetime(2024, 5, 20, 0))
+
+    mock_os_remove.assert_has_calls(
+        [
+            call("single_level_41_from_2024-05-20_00.grib"),
+            call("multi_level_41_from_2024-05-20_00.grib"),
+        ]
+    )

@@ -122,5 +122,15 @@ def fetch_forecast_data(
             f"multi_level_{file_ident}.grib",
         ),
     ]
-    results = [fetch_cams_data(*params) for params in task_params]
-    return ForecastData(*results)
+    try:
+        results = [fetch_cams_data(*params) for params in task_params]
+        return ForecastData(*results)
+    finally:
+        keep_files = os.environ.get("STORE_GRIB_FILES", "False") == "True"
+        if not keep_files:
+            [remove_file(file) for _, file in task_params]
+
+
+def remove_file(file: str):
+    logging.info(f"Removing file {file}")
+    os.remove(file)
