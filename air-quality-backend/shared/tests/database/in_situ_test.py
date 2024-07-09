@@ -12,7 +12,7 @@ from shared.src.database.in_situ import (
     ApiSource,
 )
 from shared.src.database.locations import AirQualityLocationType
-from tests.util.mock_measurement import create_mock_measurement_document
+from shared.tests.util.mock_measurement import create_mock_measurement_document
 
 
 @pytest.fixture

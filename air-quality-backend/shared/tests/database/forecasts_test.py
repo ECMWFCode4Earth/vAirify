@@ -8,7 +8,7 @@ from freezegun import freeze_time
 
 from shared.src.database.forecasts import get_forecast_data_from_database
 from shared.src.database.forecasts import insert_data, delete_data_before
-from tests.util.mock_forecast_data import create_mock_forecast_document
+from shared.tests.util.mock_forecast_data import create_mock_forecast_document
 
 
 @pytest.fixture
