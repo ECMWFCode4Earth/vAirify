@@ -3,10 +3,8 @@ import os
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, OperationFailure
 
-from air_quality.database.forecasts import Forecast
-from air_quality.database.in_situ import InSituMeasurement
-from unittest import mock
-from scripts.run_forecast_etl import main
+from shared.src.database.forecasts import Forecast
+from shared.src.database.in_situ import InSituMeasurement
 
 
 def get_database_data(collection_name: str, query_filter=None):
@@ -63,12 +61,3 @@ def seed_api_test_data(
     client = MongoClient(uri)
     collection = client[db_name][collection_name]
     collection.insert_many(test_data_list)
-
-
-def ensure_forecast_etl_run(forecast_base_time):
-    filter_forecast = {'forecast_base_time': forecast_base_time}
-    existing_data = get_database_data("forecast_data", filter_forecast)
-    if not existing_data:
-        time_env = forecast_base_time.strftime("%Y-%m-%d %H")
-        with mock.patch.dict(os.environ, {"FORECAST_BASE_TIME": time_env}):
-            main()
