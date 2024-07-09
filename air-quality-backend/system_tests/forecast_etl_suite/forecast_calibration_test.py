@@ -14,7 +14,7 @@ from system_tests.utils.cams_utilities import (
 )
 from system_tests.utils.database_utilities import get_database_data
 
-from etl.src.run_forecast_etl import main
+from etl.scripts.run_forecast_etl import main
 
 load_dotenv()
 allowed_divergence_percentage = 3

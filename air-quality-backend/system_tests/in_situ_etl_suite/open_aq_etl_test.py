@@ -22,7 +22,7 @@ from system_tests.utils.database_utilities import (
     delete_database_data,
     seed_api_test_data,
 )
-from etl.src.run_in_situ_etl import main
+from etl.scripts.run_in_situ_etl import main
 
 from dotenv import load_dotenv
 
