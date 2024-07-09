@@ -53,6 +53,7 @@ services:
       - --no-capture-output
       - -n
       - air-quality-backend
+      - PYTHONPATH=.
       - fastapi
       - dev
       - ./api/src/main.py
