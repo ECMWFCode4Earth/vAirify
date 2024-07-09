@@ -9,7 +9,7 @@ from air_quality.database.locations import get_locations_by_type, AirQualityLoca
 from air_quality.etl.forecast.forecast_adapter import transform
 from air_quality.etl.forecast.forecast_dao import fetch_forecast_data
 
-config.fileConfig("./logging.ini")
+config.fileConfig("../logging.ini")
 
 
 def main():
@@ -25,7 +25,7 @@ def main():
         base_date = datetime.strptime(base_date_env, date_format)
 
     logging.info("Extracting pollutant forecast data")
-    extracted_forecast_data = fetch_forecast_data(base_date)
+    extracted_forecast_data = fetch_forecast_data(datetime(2024,7,8,00,00,00,00))
 
     logging.info("Transforming forecast data")
     transformed_forecast_data = transform(extracted_forecast_data, cities)

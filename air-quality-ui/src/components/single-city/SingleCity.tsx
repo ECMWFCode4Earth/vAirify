@@ -152,7 +152,10 @@ export const SingleCity = () => {
             data-testid="main-comparison-chart"
             className={classes['single-city-section']}
           >
-            <AverageComparisonChart forecastData={forecastData} />
+            <AverageComparisonChart
+              forecastData={forecastData}
+              measurementsData={measurementData}
+            />
           </section>
           <section className={classes['site-measurements-section']}>
             <form
