@@ -13,7 +13,7 @@ export const Header = () => (
       <div>
         <img
           className={classes['vairify-logo']}
-          src="../src/assets/vAirifyLogo.png"
+          src="/vAirifyLogo.png"
           data-testid="vairify-logo"
           alt="vAirify"
         />
