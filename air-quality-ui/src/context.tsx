@@ -10,12 +10,14 @@ type ForecastContextType = {
   forecastBaseDate: DateTime
   setForecastBaseDate: (arg: DateTime) => void
   maxInSituDate: DateTime
+  maxForecastDate: DateTime
 }
 
 const ForecastContext = createContext<ForecastContextType | undefined>(
   undefined,
 )
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useForecastContext = () =>
   useContext(ForecastContext) as ForecastContextType
 
@@ -31,12 +33,20 @@ export const ForecastContextProvider = (props) => {
   }
   const maxInSituDate: ForecastContextType['maxInSituDate'] = DateTime.min(
     getNearestValidForecastTime(DateTime.utc()),
-    forecastBaseDate.plus({ days: 3 }),
+    forecastBaseDate.plus({ days: 5 }),
   )
+
+  const maxForecastDate: ForecastContextType['maxForecastDate'] =
+    forecastBaseDate.plus({ days: 5 })
 
   return (
     <ForecastContext.Provider
-      value={{ forecastBaseDate, setForecastBaseDate, maxInSituDate }}
+      value={{
+        forecastBaseDate,
+        setForecastBaseDate,
+        maxInSituDate,
+        maxForecastDate,
+      }}
     >
       {props.children}
     </ForecastContext.Provider>

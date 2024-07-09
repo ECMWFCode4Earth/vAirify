@@ -24,7 +24,8 @@ const getSiteName = (measurement: MeasurementsResponseDto): string => {
 }
 
 export const SingleCity = () => {
-  const { forecastBaseDate, maxInSituDate } = useForecastContext()
+  const { forecastBaseDate, maxInSituDate, maxForecastDate } =
+    useForecastContext()
   const { name: locationName = '' } = useParams()
   const [
     {
@@ -44,7 +45,7 @@ export const SingleCity = () => {
         queryFn: () =>
           getForecastData(
             forecastBaseDate,
-            maxInSituDate,
+            maxForecastDate,
             forecastBaseDate,
             locationName,
           ),
