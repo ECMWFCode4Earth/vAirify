@@ -1,4 +1,3 @@
-from . import context  # noqa: F401 - required to access shared files
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
