@@ -9,8 +9,6 @@ from shared.src.database.locations import AirQualityLocationType
 from etl.src.forecast.forecast_adapter import (
     ForecastData,
     transform,
-    _get_dimension_by_attr,
-    _get_dim_names,
     _normalise_data,
     _convert_data,
     create_data_textures,
@@ -103,30 +101,6 @@ def test__transform__returns_correctly_formatted_data():
     result = transform(input_data, default_test_cities[0:1])
     for data in result:
         assert validator(data) is True, f"{validator.errors}"
-
-
-def test__get_dimension_by_attr():
-    lat = _get_dimension_by_attr(gridded_data_single_level, "units", "degrees_north")
-    lon = _get_dimension_by_attr(gridded_data_single_level, "units", "degrees_east")
-    time = _get_dimension_by_attr(gridded_data_single_level, "standard_name", "time")
-
-    assert lat is not None
-    assert lon is not None
-    assert time is not None
-    assert lat.attrs["units"] == "degrees_north"
-    assert lon.attrs["units"] == "degrees_east"
-    assert time.attrs["standard_name"] == "time"
-
-
-def test__get_dim_names():
-    lat, lon, time = _get_dim_names(gridded_data_single_level)
-
-    assert lat is not None
-    assert lon is not None
-    assert time is not None
-    assert lat.attrs["units"] == "degrees_north"
-    assert lon.attrs["units"] == "degrees_east"
-    assert time.attrs["standard_name"] == "time"
 
 
 @pytest.mark.parametrize(
