@@ -11,7 +11,12 @@ export const Header = () => (
         />
       </div>
       <div>
-        <h1>vAirify</h1>
+        <img
+          className={classes['vairify-logo']}
+          src="../src/assets/vAirifyLogo.png"
+          data-testid="vairify-logo"
+          alt="vAirify"
+        />
       </div>
     </section>
     <Toolbar></Toolbar>
