@@ -359,6 +359,111 @@ plt.savefig(
 plt.show()
 
 # %% [markdown]
+# ### plot overall distribution
+# Let's get an overview of the distribution of reported measurements to detect potential outliers, missing values or any other inconsistencies we might have to address with the OpenAQ data
+
+# %%
+# Create histograms for each pollutant
+fig, axs = plt.subplots(3, 2, figsize=(15, 15))
+axs = axs.flatten()
+
+for i, (parameter, label) in enumerate(zip(pollutants, pollutant_labels)):
+    ax = axs[i]
+    df = data[parameter]
+    values = df['value']
+    
+    ax.hist(values, bins=50, color='blue', edgecolor='black')
+    ax.set_title(label)
+    ax.set_xlabel('Value')
+    ax.set_ylabel('Frequency')
+    
+    # Annotate min and max values
+    min_val = values.min()
+    max_val = values.max()
+    ax.annotate(f'Min: {min_val:.2f}', xy=(min_val, 1), xytext=(min_val, 5),
+                arrowprops=dict(facecolor='black', shrink=0.05))
+    ax.annotate(f'Max: {max_val:.2f}', xy=(max_val, 1), xytext=(max_val, 5),
+                arrowprops=dict(facecolor='black', shrink=0.05))
+
+# Adjust layout and show plot
+fig.tight_layout()
+plt.show()
+
+# %% [markdown]
+# - maximum values for individual pollutants are ~1000
+# - some values off by quite a distant -> values at -9999 and +9999 are not physical and potentially represent missing values
+
+# %%
+# Let's focus on the values between -1000 and 1000
+fig, axs = plt.subplots(3, 2, figsize=(15, 15))
+axs = axs.flatten()
+
+for i, (parameter, label) in enumerate(zip(pollutants, pollutant_labels)):
+    ax = axs[i]
+    df = data[parameter]
+    values = df['value']
+    
+    # Filter values between -1000 and 1000
+    filtered_values = values[(values >= -1000) & (values <= 1000)]
+    
+    ax.hist(filtered_values, bins=50, color='blue', edgecolor='black')
+    ax.set_title(label)
+    ax.set_xlabel('Value')
+    ax.set_ylabel('Frequency')
+    
+    # Annotate min and max values
+    min_val = filtered_values.min()
+    max_val = filtered_values.max()
+    ax.annotate(f'Min: {min_val:.2f}', xy=(min_val, 1), xytext=(min_val, 5),
+                arrowprops=dict(facecolor='black', shrink=0.05))
+    ax.annotate(f'Max: {max_val:.2f}', xy=(max_val, 1), xytext=(max_val, 5),
+                arrowprops=dict(facecolor='black', shrink=0.05))
+
+# Adjust layout and show plot
+fig.tight_layout()
+plt.show()
+
+# %% [markdown]
+# - some values slightly below 0 and then there is another group of values close to -1000
+# - slightly negative values can be expected due to sensor calibration, see: https://blog.quant-aq.com/why-is-my-air-quality-monitor-reporting-negative-values-and-what-can-i-do-about-it/
+# - values close to -1000 should be treated as missing values again
+
+# %%
+# Let's zoom in even further
+fig, axs = plt.subplots(3, 2, figsize=(15, 15))
+axs = axs.flatten()
+
+for i, (parameter, label) in enumerate(zip(pollutants, pollutant_labels)):
+    ax = axs[i]
+    df = data[parameter]
+    values = df['value']
+    
+    filtered_values = values[(values >= -900) & (values <= 100)]
+    
+    ax.hist(filtered_values, bins=50, color='blue', edgecolor='black')
+    ax.set_title(label)
+    ax.set_xlabel('Value')
+    ax.set_ylabel('Frequency')
+    # ax.set_xlim(-10, 1)
+    
+    # Annotate min and max values
+    min_val = filtered_values.min()
+    max_val = filtered_values.max()
+    ax.annotate(f'Min: {min_val:.2f}', xy=(min_val, 1), xytext=(min_val, 5),
+                arrowprops=dict(facecolor='black', shrink=0.05))
+    ax.annotate(f'Max: {max_val:.2f}', xy=(max_val, 1), xytext=(max_val, 5),
+                arrowprops=dict(facecolor='black', shrink=0.05))
+    
+
+# Adjust layout and show plot
+fig.tight_layout()
+plt.show()
+
+# %% [markdown]
+# - further zoom in confirms this, there are no values between -500 and ~-10, so a sensible cutoff for realistic negative values could be -50
+# - O3, NO2 and SO2 show spikes at 0, how do we want to treat them?
+
+# %% [markdown]
 # ### plot all available time series for all cities
 # Let's look at the time series data of the last 7 days for all returned locations within a 25 km search radius around the city center location. This will give us an idea about how many stations are available for each city, how homogenous the stations are within a single city and to check for data gaps and outliers. Cities with no data for any pollutant (see maps above) will be skipped.
 
