@@ -14,6 +14,6 @@ describe('Header component', () => {
     render(<Header />, {
       wrapper: BrowserRouter,
     })
-    expect(screen.getByRole('banner')).toHaveTextContent('vAirify')
+    expect(screen.getByTestId('vairify-logo')).toBeInTheDocument()
   })
 })
