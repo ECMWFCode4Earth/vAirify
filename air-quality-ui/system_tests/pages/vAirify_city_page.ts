@@ -61,9 +61,9 @@ export class VairifyCityPage {
     try {
       await this.aqiChart.waitFor();
 
-      const idleTime = 1000; // Time to consider network idle in milliseconds can tweak this to our liking
-      const checkInterval = 200; // Polling interval, e.g. check network activity every 200 millinseconds
-      const timeout = 30000; // Maximum time to wait for network idle in milliseconds
+      const idleTime = 1000;
+      const checkInterval = 200;
+      const timeout = 30000;
 
       let lastActivityTime = Date.now();
 
@@ -87,7 +87,6 @@ export class VairifyCityPage {
         }
       };
 
-      // Set the timeout for the entire wait
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error("Network idle timeout")), timeout)
       );
