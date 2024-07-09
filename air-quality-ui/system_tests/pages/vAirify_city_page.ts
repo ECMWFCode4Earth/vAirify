@@ -6,7 +6,6 @@ export class VairifyCityPage {
   readonly scroller: Locator;
   readonly apiForecastAqi: object;
   readonly aqiChart: Locator;
-  readonly chartSelector: string;
   readonly toolbarNavigation: Locator;
 
   constructor(
@@ -21,7 +20,6 @@ export class VairifyCityPage {
     this.aqiChart = this.page
       .getByTestId("main-comparison-chart")
       .locator("canvas");
-    this.chartSelector = chartSelector;
     this.toolbarNavigation = this.page.getByLabel(
       "Toolbar with site navigation"
     );
