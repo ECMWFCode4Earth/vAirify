@@ -14,6 +14,9 @@
     "test:ci": "jest --ci --json --coverage --testLocationInResults --outputFile=report.json"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/x-date-pickers": "^7.9.0",
     "@tanstack/react-query": "^5.40.1",
     "@types/echarts": "^4.9.22",
     "ag-grid-react": "^31.3.2",
