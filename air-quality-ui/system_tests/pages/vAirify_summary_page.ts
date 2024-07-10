@@ -107,7 +107,7 @@ export class VairifySummaryPage {
 
       const forecast = parseInt(forecastText.trim())
       const measured = parseInt(measuredText.trim())
-      const calculation = Math.abs(forecast - measured)
+      const calculation = forecast - measured
 
       differences.push(calculation)
     }

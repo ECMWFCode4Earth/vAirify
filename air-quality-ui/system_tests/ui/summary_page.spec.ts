@@ -240,23 +240,32 @@ test.describe('Mocked API Response Tests', () => {
       createMeasurementSummaryAPIResponseData({
         measurement_base_time: '2024-06-19T09:00:00Z',
         location_name: 'Kampala',
-        overall_aqi_level: { mean: 6 },
+        overall_aqi_level: { mean: 2 },
+        no2: { mean: { aqi_level: 1, value: 0.3812829140487199 } },
+        o3: { mean: { aqi_level: 2, value: 72.9086035913633 } },
         pm2_5: { mean: { aqi_level: 6, value: 76 } },
         pm10: { mean: { aqi_level: 2, value: 26.087666551144732 } },
+        so2: { mean: { aqi_level: 1, value: 0.6314619719025142 } },
       }),
       createMeasurementSummaryAPIResponseData({
         measurement_base_time: '2024-06-19T12:00:00Z',
         location_name: 'Abu Dhabi',
         overall_aqi_level: { mean: 5 },
+        no2: { mean: { aqi_level: 1, value: 5.871611751344455 } },
+        o3: { mean: { aqi_level: 4, value: 213.04088459925424 } },
         pm2_5: { mean: { aqi_level: 5, value: 52.75 } },
         pm10: { mean: { aqi_level: 4, value: 58.25755291558235 } },
+        so2: { mean: { aqi_level: 1, value: 8.497931484924965 } },
       }),
       createMeasurementSummaryAPIResponseData({
         measurement_base_time: '2024-06-19T12:00:00Z',
         location_name: 'Zurich',
         overall_aqi_level: { mean: 2 },
+        no2: { mean: { aqi_level: 1, value: 1.2220194497781245 } },
+        o3: { mean: { aqi_level: 3, value: 110.29793453644987 } },
         pm2_5: { mean: { aqi_level: 2, value: 15.764618078867594 } },
         pm10: { mean: { aqi_level: 2, value: 31.71802172436572 } },
+        so2: { mean: { aqi_level: 1, value: 1.3459434727665889 } },
       }),
     ]
     await vairifySummaryPage.setupPageWithMockData(
@@ -316,8 +325,8 @@ test.describe('Mocked API Response Tests', () => {
       const expectedData = [
         ['2', '6', '-4', '16.1', '76', '19 Jun 09:00'],
         ['4', '5', '-1', '30.3', '52.8', '19 Jun 12:00'],
-        ['2', '1', '1', '17.2', '15.8', '19 Jun 12:00'],
-        ['2', '', '', '7', '', '24 Jun 09:00'],
+        ['2', '2', '0', '17.2', '15.8', '19 Jun 12:00'],
+        ['2', '-', '-', '7', '-', '24 Jun 09:00'],
       ]
 
       await vairifySummaryPage.assertGridValues(expectedData)
@@ -327,7 +336,7 @@ test.describe('Mocked API Response Tests', () => {
       vairifySummaryPage,
     }) => {
       const diffArray = await vairifySummaryPage.calculateForecastDifference()
-      expect(diffArray).toEqual([-4, -1, 1])
+      expect(diffArray).toEqual([-4, -1, 0])
     })
   })
 })
