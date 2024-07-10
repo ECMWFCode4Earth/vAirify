@@ -55,6 +55,7 @@ function getChartOptions(
       trigger: 'axis',
     },
     legend: {},
+    
   }
 }
 

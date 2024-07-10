@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import { MeasurementsResponseDto } from '../../../../services/types'
 import getPollutantIndexLevel from '../../../common/aqi-calculator/AqiCalculator'
 
-const timeBucketDiffInHours = 3
+const timeBucketDiffInHours = 1
 const endTimeInDays = 5
 
 type SortMeasurementsType = { [x: string]: MeasurementsResponseDto[] }
