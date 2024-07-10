@@ -140,16 +140,8 @@ jobs:
           sparse-checkout: 'air-quality-backend'
           sparse-checkout-cone-mode: false
 
-      - name: Setup miniconda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          channels: conda-forge
-          environment-file: air-quality-backend/shared/conda/environment.yml
-          auto-activate-base: false
-          activate-environment: pr-env
-
       - name: Get Dependencies
-        run: poetry install
+        run: pip install -r requirements.test.txt
         working-directory: ./air-quality-backend/shared
         
       - name: Run lint check

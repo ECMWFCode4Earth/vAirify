@@ -1,0 +1,16 @@
+dnspython==2.6.1
+freezegun==1.5.1
+iniconfig==2.0.0
+mongomock==4.1.2
+numpy==2.0.0
+packaging==24.1
+pandas==2.2.2
+pluggy==1.5.0
+pymongo==4.8.0
+pytest==8.2.2
+python-dateutil==2.9.0.post0
+pytz==2024.1
+sentinels==1.0.0
+six==1.16.0
+tzdata==2024.1
+xarray==2024.6.0
