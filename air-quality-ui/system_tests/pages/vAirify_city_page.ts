@@ -59,7 +59,7 @@ export class VairifyCityPage {
 
       const idleTime = 1000
       const checkInterval = 200
-      const timeout = 30000
+      const timeout = 5000
 
       let lastActivityTime = Date.now()
 
