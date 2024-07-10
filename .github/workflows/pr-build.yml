@@ -139,9 +139,14 @@ jobs:
         with:
           sparse-checkout: 'air-quality-backend'
           sparse-checkout-cone-mode: false
+      - name: Setup Python
+        uses: actions/setup-python@v5.1.0
+        with:
+          python-version: '3.11' 
+          cache: 'pip'
 
       - name: Get Dependencies
-        run: pip install -r requirements.test.txt
+        run: pip install -r requirements-test.txt
         working-directory: ./air-quality-backend/shared
         
       - name: Run lint check
