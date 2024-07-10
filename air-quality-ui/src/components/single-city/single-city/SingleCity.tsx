@@ -160,7 +160,7 @@ export const SingleCity = () => {
           >
             <AverageComparisonChart
               forecastData={forecastData}
-              measurementsData={measurements}
+              measurementsData={measurementData}
               forecastBaseTime={forecastBaseTime}
             />
           </section>

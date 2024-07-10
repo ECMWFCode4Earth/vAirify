@@ -28,7 +28,7 @@ function isDateBetweenRange(
   startDate: DateTime<boolean>,
   endDate: DateTime<boolean>,
 ) {
-  return date >= startDate && date <= endDate
+  return date >= startDate && date < endDate
 }
 
 export function sortMeasurements(
