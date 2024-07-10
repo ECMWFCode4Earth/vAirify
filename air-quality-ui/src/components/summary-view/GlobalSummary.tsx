@@ -2,10 +2,10 @@ import { useQueries, useQuery } from '@tanstack/react-query'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { DateTime } from 'luxon'
-import { useMemo, useState } from 'react'
-import Switch from 'react-switch'
+import { useCallback, useMemo, useState } from 'react'
 
 import classes from './GlobalSummary.module.css'
+import { SummaryViewHeader } from './SummaryViewHeader'
 import { useForecastContext } from '../../context'
 import { getForecastData } from '../../services/forecast-data-service'
 import { getValidForecastTimesBetween } from '../../services/forecast-time-service'
@@ -20,6 +20,13 @@ import GlobalSummaryTable from '../summary-grid/table/GlobalSummaryTable'
 const GlobalSummary = (): JSX.Element => {
   const { forecastBaseDate, maxInSituDate } = useForecastContext()
   const [showAllColoured, setShowAllColoured] = useState<boolean>(true)
+
+  const wrapSetShowAllColoured = useCallback(
+    (val: boolean) => {
+      setShowAllColoured(val)
+    },
+    [setShowAllColoured],
+  )
 
   const {
     data: forecastData,
@@ -88,40 +95,16 @@ const GlobalSummary = (): JSX.Element => {
         </span>
       )}
       {!forecastPending && !summaryPending && (
-        <div>
-          <div className={`ag-theme-quartz ${classes['switch-div']}`}>
-            <label className={`ag-theme-quartz ${classes['switch-label']}`}>
-              {showAllColoured
-                ? 'Highlight all AQI values'
-                : 'Highlight primary AQI values'}
-            </label>
-            <Switch
-              data-testid="aqi-highlight-switch"
-              onChange={() => {
-                if (showAllColoured) setShowAllColoured(false)
-                else setShowAllColoured(true)
-              }}
-              checked={showAllColoured}
-            />
-          </div>
-          <div className={classes['summary-container']}>
-            <div>
-              <div>
-                Forecast Base Time:{' '}
-                {forecastBaseDate.toFormat('dd MMM HH:mm ZZZZ')}
-              </div>
-              <div data-testid="forecast-valid-range">
-                Forecast Valid Time Range:{' '}
-                {forecastBaseDate.toFormat('dd MMM HH:mm')} -{' '}
-                {maxInSituDate.toFormat('dd MMM HH:mm ZZZZ')}
-              </div>
-            </div>
-            <GlobalSummaryTable
-              forecast={forecastData}
-              summarizedMeasurements={summarizedMeasurementData}
-              showAllColoured={showAllColoured}
-            />
-          </div>
+        <div className={classes['summary-container']}>
+          <SummaryViewHeader
+            setShowAllColoured={wrapSetShowAllColoured}
+            showAllColoured={showAllColoured}
+          />
+          <GlobalSummaryTable
+            forecast={forecastData}
+            summarizedMeasurements={summarizedMeasurementData}
+            showAllColoured={showAllColoured}
+          />
         </div>
       )}
     </>
