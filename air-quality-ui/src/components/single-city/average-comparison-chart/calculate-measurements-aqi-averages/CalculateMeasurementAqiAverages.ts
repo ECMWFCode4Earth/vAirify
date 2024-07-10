@@ -86,7 +86,10 @@ export function averageAqiValues(measurementsData: SortMeasurementsType) {
       )
       totalAqi = totalAqi + overallAqiLevel
     }
-    averageAqiValues.push([time, totalAqi / measurementsData[time].length])
+    averageAqiValues.push([
+      time,
+      Math.round(totalAqi / measurementsData[time].length),
+    ])
   }
   return averageAqiValues
 }

@@ -120,7 +120,13 @@ export const SingleCity = () => {
         { pm2_5: {}, pm10: {}, no2: {}, o3: {}, so2: {} },
       )
   }, [measurementData, selectedSites])
-
+  const measurements = useMemo(() => {
+    return measurementData?.filter((measurement) =>
+      selectedSites.find(
+        (site) => site && site.value === getSiteName(measurement),
+      ),
+    )
+  }, [measurementData, selectedSites])
   const [siteColors, setSiteColors] = useState<Record<string, string>>({})
   useEffect(() => {
     const updateColors = async () => {
@@ -154,7 +160,7 @@ export const SingleCity = () => {
           >
             <AverageComparisonChart
               forecastData={forecastData}
-              measurementsData={measurementData}
+              measurementsData={measurements}
               forecastBaseTime={forecastBaseTime}
             />
           </section>

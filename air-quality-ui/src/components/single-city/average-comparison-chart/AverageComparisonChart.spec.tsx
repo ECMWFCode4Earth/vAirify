@@ -8,7 +8,7 @@ jest.mock('echarts-for-react', () => () => <div>Mock Chart</div>)
 
 describe('AverageComparisonChart', () => {
   it('renders with no data', async () => {
-    render(<AverageComparisonChart />)
+    render(<AverageComparisonChart forecastBaseTime={undefined} />)
     await waitFor(() => {
       expect(screen.getByText('Mock Chart')).toBeInTheDocument()
     })
