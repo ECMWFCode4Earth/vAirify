@@ -1,0 +1,92 @@
+import { DateTime } from 'luxon'
+
+import { MeasurementsResponseDto } from '../../../../services/types'
+import getPollutantIndexLevel from '../../../common/aqi-calculator/AqiCalculator'
+
+const timeBucketDiffInHours = 3
+const endTimeInDays = 5
+
+type SortMeasurementsType = { [x: string]: MeasurementsResponseDto[] }
+export type AverageAqiValues = (string | number)[]
+
+function generatePreAveragedDataStructure(baseTime: DateTime<boolean>) {
+  const maxDateTime = baseTime.plus({ days: endTimeInDays })
+  let currentDateTime = baseTime
+  const sortedMeasurements: SortMeasurementsType = {}
+  while (!currentDateTime.equals(maxDateTime)) {
+    const time: string | null = currentDateTime.toISO()
+    if (time != null) {
+      sortedMeasurements[time] = []
+    }
+    currentDateTime = currentDateTime.plus({ hours: timeBucketDiffInHours })
+  }
+  return sortedMeasurements
+}
+
+function isDateBetweenRange(
+  date: DateTime<boolean>,
+  startDate: DateTime<boolean>,
+  endDate: DateTime<boolean>,
+) {
+  return date >= startDate && date <= endDate
+}
+
+export function sortMeasurements(
+  measurementsData: MeasurementsResponseDto[],
+  baseTime: DateTime<boolean>,
+) {
+  const preAveragedData: { [x: string]: MeasurementsResponseDto[] } =
+    generatePreAveragedDataStructure(baseTime)
+  for (let i = 0; i < measurementsData.length; i++) {
+    for (const time in preAveragedData) {
+      const preAveragedDataDate = DateTime.fromISO(time.toString())
+      const endpointBefore = DateTime.fromISO(time.toString()).minus({
+        hours: timeBucketDiffInHours / 2,
+      })
+      const endpointAfter = DateTime.fromISO(time.toString()).plus({
+        hours: timeBucketDiffInHours / 2,
+      })
+      const measurementDataTime = DateTime.fromISO(
+        measurementsData[i].measurement_date,
+      )
+      if (
+        isDateBetweenRange(
+          measurementDataTime,
+          endpointBefore,
+          preAveragedDataDate,
+        ) ||
+        isDateBetweenRange(
+          measurementDataTime,
+          preAveragedDataDate,
+          endpointAfter,
+        )
+      ) {
+        preAveragedData[time].push(measurementsData[i])
+        break
+      }
+    }
+  }
+  return preAveragedData
+}
+
+export function averageAqiValues(measurementsData: SortMeasurementsType) {
+  const averageAqiValues: AverageAqiValues[] = []
+  for (const time in measurementsData) {
+    if (measurementsData[time].length === 0) {
+      continue
+    }
+    let totalAqi = 0
+    for (let i = 0; i < measurementsData[time].length; i++) {
+      const overallAqiLevel = Math.max(
+        getPollutantIndexLevel(measurementsData[time][i]['no2'], 'no2'),
+        getPollutantIndexLevel(measurementsData[time][i]['o3'], 'o3'),
+        getPollutantIndexLevel(measurementsData[time][i]['pm10'], 'pm10'),
+        getPollutantIndexLevel(measurementsData[time][i]['pm2_5'], 'pm2_5'),
+        getPollutantIndexLevel(measurementsData[time][i]['so2'], 'so2'),
+      )
+      totalAqi = totalAqi + overallAqiLevel
+    }
+    averageAqiValues.push([time, totalAqi / measurementsData[time].length])
+  }
+  return averageAqiValues
+}

@@ -3,16 +3,16 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import Select, { ActionMeta, MultiValue, OnChangeValue } from 'react-select'
 
-import { AverageComparisonChart } from './AverageComparisonChart'
 import classes from './SingleCity.module.css'
-import { SiteMeasurementsChart } from './SiteMeasurementsChart'
-import { ForecastContext } from '../../context'
-import { PollutantType, pollutantTypes } from '../../models'
-import { textToColor } from '../../services/echarts-service'
-import { getForecastData } from '../../services/forecast-data-service'
-import { getMeasurements } from '../../services/measurement-data-service'
-import { MeasurementsResponseDto } from '../../services/types'
-import { LoadingSpinner } from '../common/LoadingSpinner'
+import { ForecastContext } from '../../../context'
+import { PollutantType, pollutantTypes } from '../../../models'
+import { textToColor } from '../../../services/echarts-service'
+import { getForecastData } from '../../../services/forecast-data-service'
+import { getMeasurements } from '../../../services/measurement-data-service'
+import { MeasurementsResponseDto } from '../../../services/types'
+import { LoadingSpinner } from '../../common/LoadingSpinner'
+import { AverageComparisonChart } from '../average-comparison-chart/AverageComparisonChart'
+import { SiteMeasurementsChart } from '../site-measurement-chart/SiteMeasurementsChart'
 
 interface SiteOption {
   value: string
@@ -155,6 +155,7 @@ export const SingleCity = () => {
             <AverageComparisonChart
               forecastData={forecastData}
               measurementsData={measurementData}
+              forecastBaseTime={forecastBaseTime}
             />
           </section>
           <section className={classes['site-measurements-section']}>

@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import { render, screen, waitFor } from '@testing-library/react'
 
 import { AverageComparisonChart } from './AverageComparisonChart'
-import { mockForecastResponseDto } from '../../test-util/mock-type-creator'
+import { mockForecastResponseDto } from '../../../test-util/mock-type-creator'
 
 jest.mock('echarts-for-react', () => () => <div>Mock Chart</div>)
 

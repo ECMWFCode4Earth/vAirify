@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
 import { SiteMeasurementsChart } from './SiteMeasurementsChart'
-import { PollutantType } from '../../models'
+import { PollutantType } from '../../../models'
 
 jest.mock('echarts-for-react', () => () => <div>Mock Chart</div>)
 
