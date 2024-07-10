@@ -1,4 +1,4 @@
-![Alt text](air-quality-ui/src/assets/vAirifyLogo.png)
+![Alt text](air-quality-ui/public/vAirifyLogo.png)
 ## The problem
 
 The Copernicus Atmosphere Monitoring Service (CAMS) provides forecasts of air quality around the world. CAMS products have a wide reach to the general public through smartphone apps and, notably, through daily broadcasts of air quality index (AQI) forecasts for different cities by CNN International.  The accuracy of the forecasts in comparison to what actually is experienced can vary, which can be accentuated by local events (e.g. wildfires suddenly changing direction). Forecasts are currently quality checked via comparison with readings from high-end in-situ monitoring stations and satellite data, but not all of the world’s cities are covered, meaning that many forecasts go unchecked.
