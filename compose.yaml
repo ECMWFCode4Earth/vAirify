@@ -48,12 +48,6 @@ services:
       - MONGO_DB_URI=mongodb://mongo:27017
       - MONGO_DB_NAME=${MONGO_DB_NAME}
     entrypoint: 
-      - conda
-      - run
-      - --no-capture-output
-      - -n
-      - air-quality-backend
-      - PYTHONPATH=.
       - fastapi
       - dev
       - ./api/src/main.py
