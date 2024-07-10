@@ -17,7 +17,7 @@ export const SummaryViewHeader = ({
   return (
     <div className={classes['table-header']}>
       <div className={classes['table-date']}>
-        Valid Time Range: {forecastBaseDate.toFormat('dd MMM HH:mm')}
+        Time Range: {forecastBaseDate.toFormat('dd MMM HH:mm')}
         {' - '}
         {maxInSituDate.toFormat('dd MMM HH:mm ZZZZ')}
       </div>
