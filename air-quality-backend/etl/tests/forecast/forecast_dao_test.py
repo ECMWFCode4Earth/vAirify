@@ -88,6 +88,8 @@ def test__get_single_level_request_body():
             "particulate_matter_10um",
             "particulate_matter_2.5um",
             "surface_pressure",
+            "10m_u_component_of_wind",
+            "10m_v_component_of_wind",
         ],
     }
 
