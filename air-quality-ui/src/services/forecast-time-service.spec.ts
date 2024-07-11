@@ -97,7 +97,7 @@ describe('Forecast Time Service', () => {
         50,
       ],
     ])(
-      'should do',
+      'should calculate correct percentage',
       (baseForecastDate, maxForecastDate, maxInSituDate, expectedPercent) => {
         expect(
           getInSituPercentage(baseForecastDate, maxForecastDate, maxInSituDate),

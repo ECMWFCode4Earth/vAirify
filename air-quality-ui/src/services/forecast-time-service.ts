@@ -48,7 +48,7 @@ export const getInSituPercentage = (
   maxForecastDate: DateTime,
   maxInSituDate: DateTime,
 ): number => {
-  if (maxForecastDate == maxInSituDate) {
+  if (maxForecastDate.equals(maxInSituDate)) {
     return 100
   }
 
