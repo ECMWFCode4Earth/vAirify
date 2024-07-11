@@ -124,7 +124,7 @@ export class VairifySummaryPage extends BasePage {
     await this.goTo()
   }
 
-  async calculateExpectedForcastBaseTimeFromDate(
+  async calculateExpectedForecastBaseTimeFromDate(
     mockDatetimeNow: Date,
   ): Promise<Date> {
     const time24HrsAgoMilliseconds =
@@ -153,11 +153,11 @@ export class VairifySummaryPage extends BasePage {
     return expectedForecastBaseTime
   }
 
-  async calculateExpectedVolumeofRequests(
+  async calculateExpectedVolumeOfRequests(
     mockDatetimeNow: Date,
   ): Promise<number> {
     const expectedForecastBaseTime =
-      await this.calculateExpectedForcastBaseTimeFromDate(mockDatetimeNow)
+      await this.calculateExpectedForecastBaseTimeFromDate(mockDatetimeNow)
 
     // Difference between time now and base time
     const timeDifferentialMs =
@@ -173,7 +173,7 @@ export class VairifySummaryPage extends BasePage {
     mockSystemDate: Date,
   ): Promise<string> {
     const expectedForecastBaseTimeDate =
-      await this.calculateExpectedForcastBaseTimeFromDate(mockSystemDate)
+      await this.calculateExpectedForecastBaseTimeFromDate(mockSystemDate)
     const isoDate = expectedForecastBaseTimeDate.toISOString()
     return encodeURIComponent(isoDate)
   }
