@@ -3,7 +3,7 @@ import Switch from 'react-switch'
 import classes from './SummaryViewHeader.module.css'
 import { useForecastContext } from '../../context'
 
-interface SummaryViewHeaderProps {
+export interface SummaryViewHeaderProps {
   showAllColoured: boolean
   setShowAllColoured: (showAllColoured: boolean) => void
 }

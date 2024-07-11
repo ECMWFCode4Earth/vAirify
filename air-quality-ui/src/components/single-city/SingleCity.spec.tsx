@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom'
 import { useQueries } from '@tanstack/react-query'
 import { act, render, screen, waitFor } from '@testing-library/react'
+import { DateTime } from 'luxon'
 
 import { SingleCity } from './SingleCity'
 import { pollutantTypes } from '../../models'
@@ -11,6 +12,14 @@ jest.mock('@tanstack/react-query', () => ({
     { data: [], isPending: false, isError: false },
     { data: [], isPending: false, isError: false },
   ]),
+}))
+
+jest.mock('../../context', () => ({
+  useForecastContext: jest.fn().mockReturnValue({
+    forecastBaseDate: DateTime.now(),
+    maxInSituDate: DateTime.now(),
+    maxForecastDate: DateTime.now(),
+  }),
 }))
 
 jest.mock('echarts-for-react', () => () => <div>Mock Chart</div>)

@@ -21,7 +21,8 @@ const ForecastContext = createContext<ForecastContextType | undefined>(
 export const useForecastContext = () =>
   useContext(ForecastContext) as ForecastContextType
 
-export const ForecastContextProvider = (props) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const ForecastContextProvider = (props: any) => {
   const defaultValue = getLatestBaseForecastTime().minus({ hours: 24 })
 
   const [forecastBaseDate, setForecastBaseDateState] =
