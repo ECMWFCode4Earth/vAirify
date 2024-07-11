@@ -7,6 +7,7 @@ export class VairifyCityPage {
   readonly apiForecastAqi: object
   readonly aqiChart: Locator
   readonly toolbarNavigation: Locator
+  readonly loadingIcon: Locator
 
   constructor(page: Page, apiForecastAqi: object) {
     this.page = page
@@ -19,6 +20,7 @@ export class VairifyCityPage {
     this.toolbarNavigation = this.page.getByLabel(
       'Toolbar with site navigation',
     )
+    this.loadingIcon = this.page.getByTestId('loading-spinner')
   }
 
   async captureChartScreenshot() {
@@ -40,6 +42,10 @@ export class VairifyCityPage {
       await route.fulfill({ json: this.apiForecastAqi })
     })
   }
+  async waitForLoadingScreen() {
+    await this.loadingIcon.waitFor({ state: 'visible' })
+  }
+
   async waitForGraphVisible() {
     await this.aqiChart.waitFor({ state: 'visible' })
   }
