@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 
 import {
+  getInSituPercentage,
   getLatestBaseForecastTime,
   getValidForecastTimesBetween,
 } from './forecast-time-service'
@@ -75,4 +76,33 @@ describe('Forecast Time Service', () => {
       }
     },
   )
+  describe('getInSituPercentage', () => {
+    it.each([
+      [
+        DateTime.fromISO('2024-06-01T00:00:00', { zone: 'utc' }),
+        DateTime.fromISO('2024-06-05T00:00:00', { zone: 'utc' }),
+        DateTime.fromISO('2024-06-05T00:00:00', { zone: 'utc' }),
+        100,
+      ],
+      [
+        DateTime.fromISO('2024-06-01T00:00:00', { zone: 'utc' }),
+        DateTime.fromISO('2024-06-05T00:00:00', { zone: 'utc' }),
+        DateTime.fromISO('2024-06-01T00:00:00', { zone: 'utc' }),
+        0,
+      ],
+      [
+        DateTime.fromISO('2024-06-01T00:00:00', { zone: 'utc' }),
+        DateTime.fromISO('2024-06-05T00:00:00', { zone: 'utc' }),
+        DateTime.fromISO('2024-06-03T00:00:00', { zone: 'utc' }),
+        50,
+      ],
+    ])(
+      'should do',
+      (baseForecastDate, maxForecastDate, maxInSituDate, expectedPercent) => {
+        expect(
+          getInSituPercentage(baseForecastDate, maxForecastDate, maxInSituDate),
+        ).toBe(expectedPercent)
+      },
+    )
+  })
 })

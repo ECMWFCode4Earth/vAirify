@@ -42,3 +42,19 @@ export const getValidForecastTimesBetween = (
   }
   return validTimes
 }
+
+export const getInSituPercentage = (
+  baseForecastDate: DateTime,
+  maxForecastDate: DateTime,
+  maxInSituDate: DateTime,
+): number => {
+  if (maxForecastDate == maxInSituDate) {
+    return 100
+  }
+
+  return (
+    100 *
+    (maxInSituDate.diff(baseForecastDate).milliseconds /
+      maxForecastDate.diff(baseForecastDate).milliseconds)
+  )
+}

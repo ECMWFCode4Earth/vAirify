@@ -1,12 +1,12 @@
 import { EChartsOption, SeriesOption } from 'echarts'
 import ReactECharts from 'echarts-for-react'
-import { DateTime } from 'luxon'
 import { useCallback, useMemo } from 'react'
 
 import classes from './SiteMeasurementsChart.module.css'
 import { useForecastContext } from '../../context'
 import { PollutantType, pollutantTypeDisplay } from '../../models'
 import { convertToLocalTime } from '../../services/echarts-service'
+import { getInSituPercentage } from '../../services/forecast-time-service'
 import {
   ForecastResponseDto,
   MeasurementsResponseDto,
@@ -101,22 +101,6 @@ const getChartOptions = (
   }
 }
 
-const getInSituZoomPercent = (
-  baseForecastDate: DateTime,
-  maxForecastDate: DateTime,
-  maxInSituDate: DateTime,
-): number => {
-  if (maxForecastDate == maxInSituDate) {
-    return 100
-  }
-
-  return (
-    100 *
-    (maxInSituDate.diff(baseForecastDate).milliseconds /
-      maxForecastDate.diff(baseForecastDate).milliseconds)
-  )
-}
-
 export const SiteMeasurementsChart = ({
   pollutantType,
   forecastData,
@@ -164,7 +148,7 @@ export const SiteMeasurementsChart = ({
     [onSiteClick],
   )
 
-  const zoomPercent = getInSituZoomPercent(
+  const zoomPercent = getInSituPercentage(
     forecastBaseDate,
     maxForecastDate,
     maxInSituDate,
