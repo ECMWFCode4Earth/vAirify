@@ -1,6 +1,8 @@
 import { type Locator, type Page, expect } from '@playwright/test'
 
-export class VairifySummaryPage {
+import { BasePage } from './base_page'
+
+export class VairifySummaryPage extends BasePage {
   readonly page: Page
   readonly title: Locator
   readonly scroller: Locator
@@ -9,6 +11,7 @@ export class VairifySummaryPage {
   readonly forecastBaseTimeText: Locator
 
   constructor(page: Page) {
+    super(page)
     this.page = page
     this.title = this.page.locator('title')
     this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')
@@ -18,19 +21,11 @@ export class VairifySummaryPage {
       "//div[@class='_summary-container_1n5zu_1']/div[1]/div[1]",
     )
   }
-  async clickButton(buttonName: string) {
-    await this.page.getByRole('link', { name: buttonName }).click()
-  }
 
   async goTo() {
     await this.page.goto('/city/summary')
     await this.page.waitForSelector('.ag-root', { state: 'visible' })
     await this.page.waitForSelector('.ag-header-cell', { state: 'visible' })
-  }
-
-  async getTitle() {
-    const title = await this.page.title()
-    return title
   }
 
   async getColumnHeaderAndText(name: string, expectedText: string) {
@@ -114,12 +109,6 @@ export class VairifySummaryPage {
     return differences.filter((d) => !isNaN(d))
   }
 
-  async setupApiRoute(endpointUrl: string, mockedAPIResponse: object) {
-    await this.page.route(endpointUrl, async (route) => {
-      await route.fulfill({ json: mockedAPIResponse })
-    })
-  }
-
   async setupPageWithMockData(
     mockedForecastResponse: object,
     mockedMeasurementSummaryResponse: object,
@@ -133,24 +122,6 @@ export class VairifySummaryPage {
       mockedMeasurementSummaryResponse,
     )
     await this.goTo()
-  }
-
-  async captureNetworkRequestsAsArray(
-    page: Page,
-    expectedRequestMethod: string,
-    expectedRequestUrl: string,
-  ): Promise<string[]> {
-    const requestArray: string[] = []
-    page.on('request', (request) => {
-      const requestUrl: string = request.url()
-      if (
-        request.method() === expectedRequestMethod &&
-        requestUrl.includes(expectedRequestUrl)
-      ) {
-        requestArray.push(requestUrl)
-      }
-    })
-    return requestArray
   }
 
   async calculateExpectedForcastBaseTimeFromDate(
