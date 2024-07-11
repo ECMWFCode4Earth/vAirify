@@ -75,8 +75,9 @@ export class VairifySummaryPage extends BasePage {
       const row = expectedData[rowIndex]
       for (let colIndex = 0; colIndex < row.length; colIndex++) {
         const cellLocator = this.page.locator(
-          `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(${colIndex + 1})`,
+          `//div[@aria-rowindex='${rowIndex + 3}']//div[@aria-colindex='${colIndex + 2}']`,
         )
+        await cellLocator.scrollIntoViewIfNeeded()
         const cellText = await cellLocator.innerText()
         expect(cellText.trim()).toBe(row[colIndex])
       }

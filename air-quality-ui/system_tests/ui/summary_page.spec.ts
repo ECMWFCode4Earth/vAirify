@@ -283,7 +283,6 @@ test.describe('Mocked API Response Tests', () => {
 
     test.describe('Table Data: Largest Deviation', () => {
       test('Verify table shows pollutant data for the timestamp that has the largest deviation - forecast AQI 6, measurement AQI 3', async ({
-        // page,
         vairifySummaryPage,
       }) => {
         const forecastLondonValidTimeArray: object[] = [
@@ -364,19 +363,9 @@ test.describe('Mocked API Response Tests', () => {
           ],
         ]
         await vairifySummaryPage.assertGridValues(expectedTableContents)
-        // let i = 0
-        // while (i < expectedTableContents[0].length) {
-        //   const targetCell = page.locator(
-        //     `//div[ @aria-rowindex='3'] //div[@aria-colindex='${i + 2}']`,
-        //   )
-        //   await targetCell.scrollIntoViewIfNeeded()
-        //   await expect(targetCell).toContainText(expectedTableContents[0][i])
-        //   i++
-        // }
       })
 
       test('Verify table shows pollutant data for the timestamp that has the largest deviation - forecast AQI 3, measurement AQI 6', async ({
-        page,
         vairifySummaryPage,
       }) => {
         const forecastLondonValidTimeArray: object[] = [
@@ -458,19 +447,10 @@ test.describe('Mocked API Response Tests', () => {
           ],
         ]
 
-        let i = 0
-        while (i < expectedTableContents[0].length) {
-          const targetCell = page.locator(
-            `//div[ @aria-rowindex='3'] //div[@aria-colindex='${i + 2}']`,
-          )
-          await targetCell.scrollIntoViewIfNeeded()
-          await expect(targetCell).toContainText(expectedTableContents[0][i])
-          i++
-        }
+        await vairifySummaryPage.assertGridValues(expectedTableContents)
       })
 
       test('Verify table shows pollutant data for the timestamp that has the largest deviation - diff 0 - forecast AQI 3, measurement AQI 3', async ({
-        page,
         vairifySummaryPage,
       }) => {
         const forecastLondonValidTimeArray: object[] = [
@@ -527,19 +507,10 @@ test.describe('Mocked API Response Tests', () => {
           ],
         ]
 
-        let i = 0
-        while (i < expectedTableContents[0].length) {
-          const targetCell = page.locator(
-            `//div[ @aria-rowindex='3'] //div[@aria-colindex='${i + 2}']`,
-          )
-          await targetCell.scrollIntoViewIfNeeded()
-          await expect(targetCell).toContainText(expectedTableContents[0][i])
-          i++
-        }
+        await vairifySummaryPage.assertGridValues(expectedTableContents)
       })
 
       test('Verify the forecast AQI Level value is the highest overall AQI level in forecast response', async ({
-        page,
         vairifySummaryPage,
       }) => {
         const forecastLondonValidTimeArray: object[] = [
@@ -596,15 +567,7 @@ test.describe('Mocked API Response Tests', () => {
           ],
         ]
 
-        let i = 0
-        while (i < expectedTableContents[0].length) {
-          const targetCell = page.locator(
-            `//div[ @aria-rowindex='3'] //div[@aria-colindex='${i + 2}']`,
-          )
-          await targetCell.scrollIntoViewIfNeeded()
-          await expect(targetCell).toContainText(expectedTableContents[0][i])
-          i++
-        }
+        await vairifySummaryPage.assertGridValues(expectedTableContents)
       })
     })
   })
