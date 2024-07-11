@@ -190,7 +190,7 @@ def test__in_situ_etl__does_store_9998_pollutant_readings(ensure_forecast_cache)
     os.remove(london_file)
 
     results = get_database_data(collection_name, query)
-    assert len(results) == 0
+    assert len(results) == 1
 
     stored: InSituMeasurement = results[0]
 
@@ -219,7 +219,7 @@ def test__in_situ_etl__does_store_9998_pollutant_readings(ensure_forecast_cache)
         "STORE_GRIB_FILES": "True",
     },
 )
-def test__in_situ_etl__does_not_create_entry_if_only_readings_are_9999(
+def test__in_situ_etl__does_not_create_entry_if_all_readings_are_9999(
     ensure_forecast_cache,
 ):
     query = {"name": "London"}
@@ -275,7 +275,7 @@ def test__in_situ_etl__does_not_store_9999_pollutant_readings(ensure_forecast_ca
     os.remove(london_file)
 
     results = get_database_data(collection_name, query)
-    assert len(results) == 0
+    assert len(results) == 1
 
     stored: InSituMeasurement = results[0]
 
