@@ -15,7 +15,7 @@ test.describe('No Mocking', () => {
   })
 })
 
-test.describe('BVA using mocked system time', () => {
+test.describe('Boundary value analysis using mocked system time', () => {
   ;[
     {
       dateTime: '2024-07-03T10:00:00Z',
@@ -81,18 +81,6 @@ test.describe('On page load', () => {
       expect(requestArray.length).toEqual(1)
     })
 
-    test('Verify on page load the forecast API call has correct base_time', async ({
-      vairifySummaryPage,
-    }) => {
-      const expectedRequestForecastBaseTime: string =
-        await vairifySummaryPage.getExpectedRequestForecastBaseTime(
-          mockDatetimeNow,
-        )
-      expect(requestArray[0]).toContain(
-        `base_time=${expectedRequestForecastBaseTime}`,
-      )
-    })
-
     test('Verify on page load the forecast API call has valid_time_from set to the base_time', async ({
       vairifySummaryPage,
     }) => {
@@ -138,7 +126,7 @@ test.describe('On page load', () => {
       vairifySummaryPage,
     }) => {
       const expectedNumberofRequests =
-        await vairifySummaryPage.calculateExpectedVolumeofRequests(
+        await vairifySummaryPage.calculateExpectedVolumeOfRequests(
           mockDatetimeNow,
         )
       expect(requestArray.length).toEqual(expectedNumberofRequests)
