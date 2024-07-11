@@ -67,7 +67,7 @@ interface measurementSummaryAPIResponse {
 
 export function createForecastAPIResponseData(
   overrides: Partial<forecastAPIResponse> = {},
-): object {
+): forecastAPIResponse {
   const defaultForecastResponse = {
     base_time: '2024-07-08T00:00:00Z',
     valid_time: '2024-07-08T00:00:00Z',
@@ -101,7 +101,7 @@ export function createForecastAPIResponseData(
 
 export function createMeasurementSummaryAPIResponseData(
   overrides: Partial<measurementSummaryAPIResponse> = {},
-): object {
+): measurementSummaryAPIResponse {
   const defaultMeasurementSummaryResponse = {
     measurement_base_time: '2024-07-08T00:00:00Z',
     location_type: 'city',
