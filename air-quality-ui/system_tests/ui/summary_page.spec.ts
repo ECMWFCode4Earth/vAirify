@@ -48,55 +48,61 @@ test.describe('Forecast base time boundary value analysis using mocked system ti
   ;[
     {
       dateTime: '2024-07-03T10:00:00Z',
-      expectedForecastBaseTime: '02 Jul 00:00 UTC',
+      expectedRequestForecastBaseTime: '2024-07-02T00%3A00%3A00.000Z',
+      expectedForecastBaseTimePageText: '02 Jul 00:00 UTC',
     },
     {
       dateTime: '2024-07-03T09:59:00Z',
-      expectedForecastBaseTime: '01 Jul 12:00 UTC',
+      expectedRequestForecastBaseTime: '2024-07-01T12%3A00%3A00.000Z',
+      expectedForecastBaseTimePageText: '01 Jul 12:00 UTC',
     },
     {
       dateTime: '2024-07-03T21:59:00Z',
-      expectedForecastBaseTime: '02 Jul 00:00 UTC',
+      expectedRequestForecastBaseTime: '2024-07-02T00%3A00%3A00.000Z',
+      expectedForecastBaseTimePageText: '02 Jul 00:00 UTC',
     },
     {
       dateTime: '2024-07-03T22:00:00Z',
-      expectedForecastBaseTime: '02 Jul 12:00 UTC',
+      expectedRequestForecastBaseTime: '2024-07-02T12%3A00%3A00.000Z',
+      expectedForecastBaseTimePageText: '02 Jul 12:00 UTC',
     },
-  ].forEach(({ dateTime, expectedForecastBaseTime }) => {
-    test(`System time ${dateTime}, assert forecast request params are correct`, async ({
-      page,
-      vairifySummaryPage,
+  ].forEach(
+    ({
+      dateTime,
+      expectedRequestForecastBaseTime,
+      expectedForecastBaseTimePageText,
     }) => {
-      const mockSystemDate: Date = new Date(dateTime)
-      await page.clock.setFixedTime(mockSystemDate)
+      test(`System time ${dateTime}, assert forecast request params are correct`, async ({
+        page,
+        vairifySummaryPage,
+      }) => {
+        const mockSystemDate: Date = new Date(dateTime)
+        await page.clock.setFixedTime(mockSystemDate)
 
-      const requestArray: string[] =
-        await vairifySummaryPage.captureNetworkRequestsAsArray(
-          page,
-          'GET',
-          'http://localhost:8000/air-pollutant/forecast',
+        const requestArray: string[] =
+          await vairifySummaryPage.captureNetworkRequestsAsArray(
+            page,
+            'GET',
+            'http://localhost:8000/air-pollutant/forecast',
+          )
+        await vairifySummaryPage.goTo()
+
+        const expectedRequestValidTimeFrom: string =
+          expectedRequestForecastBaseTime
+        const mockDateTimeNowUriEncoded: string = encodeURIComponent(
+          mockSystemDate.toISOString(),
         )
-      await vairifySummaryPage.goTo()
 
-      const expectedRequestForecastBaseTime =
-        await vairifySummaryPage.getExpectedRequestForecastBaseTime(
-          mockSystemDate,
+        expect(requestArray[0]).toContain(
+          `location_type=city&valid_time_from=${expectedRequestValidTimeFrom}&valid_time_to=${mockDateTimeNowUriEncoded}&base_time=${expectedRequestForecastBaseTime}`,
         )
-      const expectedRequestValidTimeFrom: string =
-        expectedRequestForecastBaseTime
-      const mockDateTimeNowUriEncoded: string = encodeURIComponent(
-        mockSystemDate.toISOString(),
-      )
 
-      expect(requestArray[0]).toContain(
-        `location_type=city&valid_time_from=${expectedRequestValidTimeFrom}&valid_time_to=${mockDateTimeNowUriEncoded}&base_time=${expectedRequestForecastBaseTime}`,
-      )
-
-      await expect(vairifySummaryPage.forecastBaseTimeText).toContainText(
-        `Forecast Base Time: ${expectedForecastBaseTime}`,
-      )
-    })
-  })
+        await expect(vairifySummaryPage.forecastBaseTimeText).toContainText(
+          `Forecast Base Time: ${expectedForecastBaseTimePageText}`,
+        )
+      })
+    },
+  )
 })
 
 test.describe('API calls on page load', () => {

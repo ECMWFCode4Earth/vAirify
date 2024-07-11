@@ -169,13 +169,4 @@ export class VairifySummaryPage extends BasePage {
     // There will be 1 request when there is 0 difference
     return threeHrIncrements + 1
   }
-
-  async getExpectedRequestForecastBaseTime(
-    mockSystemDate: Date,
-  ): Promise<string> {
-    const expectedForecastBaseTimeDate =
-      await this.calculateExpectedForecastBaseTimeFromDate(mockSystemDate)
-    const isoDate = expectedForecastBaseTimeDate.toISOString()
-    return encodeURIComponent(isoDate)
-  }
 }
