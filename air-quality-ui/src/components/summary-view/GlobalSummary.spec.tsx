@@ -49,6 +49,26 @@ jest.mock(
 )
 
 describe('GlobalSummary component', () => {
+  it('shows loading spinner when forecast data is loading', async () => {
+    ;(useQuery as jest.Mock).mockReturnValueOnce({
+      data: null,
+      isPending: true,
+    })
+    render(<GlobalSummary />)
+    await waitFor(() => {
+      expect(screen.getByTestId('loading-spinner')).toBeInTheDocument()
+    })
+  })
+  it('shows loading spinner when summary data is loading', async () => {
+    ;(useQueries as jest.Mock).mockReturnValueOnce({
+      data: null,
+      isPending: true,
+    })
+    render(<GlobalSummary />)
+    await waitFor(() => {
+      expect(screen.getByTestId('loading-spinner')).toBeInTheDocument()
+    })
+  })
   it('shows message when loading forecast data errors', async () => {
     ;(useQuery as jest.Mock).mockReturnValueOnce({
       data: null,

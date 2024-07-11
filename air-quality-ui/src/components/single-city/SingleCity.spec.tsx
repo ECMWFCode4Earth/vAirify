@@ -25,6 +25,26 @@ jest.mock('../../context', () => ({
 jest.mock('echarts-for-react', () => () => <div>Mock Chart</div>)
 
 describe('SingleCityComponent', () => {
+  it('shows loading spinner when forecast data loading', async () => {
+    ;(useQueries as jest.Mock).mockReturnValue([
+      { data: [], isPending: true, isError: false },
+      { data: [], isPending: false, isError: false },
+    ])
+    render(<SingleCity />)
+    await waitFor(() => {
+      expect(screen.getByTestId('loading-spinner')).toBeInTheDocument()
+    })
+  })
+  it('shows loading spinner when measurement data loading', async () => {
+    ;(useQueries as jest.Mock).mockReturnValue([
+      { data: [], isPending: false, isError: false },
+      { data: [], isPending: true, isError: false },
+    ])
+    render(<SingleCity />)
+    await waitFor(() => {
+      expect(screen.getByTestId('loading-spinner')).toBeInTheDocument()
+    })
+  })
   it('shows message when loading forecast data errors', async () => {
     ;(useQueries as jest.Mock).mockReturnValue([
       { data: [], isPending: false, isError: true },
