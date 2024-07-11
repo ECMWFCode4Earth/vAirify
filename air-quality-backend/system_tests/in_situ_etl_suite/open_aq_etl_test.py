@@ -164,6 +164,133 @@ def test__in_situ_etl__stores_all_data_correctly(ensure_forecast_cache):
 @mock.patch.dict(
     os.environ,
     {
+        "OPEN_AQ_CITIES": "London",
+        "OPEN_AQ_CACHE": open_aq_cache_location,
+        "STORE_GRIB_FILES": "True",
+    },
+)
+def test__in_situ_etl__does_store_9998_pollutant_readings(ensure_forecast_cache):
+    query = {"name": "London"}
+    delete_database_data(collection_name, query)
+
+    date1 = "2024-05-24T13:14:15+00:00"
+    london_file = f"{open_aq_cache_location}/London_2024052413_2024052513.json"
+    pollutant_value_9998: int = 9998
+
+    london_openaq_data = [
+        create_measurement(date1, "no2", pollutant_value_9998),
+        create_measurement(date1, "o3", pollutant_value_9998),
+        create_measurement(date1, "so2", pollutant_value_9998),
+        create_measurement(date1, "pm25", pollutant_value_9998),
+        create_measurement(date1, "pm10", pollutant_value_9998),
+    ]
+
+    write_to_file(london_openaq_data, london_file)
+    main()
+    os.remove(london_file)
+
+    results = get_database_data(collection_name, query)
+    assert len(results) == 0
+
+    stored: InSituMeasurement = results[0]
+
+    assert_pollutant_value(
+        stored["no2"], pollutant_value_9998, "µg/m³", pollutant_value_9998, "µg/m³"
+    )
+    assert_pollutant_value(
+        stored["o3"], pollutant_value_9998, "µg/m³", pollutant_value_9998, "µg/m³"
+    )
+    assert_pollutant_value(
+        stored["so2"], pollutant_value_9998, "µg/m³", pollutant_value_9998, "µg/m³"
+    )
+    assert_pollutant_value(
+        stored["pm2_5"], pollutant_value_9998, "µg/m³", pollutant_value_9998, "µg/m³"
+    )
+    assert_pollutant_value(
+        stored["pm10"], pollutant_value_9998, "µg/m³", pollutant_value_9998, "µg/m³"
+    )
+
+
+@mock.patch.dict(
+    os.environ,
+    {
+        "OPEN_AQ_CITIES": "London",
+        "OPEN_AQ_CACHE": open_aq_cache_location,
+        "STORE_GRIB_FILES": "True",
+    },
+)
+def test__in_situ_etl__does_not_create_entry_if_only_readings_are_9999(
+    ensure_forecast_cache,
+):
+    query = {"name": "London"}
+    delete_database_data(collection_name, query)
+
+    date1 = "2024-05-24T13:14:15+00:00"
+    london_file = f"{open_aq_cache_location}/London_2024052413_2024052513.json"
+    pollutant_value_9999: int = 9999
+
+    london_openaq_data = [
+        create_measurement(date1, "no2", pollutant_value_9999),
+        create_measurement(date1, "o3", pollutant_value_9999),
+        create_measurement(date1, "so2", pollutant_value_9999),
+        create_measurement(date1, "pm25", pollutant_value_9999),
+        create_measurement(date1, "pm10", pollutant_value_9999),
+    ]
+
+    write_to_file(london_openaq_data, london_file)
+    main()
+    os.remove(london_file)
+
+    results = get_database_data(collection_name, query)
+    assert len(results) == 0
+
+
+@mock.patch.dict(
+    os.environ,
+    {
+        "OPEN_AQ_CITIES": "London",
+        "OPEN_AQ_CACHE": open_aq_cache_location,
+        "STORE_GRIB_FILES": "True",
+    },
+)
+def test__in_situ_etl__does_not_store_9999_pollutant_readings(ensure_forecast_cache):
+    query = {"name": "London"}
+    delete_database_data(collection_name, query)
+
+    date1 = "2024-05-24T13:14:15+00:00"
+    london_file = f"{open_aq_cache_location}/London_2024052413_2024052513.json"
+    pollutant_value_9999: int = 9999
+    pollutant_value_1: int = 1
+
+    london_openaq_data = [
+        create_measurement(date1, "no2", pollutant_value_9999),
+        create_measurement(date1, "o3", pollutant_value_9999),
+        create_measurement(date1, "so2", pollutant_value_9999),
+        create_measurement(date1, "pm25", pollutant_value_9999),
+        create_measurement(date1, "pm10", pollutant_value_1),
+    ]
+
+    write_to_file(london_openaq_data, london_file)
+    main()
+    os.remove(london_file)
+
+    results = get_database_data(collection_name, query)
+    assert len(results) == 0
+
+    stored: InSituMeasurement = results[0]
+
+    assert "no2" not in stored
+    assert "o3" not in stored
+    assert "so2" not in stored
+    assert "pm25" not in stored
+    assert_pollutant_value(
+        stored["pm10"], pollutant_value_1, "µg/m³", pollutant_value_1, "µg/m³"
+    )
+
+
+@mock.patch.dict(
+    os.environ,
+    {
         "OPEN_AQ_CITIES": "London,Melbourne",
         "OPEN_AQ_CACHE": open_aq_cache_location,
         "STORE_GRIB_FILES": "True",
