@@ -34,7 +34,7 @@ test.describe('Boundary value analysis using mocked system time', () => {
       expectedForecastBaseTime: '02 Jul 12:00 UTC',
     },
   ].forEach(({ dateTime, expectedForecastBaseTime }) => {
-    test(`System time ${dateTime}, assert forecast base time ${expectedForecastBaseTime}`, async ({
+    test(`System time ${dateTime}, assert forecast request params are correct`, async ({
       page,
       vairifySummaryPage,
     }) => {
@@ -53,9 +53,16 @@ test.describe('Boundary value analysis using mocked system time', () => {
         await vairifySummaryPage.getExpectedRequestForecastBaseTime(
           mockSystemDate,
         )
-      expect(requestArray[0]).toContain(
-        `base_time=${expectedRequestForecastBaseTime}`,
+      const expectedRequestValidTimeFrom: string =
+        expectedRequestForecastBaseTime
+      const mockDateTimeNowUriEncoded: string = encodeURIComponent(
+        mockSystemDate.toISOString(),
       )
+
+      expect(requestArray[0]).toContain(
+        `location_type=city&valid_time_from=${expectedRequestValidTimeFrom}&valid_time_to=${mockDateTimeNowUriEncoded}&base_time=${expectedRequestForecastBaseTime}`,
+      )
+
       await expect(vairifySummaryPage.forecastBaseTimeText).toContainText(
         `Forecast Base Time: ${expectedForecastBaseTime}`,
       )
@@ -79,33 +86,6 @@ test.describe('On page load', () => {
     })
     test('Verify on page load the forecast API is called once', async () => {
       expect(requestArray.length).toEqual(1)
-    })
-
-    test('Verify on page load the forecast API call has valid_time_from set to the base_time', async ({
-      vairifySummaryPage,
-    }) => {
-      const expectedRequestForecastBaseTime: string =
-        await vairifySummaryPage.getExpectedRequestForecastBaseTime(
-          mockDatetimeNow,
-        )
-      const expectedRequestValidTimeFrom: string =
-        expectedRequestForecastBaseTime
-      expect(requestArray[0]).toContain(
-        `valid_time_from=${expectedRequestValidTimeFrom}`,
-      )
-    })
-
-    test('Verify on page load the forecast API call has valid_time_to set to current time', async () => {
-      const mockDateTimeNowUriEncoded: string = encodeURIComponent(
-        mockDatetimeNow.toISOString(),
-      )
-      expect(requestArray[0]).toContain(
-        `valid_time_to=${mockDateTimeNowUriEncoded}`,
-      )
-    })
-
-    test('Verify on page load the forecast API call has location_type city', async () => {
-      expect(requestArray[0]).toContain('location_type=city')
     })
   })
 
@@ -132,7 +112,7 @@ test.describe('On page load', () => {
       expect(requestArray.length).toEqual(expectedNumberofRequests)
     })
 
-    test('Verify on page load the measurement summary API calls have correct measurement_base_times', async () => {
+    test('Verify on page load the measurement summary API calls have correct params', async () => {
       const expectedMeasurementBaseTimeArray = [
         '2024-06-09T00%3A00%3A00.000Z',
         '2024-06-09T03%3A00%3A00.000Z',
@@ -152,20 +132,8 @@ test.describe('On page load', () => {
       ]
       for (const request in requestArray) {
         expect(requestArray[request]).toContain(
-          `measurement_base_time=${expectedMeasurementBaseTimeArray[request]}`,
+          `measurement_base_time=${expectedMeasurementBaseTimeArray[request]}&measurement_time_range=90&location_type=city`,
         )
-      }
-    })
-
-    test('Verify on page load the measurement summary API calls have measurement_time_range of 90', async () => {
-      for (const request in requestArray) {
-        expect(requestArray[request]).toContain('measurement_time_range=90')
-      }
-    })
-
-    test('Verify on page load the measurement summary API calls have location_type city', async () => {
-      for (const request in requestArray) {
-        expect(requestArray[request]).toContain('location_type=city')
       }
     })
   })
