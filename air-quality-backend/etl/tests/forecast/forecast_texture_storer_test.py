@@ -47,44 +47,39 @@ def test__chunk_data_array(num_time_steps, expected_num_chunks):
         assert "time_end" in time_steps_dict[i]
 
 
-@pytest.fixture
-def mock_getcwd():
-    with patch("os.getcwd", return_value="/current/working/directory"):
-        yield
+@patch("os.makedirs")
+@patch("os.getcwd", return_value="/current/working/directory")
+def test__create_output_directory__directory_does_not_already_exist(
+    mock_getcwd, mock_makedirs
+):
+    forecast_date = "2024-07-09"
 
+    with patch("os.path.exists", side_effect=lambda path: False):
+        expected_directory = f"/current/working/directory/data_textures/{forecast_date}"
+        result = _create_output_directory(forecast_date)
 
-@pytest.fixture
-def mock_makedirs():
-    with patch("os.makedirs") as mock:
-        yield mock
+        mock_makedirs.assert_called_once_with(expected_directory, exist_ok=True)
+        assert result == expected_directory
 
 
 @patch("os.makedirs")
-@patch("os.getcwd", return_value="/mock/current/directory")
-@patch("os.path.exists", side_effect=lambda path: path.startswith("/app/data_textures"))
-def test__create_output_directory(mock_exists, mock_getcwd, mock_makedirs):
+@patch("os.getcwd", return_value="/current/working/directory")
+def test__create_output_directory__directory_already_exists(mock_getcwd, mock_makedirs):
     forecast_date = "2024-07-09"
 
-    # Test case where the directory does not exist in /app/data_textures
-    mock_exists.side_effect = lambda path: False
-    expected_directory = f"/mock/current/directory/data_textures/{forecast_date}"
-    result = _create_output_directory(forecast_date)
-    mock_makedirs.assert_called_once_with(expected_directory, exist_ok=True)
-    assert result == expected_directory
+    with patch(
+        "os.path.exists",
+        side_effect=lambda path: path == f"/app/data_textures/{forecast_date}",
+    ):
+        expected_directory = f"/app/data_textures/{forecast_date}"
+        result = _create_output_directory(forecast_date)
 
-    # Reset mocks for the next test case
-    mock_makedirs.reset_mock()
-    mock_exists.side_effect = lambda path: path == f"/app/data_textures/{forecast_date}"
-
-    # Test case where the directory exists in /app/data_textures
-    expected_directory = f"/app/data_textures/{forecast_date}"
-    result = _create_output_directory(forecast_date)
-    mock_makedirs.assert_called_once_with(expected_directory, exist_ok=True)
-    assert result == expected_directory
+        mock_makedirs.assert_called_once_with(expected_directory, exist_ok=True)
+        assert result == expected_directory
 
 
 @patch("PIL.Image.Image.save")
-def test__save_data_texture(mock_save):
+def test__write_texture_to_disk(mock_save):
     rgb_data_array = np.random.rand(11, 121, 1).astype(np.uint8)
     output_directory = "test_output"
     forecast_date = datetime.fromtimestamp(default_time, timezone.utc).strftime(
