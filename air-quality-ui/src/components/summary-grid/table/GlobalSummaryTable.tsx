@@ -194,9 +194,10 @@ const createSummaryRow = ({
       const currentDifferenceWithSymbol =
         getPerformanceSymbol(forecastData.aqiLevel, measurementData.aqiLevel) +
         numericalDifference
+
       if (
         !row.aqiDifference ||
-        numericalDifference > parseInt(row.aqiDifference.split('')[1])
+        numericalDifference > Math.abs(parseInt(row.aqiDifference))
       ) {
         row.aqiDifference = currentDifferenceWithSymbol
         row.forecast.aqiLevel = forecastData.aqiLevel
@@ -227,7 +228,6 @@ const GlobalSummaryTable = ({
     columnDefs = createColDefs(showAllColoured)
   }
   const gridOptions = createGridOptions()
-
   return (
     <div
       className={`ag-theme-quartz ${classes['summary-grid-wrapper']}`}
