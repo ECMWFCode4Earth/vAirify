@@ -72,7 +72,10 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
   {
     field: 'locationName',
     headerName: 'City',
-    headerClass: 'cell-header-format',
+    headerClass: [
+      'filterable-cell-header-format',
+      'suppress-separator-header-format',
+    ],
     cellClass: 'cell-format',
     pinned: true,
     filter: true,

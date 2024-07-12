@@ -1,29 +1,43 @@
-.cell-header-format{
+.filterable-cell-header-format{
+    .ag-icon{
+        margin-left: 5px;
+    }
+}
+
+.filterable-cell-header-format, .cell-header-format{
+    .ag-header-cell-comp-wrapper {
+        width: auto;
+    }
     justify-content: center;
+}
+
+.suppress-separator-header-format{
+    --ag-header-column-resize-handle-display: none;    
 }
 
 .cell-format{
     text-align: center;
-    font-weight: bold;
+    font-weight: 600;
 }
 
 .cell-very-good{
-    background-color: #37ac56;
+    background-color: rgba(80, 240, 229, 0.5);
 }
 .cell-good{
-    background-color: #9bd444;
+    background-color: rgba(80,204,170, 0.5);
 }
 .cell-medium{
-    background-color: #f1d208;
+    background-color: rgba(240,230,65, 0.5);
 }
 .cell-poor{
-    background-color: #ffbb01;
+    background-color: rgba(255,80,80, 0.4);
 }
 .cell-very-poor{
-    background-color: #ff8c00;
+    background-color: rgba(150,0,50, 0.4);
 }
 .cell-extremely-poor{
-    background-color: #ed0f05;
+    background-color: rgba(125,33,129, 0.4);
+    
 }
 .cell-error{
     color:white;
