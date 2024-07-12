@@ -48,7 +48,7 @@ Follow these [instructions](https://www.jetbrains.com/help/pycharm/conda-support
 ## API Local Development Setup
 from air-quality-backend/api:
 
-ensure version of python installed is atleast 3.11
+ensure version of python installed is at least 3.11
 
 create python venv
 `python -m venv .venv`
