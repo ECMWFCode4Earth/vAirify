@@ -38,13 +38,60 @@ export class VairifyCityPage {
   }
 
   async captureAqiChartScreenshot() {
-    await waitForIdleNetwork(this.page, this.aqiChart);
+    await waitForIdleNetwork(
+      this.page,
+      this.aqiChart,
+      this.pm2_5Chart,
+      this.pm10Chart,
+      this.no2Chart,
+      this.o3Chart
+    );
     return await this.aqiChart.screenshot();
   }
 
   async capturePm2_5ChartScreenshot() {
-    await waitForIdleNetwork(this.page, this.aqiChart);
+    await waitForIdleNetwork(
+      this.page,
+      this.aqiChart,
+      this.pm2_5Chart,
+      this.pm10Chart,
+      this.no2Chart,
+      this.o3Chart
+    );
     return await this.pm2_5Chart.screenshot();
+  }
+  async capturePm10ChartScreenshot() {
+    await waitForIdleNetwork(
+      this.page,
+      this.aqiChart,
+      this.pm2_5Chart,
+      this.pm10Chart,
+      this.no2Chart,
+      this.o3Chart
+    );
+    return await this.pm10Chart.screenshot();
+  }
+  async captureO3ChartScreenshot() {
+    await waitForIdleNetwork(
+      this.page,
+      this.aqiChart,
+      this.pm2_5Chart,
+      this.pm10Chart,
+      this.no2Chart,
+      this.o3Chart
+    );
+    return await this.o3Chart.screenshot();
+  }
+  async captureNo2ChartScreenshot() {
+    await waitForIdleNetwork(
+      this.page,
+      this.aqiChart,
+      this.pm2_5Chart,
+      this.pm10Chart,
+      this.no2Chart,
+      this.o3Chart
+    );
+    return await this.no2Chart.screenshot();
   }
 
   textFinder(textToFind: string) {
