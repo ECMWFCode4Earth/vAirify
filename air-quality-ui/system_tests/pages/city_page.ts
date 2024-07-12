@@ -1,58 +1,71 @@
-import { type Locator, type Page } from '@playwright/test'
+import { type Locator, type Page } from "@playwright/test";
 
-import { waitForIdleNetwork } from '../utils/helper_methods'
+import { waitForIdleNetwork } from "../utils/helper_methods";
 
 export class VairifyCityPage {
-  readonly page: Page
-  readonly title: Locator
-  readonly scroller: Locator
-  readonly apiForecastAqi: object
-  readonly aqiChart: Locator
-  readonly toolbarNavigation: Locator
+  readonly page: Page;
+  readonly title: Locator;
+  readonly scroller: Locator;
+  readonly apiForecastAqi: object;
+  readonly aqiChart: Locator;
+  readonly toolbarNavigation: Locator;
+  readonly pm2_5Chart: Locator;
+  readonly pm10Chart: Locator;
+  readonly no2Chart: Locator;
+  readonly o3Chart: Locator;
 
   constructor(page: Page, apiForecastAqi: object) {
-    this.page = page
-    this.title = this.page.locator('title')
-    this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')
-    this.apiForecastAqi = apiForecastAqi
+    this.page = page;
+    this.pm2_5Chart = this.page.getByTestId("site_measurements_chart_pm2_5");
+    this.pm10Chart = this.page.getByTestId("site_measurements_chart_pm10");
+    this.no2Chart = this.page.getByTestId("site_measurements_chart_no2");
+    this.o3Chart = this.page.getByTestId("site_measurements_chart_o3");
+    this.title = this.page.locator("title");
+    this.scroller = this.page.locator(".ag-body-horizontal-scroll-viewport");
+    this.apiForecastAqi = apiForecastAqi;
     this.aqiChart = this.page
-      .getByTestId('main-comparison-chart')
-      .locator('canvas')
+      .getByTestId("main-comparison-chart")
+      .locator("canvas");
     this.toolbarNavigation = this.page.getByLabel(
-      'Toolbar with site navigation',
-    )
+      "Toolbar with site navigation"
+    );
   }
 
   async captureChartScreenshot() {
-    await waitForIdleNetwork(this.page, this.aqiChart)
-    return await this.aqiChart.screenshot()
+    await waitForIdleNetwork(this.page, this.aqiChart);
+    return await this.aqiChart.screenshot();
   }
 
   textFinder(textToFind: string) {
-    return this.page.getByText(textToFind)
+    return this.page.getByText(textToFind);
   }
 
   toolbarTextFinder(textToFind: string) {
-    return this.toolbarNavigation.getByText(textToFind)
+    return this.toolbarNavigation.getByText(textToFind);
   }
 
   async setupRioDeJaneiroRoute() {
-    const genQuery = '*/**/air-pollutant/forecast*'
+    const genQuery = "*/**/air-pollutant/forecast*";
     await this.page.route(genQuery, async (route) => {
-      await route.fulfill({ json: this.apiForecastAqi })
-    })
+      await route.fulfill({ json: this.apiForecastAqi });
+    });
   }
 
-  async waitForGraphVisible() {
-    await this.aqiChart.waitFor({ state: 'visible' })
+  async waitForAllGraphsToBeVisible() {
+    await this.aqiChart.waitFor({ state: "visible" });
+    await this.pm2_5Chart.waitFor({ state: "visible" });
+    await this.pm10Chart.waitFor({ state: "visible" });
+    await this.o3Chart.waitFor({ state: "visible" });
+    await this.no2Chart.waitFor({ state: "visible" });
   }
+
   async gotoRioCityPage() {
-    await this.page.goto('/city/Rio%20de%20Janeiro')
+    await this.page.goto("/city/Rio%20de%20Janeiro");
   }
 
   async setupCityPageGraph() {
-    await this.setupRioDeJaneiroRoute()
-    await this.gotoRioCityPage()
-    await this.waitForGraphVisible()
+    await this.setupRioDeJaneiroRoute();
+    await this.gotoRioCityPage();
+    await this.waitForAllGraphsToBeVisible();
   }
 }
