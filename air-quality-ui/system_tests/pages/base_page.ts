@@ -2,9 +2,11 @@ import { type Page } from '@playwright/test'
 
 export class BasePage {
   readonly page: Page
+  readonly baseAPIURL: string
 
   constructor(page: Page) {
     this.page = page
+    this.baseAPIURL = 'http://localhost:8000/air-pollutant'
   }
 
   async getTitle() {
@@ -16,8 +18,8 @@ export class BasePage {
     await this.page.getByRole('link', { name: buttonName }).click()
   }
 
-  async setupApiRoute(endpointUrl: string, mockedAPIResponse: object) {
-    await this.page.route(endpointUrl, async (route) => {
+  async setupApiRoute(endpoint: string, mockedAPIResponse: object) {
+    await this.page.route(this.baseAPIURL + endpoint, async (route) => {
       await route.fulfill({ json: mockedAPIResponse })
     })
   }
@@ -25,14 +27,14 @@ export class BasePage {
   async captureNetworkRequestsAsArray(
     page: Page,
     expectedRequestMethod: string,
-    expectedRequestUrl: string,
+    expectedRequestEndpoint: string,
   ): Promise<string[]> {
     const requestArray: string[] = []
     page.on('request', (request) => {
       const requestUrl: string = request.url()
       if (
         request.method() === expectedRequestMethod &&
-        requestUrl.includes(expectedRequestUrl)
+        requestUrl.includes(this.baseAPIURL + expectedRequestEndpoint)
       ) {
         requestArray.push(requestUrl)
       }

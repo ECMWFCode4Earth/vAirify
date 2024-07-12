@@ -45,6 +45,10 @@ test.describe('No Mocking', () => {
 })
 
 test.describe('Using Mocked Data', () => {
+  const httpMethodGET = 'GET'
+  const forecastAPIEndpoint = '/forecast'
+  const measurementSummaryAPIEndpoint = '/measurements/summary'
+
   test.describe('Forecast base time boundary value analysis using mocked system time', () => {
     ;[
       {
@@ -83,8 +87,8 @@ test.describe('Using Mocked Data', () => {
           const requestArray: string[] =
             await vairifySummaryPage.captureNetworkRequestsAsArray(
               page,
-              'GET',
-              'http://localhost:8000/air-pollutant/forecast',
+              httpMethodGET,
+              forecastAPIEndpoint,
             )
           await vairifySummaryPage.goTo()
 
@@ -116,8 +120,8 @@ test.describe('Using Mocked Data', () => {
       const requestArray =
         await vairifySummaryPage.captureNetworkRequestsAsArray(
           page,
-          'GET',
-          'http://localhost:8000/air-pollutant/forecast',
+          httpMethodGET,
+          forecastAPIEndpoint,
         )
       await page.clock.setFixedTime(systemTime)
       await vairifySummaryPage.goTo()
@@ -131,8 +135,8 @@ test.describe('Using Mocked Data', () => {
       const requestArray =
         await vairifySummaryPage.captureNetworkRequestsAsArray(
           page,
-          'GET',
-          'http://localhost:8000/air-pollutant/measurements/summary',
+          httpMethodGET,
+          measurementSummaryAPIEndpoint,
         )
       await page.clock.setFixedTime(systemTime)
       await vairifySummaryPage.goTo()
@@ -167,8 +171,8 @@ test.describe('Using Mocked Data', () => {
       const requestArray =
         await vairifySummaryPage.captureNetworkRequestsAsArray(
           page,
-          'GET',
-          'http://localhost:8000/air-pollutant/measurements/summary',
+          httpMethodGET,
+          measurementSummaryAPIEndpoint,
         )
       await page.clock.setFixedTime(systemTime)
       await vairifySummaryPage.goTo()

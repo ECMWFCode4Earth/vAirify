@@ -114,12 +114,9 @@ export class VairifySummaryPage extends BasePage {
     mockedForecastResponse: object,
     mockedMeasurementSummaryResponse: object,
   ) {
+    await this.setupApiRoute('/forecast', mockedForecastResponse)
     await this.setupApiRoute(
-      '*/**/air-pollutant/forecast*',
-      mockedForecastResponse,
-    )
-    await this.setupApiRoute(
-      '*/**/air-pollutant/measurements/summary*',
+      '/measurements/summary',
       mockedMeasurementSummaryResponse,
     )
     await this.goTo()
