@@ -169,3 +169,7 @@ cython_debug/
 
 # vscode
 .vscode
+
+# data textures
+**/*CAMS_global*png
+**/*CAMS_global*webp
