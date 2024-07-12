@@ -8,6 +8,7 @@ const endTimeInDays = 5
 
 export type SortMeasurementsType = { [x: string]: MeasurementsResponseDto[] }
 export type AverageAqiValues = (string | number)[]
+type PreAveragedData = { [x: string]: MeasurementsResponseDto[] }
 
 function generatePreAveragedDataStructure(baseTime: DateTime<boolean>) {
   const maxDateTime = baseTime.plus({ days: endTimeInDays })
@@ -35,7 +36,7 @@ export function sortMeasurements(
   measurementsData: MeasurementsResponseDto[],
   baseTime: DateTime<boolean>,
 ) {
-  const preAveragedData: { [x: string]: MeasurementsResponseDto[] } =
+  const preAveragedData: PreAveragedData =
     generatePreAveragedDataStructure(baseTime)
   for (let i = 0; i < measurementsData.length; i++) {
     for (const time in preAveragedData) {

@@ -36,8 +36,11 @@ describe('Aqi Calculator', () => {
     [26, 'pm2_5', 4],
     [51, 'pm2_5', 5],
     [76, 'pm2_5', 6],
-  ])(`If comparing %s and %s, return %d`, (valueA, pollutantType, expected) => {
-    const result = getPollutantIndexLevel(valueA, pollutantType)
-    expect(result).toBe(expected)
-  })
+  ])(
+    `If value is %d and pollutant type is %s return aqi value as %d`,
+    (valueA, pollutantType, expected) => {
+      const result = getPollutantIndexLevel(valueA, pollutantType)
+      expect(result).toBe(expected)
+    },
+  )
 })

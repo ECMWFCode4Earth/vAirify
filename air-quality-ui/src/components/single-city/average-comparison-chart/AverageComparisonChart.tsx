@@ -35,17 +35,17 @@ function getChartOptions(
     },
     series: [
       {
-        data: forecastData?.map((f) => [
-          convertToLocalTime(f.valid_time),
-          f.overall_aqi_level,
+        data: forecastData?.map((dataToPlot) => [
+          convertToLocalTime(dataToPlot.valid_time),
+          dataToPlot.overall_aqi_level,
         ]),
         type: 'line',
         name: 'Forecast',
       },
       {
-        data: measurementsAveragedData?.map((f) => [
-          convertToLocalTime(f[0].toString()),
-          f[1],
+        data: measurementsAveragedData?.map((dataToPlot) => [
+          convertToLocalTime(dataToPlot[0].toString()),
+          dataToPlot[1],
         ]),
         type: 'line',
         name: 'Measurement',
