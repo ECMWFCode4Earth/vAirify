@@ -3,8 +3,8 @@ import { test as base } from '@playwright/test'
 import { apiForecastAqi } from './graph_aqi_mock'
 import { apiForecast, apiSummary } from './mocked_api'
 import { Banner } from '../pages/banner'
-import { VairifyCityPage } from '../pages/vAirify_city_page'
-import { VairifySummaryPage } from '../pages/vAirify_summary_page'
+import { VairifyCityPage } from '../pages/city_page'
+import { VairifySummaryPage } from '../pages/summary_page'
 
 type Fixtures = {
   banner: Banner

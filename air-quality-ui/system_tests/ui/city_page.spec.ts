@@ -1,5 +1,17 @@
 import { expect, test } from '../utils/fixtures'
 
+test('vAirify logo is visible', async ({ vairifyCityPage, banner }) => {
+  await vairifyCityPage.gotoRioCityPage()
+  await expect(banner.logo).toBeVisible()
+})
+
+test('AQI snapshot assertion', async ({ vairifyCityPage }) => {
+  await vairifyCityPage.setupCityPageGraph()
+  await expect(vairifyCityPage.textFinder('Rio de Janeiro')).toBeVisible()
+  const chartShot = await vairifyCityPage.captureChartScreenshot()
+  expect(chartShot).toMatchSnapshot('rio-aqi-graph.png')
+})
+
 test('Mocked response breadcrumb', async ({
   vairifySummaryPage,
   vairifyCityPage,
