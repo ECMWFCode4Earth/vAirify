@@ -2,9 +2,11 @@ import { type Page } from '@playwright/test'
 
 export class BasePage {
   readonly page: Page
+  readonly baseAPIURL: string
 
   constructor(page: Page) {
     this.page = page
+    this.baseAPIURL = 'http://localhost:8000/air-pollutant'
   }
 
   async getTitle() {
