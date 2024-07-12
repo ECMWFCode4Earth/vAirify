@@ -6,7 +6,7 @@ import {
   AverageAqiValues,
   averageAqiValues,
   sortMeasurements,
-} from './calculate-measurements-aqi-averages/CalculateMeasurementAqiAverages'
+} from '../../../services/calculate-measurements-aqi-averages/calculate-measurement-aqi-averages-service'
 import {
   convertToLocalTime,
   xAxisFormat,
@@ -55,7 +55,6 @@ function getChartOptions(
       trigger: 'axis',
     },
     legend: {},
-    
   }
 }
 
@@ -69,16 +68,13 @@ export const AverageComparisonChart = (
   props: AverageComparisonChartProps,
 ): JSX.Element => {
   let measurementsAveragedData
-  console.log(props.measurementsData)
   if (props.measurementsData) {
     const sortedMeasurements = sortMeasurements(
       props.measurementsData,
       props.forecastBaseTime,
     )
-    console.log(sortedMeasurements)
     measurementsAveragedData = averageAqiValues(sortedMeasurements)
   }
-  console.log(measurementsAveragedData)
   return (
     <ReactECharts
       className={classes['chart']}

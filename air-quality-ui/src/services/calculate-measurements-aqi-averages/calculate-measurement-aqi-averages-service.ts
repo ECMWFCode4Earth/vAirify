@@ -1,12 +1,12 @@
 import { DateTime } from 'luxon'
 
-import { MeasurementsResponseDto } from '../../../../services/types'
-import getPollutantIndexLevel from '../../../common/aqi-calculator/AqiCalculator'
+import getPollutantIndexLevel from '../aqi-calculator/aqi-calculator-service'
+import { MeasurementsResponseDto } from '../types'
 
 const timeBucketDiffInHours = 1
 const endTimeInDays = 5
 
-type SortMeasurementsType = { [x: string]: MeasurementsResponseDto[] }
+export type SortMeasurementsType = { [x: string]: MeasurementsResponseDto[] }
 export type AverageAqiValues = (string | number)[]
 
 function generatePreAveragedDataStructure(baseTime: DateTime<boolean>) {
@@ -66,7 +66,12 @@ export function sortMeasurements(
       }
     }
   }
-  return preAveragedData
+
+  return Object.fromEntries(
+    Object.entries(preAveragedData).filter(
+      (timeSection) => timeSection[1].length != 0,
+    ),
+  )
 }
 
 export function averageAqiValues(measurementsData: SortMeasurementsType) {
