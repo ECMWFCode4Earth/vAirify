@@ -9,6 +9,10 @@ test.describe('No Mocking', () => {
     await vairifySummaryPage.goTo()
   })
 
+  test('vAirify logo is visible', async ({ banner }) => {
+    await expect(banner.logo).toBeVisible()
+  })
+
   test('Verify page title is vAirify', async ({ vairifySummaryPage }) => {
     const title = await vairifySummaryPage.getTitle()
     expect(title).toBe('vAirify')
