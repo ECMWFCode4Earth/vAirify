@@ -1,11 +1,12 @@
 import { EChartsOption, SeriesOption } from 'echarts'
 import ReactECharts from 'echarts-for-react'
-import { DateTime } from 'luxon'
 import { useCallback, useMemo } from 'react'
 
 import classes from './SiteMeasurementsChart.module.css'
+import { useForecastContext } from '../../context'
 import { PollutantType, pollutantTypeDisplay } from '../../models'
 import { convertToLocalTime } from '../../services/echarts-service'
+import { getInSituPercentage } from '../../services/forecast-time-service'
 import {
   ForecastResponseDto,
   MeasurementsResponseDto,
@@ -23,15 +24,12 @@ const createForecastSeries = (
   pollutantType: PollutantType,
   forecastData: ForecastResponseDto[],
 ): SeriesOption => {
-  const now = DateTime.now()
   return {
     type: 'line',
-    data: forecastData
-      .filter((data) => DateTime.fromISO(data.valid_time) < now)
-      .map((data) => [
-        convertToLocalTime(data.valid_time),
-        data[pollutantType].value.toFixed(1),
-      ]),
+    data: forecastData.map((data) => [
+      convertToLocalTime(data.valid_time),
+      data[pollutantType].value.toFixed(1),
+    ]),
     name: 'Forecast',
     color: 'black',
     lineStyle: {
@@ -71,7 +69,10 @@ const createMeasurementSeries = (
     symbol: 'roundRect',
   }))
 
-const getChartOptions = (...series: SeriesOption[]): EChartsOption => {
+const getChartOptions = (
+  zoomPercent: number,
+  ...series: SeriesOption[]
+): EChartsOption => {
   return {
     xAxis: {
       type: 'time',
@@ -87,6 +88,7 @@ const getChartOptions = (...series: SeriesOption[]): EChartsOption => {
       {
         show: true,
         realtime: false,
+        end: zoomPercent,
       },
       {
         type: 'inside',
@@ -106,6 +108,9 @@ export const SiteMeasurementsChart = ({
   seriesColorsBySite,
   onSiteClick,
 }: SiteMeasurementsChartProps): JSX.Element => {
+  const { forecastBaseDate, maxForecastDate, maxInSituDate } =
+    useForecastContext()
+
   const measurementSeries = useMemo(
     () =>
       createMeasurementSeries(
@@ -143,6 +148,12 @@ export const SiteMeasurementsChart = ({
     [onSiteClick],
   )
 
+  const zoomPercent = getInSituPercentage(
+    forecastBaseDate,
+    maxForecastDate,
+    maxInSituDate,
+  )
+
   return (
     <>
       <label className={classes['chart-label']}>
@@ -154,7 +165,11 @@ export const SiteMeasurementsChart = ({
           click: eChartEventHandler,
         }}
         notMerge
-        option={getChartOptions(forecastSeries, ...measurementSeries)}
+        option={getChartOptions(
+          zoomPercent,
+          forecastSeries,
+          ...measurementSeries,
+        )}
       />
     </>
   )
