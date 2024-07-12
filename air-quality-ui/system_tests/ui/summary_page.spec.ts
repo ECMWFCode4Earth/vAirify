@@ -3,6 +3,9 @@ import { expect, test } from '../utils/fixtures'
 test.beforeEach(async ({ vairifySummaryPage }) => {
   await vairifySummaryPage.setupPage()
 })
+test('vAirify logo is visible', async ({ banner }) => {
+  await expect(banner.logo).toBeVisible()
+})
 
 test('Verify page title is vAirify', async ({ vairifySummaryPage }) => {
   const title = await vairifySummaryPage.getTitle()

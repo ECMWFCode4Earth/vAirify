@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 
 import pandas as pd
 import xarray
+import numpy as np
 
 from shared.src.database.forecasts import Forecast
 from shared.tests.util.mock_location import create_test_city
@@ -217,6 +218,40 @@ single_level_data_set = xarray.Dataset(
 multi_level_data_set = xarray.Dataset(
     coords=get_coordinates(),
     data_vars=dict(no2=no2, go3=go3, so2=so2, t=t),
+)
+
+gridded_data_single_level = xarray.Dataset(
+    {
+        "latitude": (("x",), np.linspace(0, 10, 11), {"units": "degrees_north"}),
+        "longitude": (("y",), np.linspace(0, 10, 11), {"units": "degrees_east"}),
+        "time_steps": (("t",), np.linspace(0, 10, 11), {"standard_name": "time"}),
+        "time": default_time,
+        "sp": (("x", "y", "t"), np.random.rand(11, 11, 11), {"units": "Pa"}),
+        "pm2p5": (
+            ("x", "y", "t"),
+            np.random.rand(11, 11, 11),
+            {"units": "micrograms_per_cubic_meter"},
+        ),
+        "pm10": (
+            ("x", "y", "t"),
+            np.random.rand(11, 11, 11),
+            {"units": "micrograms_per_cubic_meter"},
+        ),
+        "u10": (("x", "y", "t"), np.random.rand(11, 11, 11), {"units": "m/s"}),
+        "v10": (("x", "y", "t"), np.random.rand(11, 11, 11), {"units": "m/s"}),
+    }
+)
+
+gridded_data_multi_level = xarray.Dataset(
+    {
+        "latitude": (("x",), np.linspace(0, 10, 11), {"units": "degrees_north"}),
+        "longitude": (("y",), np.linspace(0, 10, 11), {"units": "degrees_east"}),
+        "time_steps": (("t",), np.linspace(0, 10, 11), {"standard_name": "time"}),
+        "time": default_time,
+        "go3": (("x", "y", "t"), np.random.rand(11, 11, 11), {"units": "ppm"}),
+        "no2": (("x", "y", "t"), np.random.rand(11, 11, 11), {"units": "ppm"}),
+        "so2": (("x", "y", "t"), np.random.rand(11, 11, 11), {"units": "ppm"}),
+    }
 )
 
 

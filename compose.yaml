@@ -7,6 +7,7 @@ services:
       - 27017:27017
     volumes:
       - database:/data/db
+
   etl-insitu:
     container_name: etl-insitu
     depends_on:
@@ -22,6 +23,8 @@ services:
       - OPEN_AQ_API_KEY=${OPEN_AQ_API_KEY}
       - CDSAPI_URL=${CDSAPI_URL}
       - CDSAPI_KEY=${CDSAPI_KEY}
+      - STORE_GRIB_FILES=${STORE_GRIB_FILES}
+      
   etl-forecast:
     container_name: etl-forecast
     depends_on:
@@ -35,6 +38,10 @@ services:
       - MONGO_DB_NAME=${MONGO_DB_NAME}
       - CDSAPI_URL=${CDSAPI_URL}
       - CDSAPI_KEY=${CDSAPI_KEY}
+      - STORE_GRIB_FILES=${STORE_GRIB_FILES}
+    volumes:
+      - data_textures:/app/data_textures
+
   api:
     container_name: backend-api
     depends_on:
@@ -48,12 +55,6 @@ services:
       - MONGO_DB_URI=mongodb://mongo:27017
       - MONGO_DB_NAME=${MONGO_DB_NAME}
     entrypoint: 
-      - conda
-      - run
-      - --no-capture-output
-      - -n
-      - air-quality-backend
-      - PYTHONPATH=.
       - fastapi
       - dev
       - ./api/src/main.py
@@ -61,6 +62,8 @@ services:
       - 0.0.0.0
     volumes:
       - ./air-quality-backend/src/:/usr/src/app/src/
+      - data_textures:/app/data_textures
+
   ui:
     container_name: frontend-ui
     depends_on:
@@ -76,6 +79,8 @@ services:
     volumes:
       - ./air-quality-ui/:/app/
       - nodemodules:/app/node_modules
+      
 volumes:
   database: {}
   nodemodules: {}
+  data_textures: {}
