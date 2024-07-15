@@ -337,8 +337,8 @@ test.describe('Using Mocked Data', () => {
         }),
         createForecastAPIResponseData({
           // AQI 6 forecast
-          valid_time: '2024-07-08T06:00:00Z',
           base_time: '2024-07-08T00:00:00Z',
+          valid_time: '2024-07-08T06:00:00Z',
           overall_aqi_level: 6,
           no2: { aqi_level: 6, value: 900 },
           o3: { aqi_level: 6, value: 400 },
