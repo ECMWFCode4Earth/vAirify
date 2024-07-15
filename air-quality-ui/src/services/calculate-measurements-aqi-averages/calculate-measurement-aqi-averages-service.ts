@@ -7,10 +7,10 @@ const timeBucketDiffInHours = 1
 const endTimeInDays = 5
 
 export type SortMeasurementsType = { [x: string]: MeasurementsResponseDto[] }
-export type AverageAqiValues = (string | number)[]
+export type AverageAqiValues = { measurementDate: string; meanAqiValue: number }
 type PreAveragedData = { [x: string]: MeasurementsResponseDto[] }
 
-function generatePreAveragedDataStructure(baseTime: DateTime<boolean>) {
+const generatePreAveragedDataStructure = (baseTime: DateTime<boolean>) => {
   const maxDateTime = baseTime.plus({ days: endTimeInDays })
   let currentDateTime = baseTime
   const sortedMeasurements: SortMeasurementsType = {}
@@ -24,18 +24,18 @@ function generatePreAveragedDataStructure(baseTime: DateTime<boolean>) {
   return sortedMeasurements
 }
 
-function isDateBetweenRange(
+const isDateBetweenRange = (
   date: DateTime<boolean>,
   startDate: DateTime<boolean>,
   endDate: DateTime<boolean>,
-) {
+) => {
   return date >= startDate && date < endDate
 }
 
-export function sortMeasurements(
+export const sortMeasurements = (
   measurementsData: MeasurementsResponseDto[],
   baseTime: DateTime<boolean>,
-) {
+) => {
   const preAveragedData: PreAveragedData =
     generatePreAveragedDataStructure(baseTime)
   for (let i = 0; i < measurementsData.length; i++) {
@@ -75,7 +75,7 @@ export function sortMeasurements(
   )
 }
 
-export function averageAqiValues(measurementsData: SortMeasurementsType) {
+export const averageAqiValues = (measurementsData: SortMeasurementsType) => {
   const averageAqiValues: AverageAqiValues[] = []
   for (const time in measurementsData) {
     if (measurementsData[time].length === 0) {
@@ -92,10 +92,10 @@ export function averageAqiValues(measurementsData: SortMeasurementsType) {
       )
       totalAqi = totalAqi + overallAqiLevel
     }
-    averageAqiValues.push([
-      time,
-      Math.round(totalAqi / measurementsData[time].length),
-    ])
+    averageAqiValues.push({
+      measurementDate: time,
+      meanAqiValue: Math.round(totalAqi / measurementsData[time].length),
+    })
   }
   return averageAqiValues
 }

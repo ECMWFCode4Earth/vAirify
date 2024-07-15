@@ -15,10 +15,10 @@ import {
   ForecastResponseDto,
   MeasurementsResponseDto,
 } from '../../../services/types'
-function getChartOptions(
+const getChartOptions = (
   forecastData?: ForecastResponseDto[],
   measurementsAveragedData?: AverageAqiValues[] | undefined,
-) {
+) => {
   return {
     xAxis: {
       type: 'time',
@@ -44,8 +44,8 @@ function getChartOptions(
       },
       {
         data: measurementsAveragedData?.map((dataToPlot) => [
-          convertToLocalTime(dataToPlot[0].toString()),
-          dataToPlot[1],
+          convertToLocalTime(dataToPlot.measurementDate),
+          dataToPlot.meanAqiValue,
         ]),
         type: 'line',
         name: 'Measurement',

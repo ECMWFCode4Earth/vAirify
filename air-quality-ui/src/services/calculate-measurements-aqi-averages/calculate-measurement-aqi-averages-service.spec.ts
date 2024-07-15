@@ -273,11 +273,11 @@ describe('averageAqiValues function', () => {
       ],
     }
     const expected = [
-      ['2024-07-10T02:00:00.000+01:00', 1],
-      ['2024-07-10T03:00:00.000+01:00', 1],
-      ['2024-07-10T04:00:00.000+01:00', 1],
-      ['2024-07-10T05:00:00.000+01:00', 1],
-      ['2024-07-10T06:00:00.000+01:00', 1],
+      { measurementDate: '2024-07-10T02:00:00.000+01:00', meanAqiValue: 1 },
+      { measurementDate: '2024-07-10T03:00:00.000+01:00', meanAqiValue: 1 },
+      { measurementDate: '2024-07-10T04:00:00.000+01:00', meanAqiValue: 1 },
+      { measurementDate: '2024-07-10T05:00:00.000+01:00', meanAqiValue: 1 },
+      { measurementDate: '2024-07-10T06:00:00.000+01:00', meanAqiValue: 1 },
     ]
     const result = averageAqiValues(sortedMeasurementData)
     expect(result).toStrictEqual(expected)
@@ -301,7 +301,9 @@ describe('averageAqiValues function', () => {
       ],
       '2024-07-10T03:00:00.000+01:00': [],
     }
-    const expected = [['2024-07-10T02:00:00.000+01:00', 1]]
+    const expected = [
+      { measurementDate: '2024-07-10T02:00:00.000+01:00', meanAqiValue: 1 },
+    ]
     const result = averageAqiValues(sortedMeasurementData)
     expect(result).toStrictEqual(expected)
   })
@@ -320,7 +322,9 @@ describe('averageAqiValues function', () => {
         },
       ],
     }
-    const expected = [['2024-07-10T02:00:00.000+01:00', 1]]
+    const expected = [
+      { measurementDate: '2024-07-10T02:00:00.000+01:00', meanAqiValue: 1 },
+    ]
     const result = averageAqiValues(sortedMeasurementData)
     expect(result).toStrictEqual(expected)
   })
