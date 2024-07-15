@@ -324,6 +324,7 @@ test.describe('Using Mocked Data', () => {
       summaryPage,
     }) => {
       const forecastLondonValidTimeArray: object[] = [
+        // AQI 3 forecast
         createForecastAPIResponseData({
           base_time: '2024-07-08T00:00:00Z',
           valid_time: '2024-07-08T00:00:00Z',
@@ -335,6 +336,7 @@ test.describe('Using Mocked Data', () => {
           so2: { aqi_level: 3, value: 300.5 },
         }),
         createForecastAPIResponseData({
+          // AQI 6 forecast
           valid_time: '2024-07-08T06:00:00Z',
           base_time: '2024-07-08T00:00:00Z',
           overall_aqi_level: 6,
@@ -345,6 +347,7 @@ test.describe('Using Mocked Data', () => {
           so2: { aqi_level: 6, value: 800 },
         }),
         createForecastAPIResponseData({
+          // AQI 5 forecast
           base_time: '2024-07-08T00:00:00Z',
           valid_time: '2024-07-08T09:00:00Z',
           overall_aqi_level: 5,
@@ -355,6 +358,7 @@ test.describe('Using Mocked Data', () => {
           so2: { aqi_level: 5, value: 510 },
         }),
         createForecastAPIResponseData({
+          // AQI 4 forecast
           base_time: '2024-07-08T00:00:00Z',
           valid_time: '2024-07-08T12:00:00Z',
           overall_aqi_level: 4,
@@ -367,6 +371,7 @@ test.describe('Using Mocked Data', () => {
       ]
 
       const measurementsLondonArray: object[] = [
+        // AQI 3 measurements
         createMeasurementSummaryAPIResponseData({
           measurement_base_time: '2024-07-08T00:00:00Z',
           overall_aqi_level: { mean: 3 },
@@ -377,6 +382,7 @@ test.describe('Using Mocked Data', () => {
           so2: { mean: { aqi_level: 3, value: 300.5 } },
         }),
         createMeasurementSummaryAPIResponseData({
+          // AQI 3 measurements
           measurement_base_time: '2024-07-08T03:00:00Z',
           overall_aqi_level: { mean: 3 },
           no2: { mean: { aqi_level: 3, value: 100.5 } },
@@ -386,6 +392,7 @@ test.describe('Using Mocked Data', () => {
           so2: { mean: { aqi_level: 3, value: 300.5 } },
         }),
         createMeasurementSummaryAPIResponseData({
+          // AQI 3 measurements
           measurement_base_time: '2024-07-08T06:00:00Z',
           overall_aqi_level: { mean: 3 },
           no2: { mean: { aqi_level: 3, value: 100.5 } },
@@ -395,6 +402,7 @@ test.describe('Using Mocked Data', () => {
           so2: { mean: { aqi_level: 3, value: 300.5 } },
         }),
         createMeasurementSummaryAPIResponseData({
+          // AQI 3 measurements
           measurement_base_time: '2024-07-08T09:00:00Z',
           overall_aqi_level: { mean: 3 },
           no2: { mean: { aqi_level: 3, value: 100.5 } },
@@ -404,6 +412,7 @@ test.describe('Using Mocked Data', () => {
           so2: { mean: { aqi_level: 3, value: 300.5 } },
         }),
         createMeasurementSummaryAPIResponseData({
+          // AQI 3 measurements
           measurement_base_time: '2024-07-08T012:00:00Z',
           overall_aqi_level: { mean: 3 },
           no2: { mean: { aqi_level: 3, value: 100.5 } },
@@ -454,36 +463,7 @@ test.describe('Using Mocked Data', () => {
       summaryPage,
     }) => {
       const forecastLondonValidTimeArray: object[] = [
-        createForecastAPIResponseData({
-          base_time: '2024-07-08T00:00:00Z',
-          valid_time: '2024-07-08T00:00:00Z',
-          overall_aqi_level: 3,
-          no2: { aqi_level: 3, value: 100.5 },
-          o3: { aqi_level: 3, value: 100.5 },
-          pm2_5: { aqi_level: 3, value: 22.5 },
-          pm10: { aqi_level: 3, value: 45.5 },
-          so2: { aqi_level: 3, value: 300.5 },
-        }),
-        createForecastAPIResponseData({
-          base_time: '2024-07-08T00:00:00Z',
-          valid_time: '2024-07-08T03:00:00Z',
-          overall_aqi_level: 3,
-          no2: { aqi_level: 3, value: 100.5 },
-          o3: { aqi_level: 3, value: 100.5 },
-          pm2_5: { aqi_level: 3, value: 22.5 },
-          pm10: { aqi_level: 3, value: 45.5 },
-          so2: { aqi_level: 3, value: 300.5 },
-        }),
-        createForecastAPIResponseData({
-          base_time: '2024-07-08T00:00:00Z',
-          valid_time: '2024-07-08T06:00:00Z',
-          overall_aqi_level: 3,
-          no2: { aqi_level: 3, value: 100.5 },
-          o3: { aqi_level: 3, value: 100.5 },
-          pm2_5: { aqi_level: 3, value: 22.5 },
-          pm10: { aqi_level: 3, value: 45.5 },
-          so2: { aqi_level: 3, value: 300.5 },
-        }),
+        // AQI 3 forecast
         createForecastAPIResponseData({
           base_time: '2024-07-08T00:00:00Z',
           valid_time: '2024-07-08T09:00:00Z',
@@ -494,6 +474,7 @@ test.describe('Using Mocked Data', () => {
           pm10: { aqi_level: 3, value: 45.5 },
           so2: { aqi_level: 3, value: 300.5 },
         }),
+        // AQI 3 forecast
         createForecastAPIResponseData({
           base_time: '2024-07-08T00:00:00Z',
           valid_time: '2024-07-08T12:00:00Z',
@@ -507,24 +488,7 @@ test.describe('Using Mocked Data', () => {
       ]
 
       const measurementsLondonArray: object[] = [
-        createMeasurementSummaryAPIResponseData({
-          measurement_base_time: '2024-07-08T00:00:00Z',
-          overall_aqi_level: { mean: 3 },
-          no2: { mean: { aqi_level: 3, value: 100.5 } },
-          o3: { mean: { aqi_level: 3, value: 100.5 } },
-          pm2_5: { mean: { aqi_level: 3, value: 22.5 } },
-          pm10: { mean: { aqi_level: 3, value: 45.5 } },
-          so2: { mean: { aqi_level: 3, value: 300.5 } },
-        }),
-        createMeasurementSummaryAPIResponseData({
-          measurement_base_time: '2024-07-08T06:00:00Z',
-          overall_aqi_level: { mean: 5 },
-          no2: { mean: { aqi_level: 5, value: 240 } },
-          o3: { mean: { aqi_level: 5, value: 370 } },
-          pm2_5: { mean: { aqi_level: 5, value: 60 } },
-          pm10: { mean: { aqi_level: 5, value: 120 } },
-          so2: { mean: { aqi_level: 5, value: 510 } },
-        }),
+        // AQI 6 measurements
         createMeasurementSummaryAPIResponseData({
           measurement_base_time: '2024-07-08T09:00:00Z',
           overall_aqi_level: { mean: 6 },
@@ -535,6 +499,7 @@ test.describe('Using Mocked Data', () => {
           so2: { mean: { aqi_level: 6, value: 800 } },
         }),
         createMeasurementSummaryAPIResponseData({
+          // AQI 4 measurements
           measurement_base_time: '2024-07-08T012:00:00Z',
           overall_aqi_level: { mean: 4 },
           no2: { mean: { aqi_level: 4, value: 125 } },
@@ -586,15 +551,7 @@ test.describe('Using Mocked Data', () => {
       summaryPage,
     }) => {
       const forecastLondonValidTimeArray: object[] = [
-        createForecastAPIResponseData({
-          base_time: '2024-07-08T00:00:00Z',
-          overall_aqi_level: 3,
-          no2: { aqi_level: 3, value: 100.5 },
-          o3: { aqi_level: 3, value: 100.5 },
-          pm2_5: { aqi_level: 3, value: 22.5 },
-          pm10: { aqi_level: 3, value: 45.5 },
-          so2: { aqi_level: 3, value: 300.5 },
-        }),
+        // AQI 3 forecast
         createForecastAPIResponseData({
           base_time: '2024-07-08T00:00:00Z',
           valid_time: '2024-07-08T03:00:00Z',
@@ -605,6 +562,7 @@ test.describe('Using Mocked Data', () => {
           pm10: { aqi_level: 3, value: 45.5 },
           so2: { aqi_level: 3, value: 300.5 },
         }),
+        // AQI 3 forecast
         createForecastAPIResponseData({
           base_time: '2024-07-08T00:00:00Z',
           valid_time: '2024-07-08T12:00:00Z',
@@ -618,15 +576,7 @@ test.describe('Using Mocked Data', () => {
       ]
 
       const measurementsLondonArray: object[] = [
-        createMeasurementSummaryAPIResponseData({
-          measurement_base_time: '2024-07-08T00:00:00Z',
-          overall_aqi_level: { mean: 3 },
-          no2: { mean: { aqi_level: 3, value: 100.5 } },
-          o3: { mean: { aqi_level: 3, value: 100.5 } },
-          pm2_5: { mean: { aqi_level: 3, value: 22.5 } },
-          pm10: { mean: { aqi_level: 3, value: 45.5 } },
-          so2: { mean: { aqi_level: 3, value: 300.5 } },
-        }),
+        // AQI 3 measurements
         createMeasurementSummaryAPIResponseData({
           measurement_base_time: '2024-07-08T03:00:00Z',
           overall_aqi_level: { mean: 3 },
@@ -636,6 +586,7 @@ test.describe('Using Mocked Data', () => {
           pm10: { mean: { aqi_level: 3, value: 45.5 } },
           so2: { mean: { aqi_level: 3, value: 300.5 } },
         }),
+        // AQI 3 mesurements (higher)
         createMeasurementSummaryAPIResponseData({
           measurement_base_time: '2024-07-08T12:00:00Z',
           overall_aqi_level: { mean: 3 },
@@ -688,26 +639,47 @@ test.describe('Using Mocked Data', () => {
       summaryPage,
     }) => {
       const forecastLondonValidTimeArray: object[] = [
-        createForecastAPIResponseData(),
+        // AQI 3 forecast
         createForecastAPIResponseData({
+          base_time: '2024-07-08T00:00:00Z',
           valid_time: '2024-07-08T03:00:00Z',
+          overall_aqi_level: 3,
+          no2: { aqi_level: 3, value: 100.5 },
+          o3: { aqi_level: 3, value: 100.5 },
+          pm2_5: { aqi_level: 3, value: 22.5 },
+          pm10: { aqi_level: 3, value: 45.5 },
+          so2: { aqi_level: 3, value: 300.5 },
         }),
         createForecastAPIResponseData({
+          //AQI 3 forecast
+          base_time: '2024-07-08T00:00:00Z',
           valid_time: '2024-07-08T12:00:00Z',
+          overall_aqi_level: 3,
+          no2: { aqi_level: 3, value: 100.5 },
+          o3: { aqi_level: 3, value: 100.5 },
+          pm2_5: { aqi_level: 3, value: 22.5 },
+          pm10: { aqi_level: 3, value: 45.5 },
+          so2: { aqi_level: 3, value: 300.5 },
         }),
       ]
 
       const measurementsLondonArray: object[] = [
-        createMeasurementSummaryAPIResponseData(),
+        // AQI 3 measurements
         createMeasurementSummaryAPIResponseData({
           measurement_base_time: '2024-07-08T03:00:00Z',
+          overall_aqi_level: { mean: 3 },
+          no2: { mean: { aqi_level: 3, value: 100.5 } },
+          o3: { mean: { aqi_level: 3, value: 100.5 } },
+          pm2_5: { mean: { aqi_level: 3, value: 22.5 } },
+          pm10: { mean: { aqi_level: 3, value: 45.5 } },
+          so2: { mean: { aqi_level: 3, value: 300.5 } },
         }),
         createMeasurementSummaryAPIResponseData({
           measurement_base_time: '2024-07-08T12:00:00Z',
           overall_aqi_level: { mean: 3 },
           no2: { mean: { aqi_level: 3, value: 119 } },
           o3: { mean: { aqi_level: 3, value: 129 } },
-          pm2_5: { mean: { aqi_level: 6, value: 799 } },
+          pm2_5: { mean: { aqi_level: 6, value: 799 } }, // Highest pollutant AQI
           pm10: { mean: { aqi_level: 3, value: 49 } },
           so2: { mean: { aqi_level: 3, value: 349 } },
         }),
@@ -720,24 +692,10 @@ test.describe('Using Mocked Data', () => {
 
       const expectedTableContents: string[][] = [
         [
-          '3',
-          '6',
-          '-3',
-          '22.5',
-          '799',
-          '08 Jul 12:00',
-          '45.5',
-          '49',
-          '08 Jul 12:00',
-          '100.5',
-          '119',
-          '08 Jul 12:00',
-          '100.5',
-          '129',
-          '08 Jul 12:00',
-          '300.5',
-          '349',
-          '08 Jul 12:00',
+          // AQI Level
+          '3', // Forecast
+          '6', // Measured
+          '-3', // Diff
         ],
       ]
 
