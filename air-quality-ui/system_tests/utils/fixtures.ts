@@ -19,7 +19,9 @@ const test = base.extend<Fixtures>({
     await use(new VairifySummaryPage(page, apiForecast, apiSummary))
   },
   vairifyCityPage: async ({ page }, use) => {
-    await use(new VairifyCityPage(page, mockForecastObject, mockMeasurementsObject))
+    await use(
+      new VairifyCityPage(page, mockForecastObject, mockMeasurementsObject),
+    )
   },
 })
 
