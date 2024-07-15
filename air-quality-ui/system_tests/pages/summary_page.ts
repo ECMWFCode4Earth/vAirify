@@ -110,61 +110,18 @@ export class SummaryPage extends BasePage {
 
   async setupPageWithMockData(
     mockedForecastResponse: object,
-    mockedMeasurementSummaryResponse: object,
+    mockedMeasurementSummaryResponse?: object,
   ) {
+    if (typeof mockedMeasurementSummaryResponse !== 'undefined') {
+      await this.setupApiRoute(
+        '*/**/air-pollutant/measurements/summary*',
+        mockedMeasurementSummaryResponse,
+      )
+    }
     await this.setupApiRoute(
       '*/**/air-pollutant/forecast*',
       mockedForecastResponse,
     )
-    await this.setupApiRoute(
-      '*/**/air-pollutant/measurements/summary*',
-      mockedMeasurementSummaryResponse,
-    )
     await this.goTo()
-  }
-
-  async calculateExpectedForecastBaseTimeFromDate(
-    mockDatetimeNow: Date,
-  ): Promise<Date> {
-    const time24HrsAgoMilliseconds =
-      mockDatetimeNow.getTime() - 24 * 60 * 60 * 1000
-    const datetime24HrsAgo = new Date(time24HrsAgoMilliseconds)
-    const hours24HrsAgo = datetime24HrsAgo.getUTCHours()
-    const expectedForecastBaseTime: Date = datetime24HrsAgo
-
-    expectedForecastBaseTime.setMinutes(0)
-    expectedForecastBaseTime.setSeconds(0)
-    expectedForecastBaseTime.setMilliseconds(0)
-
-    if (10 > hours24HrsAgo) {
-      // go back another day
-      const time48HrsAgoMilliseconds =
-        mockDatetimeNow.getTime() - 24 * 60 * 60 * 1000 * 2
-      const datetime48HrsAgo = new Date(time48HrsAgoMilliseconds)
-      expectedForecastBaseTime.setUTCDate(datetime48HrsAgo.getUTCDate())
-      expectedForecastBaseTime.setUTCHours(12)
-    } else if (22 > hours24HrsAgo && hours24HrsAgo >= 10) {
-      expectedForecastBaseTime.setUTCHours(0)
-    } else {
-      expectedForecastBaseTime.setUTCHours(12)
-    }
-
-    return expectedForecastBaseTime
-  }
-
-  async calculateExpectedVolumeOfRequests(
-    mockDatetimeNow: Date,
-  ): Promise<number> {
-    const expectedForecastBaseTime =
-      await this.calculateExpectedForecastBaseTimeFromDate(mockDatetimeNow)
-
-    // Difference between time now and base time
-    const timeDifferentialMs =
-      mockDatetimeNow.getTime() - expectedForecastBaseTime.getTime()
-    const timeDifferentialHours = timeDifferentialMs / (1000 * 60 * 60)
-    const threeHrIncrements = Math.floor(timeDifferentialHours / 3)
-
-    // There will be 1 request when there is 0 difference
-    return threeHrIncrements + 1
   }
 }
