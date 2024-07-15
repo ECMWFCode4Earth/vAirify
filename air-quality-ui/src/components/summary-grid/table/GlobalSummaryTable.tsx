@@ -26,7 +26,7 @@ import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,
 } from '../../../services/types'
-import cellRules from '../cell/cell-rules/CellRules'
+import { cellRules } from '../cell/cell-rules/CellRules'
 import { LocationCellRenderer } from '../cell/location-cell-renderer/LocationCellRenderer'
 
 type SummaryDetail = {
@@ -129,7 +129,7 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         headerName: `Forecast`,
         headerClass: 'cell-header-format',
         cellClass: 'cell-format',
-        cellClassRules: cellRules(showAllColoured)[type],
+        cellClassRules: cellRules(showAllColoured, type),
         maxWidth: maxWidth,
         valueFormatter: (params: ValueFormatterParams) =>
           insertEmptyValueDash(params.value),
@@ -139,7 +139,7 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         headerName: `Measured`,
         headerClass: 'cell-header-format',
         cellClass: 'cell-format',
-        cellClassRules: cellRules(showAllColoured)[type],
+        cellClassRules: cellRules(showAllColoured, type),
         maxWidth: maxWidth,
         valueFormatter: (params: ValueFormatterParams) =>
           insertEmptyValueDash(params.value),
