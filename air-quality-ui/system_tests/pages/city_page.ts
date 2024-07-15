@@ -14,6 +14,7 @@ export class VairifyCityPage {
   readonly pm10Chart: Locator
   readonly no2Chart: Locator
   readonly o3Chart: Locator
+  readonly datePicker: Locator
 
   constructor(
     page: Page,
@@ -21,6 +22,7 @@ export class VairifyCityPage {
     mockMeasurementsObject: object,
   ) {
     this.page = page
+    this.datePicker = this.page.getByPlaceholder('DD/MM/YYYY hh:mm')
     this.pm2_5Chart = this.page.getByTestId('site_measurements_chart_pm2_5')
     this.pm10Chart = this.page.getByTestId('site_measurements_chart_pm10')
     this.no2Chart = this.page.getByTestId('site_measurements_chart_no2')
@@ -35,6 +37,9 @@ export class VairifyCityPage {
     this.toolbarNavigation = this.page.getByLabel(
       'Toolbar with site navigation',
     )
+  }
+  async setBaseTime(baseTime: string) {
+    return this.datePicker.fill(baseTime)
   }
 
   async captureAqiChartScreenshot() {
