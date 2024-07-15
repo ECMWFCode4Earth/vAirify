@@ -5,7 +5,6 @@ import Select, { ActionMeta, MultiValue, OnChangeValue } from 'react-select'
 
 import { AverageComparisonChart } from './average-comparison-chart/AverageComparisonChart'
 import classes from './SingleCity.module.css'
-import { SiteMeasurementsChart } from './SiteMeasurementsChart'
 import { useForecastContext } from '../../context'
 import { PollutantType, pollutantTypes } from '../../models'
 import { textToColor } from '../../services/echarts-service'
@@ -13,6 +12,7 @@ import { getForecastData } from '../../services/forecast-data-service'
 import { getMeasurements } from '../../services/measurement-data-service'
 import { MeasurementsResponseDto } from '../../services/types'
 import { LoadingSpinner } from '../common/LoadingSpinner'
+import { SiteMeasurementsChart } from './site-measurement-chart/SiteMeasurementsChart'
 
 interface SiteOption {
   value: string
@@ -159,7 +159,7 @@ export const SingleCity = () => {
             <AverageComparisonChart
               forecastData={forecastData}
               measurementsData={measurements}
-              forecastBaseTime={forecastBaseTime}
+              forecastBaseTime={forecastBaseDate}
             />
           </section>
           <section className={classes['site-measurements-section']}>
