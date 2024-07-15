@@ -184,7 +184,16 @@ test.describe('Using Mocked Data', () => {
         await summaryPage.setupPageWithMockData(mockedForecastResponse)
         const count: number = await summaryPage.textCellSearch('Kyiv')
         const expectedData: string[][] = [
-          ['2', '-', '-', '7', '-', '24 Jun 09:00'],
+          [
+            // AQI Level
+            '2', // Forecast
+            '-', // Measured
+            '-', // Diff
+            // pm2.5
+            '7', // Forecast
+            '-', // Measured
+            '24 Jun 09:00', // Time
+          ],
         ]
 
         expect(count).toEqual(1)
@@ -271,18 +280,46 @@ test.describe('Using Mocked Data', () => {
         )
         const expectedData = [
           // Kampala
-          ['2', '6', '-4', '16.1', '76', '19 Jun 09:00'],
+          [
+            // AQI Level
+            '2', // Forecast
+            '6', // Measured
+            '-4', // Diff
+            // pm2.5
+            '16.1', // Forecast
+            '76', // Measured
+            '19 Jun 09:00', // Time
+          ],
           // Abu Dhabi
-          ['4', '5', '-1', '30.3', '52.8', '19 Jun 12:00'],
+          [
+            // AQI Level
+            '4', //Forecast
+            '5', //Measured
+            '-1', // Diff
+            //pm2.5
+            '30.3', //Forecast
+            '52.8', // Measured
+            '19 Jun 12:00', //Time
+          ],
           // Zurich
-          ['2', '2', '0', '17.2', '15.8', '19 Jun 12:00'],
+          [
+            // AQI Level
+            '2', //Forecast
+            '2', //Measured
+            '0', // Diff
+            //pm2.5
+            '17.2', //Forecast
+            '15.8', //Measured
+            '19 Jun 12:00', //Time
+          ],
         ]
 
         await summaryPage.assertGridValues(expectedData)
       })
     })
   })
-  test.describe('Table Data: Largest Deviation', () => {
+
+  test.describe('Table Data: Verifying a full row is correct', () => {
     test('Verify table shows pollutant data for the timestamp that has the largest deviation - forecast AQI 6, measurement AQI 3', async ({
       summaryPage,
     }) => {
@@ -384,24 +421,30 @@ test.describe('Using Mocked Data', () => {
 
       const expectedTableContents: string[][] = [
         [
-          '6',
-          '3',
-          '+3',
-          '80',
-          '22.5',
-          '08 Jul 06:00',
-          '160',
-          '45.5',
-          '08 Jul 06:00',
-          '900',
-          '100.5',
-          '08 Jul 06:00',
-          '400',
-          '100.5',
-          '08 Jul 06:00',
-          '800',
-          '300.5',
-          '08 Jul 06:00',
+          // AQI Level
+          '6', // Forecast
+          '3', // Measured
+          '+3', // Diff
+          // pm2.5
+          '80', // Forecast
+          '22.5', // Measured
+          '08 Jul 06:00', // Time
+          // pm10
+          '160', // Forecast
+          '45.5', // Measured
+          '08 Jul 06:00', // Time
+          // no2
+          '900', // Forecast
+          '100.5', // Measured
+          '08 Jul 06:00', // Time
+          // o3
+          '400', // Forecast
+          '100.5', // Measured
+          '08 Jul 06:00', // Time
+          //so2
+          '800', // Forecast
+          '300.5', // Measured
+          '08 Jul 06:00', // Time
         ],
       ]
       await summaryPage.assertGridValues(expectedTableContents)
@@ -509,24 +552,30 @@ test.describe('Using Mocked Data', () => {
 
       const expectedTableContents: string[][] = [
         [
-          '3',
-          '6',
-          '-3',
-          '22.5',
-          '80',
-          '08 Jul 09:00',
-          '45.5',
-          '160',
-          '08 Jul 09:00',
-          '100.5',
-          '900',
-          '08 Jul 09:00',
-          '100.5',
-          '400',
-          '08 Jul 09:00',
-          '300.5',
-          '800',
-          '08 Jul 09:00',
+          // AQI Level
+          '3', // Forecast
+          '6', // Measured
+          '-3', // Diff
+          // pm2.5
+          '22.5', // Forecast
+          '80', // Measured
+          '08 Jul 09:00', //Time
+          // pm10
+          '45.5', // Forecast
+          '160', // Measured
+          '08 Jul 09:00', //Time
+          // no2
+          '100.5', // Forecast
+          '900', // Measured
+          '08 Jul 09:00', //Time
+          // o3
+          '100.5', // Forecast
+          '400', // Measured
+          '08 Jul 09:00', //Time
+          // so2
+          '300.5', // Forecast
+          '800', // Measured
+          '08 Jul 09:00', //Time
         ],
       ]
 
@@ -605,24 +654,30 @@ test.describe('Using Mocked Data', () => {
 
       const expectedTableContents: string[][] = [
         [
-          '3',
-          '3',
-          '0',
-          '22.5',
-          '24',
-          '08 Jul 12:00',
-          '45.5',
-          '49',
-          '08 Jul 12:00',
-          '100.5',
-          '119',
-          '08 Jul 12:00',
-          '100.5',
-          '129',
-          '08 Jul 12:00',
-          '300.5',
-          '349',
-          '08 Jul 12:00',
+          // AQI Level
+          '3', // Forecast
+          '3', // Measured
+          '0', // Diff
+          // pm2.5
+          '22.5', // Forecast
+          '24', //Measured
+          '08 Jul 12:00', //Time
+          // pm10
+          '45.5', // Forecast
+          '49', // Measured
+          '08 Jul 12:00', //Time
+          // no2
+          '100.5', // Forecast
+          '119', // Measured
+          '08 Jul 12:00', //Time
+          // o3
+          '100.5', // Forecast
+          '129', // Measured
+          '08 Jul 12:00', //Time
+          // so2
+          '300.5', // Forecast
+          '349', // Measured
+          '08 Jul 12:00', //Time
         ],
       ]
 
