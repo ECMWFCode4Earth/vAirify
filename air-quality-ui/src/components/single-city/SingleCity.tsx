@@ -1,12 +1,12 @@
 import { useQueries } from '@tanstack/react-query'
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import Select, { ActionMeta, MultiValue, OnChangeValue } from 'react-select'
 
 import { AverageComparisonChart } from './average-comparison-chart/AverageComparisonChart'
 import classes from './SingleCity.module.css'
-import { SiteMeasurementsChart } from './site-measurement-chart/SiteMeasurementsChart'
-import { ForecastContext } from '../../context'
+import { SiteMeasurementsChart } from './SiteMeasurementsChart'
+import { useForecastContext } from '../../context'
 import { PollutantType, pollutantTypes } from '../../models'
 import { textToColor } from '../../services/echarts-service'
 import { getForecastData } from '../../services/forecast-data-service'
@@ -24,7 +24,8 @@ const getSiteName = (measurement: MeasurementsResponseDto): string => {
 }
 
 export const SingleCity = () => {
-  const forecastBaseTime = useContext(ForecastContext)
+  const { forecastBaseDate, maxInSituDate, maxForecastDate } =
+    useForecastContext()
   const { name: locationName = '' } = useParams()
   const [
     {
@@ -40,24 +41,21 @@ export const SingleCity = () => {
   ] = useQueries({
     queries: [
       {
-        queryKey: ['forecast', locationName],
+        queryKey: [forecastBaseDate, locationName],
         queryFn: () =>
           getForecastData(
-            forecastBaseTime,
-            forecastBaseTime.plus({ days: 5 }),
-            forecastBaseTime,
+            forecastBaseDate,
+            maxForecastDate,
+            forecastBaseDate,
             locationName,
           ),
       },
       {
-        queryKey: ['measurements', locationName],
+        queryKey: ['measurements', locationName, forecastBaseDate],
         queryFn: () =>
-          getMeasurements(
-            forecastBaseTime,
-            forecastBaseTime.plus({ days: 5 }),
-            'city',
-            [locationName],
-          ),
+          getMeasurements(forecastBaseDate, maxInSituDate, 'city', [
+            locationName,
+          ]),
       },
     ],
   })

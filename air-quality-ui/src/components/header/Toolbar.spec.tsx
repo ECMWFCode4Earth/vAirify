@@ -1,6 +1,5 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
 
 import { Toolbar } from './Toolbar'
 
@@ -9,11 +8,14 @@ jest.mock('react-router-dom', () => ({
   useMatches: jest.fn().mockReturnValue([]),
 }))
 
+jest.mock('./Breadcrumbs', () => ({ Breadcrumbs: () => 'mocked breadcrumbs' }))
+jest.mock('./BaseForecastDatetimePicker', () => ({
+  BaseForecastDatetimePicker: () => 'mocked datepicker',
+}))
+
 describe('Toolbar component', () => {
   it('renders toolbar', () => {
-    render(<Toolbar />, {
-      wrapper: BrowserRouter,
-    })
+    render(<Toolbar />)
     expect(screen.getByRole('toolbar')).toBeInTheDocument()
   })
 })

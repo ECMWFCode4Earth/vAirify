@@ -1,9 +1,10 @@
 import '@testing-library/jest-dom'
 import { useQueries, useQuery } from '@tanstack/react-query'
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { DateTime } from 'luxon'
 
 import GlobalSummary from './GlobalSummary'
+import { SummaryViewHeaderProps } from './SummaryViewHeader'
 import { GlobalSummaryTableProps } from '../summary-grid/table/GlobalSummaryTable'
 
 jest.mock('@tanstack/react-query', () => ({
@@ -11,12 +12,14 @@ jest.mock('@tanstack/react-query', () => ({
   useQueries: jest.fn().mockReturnValue({ data: {}, isError: false }),
 }))
 
+jest.mock('../../context', () => ({
+  useForecastContext: jest.fn().mockReturnValue({
+    forecastBaseDate: DateTime.now(),
+    maxInSituDate: DateTime.now(),
+  }),
+}))
+
 jest.mock('../../services/forecast-time-service', () => ({
-  getLatestBaseForecastTime: jest
-    .fn()
-    .mockImplementation(() =>
-      DateTime.fromISO('2024-06-02T03:00:00', { zone: 'UTC' }),
-    ),
   getValidForecastTimesBetween: jest
     .fn()
     .mockImplementation(() => [
@@ -25,7 +28,20 @@ jest.mock('../../services/forecast-time-service', () => ({
     ]),
 }))
 
-const mockGridSummaryTable = jest.fn().mockReturnValue(<>mock grid</>)
+let setShowAllColouredState: (val: boolean) => void
+
+const mockSummaryViewHeader = jest
+  .fn()
+  .mockReturnValue(<span>mock summary header</span>)
+
+jest.mock('./SummaryViewHeader', () => ({
+  SummaryViewHeader: (props: SummaryViewHeaderProps) => {
+    setShowAllColouredState = props.setShowAllColoured
+    return mockSummaryViewHeader(props)
+  },
+}))
+
+const mockGridSummaryTable = jest.fn().mockReturnValue(<span>mock grid</span>)
 jest.mock(
   '../summary-grid/table/GlobalSummaryTable',
   () => (props: Partial<GlobalSummaryTableProps>) =>
@@ -33,6 +49,26 @@ jest.mock(
 )
 
 describe('GlobalSummary component', () => {
+  it('shows loading spinner when forecast data is loading', async () => {
+    ;(useQuery as jest.Mock).mockReturnValueOnce({
+      data: null,
+      isPending: true,
+    })
+    render(<GlobalSummary />)
+    await waitFor(() => {
+      expect(screen.getByTestId('loading-spinner')).toBeInTheDocument()
+    })
+  })
+  it('shows loading spinner when summary data is loading', async () => {
+    ;(useQueries as jest.Mock).mockReturnValueOnce({
+      data: null,
+      isPending: true,
+    })
+    render(<GlobalSummary />)
+    await waitFor(() => {
+      expect(screen.getByTestId('loading-spinner')).toBeInTheDocument()
+    })
+  })
   it('shows message when loading forecast data errors', async () => {
     ;(useQuery as jest.Mock).mockReturnValueOnce({
       data: null,
@@ -53,20 +89,10 @@ describe('GlobalSummary component', () => {
       expect(screen.getByText('Error occurred')).toBeInTheDocument()
     })
   })
-  it('shows forecast base time', async () => {
+  it('shows the summary header', async () => {
     render(<GlobalSummary />)
     await waitFor(() => {
-      expect(
-        screen.getByText('Forecast Base Time: 01 Jun 03:00 UTC'),
-      ).toBeInTheDocument()
-    })
-  })
-  it('shows forecast valid time range', async () => {
-    render(<GlobalSummary />)
-    await waitFor(() => {
-      expect(screen.getByTestId('forecast-valid-range')).toHaveTextContent(
-        'Forecast Valid Time Range: 01 Jun 03:00 - 01 Jun 15:00 UTC',
-      )
+      expect(screen.getByText('mock summary header')).toBeInTheDocument()
     })
   })
   it('shows the summary table', async () => {
@@ -87,11 +113,9 @@ describe('GlobalSummary component', () => {
     })
   })
 
-  it('showAllColours variable to passed to GridSummaryTable set to false when switch is clicked', async () => {
+  it('showAllColours variable to passed to GridSummaryTable set to false when state is switched', async () => {
     render(<GlobalSummary />)
-    await act(async () => {
-      ;(await screen.getByTestId('aqi-highlight-switch')).click()
-    })
+    setShowAllColouredState(false)
     await waitFor(() => {
       expect(mockGridSummaryTable).toHaveBeenCalledWith({
         forecast: {},
