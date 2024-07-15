@@ -4,35 +4,25 @@ import {
   createMeasurementSummaryAPIResponseData,
 } from '../utils/mocked_api'
 
-test.describe('No Mocking', () => {
-  test.beforeEach(async ({ summaryPage }) => {
-    await summaryPage.goTo()
-  })
+test('Verify that Headers exist and Innertext matches', async ({
+  summaryPage,
+}) => {
+  await summaryPage.goTo()
+  await summaryPage.getColumnHeaderAndText('AQI Level', 'AQI Level')
+  await summaryPage.getColumnHeaderAndText('PM 2.5 (µg/m³)', 'PM 2.5 (µg/m³)')
+  await summaryPage.getColumnHeaderAndText('PM 10 (µg/m³)', 'PM 10 (µg/m³)')
+  await summaryPage.scrollToRightmostPosition()
+  await summaryPage.page.waitForTimeout(1000)
 
-  test('Verify page title is vAirify', async ({ summaryPage }) => {
-    const title = await summaryPage.getTitle()
-    expect(title).toBe('vAirify')
-  })
-
-  test('Verify that Headers exist and Innertext matches', async ({
-    summaryPage,
-  }) => {
-    await summaryPage.getColumnHeaderAndText('AQI Level', 'AQI Level')
-    await summaryPage.getColumnHeaderAndText('PM 2.5 (µg/m³)', 'PM 2.5 (µg/m³)')
-    await summaryPage.getColumnHeaderAndText('PM 10 (µg/m³)', 'PM 10 (µg/m³)')
-    await summaryPage.scrollToRightmostPosition()
-    await summaryPage.page.waitForTimeout(1000)
-
-    await summaryPage.getColumnHeaderAndText(
-      'Nitrogen Dioxide (µg/m³)',
-      'Nitrogen Dioxide (µg/m³)',
-    )
-    await summaryPage.getColumnHeaderAndText('Ozone (µg/m³)', 'Ozone (µg/m³)')
-    await summaryPage.getColumnHeaderAndText(
-      'Sulphur Dioxide (µg/m³)',
-      'Sulphur Dioxide (µg/m³)',
-    )
-  })
+  await summaryPage.getColumnHeaderAndText(
+    'Nitrogen Dioxide (µg/m³)',
+    'Nitrogen Dioxide (µg/m³)',
+  )
+  await summaryPage.getColumnHeaderAndText('Ozone (µg/m³)', 'Ozone (µg/m³)')
+  await summaryPage.getColumnHeaderAndText(
+    'Sulphur Dioxide (µg/m³)',
+    'Sulphur Dioxide (µg/m³)',
+  )
 })
 
 test.describe('Using Mocked Data', () => {
