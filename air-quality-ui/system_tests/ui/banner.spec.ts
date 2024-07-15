@@ -4,9 +4,11 @@ import {
   createMeasurementSummaryAPIResponseData,
 } from '../utils/mocked_api'
 
-test('vAirify logo is visible on city page', async ({ cityPage, banner }) => {
-  await cityPage.gotoRioCityPage()
-  await expect(banner.logo).toBeVisible()
+test.describe('City page', () => {
+  test('vAirify logo is visible on city page', async ({ cityPage, banner }) => {
+    await cityPage.gotoRioCityPage()
+    await expect(banner.logo).toBeVisible()
+  })
 })
 
 test.describe('Summary page', () => {
