@@ -1,46 +1,29 @@
 import { type Locator, type Page, expect } from '@playwright/test'
 
-export class VairifySummaryPage {
+import { BasePage } from './base_page'
+
+export class SummaryPage extends BasePage {
   readonly page: Page
-  readonly apiForecast: object
-  readonly apiSummary: object
   readonly title: Locator
   readonly scroller: Locator
   readonly agCell: Locator
   readonly allCells: Locator
+  readonly forecastBaseTimeText: Locator
 
-  constructor(page: Page, apiForecast: object, apiSummary: object) {
+  constructor(page: Page) {
+    super(page)
     this.page = page
-    this.apiForecast = apiForecast
-    this.apiSummary = apiSummary
     this.title = this.page.locator('title')
     this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')
     this.agCell = this.page.locator('role=gridcell')
     this.allCells = this.page.locator('[role=gridcell]')
-  }
-  async clickButton(buttonName: string) {
-    await this.page.getByRole('link', { name: buttonName }).click()
+    this.forecastBaseTimeText = this.page.getByText('Forecast Base Time')
   }
 
-  async gotoSummaryPage() {
+  async goTo() {
     await this.page.goto('/city/summary')
-  }
-
-  async getTitle() {
-    const title = await this.page.title()
-    return title
-  }
-
-  async setupApiRoutes() {
-    await this.page.route('*/**/air-pollutant/forecast*', async (route) => {
-      await route.fulfill({ json: this.apiForecast })
-    })
-    await this.page.route(
-      '*/**/air-pollutant/measurements/summary*',
-      async (route) => {
-        await route.fulfill({ json: this.apiSummary })
-      },
-    )
+    await this.page.waitForSelector('.ag-root', { state: 'visible' })
+    await this.page.waitForSelector('.ag-header-cell', { state: 'visible' })
   }
 
   async getColumnHeaderAndText(name: string, expectedText: string) {
@@ -53,11 +36,6 @@ export class VairifySummaryPage {
     await this.scroller.evaluate((element: HTMLElement) => {
       element.scrollLeft = element.scrollWidth
     })
-  }
-
-  async waitForGridVisible() {
-    await this.page.waitForSelector('.ag-root', { state: 'visible' })
-    await this.page.waitForSelector('.ag-header-cell', { state: 'visible' })
   }
 
   async checkNumbersHaveOneDecimalOnly(text: string) {
@@ -95,8 +73,9 @@ export class VairifySummaryPage {
       const row = expectedData[rowIndex]
       for (let colIndex = 0; colIndex < row.length; colIndex++) {
         const cellLocator = this.page.locator(
-          `.ag-center-cols-container .ag-row:nth-child(${rowIndex + 1}) .ag-cell:nth-child(${colIndex + 1})`,
+          `//div[@aria-rowindex='${rowIndex + 3}']//div[@aria-colindex='${colIndex + 2}']`,
         )
+        await cellLocator.scrollIntoViewIfNeeded()
         const cellText = await cellLocator.innerText()
         expect(cellText.trim()).toBe(row[colIndex])
       }
@@ -122,16 +101,27 @@ export class VairifySummaryPage {
 
       const forecast = parseInt(forecastText.trim())
       const measured = parseInt(measuredText.trim())
-      const calculation = Math.abs(forecast - measured)
+      const calculation = forecast - measured
 
       differences.push(calculation)
     }
     return differences.filter((d) => !isNaN(d))
   }
 
-  async setupPage() {
-    await this.setupApiRoutes()
-    await this.gotoSummaryPage()
-    await this.waitForGridVisible()
+  async setupPageWithMockData(
+    mockedForecastResponse: object,
+    mockedMeasurementSummaryResponse?: object,
+  ) {
+    if (typeof mockedMeasurementSummaryResponse !== 'undefined') {
+      await this.setupApiRoute(
+        '*/**/air-pollutant/measurements/summary*',
+        mockedMeasurementSummaryResponse,
+      )
+    }
+    await this.setupApiRoute(
+      '*/**/air-pollutant/forecast*',
+      mockedForecastResponse,
+    )
+    await this.goTo()
   }
 }

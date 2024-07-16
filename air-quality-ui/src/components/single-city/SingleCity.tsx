@@ -3,9 +3,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import Select, { ActionMeta, MultiValue, OnChangeValue } from 'react-select'
 
-import { AverageComparisonChart } from './AverageComparisonChart'
+import { AverageComparisonChart } from './average-comparison-chart/AverageComparisonChart'
 import classes from './SingleCity.module.css'
-import { SiteMeasurementsChart } from './SiteMeasurementsChart'
+import { SiteMeasurementsChart } from './site-measurement-chart/SiteMeasurementsChart'
 import { useForecastContext } from '../../context'
 import { PollutantType, pollutantTypes } from '../../models'
 import { textToColor } from '../../services/echarts-service'
@@ -118,7 +118,13 @@ export const SingleCity = () => {
         { pm2_5: {}, pm10: {}, no2: {}, o3: {}, so2: {} },
       )
   }, [measurementData, selectedSites])
-
+  const measurements = useMemo(() => {
+    return measurementData?.filter((measurement) =>
+      selectedSites.find(
+        (site) => site && site.value === getSiteName(measurement),
+      ),
+    )
+  }, [measurementData, selectedSites])
   const [siteColors, setSiteColors] = useState<Record<string, string>>({})
   useEffect(() => {
     const updateColors = async () => {
@@ -150,7 +156,11 @@ export const SingleCity = () => {
             data-testid="main-comparison-chart"
             className={classes['single-city-section']}
           >
-            <AverageComparisonChart forecastData={forecastData} />
+            <AverageComparisonChart
+              forecastData={forecastData}
+              measurementsData={measurements}
+              forecastBaseTime={forecastBaseDate}
+            />
           </section>
           <section className={classes['site-measurements-section']}>
             <form

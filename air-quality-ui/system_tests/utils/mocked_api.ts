@@ -1,162 +1,102 @@
-export const apiForecast = [
-  {
-    base_time: '2024-06-19T00:00:00Z',
-    valid_time: '2024-06-19T09:00:00Z',
-    location_type: 'city',
-    location_name: 'Kampala',
-    overall_aqi_level: 2,
-    no2: {
-      aqi_level: 1,
-      value: 0.3812829140487199,
-    },
-    o3: {
-      aqi_level: 2,
-      value: 72.9086035913633,
-    },
-    pm2_5: {
-      aqi_level: 2,
-      value: 16.067128848211063,
-    },
-    pm10: {
-      aqi_level: 2,
-      value: 26.087666551144732,
-    },
-    so2: {
-      aqi_level: 1,
-      value: 0.6314619719025142,
-    },
-  },
-  {
-    base_time: '2024-06-19T00:00:00Z',
-    valid_time: '2024-06-19T12:00:00Z',
-    location_type: 'city',
-    location_name: 'Abu Dhabi',
-    overall_aqi_level: 3,
-    no2: {
-      aqi_level: 1,
-      value: 5.871611751344455,
-    },
-    o3: {
-      aqi_level: 4,
-      value: 213.04088459925424,
-    },
-    pm2_5: {
-      aqi_level: 4,
-      value: 30.29016575805515,
-    },
-    pm10: {
-      aqi_level: 4,
-      value: 58.25755291558235,
-    },
-    so2: {
-      aqi_level: 1,
-      value: 8.497931484924965,
-    },
-  },
-  {
-    base_time: '2024-06-19T00:00:00Z',
-    valid_time: '2024-06-19T12:00:00Z',
-    location_type: 'city',
-    location_name: 'Zurich',
-    overall_aqi_level: 3,
-    no2: {
-      aqi_level: 1,
-      value: 1.2220194497781245,
-    },
-    o3: {
-      aqi_level: 3,
-      value: 110.29793453644987,
-    },
-    pm2_5: {
-      aqi_level: 2,
-      value: 17.161946368293673,
-    },
-    pm10: {
-      aqi_level: 2,
-      value: 31.71802172436572,
-    },
-    so2: {
-      aqi_level: 1,
-      value: 1.3459434727665889,
-    },
-  },
-  // City should not show up.
-  {
-    base_time: '2024-06-24T00:00:00Z',
-    valid_time: '2024-06-24T09:00:00Z',
-    location_type: 'city',
-    location_name: 'Kyiv',
-    overall_aqi_level: 2,
-    no2: {
-      aqi_level: 1,
-      value: 0.7852695955767444,
-    },
-    o3: {
-      aqi_level: 2,
-      value: 80.0214446372413,
-    },
-    pm2_5: {
-      aqi_level: 1,
-      value: 7.024702103355023,
-    },
-    pm10: {
-      aqi_level: 1,
-      value: 10.313057730041718,
-    },
-    so2: {
-      aqi_level: 1,
-      value: 0.465807542763243,
-    },
-  },
-]
+import { CaseAQI3 } from './default_aqi_enums'
 
-export const apiSummary = [
-  {
-    measurement_base_time: '2024-06-19T09:00:00Z',
+interface forecastAPIResponse {
+  base_time: string
+  valid_time: string
+  location_type: string
+  location_name: string
+  overall_aqi_level: number
+  no2: { aqi_level: number; value: number }
+  o3: { aqi_level: number; value: number }
+  pm2_5: { aqi_level: number; value: number }
+  pm10: { aqi_level: number; value: number }
+  so2: { aqi_level: number; value: number }
+}
+
+interface measurementSummaryAPIResponse {
+  measurement_base_time: string
+  location_type: string
+  location_name: string
+  overall_aqi_level: {
+    mean: number
+  }
+  no2: { mean: { aqi_level: number; value: number } }
+  o3: { mean: { aqi_level: number; value: number } }
+  pm2_5: { mean: { aqi_level: number; value: number } }
+  pm10: { mean: { aqi_level: number; value: number } }
+  so2: { mean: { aqi_level: number; value: number } }
+}
+
+export function createForecastAPIResponseData(
+  overrides: Partial<forecastAPIResponse> = {},
+): forecastAPIResponse {
+  const defaultForecastResponse = {
+    base_time: '2024-07-08T00:00:00Z',
+    valid_time: '2024-07-08T00:00:00Z',
     location_type: 'city',
-    location_name: 'Kampala',
-    overall_aqi_level: {
-      mean: 6,
-    },
-    pm2_5: {
-      mean: {
-        aqi_level: 6,
-        value: 76,
-      },
-    },
-  },
-  {
-    measurement_base_time: '2024-06-19T12:00:00Z',
+    location_name: 'Los Angeles',
+    overall_aqi_level: 3,
+    no2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.no2 },
+    o3: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 },
+    pm2_5: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
+    pm10: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm10 },
+    so2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 },
+  }
+
+  return { ...defaultForecastResponse, ...overrides }
+}
+
+export function createForecastResponseWithValidTimeAndAQI(
+  valid_time: string,
+  aqiLevel: number,
+) {
+  return {
+    base_time: '2024-07-08T00:00:00Z',
+    valid_time: valid_time,
     location_type: 'city',
-    location_name: 'Abu Dhabi',
-    overall_aqi_level: {
-      mean: 5,
-    },
-    pm2_5: {
-      mean: {
-        aqi_level: 5,
-        value: 52.75,
-      },
-    },
-  },
-  {
-    measurement_base_time: '2024-06-19T12:00:00Z',
+    location_name: 'Los Angeles',
+    overall_aqi_level: aqiLevel,
+    no2: { aqi_level: aqiLevel, value: 0 },
+    o3: { aqi_level: aqiLevel, value: 0 },
+    pm2_5: { aqi_level: aqiLevel, value: 0 },
+    pm10: { aqi_level: aqiLevel, value: 0 },
+    so2: { aqi_level: aqiLevel, value: 0 },
+  }
+}
+
+export function createMeasurementSummaryAPIResponseData(
+  overrides: Partial<measurementSummaryAPIResponse> = {},
+): measurementSummaryAPIResponse {
+  const defaultMeasurementSummaryResponse = {
+    measurement_base_time: '2024-07-08T00:00:00Z',
     location_type: 'city',
-    location_name: 'Zurich',
+    location_name: 'Los Angeles',
     overall_aqi_level: {
-      mean: 2,
+      mean: 3,
     },
-    pm2_5: {
-      mean: {
-        aqi_level: 2,
-        value: 15.764618078867594,
-      },
-    },
-    pm10: {
-      mean: {
-        aqi_level: 1,
-        value: 16.039256008466086,
-      },
-    },
-  },
-]
+    no2: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.no2 } },
+    o3: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 } },
+    pm2_5: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 } },
+    pm10: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm10 } },
+    so2: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 } },
+  }
+
+  return { ...defaultMeasurementSummaryResponse, ...overrides }
+}
+
+export function createMeasurementSumResponseWithTimeAndAQI(
+  measurementBaseTime: string,
+  aqiLevel: number,
+) {
+  return {
+    measurement_base_time: measurementBaseTime,
+    location_type: 'city',
+    location_name: 'Los Angeles',
+    overall_aqi_level: { mean: aqiLevel },
+    no2: { mean: { aqi_level: aqiLevel, value: 0 } },
+    o3: { mean: { aqi_level: aqiLevel, value: 0 } },
+    pm2_5: { mean: { aqi_level: aqiLevel, value: 0 } },
+    pm10: { mean: { aqi_level: aqiLevel, value: 0 } },
+    so2: { mean: { aqi_level: aqiLevel, value: 0 } },
+  }
+}
