@@ -15,6 +15,7 @@ export class VairifyCityPage {
   readonly no2Chart: Locator
   readonly o3Chart: Locator
   readonly datePicker: Locator
+  readonly siteForm: Locator
 
   constructor(
     page: Page,
@@ -27,6 +28,7 @@ export class VairifyCityPage {
     this.pm10Chart = this.page.getByTestId('site_measurements_chart_pm10')
     this.no2Chart = this.page.getByTestId('site_measurements_chart_no2')
     this.o3Chart = this.page.getByTestId('site_measurements_chart_o3')
+    this.siteForm = this.page.getByTestId('sites-form')
     this.title = this.page.locator('title')
     this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')
     this.mockForecastObject = mockForecastObject
@@ -40,6 +42,11 @@ export class VairifyCityPage {
   }
   async setBaseTime(baseTime: string) {
     return this.datePicker.fill(baseTime)
+  }
+
+  async siteRemover(location: string) {
+    const siteDeselect = this.page.getByLabel(`Remove ${location}`)
+    await siteDeselect.click()
   }
 
   async captureAqiChartScreenshot() {
