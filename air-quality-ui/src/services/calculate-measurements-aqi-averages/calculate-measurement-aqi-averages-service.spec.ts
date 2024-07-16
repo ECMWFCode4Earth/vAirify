@@ -77,22 +77,7 @@ describe('sortMeasurements function', () => {
       },
     ]
     const expected = {
-      '2024-07-10T01:00:00.000+00:00': [
-        {
-          measurement_date: '2024-07-10T01:00:00Z',
-          location_type: 'city',
-          location_name: 'São Paulo',
-          api_source: 'OpenAQ',
-          pm2_5: 8.6,
-          o3: 1.1,
-          pm10: 11.1,
-          so2: 8.6,
-          entity: 'Governmental Organization',
-          sensor_type: 'reference grade',
-          site_name: 'Sao Paulo',
-        },
-      ],
-      '2024-07-10T02:00:00.000+00:00': [
+      '2024-07-10T01:00:00.000Z': [
         {
           api_source: 'OpenAQ',
           entity: 'Governmental Organization',
@@ -107,7 +92,7 @@ describe('sortMeasurements function', () => {
           so2: 8.6,
         },
       ],
-      '2024-07-10T03:00:00.000+00:00': [
+      '2024-07-10T02:00:00.000Z': [
         {
           api_source: 'OpenAQ',
           entity: 'Governmental Organization',
@@ -122,7 +107,7 @@ describe('sortMeasurements function', () => {
           so2: 1.3,
         },
       ],
-      '2024-07-10T04:00:00.000+00:00': [
+      '2024-07-10T03:00:00.000Z': [
         {
           api_source: 'OpenAQ',
           entity: 'Governmental Organization',
@@ -137,7 +122,7 @@ describe('sortMeasurements function', () => {
           so2: 1.1,
         },
       ],
-      '2024-07-10T05:00:00.000+00:00': [
+      '2024-07-10T04:00:00.000Z': [
         {
           api_source: 'OpenAQ',
           entity: 'Governmental Organization',
@@ -152,7 +137,7 @@ describe('sortMeasurements function', () => {
           so2: 1.1,
         },
       ],
-      '2024-07-10T06:00:00.000+00:00': [
+      '2024-07-10T05:00:00.000Z': [
         {
           api_source: 'OpenAQ',
           entity: 'Governmental Organization',
@@ -170,7 +155,7 @@ describe('sortMeasurements function', () => {
     }
     const result = sortMeasurements(
       measurementsData,
-      DateTime.fromISO('2024-07-10T00:00:00+00:00', { zone: 'utc' }),
+      DateTime.fromISO('2024-07-10T01:00:00Z', { zone: 'utc' }),
     )
     expect(result).toStrictEqual(expected)
   })
@@ -188,7 +173,7 @@ describe('sortMeasurements function', () => {
       },
     ]
     const expected = {
-      '2024-07-10T06:00:00.000+00:00': [
+      '2024-07-10T05:00:00.000Z': [
         {
           api_source: 'OpenAQ',
           entity: 'Governmental Organization',
@@ -203,7 +188,7 @@ describe('sortMeasurements function', () => {
     }
     const result = sortMeasurements(
       measurementsData,
-      DateTime.fromISO('2024-07-10T00:00:00+00:00', { zone: 'utc' }),
+      DateTime.fromISO('2024-07-10T00:00:00Z', { zone: 'utc' }),
     )
     expect(result).toStrictEqual(expected)
   })
@@ -211,7 +196,7 @@ describe('sortMeasurements function', () => {
 describe('averageAqiValues function', () => {
   it(`Average all values within time buckets`, () => {
     const sortedMeasurementData: SortMeasurementsType = {
-      '2024-07-10T02:00:00.000+00:00': [
+      '2024-07-10T02:00:00.000Z': [
         {
           api_source: 'OpenAQ',
           entity: 'Governmental Organization',
@@ -226,7 +211,7 @@ describe('averageAqiValues function', () => {
           so2: 8.6,
         },
       ],
-      '2024-07-10T03:00:00.000+00:00': [
+      '2024-07-10T03:00:00.000Z': [
         {
           api_source: 'OpenAQ',
           entity: 'Governmental Organization',
@@ -241,7 +226,7 @@ describe('averageAqiValues function', () => {
           so2: 1.3,
         },
       ],
-      '2024-07-10T04:00:00.000+00:00': [
+      '2024-07-10T04:00:00.000Z': [
         {
           api_source: 'OpenAQ',
           entity: 'Governmental Organization',
@@ -256,7 +241,7 @@ describe('averageAqiValues function', () => {
           so2: 1.1,
         },
       ],
-      '2024-07-10T05:00:00.000+00:00': [
+      '2024-07-10T05:00:00.000Z': [
         {
           api_source: 'OpenAQ',
           entity: 'Governmental Organization',
@@ -271,7 +256,7 @@ describe('averageAqiValues function', () => {
           so2: 1.1,
         },
       ],
-      '2024-07-10T06:00:00.000+00:00': [
+      '2024-07-10T06:00:00.000Z': [
         {
           api_source: 'OpenAQ',
           entity: 'Governmental Organization',
@@ -288,18 +273,18 @@ describe('averageAqiValues function', () => {
       ],
     }
     const expected = [
-      { measurementDate: '2024-07-10T02:00:00.000+00:00', meanAqiValue: 1 },
-      { measurementDate: '2024-07-10T03:00:00.000+00:00', meanAqiValue: 1 },
-      { measurementDate: '2024-07-10T04:00:00.000+00:00', meanAqiValue: 1 },
-      { measurementDate: '2024-07-10T05:00:00.000+00:00', meanAqiValue: 1 },
-      { measurementDate: '2024-07-10T06:00:00.000+00:00', meanAqiValue: 1 },
+      { measurementDate: '2024-07-10T02:00:00.000Z', meanAqiValue: 1 },
+      { measurementDate: '2024-07-10T03:00:00.000Z', meanAqiValue: 1 },
+      { measurementDate: '2024-07-10T04:00:00.000Z', meanAqiValue: 1 },
+      { measurementDate: '2024-07-10T05:00:00.000Z', meanAqiValue: 1 },
+      { measurementDate: '2024-07-10T06:00:00.000Z', meanAqiValue: 1 },
     ]
     const result = averageAqiValues(sortedMeasurementData)
     expect(result).toStrictEqual(expected)
   })
   it(`Only attempt to average time buckets with measurements in them, remove empty time buckets`, () => {
     const sortedMeasurementData: SortMeasurementsType = {
-      '2024-07-10T02:00:00.000+00:00': [
+      '2024-07-10T02:00:00.000Z': [
         {
           api_source: 'OpenAQ',
           entity: 'Governmental Organization',
@@ -314,17 +299,17 @@ describe('averageAqiValues function', () => {
           site_name: 'Sao Paulo',
         },
       ],
-      '2024-07-10T03:00:00.000+00:00': [],
+      '2024-07-10T03:00:00.000Z': [],
     }
     const expected = [
-      { measurementDate: '2024-07-10T02:00:00.000+00:00', meanAqiValue: 1 },
+      { measurementDate: '2024-07-10T02:00:00.000Z', meanAqiValue: 1 },
     ]
     const result = averageAqiValues(sortedMeasurementData)
     expect(result).toStrictEqual(expected)
   })
   it(`Still averages even with missing measurements`, () => {
     const sortedMeasurementData: SortMeasurementsType = {
-      '2024-07-10T02:00:00.000+00:00': [
+      '2024-07-10T02:00:00.000Z': [
         {
           api_source: 'OpenAQ',
           entity: 'Governmental Organization',
@@ -338,7 +323,7 @@ describe('averageAqiValues function', () => {
       ],
     }
     const expected = [
-      { measurementDate: '2024-07-10T02:00:00.000+00:00', meanAqiValue: 1 },
+      { measurementDate: '2024-07-10T02:00:00.000Z', meanAqiValue: 1 },
     ]
     const result = averageAqiValues(sortedMeasurementData)
     expect(result).toStrictEqual(expected)
