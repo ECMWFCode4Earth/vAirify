@@ -38,6 +38,7 @@ export const sortMeasurements = (
 ) => {
   const preAveragedData: PreAveragedData =
     generatePreAveragedDataStructure(baseTime)
+  // console.log(preAveragedData)
   for (let i = 0; i < measurementsData.length; i++) {
     for (const time in preAveragedData) {
       const preAveragedDataDate = DateTime.fromISO(time.toString())
@@ -67,7 +68,6 @@ export const sortMeasurements = (
       }
     }
   }
-
   return Object.fromEntries(
     Object.entries(preAveragedData).filter(
       (timeSection) => timeSection[1].length != 0,
