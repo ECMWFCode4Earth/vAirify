@@ -1,7 +1,7 @@
 import colourCell, { Params } from './ColourCell'
 import { PollutantType } from '../../../../models'
 
-export const cellRules = (
+export const pollutantCellRules = (
   showAllColoured: boolean,
   pollutantType: PollutantType | null = null,
 ) => {
@@ -31,5 +31,23 @@ export const cellRules = (
     },
     'empty-cell': (params: Params) =>
       params.value === undefined && showAllColoured,
+  }
+}
+
+export const aqiCellRules = () => {
+  return {
+    'cell-very-good': (params: { value: number }) => params.value === 1,
+    'cell-good': (params: { value: number }) => params.value === 2,
+    'cell-medium': (params: { value: number }) => params.value === 3,
+    'cell-poor': (params: { value: number }) => params.value === 4,
+    'cell-very-poor': (params: { value: number }) => params.value === 5,
+    'cell-extremely-poor': (params: { value: number }) => params.value === 6,
+    'cell-error': (params: { value: number }) => {
+      if (params.value) {
+        return params.value > 6
+      }
+      return false
+    },
+    'empty-cell': (params: { value: number }) => params.value === undefined,
   }
 }

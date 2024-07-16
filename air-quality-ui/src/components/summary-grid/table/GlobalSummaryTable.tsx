@@ -26,7 +26,7 @@ import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,
 } from '../../../services/types'
-import { cellRules } from '../cell/cell-rules/CellRules'
+import { aqiCellRules, pollutantCellRules } from '../cell/cell-rules/CellRules'
 import { LocationCellRenderer } from '../cell/location-cell-renderer/LocationCellRenderer'
 
 type SummaryDetail = {
@@ -91,6 +91,7 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         headerClass: 'cell-header-format',
         maxWidth: maxWidth,
         cellClass: 'cell-format',
+        cellClassRules: aqiCellRules(),
         valueFormatter: (params: ValueFormatterParams) =>
           insertEmptyValueDash(params.value),
       },
@@ -100,6 +101,7 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         headerClass: 'cell-header-format',
         maxWidth: maxWidth,
         cellClass: 'cell-format',
+        cellClassRules: aqiCellRules(),
         valueFormatter: (params: ValueFormatterParams) =>
           insertEmptyValueDash(params.value),
       },
@@ -129,7 +131,7 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         headerName: `Forecast`,
         headerClass: 'cell-header-format',
         cellClass: 'cell-format',
-        cellClassRules: cellRules(showAllColoured, type),
+        cellClassRules: pollutantCellRules(showAllColoured, type),
         maxWidth: maxWidth,
         valueFormatter: (params: ValueFormatterParams) =>
           insertEmptyValueDash(params.value),
@@ -139,7 +141,7 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         headerName: `Measured`,
         headerClass: 'cell-header-format',
         cellClass: 'cell-format',
-        cellClassRules: cellRules(showAllColoured, type),
+        cellClassRules: pollutantCellRules(showAllColoured, type),
         maxWidth: maxWidth,
         valueFormatter: (params: ValueFormatterParams) =>
           insertEmptyValueDash(params.value),

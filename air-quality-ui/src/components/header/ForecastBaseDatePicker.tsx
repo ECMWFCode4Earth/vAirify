@@ -6,7 +6,7 @@ import { DateTime } from 'luxon'
 
 import { useForecastContext } from '../../context'
 
-export const BaseForecastDatetimePicker = (): JSX.Element => {
+export const ForecastBaseDatePicker = (): JSX.Element => {
   const { forecastBaseDate, setForecastBaseDate } = useForecastContext()
   const darkTheme = createTheme({
     palette: {
@@ -19,7 +19,7 @@ export const BaseForecastDatetimePicker = (): JSX.Element => {
       <ThemeProvider theme={darkTheme}>
         <DateTimePicker
           sx={{ '.MuiFormLabel-root': { color: 'white' } }}
-          label="Base Forecast Date"
+          label="Forecast Base Date"
           disableFuture={true}
           skipDisabled={true}
           timeSteps={{ minutes: 720 }}
