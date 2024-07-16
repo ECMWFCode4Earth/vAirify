@@ -80,6 +80,22 @@ const measurementDataFour = mockMeasurementSummaryResponseDto({
   so2: { mean: { aqi_level: 1, value: 3.6 } },
 })
 
+const forecastDataUniqueAqiText = mockForecastResponseDto({
+  location_name: 'Seoul',
+  base_time: '2024-07-09T00:00:00Z',
+  valid_time: '2024-07-09T00:00:00Z',
+  overall_aqi_level: 5,
+  no2: { aqi_level: 5, value: 222 },
+})
+
+const measurementDataUniqueAqiText = mockMeasurementSummaryResponseDto({
+  location_name: 'Seoul',
+  measurement_base_time: '2024-07-09T00:00:00Z',
+  location_type: 'city',
+  overall_aqi_level: { mean: 6 },
+  no2: { mean: { aqi_level: 6, value: 777 } },
+})
+
 const renderGrid = (
   forecast: Record<string, ForecastResponseDto[]> | undefined,
   measurements: Record<string, MeasurementSummaryResponseDto[]> | undefined,
@@ -195,6 +211,19 @@ describe('GlobalSummaryTable component', () => {
       )
       await waitFor(() => {
         expect(screen.getByText('3.6')).not.toHaveClass('cell-very-good')
+      })
+    })
+    it('forecast and measured AQI are displayed and highlighted', async () => {
+      renderGrid(
+        { Seoul: [forecastDataUniqueAqiText] },
+        { Seoul: [measurementDataUniqueAqiText] },
+        false,
+      )
+      await waitFor(() => {
+        expect(screen.getByText('5')).toHaveClass('cell-very-poor')
+      })
+      await waitFor(() => {
+        expect(screen.getByText('6')).toHaveClass('cell-extremely-poor')
       })
     })
   })
