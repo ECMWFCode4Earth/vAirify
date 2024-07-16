@@ -20,22 +20,24 @@
 }
 
 .cell-very-good{
-    background-color: rgba(80, 240, 229, 0.5);
+    background-color: #50f0e5;
 }
 .cell-good{
-    background-color: rgba(80,204,170, 0.5);
+    background-color: #50ccaa;
 }
 .cell-medium{
-    background-color: rgba(240,230,65, 0.5);
+    background-color: #f0e641;
 }
 .cell-poor{
-    background-color: rgba(255,80,80, 0.4);
+    background-color: #ff505080;
 }
 .cell-very-poor{
-    background-color: rgba(150,0,50, 0.4);
+    background-color: #960032;
+    color: white;
 }
 .cell-extremely-poor{
-    background-color: rgba(125,33,129, 0.4);
+    background-color: #7d2181;
+    color: white;
     
 }
 .cell-error{
