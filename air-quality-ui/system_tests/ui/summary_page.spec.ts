@@ -321,6 +321,52 @@ test.describe('Using Mocked Data', () => {
       await summaryPage.assertGridValues(expectedData)
     })
 
+    test('(BugFix #191) Verify pollutant level diff 0 does not override a larger diff for calculation of overall AQI level', async ({
+      summaryPage,
+    }) => {
+      // Specific polutant values used to replicate example in bug, however simplified to one valid_time
+      const mockedForecastResponse = [
+        createForecastAPIResponseData({
+          base_time: '2024-07-15T00:00:00Z',
+          valid_time: '2024-07-16T09:00:00Z',
+          location_type: 'city',
+          overall_aqi_level: 3,
+          no2: { aqi_level: 1, value: 9.3 },
+          o3: { aqi_level: 3, value: 107.2 },
+          pm2_5: { aqi_level: 2, value: 12.1 },
+          pm10: { aqi_level: 2, value: 23.3 },
+          so2: { aqi_level: 1, value: 1.5 },
+        }),
+      ]
+      const measurementSummaryResponse = [
+        createMeasurementSummaryAPIResponseData({
+          measurement_base_time: '2024-07-16T09:00:00Z',
+          overall_aqi_level: { mean: 1 },
+          no2: { mean: { aqi_level: 1, value: 25.3 } },
+          o3: { mean: { aqi_level: 1, value: 31.4 } },
+          pm2_5: { mean: { aqi_level: 1, value: 0 } },
+          pm10: { mean: { aqi_level: 1, value: 0 } },
+          so2: { mean: { aqi_level: 1, value: 2.5 } },
+        }),
+      ]
+
+      await summaryPage.setupPageWithMockData(
+        mockedForecastResponse,
+        measurementSummaryResponse,
+      )
+
+      const expectedTableContents: string[][] = [
+        [
+          // AQI Level
+          '3', // Forecast
+          '1', // Measured
+          '+2', // Diff
+        ],
+      ]
+
+      await summaryPage.assertGridValues(expectedTableContents)
+    })
+
     test.describe('Verifying a full row is correct', () => {
       test('Verify table shows pollutant data for the timestamp that has the largest deviation - forecast AQI 6, measurement AQI 3', async ({
         summaryPage,
