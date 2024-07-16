@@ -38,14 +38,13 @@ export const sortMeasurements = (
 ) => {
   const preAveragedData: PreAveragedData =
     generatePreAveragedDataStructure(baseTime)
-  // console.log(preAveragedData)
   for (let i = 0; i < measurementsData.length; i++) {
     for (const time in preAveragedData) {
-      const preAveragedDataDate = DateTime.fromISO(time.toString())
-      const endpointBefore = DateTime.fromISO(time.toString()).minus({
+      const preAveragedDataDate = DateTime.fromISO(time)
+      const endpointBefore = DateTime.fromISO(time).minus({
         hours: timeBucketDiffInHours / 2,
       })
-      const endpointAfter = DateTime.fromISO(time.toString()).plus({
+      const endpointAfter = DateTime.fromISO(time).plus({
         hours: timeBucketDiffInHours / 2,
       })
       const measurementDataTime = DateTime.fromISO(
