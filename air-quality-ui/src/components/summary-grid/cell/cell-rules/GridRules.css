@@ -1,23 +1,22 @@
+.suppress-separator-header-format{
+    --ag-header-column-resize-handle-display: none;    
+}
+
 .filterable-cell-header-format{
     .ag-icon{
         margin-left: 5px;
     }
 }
 
-.filterable-cell-header-format, .cell-header-format{
+.cell-header-format{
     .ag-header-cell-comp-wrapper {
         width: auto;
     }
     justify-content: center;
 }
 
-.suppress-separator-header-format{
-    --ag-header-column-resize-handle-display: none;    
-}
-
 .cell-format{
     text-align: center;
-    font-weight: 450;
 }
 
 .cell-very-good{
