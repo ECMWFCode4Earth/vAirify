@@ -14,7 +14,7 @@ const generatePreAveragedDataStructure = (baseTime: DateTime<boolean>) => {
   const maxDateTime = baseTime.plus({ days: endTimeInDays })
   let currentDateTime = baseTime
   const sortedMeasurements: SortMeasurementsType = {}
-  while (!currentDateTime.equals(maxDateTime)) {
+  while (currentDateTime <= maxDateTime) {
     const time: string | null = currentDateTime.toISO()
     if (time != null) {
       sortedMeasurements[time] = []

@@ -155,7 +155,7 @@ describe('sortMeasurements function', () => {
     }
     const result = sortMeasurements(
       measurementsData,
-      DateTime.fromISO('2024-07-10T00:00:00Z'),
+      DateTime.fromISO('2024-07-10T00:00:00+01:00'),
     )
     expect(result).toStrictEqual(expected)
   })
@@ -188,7 +188,7 @@ describe('sortMeasurements function', () => {
     }
     const result = sortMeasurements(
       measurementsData,
-      DateTime.fromISO('2024-07-10T00:00:00Z'),
+      DateTime.fromISO('2024-07-10T00:00:00+01:00'),
     )
     expect(result).toStrictEqual(expected)
   })
