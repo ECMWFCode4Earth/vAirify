@@ -1,3 +1,4 @@
+import { CaseAQI3, CaseAQI6 } from '../utils/default_aqi_enums'
 import { expect, test } from '../utils/fixtures'
 import {
   createForecastAPIResponseData,
@@ -326,7 +327,16 @@ test.describe('Using Mocked Data', () => {
       }) => {
         const forecastLondonValidTimeArray: object[] = [
           createForecastResponseWithValidTimeAndAQI('2024-07-08T00:00:00Z', 3),
-          createForecastResponseWithValidTimeAndAQI('2024-07-08T06:00:00Z', 6),
+          createForecastAPIResponseData({
+            base_time: '2024-07-08T00:00:00Z',
+            valid_time: '2024-07-08T06:00:00Z',
+            overall_aqi_level: CaseAQI6.aqiLevel,
+            no2: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.no2 },
+            o3: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.o3 },
+            pm2_5: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm2_5 },
+            pm10: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm10 },
+            so2: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 },
+          }),
           createForecastResponseWithValidTimeAndAQI('2024-07-08T09:00:00Z', 5),
           createForecastResponseWithValidTimeAndAQI('2024-07-08T12:00:00Z', 4),
         ]
@@ -334,8 +344,23 @@ test.describe('Using Mocked Data', () => {
         const measurementsLondonArray: object[] = [
           // AQI 3 measurements
           createMeasurementSumResponseWithTimeAndAQI('2024-07-08T00:00:00Z', 3),
-          createMeasurementSumResponseWithTimeAndAQI('2024-07-08T03:00:00Z', 3),
-          createMeasurementSumResponseWithTimeAndAQI('2024-07-08T06:00:00Z', 3),
+          createMeasurementSummaryAPIResponseData({
+            measurement_base_time: '2024-07-08T06:00:00Z',
+            overall_aqi_level: { mean: CaseAQI3.aqiLevel },
+            no2: {
+              mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.no2 },
+            },
+            o3: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 } },
+            pm2_5: {
+              mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
+            },
+            pm10: {
+              mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm10 },
+            },
+            so2: {
+              mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 },
+            },
+          }),
           createMeasurementSumResponseWithTimeAndAQI('2024-07-08T09:00:00Z', 3),
           createMeasurementSumResponseWithTimeAndAQI('2024-07-08T12:00:00Z', 3),
         ]
@@ -348,28 +373,28 @@ test.describe('Using Mocked Data', () => {
         const expectedTableContents: string[][] = [
           [
             // AQI Level
-            '6', // Forecast
-            '3', // Measured
+            CaseAQI6.aqiLevel.toString(), // Forecast
+            CaseAQI3.aqiLevel.toString(), // Measured
             '+3', // Diff
             // pm2.5
-            '80', // Forecast
-            '22.5', // Measured
+            CaseAQI6.pm2_5.toString(), // Forecast
+            CaseAQI3.pm2_5.toString(), // Measured
             '08 Jul 06:00', // Time
             // pm10
-            '160', // Forecast
-            '45.5', // Measured
+            CaseAQI6.pm10.toString(), // Forecast
+            CaseAQI3.pm10.toString(), // Measured
             '08 Jul 06:00', // Time
             // no2
-            '900', // Forecast
-            '100.5', // Measured
+            CaseAQI6.no2.toString(), // Forecast
+            CaseAQI3.no2.toString(), // Measured
             '08 Jul 06:00', // Time
             // o3
-            '400', // Forecast
-            '100', // Measured
+            CaseAQI6.o3.toString(), // Forecast
+            CaseAQI3.o3.toString(), // Measured
             '08 Jul 06:00', // Time
             //so2
-            '800', // Forecast
-            '300.5', // Measured
+            CaseAQI6.so2.toString(), // Forecast
+            CaseAQI3.so2.toString(), // Measured
             '08 Jul 06:00', // Time
           ],
         ]
@@ -380,16 +405,38 @@ test.describe('Using Mocked Data', () => {
         summaryPage,
       }) => {
         const forecastLondonValidTimeArray: object[] = [
-          createForecastResponseWithValidTimeAndAQI('2024-07-08T09:00:00Z', 3),
+          createForecastAPIResponseData({
+            base_time: '2024-07-08T00:00:00Z',
+            valid_time: '2024-07-08T09:00:00Z',
+            overall_aqi_level: CaseAQI3.aqiLevel,
+            no2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.no2 },
+            o3: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 },
+            pm2_5: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
+            pm10: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm10 },
+            so2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 },
+          }),
           createForecastResponseWithValidTimeAndAQI('2024-07-08T12:00:00Z', 3),
         ]
 
         const measurementsLondonArray: object[] = [
-          createMeasurementSumResponseWithTimeAndAQI('2024-07-08T09:00:00Z', 6),
-          createMeasurementSumResponseWithTimeAndAQI(
-            '2024-07-08T012:00:00Z',
-            4,
-          ),
+          createMeasurementSummaryAPIResponseData({
+            measurement_base_time: '2024-07-08T09:00:00Z',
+            overall_aqi_level: { mean: CaseAQI6.aqiLevel },
+            no2: {
+              mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.no2 },
+            },
+            o3: { mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.o3 } },
+            pm2_5: {
+              mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm2_5 },
+            },
+            pm10: {
+              mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm10 },
+            },
+            so2: {
+              mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 },
+            },
+          }),
+          createMeasurementSumResponseWithTimeAndAQI('2024-07-08T12:00:00Z', 4),
         ]
 
         await summaryPage.setupPageWithMockData(
@@ -400,28 +447,28 @@ test.describe('Using Mocked Data', () => {
         const expectedTableContents: string[][] = [
           [
             // AQI Level
-            '3', // Forecast
-            '6', // Measured
+            CaseAQI3.aqiLevel.toString(), // Forecast
+            CaseAQI6.aqiLevel.toString(), // Measured
             '-3', // Diff
             // pm2.5
-            '22.5', // Forecast
-            '80', // Measured
+            CaseAQI3.pm2_5.toString(), // Forecast
+            CaseAQI6.pm2_5.toString(), // Measured
             '08 Jul 09:00', //Time
             // pm10
-            '45.5', // Forecast
-            '160', // Measured
+            CaseAQI3.pm10.toString(), // Forecast
+            CaseAQI6.pm10.toString(), // Measured
             '08 Jul 09:00', //Time
             // no2
-            '100.5', // Forecast
-            '900', // Measured
+            CaseAQI3.no2.toString(), // Forecast
+            CaseAQI6.no2.toString(), // Measured
             '08 Jul 09:00', //Time
             // o3
-            '100', // Forecast
-            '400', // Measured
+            CaseAQI3.o3.toString(), // Forecast
+            CaseAQI6.o3.toString(), // Measured
             '08 Jul 09:00', //Time
             // so2
-            '300.5', // Forecast
-            '800', // Measured
+            CaseAQI3.so2.toString(), // Forecast
+            CaseAQI6.so2.toString(), // Measured
             '08 Jul 09:00', //Time
           ],
         ]
@@ -433,23 +480,31 @@ test.describe('Using Mocked Data', () => {
         summaryPage,
       }) => {
         const forecastLondonValidTimeArray: object[] = [
-          // AQI 3 default forecast
           createForecastResponseWithValidTimeAndAQI('2024-07-08T03:00:00Z', 3),
-          createForecastResponseWithValidTimeAndAQI('2024-07-08T12:00:00Z', 3),
+          // AQI 3 default forecast
+          createForecastAPIResponseData({
+            base_time: '2024-07-08T00:00:00Z',
+            valid_time: '2024-07-08T12:00:00Z',
+            overall_aqi_level: CaseAQI3.aqiLevel,
+            no2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.no2 },
+            o3: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 },
+            pm2_5: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
+            pm10: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm10 },
+            so2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 },
+          }),
         ]
 
         const measurementsLondonArray: object[] = [
-          // AQI 3 default measurment
           createMeasurementSumResponseWithTimeAndAQI('2024-07-08T03:00:00Z', 3),
           // AQI 3 mesurements (higher)
           createMeasurementSummaryAPIResponseData({
             measurement_base_time: '2024-07-08T12:00:00Z',
-            overall_aqi_level: { mean: 3 },
-            no2: { mean: { aqi_level: 3, value: 119 } },
-            o3: { mean: { aqi_level: 3, value: 129 } },
-            pm2_5: { mean: { aqi_level: 3, value: 24 } },
-            pm10: { mean: { aqi_level: 3, value: 49 } },
-            so2: { mean: { aqi_level: 3, value: 349 } },
+            overall_aqi_level: { mean: CaseAQI3.aqiLevel },
+            no2: { mean: { aqi_level: CaseAQI3.aqiLevel, value: 119 } },
+            o3: { mean: { aqi_level: CaseAQI3.aqiLevel, value: 129 } },
+            pm2_5: { mean: { aqi_level: CaseAQI3.aqiLevel, value: 24 } },
+            pm10: { mean: { aqi_level: CaseAQI3.aqiLevel, value: 49 } },
+            so2: { mean: { aqi_level: CaseAQI3.aqiLevel, value: 349 } },
           }),
         ]
 
@@ -461,27 +516,27 @@ test.describe('Using Mocked Data', () => {
         const expectedTableContents: string[][] = [
           [
             // AQI Level
-            '3', // Forecast
-            '3', // Measured
+            CaseAQI3.aqiLevel.toString(), // Forecast
+            CaseAQI3.aqiLevel.toString(), // Measured
             '0', // Diff
             // pm2.5
-            '22.5', // Forecast
+            CaseAQI3.pm2_5.toString(), // Forecast
             '24', //Measured
             '08 Jul 12:00', //Time
             // pm10
-            '45.5', // Forecast
+            CaseAQI3.pm10.toString(), // Forecast
             '49', // Measured
             '08 Jul 12:00', //Time
             // no2
-            '100.5', // Forecast
+            CaseAQI3.no2.toString(), // Forecast
             '119', // Measured
             '08 Jul 12:00', //Time
             // o3
-            '100', // Forecast
+            CaseAQI3.o3.toString(), // Forecast
             '129', // Measured
             '08 Jul 12:00', //Time
             // so2
-            '300.5', // Forecast
+            CaseAQI3.so2.toString(), // Forecast
             '349', // Measured
             '08 Jul 12:00', //Time
           ],
@@ -502,16 +557,7 @@ test.describe('Using Mocked Data', () => {
       const measurementsLondonArray: object[] = [
         // AQI 3 default measurements
         createMeasurementSumResponseWithTimeAndAQI('2024-07-08T03:00:00Z', 3),
-        // AQI 3 - Highest pollutant values and AQI
-        createMeasurementSummaryAPIResponseData({
-          measurement_base_time: '2024-07-08T12:00:00Z',
-          overall_aqi_level: { mean: 6 },
-          no2: { mean: { aqi_level: 3, value: 119 } },
-          o3: { mean: { aqi_level: 3, value: 129 } },
-          pm2_5: { mean: { aqi_level: 6, value: 799 } },
-          pm10: { mean: { aqi_level: 3, value: 49 } },
-          so2: { mean: { aqi_level: 3, value: 349 } },
-        }),
+        createMeasurementSumResponseWithTimeAndAQI('2024-07-08T12:00:00Z', 6),
       ]
 
       await summaryPage.setupPageWithMockData(

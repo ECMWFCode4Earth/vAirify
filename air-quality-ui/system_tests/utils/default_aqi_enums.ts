@@ -1,4 +1,4 @@
-export enum DefaultAqi3 {
+export enum CaseAQI3 {
   aqiLevel = 3,
   no2 = 100.5,
   o3 = 100,
@@ -7,7 +7,7 @@ export enum DefaultAqi3 {
   so2 = 300.5,
 }
 
-export enum DefaultAqi4 {
+export enum CaseAQI4 {
   aqiLevel = 4,
   no2 = 125,
   o3 = 135,
@@ -16,7 +16,7 @@ export enum DefaultAqi4 {
   so2 = 205,
 }
 
-export enum DefaultAqi5 {
+export enum CaseAQI5 {
   aqiLevel = 5,
   no2 = 240,
   o3 = 370,
@@ -25,7 +25,7 @@ export enum DefaultAqi5 {
   so2 = 510,
 }
 
-export enum DefaultAqi6 {
+export enum CaseAQI6 {
   aqiLevel = 6,
   no2 = 900,
   o3 = 400,
