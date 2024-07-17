@@ -107,4 +107,21 @@ export class CityPage extends BasePage {
     await this.gotoRioCityPage()
     await this.waitForAllGraphsToBeVisible()
   }
+
+  async setupCityPageWithMockData(
+    mockedForecastResponse: object,
+    mockedMeasurementsCityPageResponse?: object,
+  ) {
+    if (typeof mockedMeasurementsCityPageResponse !== 'undefined') {
+      await this.setupApiRoute(
+        '*/**/air-pollutant/measurements*',
+        mockedMeasurementsCityPageResponse,
+      )
+    }
+    await this.setupApiRoute(
+      '*/**/air-pollutant/forecast*',
+      mockedForecastResponse,
+    )
+    await this.gotoRioCityPage()
+  }
 }
