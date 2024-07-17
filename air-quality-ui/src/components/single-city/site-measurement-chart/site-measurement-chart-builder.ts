@@ -1,13 +1,13 @@
 import { EChartsOption, SeriesOption } from 'echarts'
 
-import { PollutantType } from '../../../models'
+import { PollutantType, pollutantTypeDisplay } from '../../../models'
 import { convertToLocalTime } from '../../../services/echarts-service'
 import {
   ForecastResponseDto,
   MeasurementsResponseDto,
 } from '../../../services/types'
 
-export const createForecastSeries = (
+const createForecastSeries = (
   pollutantType: PollutantType,
   forecastData: ForecastResponseDto[],
 ): SeriesOption => {
@@ -28,7 +28,7 @@ export const createForecastSeries = (
   }
 }
 
-export const createMeasurementSeries = (
+const createMeasurementSeries = (
   pollutantType: PollutantType,
   measurementsBySite: Record<string, MeasurementsResponseDto[]>,
   seriesColorsBySite?: Record<string, string>,
@@ -56,7 +56,7 @@ export const createMeasurementSeries = (
     symbol: 'roundRect',
   }))
 
-const getChartOptions = (
+const createChartOptions = (
   zoomPercent: number,
   pollutantName: string,
 ): EChartsOption => {
@@ -91,15 +91,26 @@ const getChartOptions = (
   }
 }
 
-export const GenerateMeasurementChart = (
-  pollutantName: string,
+export const generateMeasurementChart = (
+  pollutantType: PollutantType,
   zoomPercent: number,
-  ...series: SeriesOption[]
+  measurementsBySite: Record<string, MeasurementsResponseDto[]>,
+  forecastData: ForecastResponseDto[],
+  seriesColorsBySite?: Record<string, string>,
 ) => {
-  const options = getChartOptions(zoomPercent, pollutantName)
+  const series = createMeasurementSeries(
+    pollutantType,
+    measurementsBySite,
+    seriesColorsBySite,
+  )
+  const forecast = createForecastSeries(pollutantType, forecastData)
+  const options = createChartOptions(
+    zoomPercent,
+    pollutantTypeDisplay[pollutantType],
+  )
 
   return {
     ...options,
-    series,
+    series: [...series, forecast],
   }
 }

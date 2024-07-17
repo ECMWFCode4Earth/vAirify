@@ -1,14 +1,10 @@
 import ReactECharts from 'echarts-for-react'
-import { useCallback, useMemo } from 'react'
+import { useCallback } from 'react'
 
-import {
-  GenerateMeasurementChart,
-  createForecastSeries,
-  createMeasurementSeries,
-} from './site-measurement-chart-builder'
+import { generateMeasurementChart } from './site-measurement-chart-builder'
 import classes from './SiteMeasurementsChart.module.css'
 import { useForecastContext } from '../../../context'
-import { PollutantType, pollutantTypeDisplay } from '../../../models'
+import { PollutantType } from '../../../models'
 import { getInSituPercentage } from '../../../services/forecast-time-service'
 import {
   ForecastResponseDto,
@@ -32,21 +28,6 @@ export const SiteMeasurementsChart = ({
 }: SiteMeasurementsChartProps): JSX.Element => {
   const { forecastBaseDate, maxForecastDate, maxInSituDate } =
     useForecastContext()
-
-  const measurementSeries = useMemo(
-    () =>
-      createMeasurementSeries(
-        pollutantType,
-        measurementsBySite,
-        seriesColorsBySite,
-      ),
-    [pollutantType, measurementsBySite, seriesColorsBySite],
-  )
-
-  const forecastSeries = useMemo(
-    () => createForecastSeries(pollutantType, forecastData),
-    [pollutantType, forecastData],
-  )
 
   const eChartEventHandler = useCallback(
     ({
@@ -84,11 +65,12 @@ export const SiteMeasurementsChart = ({
           click: eChartEventHandler,
         }}
         notMerge
-        option={GenerateMeasurementChart(
-          pollutantTypeDisplay[pollutantType],
+        option={generateMeasurementChart(
+          pollutantType,
           zoomPercent,
-          forecastSeries,
-          ...measurementSeries,
+          measurementsBySite,
+          forecastData,
+          seriesColorsBySite,
         )}
       />
     </>
