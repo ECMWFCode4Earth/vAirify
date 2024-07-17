@@ -4,7 +4,7 @@
     flex-direction: column;
     min-height: 80vh;
     justify-content: center;
-    padding: 32px 32px;
+    padding: 10px 32px;
 }
 
 .single-city-section {
@@ -26,11 +26,13 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     padding: 0 0 32px 0;
+    row-gap: 32px;
 }
 
 .site-measurements-section {
     align-items: center;
     padding: 32px 0 32px 0;
+    min-width: 600px;
     max-width: 800px;   
 }
 
