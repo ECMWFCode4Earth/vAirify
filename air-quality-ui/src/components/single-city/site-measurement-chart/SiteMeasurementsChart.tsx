@@ -4,7 +4,7 @@ import { useCallback } from 'react'
 import { generateMeasurementChart } from './site-measurement-chart-builder'
 import classes from './SiteMeasurementsChart.module.css'
 import { useForecastContext } from '../../../context'
-import { PollutantType } from '../../../models'
+import { PollutantType, pollutantTypeDisplay } from '../../../models'
 import { getInSituPercentage } from '../../../services/forecast-time-service'
 import {
   ForecastResponseDto,
@@ -59,6 +59,9 @@ export const SiteMeasurementsChart = ({
 
   return (
     <>
+      <label className={classes['chart-label']}>
+        {pollutantTypeDisplay[pollutantType]}
+      </label>
       <ReactECharts
         className={classes['chart']}
         onEvents={{
