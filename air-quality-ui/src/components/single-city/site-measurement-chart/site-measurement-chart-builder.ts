@@ -1,6 +1,6 @@
 import { EChartsOption, SeriesOption } from 'echarts'
 
-import { PollutantType, pollutantTypeDisplay } from '../../../models'
+import { PollutantType } from '../../../models'
 import { convertToLocalTime } from '../../../services/echarts-service'
 import {
   ForecastResponseDto,
@@ -56,15 +56,8 @@ const createMeasurementSeries = (
     symbol: 'roundRect',
   }))
 
-const createChartOptions = (
-  zoomPercent: number,
-  pollutantName: string,
-): EChartsOption => {
+const createChartOptions = (zoomPercent: number): EChartsOption => {
   return {
-    title: {
-      text: pollutantName,
-      left: 'center',
-    },
     xAxis: {
       type: 'time',
     },
@@ -74,17 +67,11 @@ const createChartOptions = (
       nameGap: 50,
       nameLocation: 'middle',
     },
-    dataZoom: [
-      {
-        show: true,
-        realtime: false,
-        end: zoomPercent,
-      },
-      {
-        type: 'inside',
-        realtime: false,
-      },
-    ],
+    dataZoom: {
+      show: true,
+      realtime: false,
+      end: zoomPercent,
+    },
     tooltip: {
       trigger: 'item',
     },
@@ -104,10 +91,7 @@ export const generateMeasurementChart = (
     seriesColorsBySite,
   )
   const forecast = createForecastSeries(pollutantType, forecastData)
-  const options = createChartOptions(
-    zoomPercent,
-    pollutantTypeDisplay[pollutantType],
-  )
+  const options = createChartOptions(zoomPercent)
 
   return {
     ...options,
