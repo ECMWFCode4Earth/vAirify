@@ -11,13 +11,19 @@ import {
   MeasurementsResponseDto,
 } from '../../../services/types'
 
+const originalDateResolvedOptions = new Intl.DateTimeFormat().resolvedOptions()
+jest.spyOn(Intl.DateTimeFormat.prototype, 'resolvedOptions').mockReturnValue({
+  ...originalDateResolvedOptions,
+  timeZone: 'GMT',
+})
+
 describe('Site Measurement Chart', () => {
   const pollutantType: PollutantType = 'pm2_5'
   const zoomPercent: number = 45
   const measurementsBySite: Record<string, MeasurementsResponseDto[]> = {
     locationA: [
       {
-        measurement_date: '2024-01-01T01:00:00',
+        measurement_date: '2024-01-01T01:00:00Z',
         location_name: 'locationA',
         location_type: 'city',
         api_source: 'source',
@@ -28,7 +34,7 @@ describe('Site Measurement Chart', () => {
         pm10: 9,
       },
       {
-        measurement_date: '2024-01-01T02:00:00',
+        measurement_date: '2024-01-01T02:00:00Z',
         location_name: 'locationA',
         location_type: 'city',
         api_source: 'source',
@@ -65,8 +71,8 @@ describe('Site Measurement Chart', () => {
 
   const forecastData: ForecastResponseDto[] = [
     {
-      base_time: '2024-01-01T00:00:00',
-      valid_time: '2024-01-01T00:00:00',
+      base_time: '2024-01-01T00:00:00Z',
+      valid_time: '2024-01-01T00:00:00Z',
       location_type: 'city',
       overall_aqi_level: 4,
       pm2_5: {
@@ -76,8 +82,8 @@ describe('Site Measurement Chart', () => {
       ...forecastBaseData,
     },
     {
-      base_time: '2024-01-02T00:00:00',
-      valid_time: '2024-01-02T00:00:00',
+      base_time: '2024-01-02T00:00:00Z',
+      valid_time: '2024-01-02T00:00:00Z',
       location_type: 'city',
       overall_aqi_level: 2,
       pm2_5: {
@@ -187,8 +193,8 @@ describe('Site Measurement Chart', () => {
         ).data
         expect(data).toHaveLength(2)
         expect(data).toEqual([
-          ['2024-01-01T00:00:00.000+00:00', '2.0'],
-          ['2024-01-02T00:00:00.000+00:00', '4.0'],
+          ['2024-01-01T00:00:00.000Z', '2.0'],
+          ['2024-01-02T00:00:00.000Z', '4.0'],
         ])
       })
     })
@@ -250,8 +256,8 @@ describe('Site Measurement Chart', () => {
         ).data
         expect(data).toHaveLength(2)
         expect(data).toEqual([
-          ['2024-01-01T01:00:00.000+00:00', '12.0'],
-          ['2024-01-01T02:00:00.000+00:00', '43.0'],
+          ['2024-01-01T01:00:00.000Z', '12.0'],
+          ['2024-01-01T02:00:00.000Z', '43.0'],
         ])
       })
     })

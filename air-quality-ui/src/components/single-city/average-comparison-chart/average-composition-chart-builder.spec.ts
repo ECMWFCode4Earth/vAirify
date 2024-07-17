@@ -4,6 +4,12 @@ import { getForecastOptions } from './average-composition-chart-builder'
 import { AverageAqiValues } from '../../../services/calculate-measurements-aqi-averages/calculate-measurement-aqi-averages-service'
 import { ForecastResponseDto } from '../../../services/types'
 
+const originalDateResolvedOptions = new Intl.DateTimeFormat().resolvedOptions()
+jest.spyOn(Intl.DateTimeFormat.prototype, 'resolvedOptions').mockReturnValue({
+  ...originalDateResolvedOptions,
+  timeZone: 'GMT',
+})
+
 describe('AverageComparisonChart', () => {
   const forecastBaseData = {
     location_name: 'string',
@@ -31,15 +37,15 @@ describe('AverageComparisonChart', () => {
 
   const testForecastData: ForecastResponseDto[] = [
     {
-      base_time: '2024-01-01T00:00:00',
-      valid_time: '2024-01-01T00:00:00',
+      base_time: '2024-01-01T00:00:00Z',
+      valid_time: '2024-01-01T00:00:00Z',
       location_type: 'city',
       overall_aqi_level: 4,
       ...forecastBaseData,
     },
     {
-      base_time: '2024-01-02T00:00:00',
-      valid_time: '2024-01-02T00:00:00',
+      base_time: '2024-01-02T00:00:00Z',
+      valid_time: '2024-01-02T00:00:00Z',
       location_type: 'city',
       overall_aqi_level: 2,
       ...forecastBaseData,
@@ -49,11 +55,11 @@ describe('AverageComparisonChart', () => {
   const testMeasurementData: AverageAqiValues[] = [
     {
       meanAqiValue: 3,
-      measurementDate: '2024-01-01T00:00:00',
+      measurementDate: '2024-01-01T00:00:00Z',
     },
     {
       meanAqiValue: 4,
-      measurementDate: '2024-01-02T00:00:00',
+      measurementDate: '2024-01-02T00:00:00Z',
     },
   ]
 
@@ -89,11 +95,12 @@ describe('AverageComparisonChart', () => {
           result.series.find((x) => x.name === 'Forecast')?.data,
         ).toHaveLength(2)
       })
+
       it('has mapped the forecast data correctly', async () => {
         const result = getForecastOptions(testForecastData, testMeasurementData)
         expect(result.series.find((x) => x.name === 'Forecast')?.data).toEqual([
-          ['2024-01-01T00:00:00.000+00:00', 4],
-          ['2024-01-02T00:00:00.000+00:00', 2],
+          ['2024-01-01T00:00:00.000Z', 4],
+          ['2024-01-02T00:00:00.000Z', 2],
         ])
       })
     })
@@ -118,8 +125,8 @@ describe('AverageComparisonChart', () => {
         expect(
           result.series.find((x) => x.name === 'Measurement')?.data,
         ).toEqual([
-          ['2024-01-01T00:00:00.000+00:00', 3],
-          ['2024-01-02T00:00:00.000+00:00', 4],
+          ['2024-01-01T00:00:00.000Z', 3],
+          ['2024-01-02T00:00:00.000Z', 4],
         ])
       })
     })
