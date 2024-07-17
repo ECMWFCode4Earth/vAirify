@@ -1,8 +1,9 @@
 import { type Locator, type Page } from '@playwright/test'
 
+import { BasePage } from './base_page'
 import { waitForIdleNetwork } from '../utils/helper_methods'
 
-export class VairifyCityPage {
+export class CityPage extends BasePage {
   readonly page: Page
   readonly title: Locator
   readonly scroller: Locator
@@ -22,6 +23,7 @@ export class VairifyCityPage {
     mockForecastObject: object,
     mockMeasurementsObject: object,
   ) {
+    super(page)
     this.page = page
     this.datePicker = this.page.getByPlaceholder('DD/MM/YYYY hh:mm')
     this.pm2_5Chart = this.page.getByTestId('site_measurements_chart_pm2_5')

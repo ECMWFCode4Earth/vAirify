@@ -1,5 +1,5 @@
-import { BaseForecastDatetimePicker } from './BaseForecastDatetimePicker'
 import { Breadcrumbs } from './Breadcrumbs'
+import { ForecastBaseDatePicker } from './ForecastBaseDatePicker'
 import classes from './Toolbar.module.css'
 
 export const Toolbar = () => {
@@ -10,7 +10,7 @@ export const Toolbar = () => {
       className={classes['toolbar-section']}
     >
       <Breadcrumbs />
-      <BaseForecastDatetimePicker />
+      <ForecastBaseDatePicker />
     </section>
   )
 }
