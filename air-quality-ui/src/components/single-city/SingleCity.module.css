@@ -21,16 +21,17 @@
     flex-direction: column;
 }
 
-.site-measurements-section {
+.chart-section {
     align-items: center;
-    display: flex;
-    flex-direction: column;
-    padding: 32px 0 32px 0;
-    max-width: 800px;   
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 0 0 32px 0;
 }
 
-.site-measurement-chart {
+.site-measurements-section {
+    align-items: center;
     padding: 32px 0 32px 0;
+    max-width: 800px;   
 }
 
 .site-select-form {
