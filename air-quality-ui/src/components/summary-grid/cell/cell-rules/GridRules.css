@@ -1,29 +1,44 @@
+.suppress-separator-header-format{
+    --ag-header-column-resize-handle-display: none;    
+}
+
+.filterable-cell-header-format{
+    .ag-icon{
+        margin-left: 5px;
+    }
+}
+
 .cell-header-format{
+    .ag-header-cell-comp-wrapper {
+        width: auto;
+    }
     justify-content: center;
 }
 
 .cell-format{
     text-align: center;
-    font-weight: bold;
 }
 
 .cell-very-good{
-    background-color: #37ac56;
+    background-color: #50f0e5;
 }
 .cell-good{
-    background-color: #9bd444;
+    background-color: #50ccaa;
 }
 .cell-medium{
-    background-color: #f1d208;
+    background-color: #f0e641;
 }
 .cell-poor{
-    background-color: #ffbb01;
+    background-color: #ff505080;
 }
 .cell-very-poor{
-    background-color: #ff8c00;
+    background-color: #960032;
+    color: white;
 }
 .cell-extremely-poor{
-    background-color: #ed0f05;
+    background-color: #7d2181;
+    color: white;
+    
 }
 .cell-error{
     color:white;

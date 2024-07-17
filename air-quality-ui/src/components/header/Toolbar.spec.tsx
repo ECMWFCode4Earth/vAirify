@@ -9,8 +9,8 @@ jest.mock('react-router-dom', () => ({
 }))
 
 jest.mock('./Breadcrumbs', () => ({ Breadcrumbs: () => 'mocked breadcrumbs' }))
-jest.mock('./BaseForecastDatetimePicker', () => ({
-  BaseForecastDatetimePicker: () => 'mocked datepicker',
+jest.mock('./ForecastBaseDatePicker', () => ({
+  ForecastBaseDatePicker: () => 'mocked datepicker',
 }))
 
 describe('Toolbar component', () => {
