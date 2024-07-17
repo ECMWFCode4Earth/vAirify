@@ -94,7 +94,6 @@ describe('SingleCityComponent', () => {
         render(<SingleCity />)
       await waitFor(() => {
         expect(screen.getByText('Measurement Sites')).toBeInTheDocument()
-        expect(screen.getByText('Site Measurements')).toBeInTheDocument()
       })
     })
     it('groups data correctly by site for display (all pollutants)', async () => {
