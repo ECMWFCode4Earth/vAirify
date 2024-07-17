@@ -1,4 +1,8 @@
-import { YAXisComponentOption } from 'echarts'
+import {
+  LegendComponentOption,
+  TitleComponentOption,
+  YAXisComponentOption,
+} from 'echarts'
 
 import { getForecastOptions } from './average-composition-chart-builder'
 import { AverageAqiValues } from '../../../services/calculate-measurements-aqi-averages/calculate-measurement-aqi-averages-service'
@@ -62,6 +66,25 @@ describe('AverageComparisonChart', () => {
       measurementDate: '2024-01-02T00:00:00Z',
     },
   ]
+
+  describe('legend', () => {
+    it('is positioned on right', async () => {
+      const result = getForecastOptions(testForecastData, testMeasurementData)
+      expect((result.legend as LegendComponentOption).left).toBe('right')
+    })
+  })
+
+  describe('title', () => {
+    it('says AQI', async () => {
+      const result = getForecastOptions(testForecastData, testMeasurementData)
+      expect((result.title as TitleComponentOption).text).toBe('AQI')
+    })
+
+    it('is in the center', async () => {
+      const result = getForecastOptions(testForecastData, testMeasurementData)
+      expect((result.title as TitleComponentOption).left).toBe('center')
+    })
+  })
 
   describe('yAxis', () => {
     it('label is AQI', async () => {
