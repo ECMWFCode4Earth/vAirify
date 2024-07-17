@@ -164,12 +164,8 @@ export const SingleCity = () => {
               />
             </div>
             {measurementsByPollutantBySite &&
-              Object.entries(measurementsByPollutantBySite)
-                .filter(
-                  ([, measurementsBySite]) =>
-                    !!Object.keys(measurementsBySite).length,
-                )
-                .map(([pollutantType, measurementsBySite]) => (
+              Object.entries(measurementsByPollutantBySite).map(
+                ([pollutantType, measurementsBySite]) => (
                   <div
                     key={`site_measurements_chart_${pollutantType}`}
                     data-testid={`site_measurements_chart_${pollutantType}`}
@@ -182,7 +178,8 @@ export const SingleCity = () => {
                       seriesColorsBySite={siteColors}
                     />
                   </div>
-                ))}
+                ),
+              )}
           </section>
           <section className={classes['site-measurements-section']}>
             <form
