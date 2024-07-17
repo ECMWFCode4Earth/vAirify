@@ -173,3 +173,5 @@ cython_debug/
 # data textures
 **/*CAMS_global*png
 **/*CAMS_global*webp
+
+.vite
