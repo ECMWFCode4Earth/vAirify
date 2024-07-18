@@ -7,22 +7,18 @@ export class CityPage extends BasePage {
   readonly page: Page
   readonly title: Locator
   readonly scroller: Locator
-  readonly mockForecastObject: object
-  readonly mockMeasurementsObject: object
+
   readonly aqiChart: Locator
   readonly toolbarNavigation: Locator
   readonly pm2_5Chart: Locator
   readonly pm10Chart: Locator
   readonly no2Chart: Locator
   readonly o3Chart: Locator
+  readonly so2Chart: Locator
   readonly datePicker: Locator
   readonly siteForm: Locator
 
-  constructor(
-    page: Page,
-    mockForecastObject: object,
-    mockMeasurementsObject: object,
-  ) {
+  constructor(page: Page) {
     super(page)
     this.page = page
     this.datePicker = this.page.getByPlaceholder('DD/MM/YYYY hh:mm')
@@ -30,11 +26,11 @@ export class CityPage extends BasePage {
     this.pm10Chart = this.page.getByTestId('site_measurements_chart_pm10')
     this.no2Chart = this.page.getByTestId('site_measurements_chart_no2')
     this.o3Chart = this.page.getByTestId('site_measurements_chart_o3')
+    this.so2Chart = this.page.getByTestId('site_measurements_chart_so2')
     this.siteForm = this.page.getByTestId('sites-form')
     this.title = this.page.locator('title')
     this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')
-    this.mockForecastObject = mockForecastObject
-    this.mockMeasurementsObject = mockMeasurementsObject
+
     this.aqiChart = this.page
       .getByTestId('main-comparison-chart')
       .locator('canvas')
@@ -73,21 +69,17 @@ export class CityPage extends BasePage {
     return await this.no2Chart.screenshot()
   }
 
+  async captureSo2ChartScreenshot() {
+    await waitForIdleNetwork(this.page, this.so2Chart)
+    return await this.so2Chart.screenshot()
+  }
+
   textFinder(textToFind: string) {
     return this.page.getByText(textToFind)
   }
 
   toolbarTextFinder(textToFind: string) {
     return this.toolbarNavigation.getByText(textToFind)
-  }
-
-  async setupRioDeJaneiroRoute() {
-    await this.page.route('*/**/air-pollutant/forecast*', async (route) => {
-      await route.fulfill({ json: this.mockForecastObject })
-    })
-    await this.page.route('*/**/air-pollutant/measurements*', async (route) => {
-      await route.fulfill({ json: this.mockMeasurementsObject })
-    })
   }
 
   async waitForAllGraphsToBeVisible() {
@@ -100,12 +92,6 @@ export class CityPage extends BasePage {
 
   async gotoRioCityPage() {
     await this.page.goto('/city/Rio%20de%20Janeiro')
-  }
-
-  async setupCityPageGraph() {
-    await this.setupRioDeJaneiroRoute()
-    await this.gotoRioCityPage()
-    await this.waitForAllGraphsToBeVisible()
   }
 
   async setupCityPageWithMockData(
