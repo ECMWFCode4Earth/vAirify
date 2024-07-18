@@ -68,16 +68,23 @@ export class SummaryPage extends BasePage {
     return count
   }
 
-  async assertGridValues(expectedData: string[][]) {
+  async assertGridAttributes(attribute: string, expectedData: string[][]) {
     for (let rowIndex = 0; rowIndex < expectedData.length; rowIndex++) {
-      const row = expectedData[rowIndex]
+      const row: string[] = expectedData[rowIndex]
       for (let colIndex = 0; colIndex < row.length; colIndex++) {
-        const cellLocator = this.page.locator(
+        const cellLocator: Locator = this.page.locator(
           `//div[@aria-rowindex='${rowIndex + 3}']//div[@aria-colindex='${colIndex + 2}']`,
         )
         await cellLocator.scrollIntoViewIfNeeded()
-        const cellText = await cellLocator.innerText()
-        expect(cellText.trim()).toBe(row[colIndex])
+        if (attribute == 'values') {
+          const cellText: string = await cellLocator.innerText()
+          expect(cellText.trim()).toBe(row[colIndex])
+        } else if (attribute == 'colours') {
+          console.log(row[colIndex])
+          await expect(cellLocator).toHaveCSS('background-color', row[colIndex])
+        } else {
+          throw new Error('Invalid attribute value')
+        }
       }
     }
   }
