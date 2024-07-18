@@ -1,4 +1,12 @@
-import { CaseAQI3, CaseAQI6 } from '../../utils/default_aqi_enums'
+import {
+  CaseAQI1,
+  CaseAQI2,
+  CaseAQI3,
+  CaseAQI4,
+  CaseAQI5,
+  CaseAQI6,
+  Colours,
+} from '../../utils/enums'
 import { expect, test } from '../../utils/fixtures'
 import {
   createForecastAPIResponseData,
@@ -63,7 +71,7 @@ test.describe('Table data validation', () => {
     ]
 
     expect(count).toEqual(1)
-    await summaryPage.assertGridValues(expectedData)
+    await summaryPage.assertGridAttributes('values', expectedData)
   })
 
   test('Check data over several rows is displayed correctly on grid', async ({
@@ -180,7 +188,7 @@ test.describe('Table data validation', () => {
       ],
     ]
 
-    await summaryPage.assertGridValues(expectedData)
+    await summaryPage.assertGridAttributes('values', expectedData)
   })
 
   test('(BugFix #191) Verify pollutant level diff 0 does not override a larger diff for calculation of overall AQI level', async ({
@@ -226,7 +234,7 @@ test.describe('Table data validation', () => {
       ],
     ]
 
-    await summaryPage.assertGridValues(expectedTableContents)
+    await summaryPage.assertGridAttributes('values', expectedTableContents)
   })
 
   test.describe('Verifying a full row is correct', () => {
@@ -306,7 +314,7 @@ test.describe('Table data validation', () => {
           '08 Jul 06:00', // Time
         ],
       ]
-      await summaryPage.assertGridValues(expectedTableContents)
+      await summaryPage.assertGridAttributes('values', expectedTableContents)
     })
 
     test('Verify table shows pollutant data for the timestamp that has the largest deviation - forecast AQI 3, measurement AQI 6', async ({
@@ -381,7 +389,7 @@ test.describe('Table data validation', () => {
         ],
       ]
 
-      await summaryPage.assertGridValues(expectedTableContents)
+      await summaryPage.assertGridAttributes('values', expectedTableContents)
     })
 
     test('Verify table shows pollutant data for the timestamp that has the largest deviation - diff 0 - forecast AQI 3, measurement AQI 3', async ({
@@ -450,7 +458,7 @@ test.describe('Table data validation', () => {
         ],
       ]
 
-      await summaryPage.assertGridValues(expectedTableContents)
+      await summaryPage.assertGridAttributes('values', expectedTableContents)
     })
   })
   test('Verify the forecast AQI Level value is the highest overall AQI level in forecast response', async ({
@@ -482,6 +490,106 @@ test.describe('Table data validation', () => {
       ],
     ]
 
-    await summaryPage.assertGridValues(expectedTableContents)
+    await summaryPage.assertGridAttributes('values', expectedTableContents)
+  })
+  test.describe('Colour testing', () => {
+    test.beforeEach(async ({ summaryPage }) => {
+      await summaryPage.setupPageWithMockData(
+        [
+          createForecastAPIResponseData({
+            valid_time: '2024-07-08T03:00:00Z',
+            no2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.no2 },
+            o3: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.o3 },
+            pm2_5: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
+            pm10: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm10 },
+            so2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.so2 },
+          }),
+        ],
+        [
+          createMeasurementSummaryAPIResponseData({
+            measurement_base_time: '2024-07-08T03:00:00Z',
+            no2: {
+              mean: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.no2 },
+            },
+            o3: {
+              mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 },
+            },
+            pm2_5: {
+              mean: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm2_5 },
+            },
+            pm10: {
+              mean: { aqi_level: CaseAQI5.aqiLevel, value: CaseAQI5.pm10 },
+            },
+            so2: {
+              mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 },
+            },
+          }),
+        ],
+      )
+    })
+    test('Toggle: Highlight all AQI values', async ({ summaryPage }) => {
+      const expectedTableColours: string[][] = [
+        [
+          // AQI Level
+          Colours.aqi1, // Forecast
+          Colours.aqi6, //Measured
+          Colours.notColoured, // Diff
+          // pm2.5
+          Colours.aqi3, // Forecast
+          Colours.aqi4, //Measured
+          Colours.notColoured, //Time
+          // pm10
+          Colours.aqi4, // Forecast
+          Colours.aqi5, // Measured
+          Colours.notColoured, //Time
+          // no2
+          Colours.aqi1, // Forecast
+          Colours.aqi2, // Measured
+          Colours.notColoured, //Time
+          // o3
+          Colours.aqi2, // Forecast
+          Colours.aqi3, // Measured
+          Colours.notColoured, //Time
+          // so2
+          Colours.aqi1, // Forecast
+          Colours.aqi6, // Measured
+          Colours.notColoured, //Time
+        ],
+      ]
+
+      await summaryPage.assertGridAttributes('colours', expectedTableColours)
+    })
+    test('Toggle:Highlight primary AQI values', async ({ summaryPage }) => {
+      const expectedTableColours: string[][] = [
+        [
+          // AQI Level
+          Colours.aqi1, // Forecast
+          Colours.aqi6, //Measured
+          Colours.notColoured, // Diff
+          // pm2.5
+          Colours.notColoured, // Forecast
+          Colours.notColoured, //Measured
+          Colours.notColoured, //Time
+          // pm10
+          Colours.notColoured, // Forecast
+          Colours.notColoured, // Measured
+          Colours.notColoured, //Time
+          // no2
+          Colours.notColoured, // Forecast
+          Colours.notColoured, // Measured
+          Colours.notColoured, //Time
+          // o3
+          Colours.notColoured, // Forecast
+          Colours.notColoured, // Measured
+          Colours.notColoured, //Time
+          // so2
+          Colours.aqi1, // Forecast
+          Colours.aqi6, // Measured
+          Colours.notColoured, //Time
+        ],
+      ]
+      await summaryPage.highlightValuesToggle.click()
+      await summaryPage.assertGridAttributes('colours', expectedTableColours)
+    })
   })
 })
