@@ -7,6 +7,7 @@ export class SummaryPage extends BasePage {
 
   readonly agCell: Locator
   readonly allCells: Locator
+  readonly highlightValuesToggle: Locator
   readonly scroller: Locator
   readonly title: Locator
 
@@ -16,6 +17,7 @@ export class SummaryPage extends BasePage {
 
     this.agCell = page.locator('role=gridcell')
     this.allCells = page.locator('[role=gridcell]')
+    this.highlightValuesToggle = page.locator('//div[@class="react-switch-bg"]')
     this.scroller = page.locator('.ag-body-horizontal-scroll-viewport')
     this.title = page.locator('title')
   }
