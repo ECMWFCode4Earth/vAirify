@@ -4,6 +4,7 @@ import pandas as pd
 import xarray as xr
 import numpy as np
 from PIL import Image
+from datetime import datetime
 
 
 def _chunk_data_array(
@@ -147,7 +148,7 @@ def save_data_textures(
             file_format,
         )
         document = {
-            "forecast_base_time": forecast_date,
+            "forecast_base_time": datetime.strptime(forecast_date, '%Y-%m-%d_%H'),
             "variable": variable_name,
             "source": "cams-production",
             "min_value": min_value,
