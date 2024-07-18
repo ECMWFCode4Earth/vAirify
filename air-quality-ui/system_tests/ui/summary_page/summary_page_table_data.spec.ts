@@ -527,7 +527,9 @@ test.describe('Table data validation', () => {
         ],
       )
     })
-    test('Toggle: Highlight all AQI values', async ({ summaryPage }) => {
+    test('Default Toggle: Highlight all AQI values', async ({
+      summaryPage,
+    }) => {
       const expectedTableColours: string[][] = [
         [
           // AQI Level
@@ -559,7 +561,9 @@ test.describe('Table data validation', () => {
 
       await summaryPage.assertGridAttributes('colours', expectedTableColours)
     })
-    test('Toggle:Highlight primary AQI values', async ({ summaryPage }) => {
+    test('Click Toggle: Highlight primary AQI values', async ({
+      summaryPage,
+    }) => {
       const expectedTableColours: string[][] = [
         [
           // AQI Level
