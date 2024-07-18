@@ -80,7 +80,6 @@ export class SummaryPage extends BasePage {
           const cellText: string = await cellLocator.innerText()
           expect(cellText.trim()).toBe(row[colIndex])
         } else if (attribute == 'colours') {
-          console.log(row[colIndex])
           await expect(cellLocator).toHaveCSS('background-color', row[colIndex])
         } else {
           throw new Error('Invalid attribute value')
