@@ -1,16 +1,17 @@
 import { expect, test } from '../utils/fixtures'
+import { gotoPage, setupPageWithMockData } from '../utils/helper_methods'
 import {
   createForecastAPIResponseData,
   createMeasurementsCityPageResponseData,
 } from '../utils/mocked_api'
 
-test('vAirify logo is visible', async ({ cityPage, banner }) => {
-  await cityPage.gotoRioCityPage()
+test('vAirify logo is visible', async ({ page, banner }) => {
+  await gotoPage(page, '/city/Rio%20de%20Janeiro')
   await expect(banner.logo).toBeVisible()
 })
 
 test.describe('City graph snapshots', () => {
-  test.beforeEach(async ({ cityPage }) => {
+  test.beforeEach(async ({ cityPage, page }) => {
     const mockedForecastResponse = [
       createForecastAPIResponseData({
         base_time: '2024-07-01T00:00:00Z',
@@ -214,51 +215,86 @@ test.describe('City graph snapshots', () => {
       }),
     ]
 
-    await cityPage.setupCityPageWithMockData(
-      mockedForecastResponse,
-      mockedMeasurementsCityPageResponse,
+    await setupPageWithMockData(
+      page,
+      [
+        {
+          endpointUrl: '*/**/air-pollutant/forecast*',
+          mockedAPIResponse: mockedForecastResponse,
+        },
+        {
+          endpointUrl: '*/**/air-pollutant/measurements*',
+          mockedAPIResponse: mockedMeasurementsCityPageResponse,
+        },
+      ],
+      '/city/Rio%20de%20Janeiro',
     )
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
   })
   test('AQI snapshot', async ({ cityPage }) => {
-    const chartShot = await cityPage.captureAqiChartScreenshot()
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.aqiChart)
     expect(chartShot).toMatchSnapshot('rio-aqi-graph.png')
   })
 
   test('pm2.5 snapshot', async ({ cityPage }) => {
-    const chartShot = await cityPage.capturePm2_5ChartScreenshot()
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.pm2_5Chart)
     expect(chartShot).toMatchSnapshot('rio-pm2_5-graph.png')
   })
 
   test('pm10 snapshot', async ({ cityPage }) => {
-    const chartShot = await cityPage.capturePm10ChartScreenshot()
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.pm10Chart)
     expect(chartShot).toMatchSnapshot('rio-pm10-graph.png')
   })
 
   test('o3 snapshot', async ({ cityPage, page }) => {
-    const chartShot = await cityPage.captureO3ChartScreenshot()
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.o3Chart)
     expect(chartShot).toMatchSnapshot('rio-o3-graph.png')
     await page.pause()
   })
 
   test('no2 snapshot', async ({ cityPage }) => {
-    const chartShot = await cityPage.captureNo2ChartScreenshot()
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.no2Chart)
     expect(chartShot).toMatchSnapshot('rio-no2-graph.png')
   })
   test('so2 snapshot', async ({ cityPage }) => {
-    const chartShot = await cityPage.captureNo2ChartScreenshot()
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.so2Chart)
     expect(chartShot).toMatchSnapshot('rio-so2-graph.png')
   })
-
-  // test("Verify o3 update correctly when sites are removed", async ({
-  //   cityPage,
-  // }) => {
-  //   await cityPage.siteRemover("Copacabana");
-  //   await cityPage.siteRemover("Centro");
-  //   const chartShot = await cityPage.captureO3ChartScreenshot();
-  //   expect(chartShot).toMatchSnapshot(
-  //     "rio-o3-graph-without-copacabana-centro.png"
-  //   );
-  // });
+  // remove station CENTRO
+  test('Verify pm2.5 graph updates correctly when sites are removed', async ({
+    cityPage,
+  }) => {
+    await cityPage.siteRemover('Centro')
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.pm2_5Chart)
+    expect(chartShot).toMatchSnapshot('rio-pm2.5-graph-without-centro.png')
+  })
+  test('Verify pm10 graph updates correctly when sites are removed', async ({
+    cityPage,
+  }) => {
+    await cityPage.siteRemover('Centro')
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.pm10Chart)
+    expect(chartShot).toMatchSnapshot('rio-pm10-graph-without-centro.png')
+  })
+  test('Verify o3 graph updates correctly when sites are removed', async ({
+    cityPage,
+  }) => {
+    await cityPage.siteRemover('Centro')
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.o3Chart)
+    expect(chartShot).toMatchSnapshot('rio-o3-graph-without-centro.png')
+  })
+  test('Verify no2 graph updates correctly when sites are removed', async ({
+    cityPage,
+  }) => {
+    await cityPage.siteRemover('Centro')
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.no2Chart)
+    expect(chartShot).toMatchSnapshot('rio-no2-graph-without-centro.png')
+  })
+  test('Verify so2 graph updates correctly when sites are removed', async ({
+    cityPage,
+  }) => {
+    await cityPage.siteRemover('Centro')
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.so2Chart)
+    expect(chartShot).toMatchSnapshot('rio-so2-graph-without-centro.png')
+  })
 })

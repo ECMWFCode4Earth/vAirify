@@ -1,12 +1,13 @@
 import { expect, test } from '../utils/fixtures'
+import { gotoPage, setupPageWithMockData } from '../utils/helper_methods'
 import {
   createForecastAPIResponseData,
   createMeasurementSummaryAPIResponseData,
 } from '../utils/mocked_api'
 
 test.describe('City page', () => {
-  test('vAirify logo is visible on city page', async ({ cityPage, banner }) => {
-    await cityPage.gotoRioCityPage()
+  test('vAirify logo is visible on city page', async ({ page, banner }) => {
+    await gotoPage(page, '/city/Rio%20de%20Janeiro')
     await expect(banner.logo).toBeVisible()
   })
 })
@@ -30,6 +31,7 @@ test.describe('Summary page', () => {
 test('Verify breadcrumb text is correct on each page', async ({
   summaryPage,
   cityPage,
+  page,
 }) => {
   const mockedForecastResponse = [
     createForecastAPIResponseData({
@@ -72,9 +74,19 @@ test('Verify breadcrumb text is correct on each page', async ({
       location_name: 'Zurich',
     }),
   ]
-  await summaryPage.setupPageWithMockData(
-    mockedForecastResponse,
-    mockedMeasurementSummaryResponse,
+  await setupPageWithMockData(
+    page,
+    [
+      {
+        endpointUrl: '*/**/air-pollutant/forecast*',
+        mockedAPIResponse: mockedForecastResponse,
+      },
+      {
+        endpointUrl: '*/**/air-pollutant/measurements/summary*',
+        mockedAPIResponse: mockedMeasurementSummaryResponse,
+      },
+    ],
+    '/city/summary',
   )
   await summaryPage.clickButton('Kampala')
   await expect(cityPage.toolbarTextFinder('Cities/Kampala')).toBeVisible()

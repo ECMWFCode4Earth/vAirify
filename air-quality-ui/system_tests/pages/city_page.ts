@@ -43,35 +43,14 @@ export class CityPage extends BasePage {
   }
 
   async siteRemover(location: string) {
+    await this.siteForm.waitFor({ state: 'visible' })
     const siteDeselect = this.page.getByLabel(`Remove ${location}`)
     await siteDeselect.click()
   }
 
-  async captureAqiChartScreenshot() {
-    await waitForIdleNetwork(this.page, this.aqiChart)
-    return await this.aqiChart.screenshot()
-  }
-
-  async capturePm2_5ChartScreenshot() {
-    await waitForIdleNetwork(this.page, this.pm2_5Chart)
-    return await this.pm2_5Chart.screenshot()
-  }
-  async capturePm10ChartScreenshot() {
-    await waitForIdleNetwork(this.page, this.pm10Chart)
-    return await this.pm10Chart.screenshot()
-  }
-  async captureO3ChartScreenshot() {
-    await waitForIdleNetwork(this.page, this.o3Chart)
-    return await this.o3Chart.screenshot()
-  }
-  async captureNo2ChartScreenshot() {
-    await waitForIdleNetwork(this.page, this.no2Chart)
-    return await this.no2Chart.screenshot()
-  }
-
-  async captureSo2ChartScreenshot() {
-    await waitForIdleNetwork(this.page, this.so2Chart)
-    return await this.so2Chart.screenshot()
+  async captureChartScreenshot(chartElement: Locator) {
+    await waitForIdleNetwork(this.page, chartElement)
+    return await chartElement.screenshot()
   }
 
   textFinder(textToFind: string) {
@@ -88,26 +67,5 @@ export class CityPage extends BasePage {
     await this.pm10Chart.waitFor({ state: 'visible' })
     await this.o3Chart.waitFor({ state: 'visible' })
     await this.no2Chart.waitFor({ state: 'visible' })
-  }
-
-  async gotoRioCityPage() {
-    await this.page.goto('/city/Rio%20de%20Janeiro')
-  }
-
-  async setupCityPageWithMockData(
-    mockedForecastResponse: object,
-    mockedMeasurementsCityPageResponse?: object,
-  ) {
-    if (typeof mockedMeasurementsCityPageResponse !== 'undefined') {
-      await this.setupApiRoute(
-        '*/**/air-pollutant/measurements*',
-        mockedMeasurementsCityPageResponse,
-      )
-    }
-    await this.setupApiRoute(
-      '*/**/air-pollutant/forecast*',
-      mockedForecastResponse,
-    )
-    await this.gotoRioCityPage()
   }
 }
