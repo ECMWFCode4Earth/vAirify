@@ -194,17 +194,24 @@ const createSummaryRow = ({
           aqiLevel: measurementData.aqiLevel,
         },
       }
-      const numericalDifference = Math.abs(
+      const newDifference = Math.abs(
         measurementData.aqiLevel - forecastData.aqiLevel,
       )
-      const currentDifferenceWithSymbol =
-        getPerformanceSymbol(forecastData.aqiLevel, measurementData.aqiLevel) +
-        numericalDifference
+      const currentDifference = Math.abs(parseInt((row.aqiDifference ??= '0')))
+      const currentForecastAqi = (row.forecast.aqiLevel ??= 0)
 
       if (
         !row.aqiDifference ||
-        numericalDifference > Math.abs(parseInt(row.aqiDifference))
+        newDifference > currentDifference ||
+        (newDifference == currentDifference &&
+          forecastData.aqiLevel > currentForecastAqi)
       ) {
+        const currentDifferenceWithSymbol =
+          getPerformanceSymbol(
+            forecastData.aqiLevel,
+            measurementData.aqiLevel,
+          ) + newDifference
+
         row.aqiDifference = currentDifferenceWithSymbol
         row.forecast.aqiLevel = forecastData.aqiLevel
         row.measurements.aqiLevel = measurementData.aqiLevel

@@ -127,4 +127,97 @@ describe('Summary Comparison Service', () => {
       value: 1,
     })
   })
+  it('should produce comparisons with a preference of highest forecast when otherwise tied', () => {
+    const forecastData = {
+      London: [
+        mockForecastResponseDto({
+          valid_time: '2024-06-01T00:00:00Z',
+          overall_aqi_level: 4,
+          no2: { aqi_level: 4, value: 4 },
+          so2: { aqi_level: 1, value: 1 },
+        }),
+        mockForecastResponseDto({
+          valid_time: '2024-06-01T03:00:00Z',
+          overall_aqi_level: 6,
+          no2: { aqi_level: 6, value: 6 },
+          so2: { aqi_level: 2, value: 2 },
+        }),
+      ],
+    }
+    const measurements = {
+      London: [
+        mockMeasurementSummaryResponseDto({
+          measurement_base_time: '2024-06-01T00:00:00Z',
+          no2: { mean: { aqi_level: 6, value: 6 } },
+          so2: { mean: { aqi_level: 3, value: 3 } },
+        }),
+        mockMeasurementSummaryResponseDto({
+          measurement_base_time: '2024-06-01T03:00:00Z',
+          no2: { mean: { aqi_level: 4, value: 4 } },
+          so2: { mean: { aqi_level: 4, value: 4 } },
+        }),
+      ],
+    }
+    const comparisons = createComparisonData(forecastData, measurements)
+    expect(comparisons.length).toEqual(1)
+
+    expect(comparisons[0]['no2'].forecastData).toEqual({
+      validTime: '2024-06-01T03:00:00Z',
+      aqiLevel: 6,
+      value: 6,
+    })
+    expect(comparisons[0]['no2'].measurementData).toEqual({
+      aqiLevel: 4,
+      value: 4,
+    })
+    expect(comparisons[0]['so2'].forecastData).toEqual({
+      validTime: '2024-06-01T03:00:00Z',
+      aqiLevel: 2,
+      value: 2,
+    })
+    expect(comparisons[0]['so2'].measurementData).toEqual({
+      aqiLevel: 4,
+      value: 4,
+    })
+  })
+  it('should produce comparisons with defaulting to earliest when otherwise tied', () => {
+    const forecastData = {
+      London: [
+        mockForecastResponseDto({
+          valid_time: '2024-06-01T00:00:00Z',
+          overall_aqi_level: 4,
+          no2: { aqi_level: 4, value: 4 },
+        }),
+        mockForecastResponseDto({
+          valid_time: '2024-06-01T03:00:00Z',
+          overall_aqi_level: 4,
+          no2: { aqi_level: 4, value: 4 },
+        }),
+      ],
+    }
+    const measurements = {
+      London: [
+        mockMeasurementSummaryResponseDto({
+          measurement_base_time: '2024-06-01T00:00:00Z',
+          no2: { mean: { aqi_level: 6, value: 6 } },
+        }),
+        mockMeasurementSummaryResponseDto({
+          measurement_base_time: '2024-06-01T03:00:00Z',
+          no2: { mean: { aqi_level: 6, value: 6 } },
+        }),
+      ],
+    }
+    const comparisons = createComparisonData(forecastData, measurements)
+    expect(comparisons.length).toEqual(1)
+
+    expect(comparisons[0]['no2'].forecastData).toEqual({
+      validTime: '2024-06-01T00:00:00Z',
+      aqiLevel: 4,
+      value: 4,
+    })
+    expect(comparisons[0]['no2'].measurementData).toEqual({
+      aqiLevel: 6,
+      value: 6,
+    })
+  })
 })

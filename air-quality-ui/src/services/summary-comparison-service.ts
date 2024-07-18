@@ -65,25 +65,29 @@ const reduceComparisonData = (
   const forecastAqiLevel = forecastForPollutant.aqi_level
   const measurementAqiLevel = measurementForPollutant.mean.aqi_level
   const aqiDifference = Math.abs(forecastAqiLevel - measurementAqiLevel)
-  const newComparisonData = { ...currentComparison }
+  const reducedComparisonData = { ...currentComparison }
+
   if (
-    !newComparisonData.aqiDifference ||
-    newComparisonData.aqiDifference < aqiDifference
+    !reducedComparisonData.aqiDifference ||
+    reducedComparisonData.aqiDifference < aqiDifference ||
+    (reducedComparisonData.aqiDifference == aqiDifference &&
+      reducedComparisonData.forecastData.aqiLevel <
+        forecastForPollutant.aqi_level)
   ) {
-    newComparisonData.aqiDifference = aqiDifference
-    newComparisonData.forecastData = {
+    reducedComparisonData.aqiDifference = aqiDifference
+    reducedComparisonData.forecastData = {
       aqiLevel: forecastForPollutant.aqi_level,
       value: forecastForPollutant.value,
       validTime: comparisonTime,
     }
-    newComparisonData.measurementData = measurementForPollutant
+    reducedComparisonData.measurementData = measurementForPollutant
       ? {
           aqiLevel: measurementForPollutant.mean.aqi_level,
           value: measurementForPollutant.mean.value,
         }
       : undefined
   }
-  return newComparisonData
+  return reducedComparisonData
 }
 
 export const createComparisonData = (
