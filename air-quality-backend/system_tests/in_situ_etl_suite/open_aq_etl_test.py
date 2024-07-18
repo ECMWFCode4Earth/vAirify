@@ -145,6 +145,12 @@ def test__in_situ_etl__stores_all_data_correctly(ensure_forecast_cache):
     assert stored["location_type"] == "city"
     assert stored["api_source"] == "OpenAQ"
     assert stored["location"]["type"] == "point"
+    assert stored["last_modified_time"] == datetime(
+        2024, 5, 25, 13, 14, 15, tzinfo=timezone.utc
+    )
+    assert stored["created_time"] == datetime(
+        2024, 5, 25, 13, 14, 15, tzinfo=timezone.utc
+    )
     assert (
         stored["location"]["coordinates"][0]
         == london_openaq_data[0]["coordinates"]["longitude"]
