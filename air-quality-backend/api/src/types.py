@@ -38,6 +38,17 @@ class MeasurementDto(TypedDict):
     sensor_type: NotRequired[str]
     site_name: str
 
+class TextureDto(TypedDict):
+    base_time: datetime
+    variable: str
+    time_start: str
+    time_end: str
+    chunk: str
+    source: str
+    chunk: str
+    texture_uri: str
+    min_value: float
+    max_value: float
 
 T = TypeVar("T")
 
