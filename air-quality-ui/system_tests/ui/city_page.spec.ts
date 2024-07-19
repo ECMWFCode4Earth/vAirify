@@ -10,6 +10,61 @@ test('vAirify logo is visible', async ({ page, banner }) => {
   await expect(banner.logo).toBeVisible()
 })
 
+test('legenda', async ({ page, cityPage }) => {
+  const mockedForecastResponse = [
+    createForecastAPIResponseData({
+      base_time: '2024-07-01T00:00:00Z',
+      valid_time: '2024-07-01T00:00:00Z',
+      location_name: 'Rio de Janeiro',
+      overall_aqi_level: 1,
+    }),
+    createForecastAPIResponseData({
+      base_time: '2024-07-01T00:00:00Z',
+      valid_time: '2024-07-01T03:00:00Z',
+      location_name: 'Rio de Janeiro',
+      overall_aqi_level: 4,
+    }),
+    createForecastAPIResponseData({
+      base_time: '2024-07-01T00:00:00Z',
+      valid_time: '2024-07-01T06:00:00Z',
+      location_name: 'Rio de Janeiro',
+      overall_aqi_level: 3,
+    }),
+  ]
+  const mockedMeasurementsCityPageResponse = [
+    createMeasurementsCityPageResponseData({
+      site_name: 'Tijuca',
+    }),
+    createMeasurementsCityPageResponseData({
+      site_name: 'Centro',
+    }),
+    createMeasurementsCityPageResponseData({
+      site_name: 'Copacabana',
+    }),
+  ]
+  await setupPageWithMockData(
+    page,
+    [
+      {
+        endpointUrl: '*/**/air-pollutant/forecast*',
+        mockedAPIResponse: mockedForecastResponse,
+      },
+      {
+        endpointUrl: '*/**/air-pollutant/measurements*',
+        mockedAPIResponse: mockedMeasurementsCityPageResponse,
+      },
+    ],
+    '/city/Rio%20de%20Janeiro',
+  )
+
+  await cityPage.waitForAllGraphsToBeVisible()
+  await expect(cityPage.textFinder('Tijuca')).toBeVisible()
+  await expect(cityPage.textFinder('Centro')).toBeVisible()
+  await expect(cityPage.textFinder('Copacabana')).toBeVisible()
+  await cityPage.siteRemover('Centro')
+  expect(cityPage.textFinder('Centro')).toBeUndefined()
+})
+
 test.describe('City graph snapshots', () => {
   test.beforeEach(async ({ cityPage, page }) => {
     const mockedForecastResponse = [
