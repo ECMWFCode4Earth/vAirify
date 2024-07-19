@@ -35,7 +35,7 @@ describe('SummaryViewHeader component', () => {
       />,
     )
     await act(async () => {
-      ;(await screen.getByTestId('aqi-highlight-switch')).click()
+      ;(await screen.getByRole('checkbox')).click()
     })
     await waitFor(() => {
       expect(mockSetShowAllColoured).toHaveBeenCalledWith(true)
