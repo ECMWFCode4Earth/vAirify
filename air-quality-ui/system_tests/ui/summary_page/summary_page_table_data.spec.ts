@@ -74,7 +74,7 @@ test.describe('Table data validation', () => {
     await summaryPage.assertGridAttributes('values', expectedData)
   })
 
-  test('Check data over several rows is displayed correctly on grid', async ({
+  test('Check data over several rows is displayed correctly on grid, including +/- diffs', async ({
     summaryPage,
   }) => {
     const mockedForecastResponse = [
@@ -98,7 +98,7 @@ test.describe('Table data validation', () => {
         overall_aqi_level: 4,
         no2: { aqi_level: 1, value: 5.871611751344455 },
         o3: { aqi_level: 4, value: 213.04088459925424 },
-        pm2_5: { aqi_level: 4, value: 30.29016575805515 },
+        pm2_5: { aqi_level: 5, value: 52.75 },
         pm10: { aqi_level: 4, value: 58.25755291558235 },
         so2: { aqi_level: 1, value: 8.497931484924965 },
       }),
@@ -133,7 +133,7 @@ test.describe('Table data validation', () => {
         overall_aqi_level: { mean: 5 },
         no2: { mean: { aqi_level: 1, value: 5.871611751344455 } },
         o3: { mean: { aqi_level: 4, value: 213.04088459925424 } },
-        pm2_5: { mean: { aqi_level: 5, value: 52.75 } },
+        pm2_5: { mean: { aqi_level: 4, value: 30.29016575805515 } },
         pm10: { mean: { aqi_level: 4, value: 58.25755291558235 } },
         so2: { mean: { aqi_level: 1, value: 8.497931484924965 } },
       }),
@@ -167,12 +167,12 @@ test.describe('Table data validation', () => {
       // Abu Dhabi
       [
         // AQI Level
-        '4', //Forecast
-        '5', //Measured
-        '-1', // Diff
+        '5', //Forecast
+        '4', //Measured
+        '+1', // Diff
         //pm2.5
-        '30.3', //Forecast
-        '52.8', // Measured
+        '52.8', //Forecast
+        '30.3', // Measured
         '19 Jun 12:00', //Time
       ],
       // Zurich
@@ -455,6 +455,45 @@ test.describe('Table data validation', () => {
           CaseAQI3.so2.toString(), // Forecast
           '349', // Measured
           '08 Jul 12:00', //Time
+        ],
+      ]
+
+      await summaryPage.assertGridAttributes('values', expectedTableContents)
+    })
+    test('Verify if multiple pollutants share the max diff, the AQI values displayed will be the ones with highest overall AQI value', async ({
+      summaryPage,
+    }) => {
+      const forecastLondonValidTimeArray: object[] = [
+        createForecastResponseWithValidTimeAndAQI('2024-07-08T03:00:00Z', 1),
+      ]
+
+      const measurementsLondonArray: object[] = [
+        createMeasurementSummaryAPIResponseData({
+          measurement_base_time: '2024-07-08T03:00:00Z',
+          overall_aqi_level: { mean: CaseAQI3.aqiLevel },
+          no2: { mean: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.no2 } },
+          o3: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 } },
+          pm2_5: {
+            mean: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm2_5 },
+          },
+          pm10: {
+            mean: { aqi_level: CaseAQI5.aqiLevel, value: CaseAQI5.pm10 },
+          },
+          so2: { mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 } },
+        }),
+      ]
+
+      await summaryPage.setupPageWithMockData(
+        forecastLondonValidTimeArray,
+        measurementsLondonArray,
+      )
+
+      const expectedTableContents: string[][] = [
+        [
+          // AQI Level
+          CaseAQI1.aqiLevel.toString(), // Forecast
+          CaseAQI6.aqiLevel.toString(), // Measured
+          '-5', // Diff
         ],
       ]
 
