@@ -41,8 +41,8 @@ class MeasurementDto(TypedDict):
 class TextureDto(TypedDict):
     base_time: datetime
     variable: str
-    time_start: str
-    time_end: str
+    time_start: datetime
+    time_end: datetime
     chunk: str
     source: str
     chunk: str

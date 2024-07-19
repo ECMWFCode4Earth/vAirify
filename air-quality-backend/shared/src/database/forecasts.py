@@ -35,9 +35,9 @@ class DataTexture(TypedDict):
     _id: ObjectId
     forecast_base_time: datetime
     source: str
-    time_start: str
+    time_start: datetime
     variable: str
-    time_end: str
+    time_end: datetime
     chunk: str
     last_modified_time: datetime
     max_value: float
