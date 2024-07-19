@@ -193,7 +193,7 @@ export const createSummaryRow = ({
         measurementData.aqiLevel - forecastData.aqiLevel,
       )
       const currentDifference = Math.abs(parseInt(row.aqiDifference ?? '0'))
-      const currentForecastAqi = row.forecast.aqiLevel ?? 0
+      const currentForecastAqi = row.forecast.aqiLevel!
 
       if (
         !row.aqiDifference ||
