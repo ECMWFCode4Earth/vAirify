@@ -1,4 +1,4 @@
-import Switch from 'react-switch'
+import Switch from '@mui/material/Switch'
 
 import classes from './SummaryViewHeader.module.css'
 import { useForecastContext } from '../../context'
@@ -23,16 +23,12 @@ export const SummaryViewHeader = ({
       </div>
       <div className={`ag-theme-quartz ${classes['table-switch-container']}`}>
         <label className={`ag-theme-quartz ${classes['table-switch-label']}`}>
-          {showAllColoured
-            ? 'Highlight all AQI values'
-            : 'Highlight primary AQI values'}
+          Highlight all AQI values
         </label>
         <Switch
           className={classes['table-switch']}
-          data-testid="aqi-highlight-switch"
-          onChange={() => {
-            if (showAllColoured) setShowAllColoured(false)
-            else setShowAllColoured(true)
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            setShowAllColoured(event.target.checked)
           }}
           checked={showAllColoured}
         />
