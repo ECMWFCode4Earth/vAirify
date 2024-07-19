@@ -118,6 +118,7 @@ export const SingleCity = () => {
         { pm2_5: {}, pm10: {}, no2: {}, o3: {}, so2: {} },
       )
   }, [measurementData, selectedSites])
+
   const measurements = useMemo(() => {
     return measurementData?.filter((measurement) =>
       selectedSites.find(
@@ -125,6 +126,7 @@ export const SingleCity = () => {
       ),
     )
   }, [measurementData, selectedSites])
+
   const [siteColors, setSiteColors] = useState<Record<string, string>>({})
   useEffect(() => {
     const updateColors = async () => {
@@ -137,6 +139,7 @@ export const SingleCity = () => {
     }
     updateColors()
   }, [sites])
+
   const deselectSite = useCallback((siteName: string) => {
     setSelectedSites((current) =>
       current.filter(({ value }) => value !== siteName),
@@ -152,15 +155,31 @@ export const SingleCity = () => {
       {(forecastDataPending || measurementDataPending) && <LoadingSpinner />}
       {!forecastDataPending && !measurementDataPending && (
         <>
-          <section
-            data-testid="main-comparison-chart"
-            className={classes['single-city-section']}
-          >
-            <AverageComparisonChart
-              forecastData={forecastData}
-              measurementsData={measurements}
-              forecastBaseTime={forecastBaseDate}
-            />
+          <section className={classes['chart-section']}>
+            <div key="aqi_chart" data-testid="aqi_chart">
+              <AverageComparisonChart
+                forecastData={forecastData}
+                measurementsData={measurements}
+                forecastBaseTime={forecastBaseDate}
+              />
+            </div>
+            {measurementsByPollutantBySite &&
+              Object.entries(measurementsByPollutantBySite).map(
+                ([pollutantType, measurementsBySite]) => (
+                  <div
+                    key={`site_measurements_chart_${pollutantType}`}
+                    data-testid={`site_measurements_chart_${pollutantType}`}
+                  >
+                    <SiteMeasurementsChart
+                      forecastData={forecastData}
+                      measurementsBySite={measurementsBySite}
+                      onSiteClick={deselectSite}
+                      pollutantType={pollutantType as PollutantType}
+                      seriesColorsBySite={siteColors}
+                    />
+                  </div>
+                ),
+              )}
           </section>
           <section className={classes['site-measurements-section']}>
             <form
@@ -184,30 +203,6 @@ export const SingleCity = () => {
                 value={selectedSites}
               />
             </form>
-          </section>
-          <section className={classes['site-measurements-section']}>
-            <h3>Site Measurements</h3>
-            {measurementsByPollutantBySite &&
-              Object.entries(measurementsByPollutantBySite)
-                .filter(
-                  ([, measurementsBySite]) =>
-                    !!Object.keys(measurementsBySite).length,
-                )
-                .map(([pollutantType, measurementsBySite]) => (
-                  <div
-                    key={`site_measurements_chart_${pollutantType}`}
-                    data-testid={`site_measurements_chart_${pollutantType}`}
-                    className={classes['site-measurement-chart']}
-                  >
-                    <SiteMeasurementsChart
-                      forecastData={forecastData}
-                      measurementsBySite={measurementsBySite}
-                      onSiteClick={deselectSite}
-                      pollutantType={pollutantType as PollutantType}
-                      seriesColorsBySite={siteColors}
-                    />
-                  </div>
-                ))}
           </section>
         </>
       )}
