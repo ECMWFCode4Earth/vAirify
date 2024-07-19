@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import time
 from datetime import datetime
 from urllib.parse import urlencode
 
@@ -96,4 +97,5 @@ def fetch_in_situ_measurements(cities, date_from: datetime, date_to: datetime):
             city, date_from, date_to, cache_location, session
         )
         in_situ_data_by_city[city["name"]] = {"measurements": results, "city": city}
+        time.sleep(1)  # To stop us getting rate limited by Open AQ
     return in_situ_data_by_city
