@@ -4,36 +4,34 @@ import { BasePage } from './base_page'
 import { waitForIdleNetwork } from '../utils/helper_methods'
 
 export class CityPage extends BasePage {
-  readonly page: Page
-  readonly title: Locator
-  readonly scroller: Locator
-
   readonly aqiChart: Locator
-  readonly toolbarNavigation: Locator
-  readonly pm2_5Chart: Locator
-  readonly pm10Chart: Locator
+  readonly datePicker: Locator
   readonly no2Chart: Locator
   readonly o3Chart: Locator
-  readonly so2Chart: Locator
-  readonly datePicker: Locator
+  readonly page: Page
+  readonly pm10Chart: Locator
+  readonly pm2_5Chart: Locator
+  readonly scroller: Locator
   readonly siteForm: Locator
+  readonly so2Chart: Locator
+  readonly title: Locator
+  readonly toolbarNavigation: Locator
 
   constructor(page: Page) {
     super(page)
-    this.page = page
-    this.datePicker = this.page.getByPlaceholder('DD/MM/YYYY hh:mm')
-    this.pm2_5Chart = this.page.getByTestId('site_measurements_chart_pm2_5')
-    this.pm10Chart = this.page.getByTestId('site_measurements_chart_pm10')
-    this.no2Chart = this.page.getByTestId('site_measurements_chart_no2')
-    this.o3Chart = this.page.getByTestId('site_measurements_chart_o3')
-    this.so2Chart = this.page.getByTestId('site_measurements_chart_so2')
-    this.siteForm = this.page.getByTestId('sites-form')
-    this.title = this.page.locator('title')
-    this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')
-
     this.aqiChart = this.page
       .getByTestId('main-comparison-chart')
       .locator('canvas')
+    this.datePicker = this.page.getByPlaceholder('DD/MM/YYYY hh:mm')
+    this.no2Chart = this.page.getByTestId('site_measurements_chart_no2')
+    this.o3Chart = this.page.getByTestId('site_measurements_chart_o3')
+    this.page = page
+    this.pm10Chart = this.page.getByTestId('site_measurements_chart_pm10')
+    this.pm2_5Chart = this.page.getByTestId('site_measurements_chart_pm2_5')
+    this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')
+    this.siteForm = this.page.getByTestId('sites-form')
+    this.so2Chart = this.page.getByTestId('site_measurements_chart_so2')
+    this.title = this.page.locator('title')
     this.toolbarNavigation = this.page.getByLabel(
       'Toolbar with site navigation',
     )
