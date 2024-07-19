@@ -54,6 +54,7 @@ services:
     environment:
       - MONGO_DB_URI=mongodb://mongo:27017
       - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - UI_URL=${UI_URL}
     entrypoint: 
       - fastapi
       - dev
