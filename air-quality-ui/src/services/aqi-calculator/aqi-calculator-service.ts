@@ -1,7 +1,7 @@
 type AqiRangesByPollutantType = {
   [key: string]: number[]
 }
-const aqiRangesByPollutant: AqiRangesByPollutantType = {
+export const aqiRangesByPollutant: AqiRangesByPollutantType = {
   o3: [50, 100, 130, 240, 380, 800],
   no2: [40, 90, 120, 230, 340, 1000],
   so2: [100, 200, 350, 500, 750, 1250],

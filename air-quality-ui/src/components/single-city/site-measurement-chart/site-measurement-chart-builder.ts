@@ -1,11 +1,55 @@
 import { EChartsOption, SeriesOption } from 'echarts'
+// eslint-disable-next-line import/no-unresolved
+import { MarkArea2DDataItemOption } from 'echarts/types/src/component/marker/MarkAreaModel.js'
 
 import { PollutantType, pollutantTypeDisplay } from '../../../models'
+import { aqiRangesByPollutant } from '../../../services/aqi-calculator/aqi-calculator-service'
 import { convertToLocalTime } from '../../../services/echarts-service'
 import {
   ForecastResponseDto,
   MeasurementsResponseDto,
 } from '../../../services/types'
+
+const createBackgroundAqiZones = (pollutant: PollutantType): SeriesOption => {
+  const ranges = aqiRangesByPollutant[pollutant]
+
+  return {
+    type: 'line',
+    data: [],
+    name: 'Background',
+    markArea: {
+      data: [
+        getAqiBand(0, ranges[0], '#50f0e5'),
+        getAqiBand(ranges[0], ranges[1], '#50ccaa'),
+        getAqiBand(ranges[1], ranges[2], '#f0e641'),
+        getAqiBand(ranges[2], ranges[3], '#ff505080'),
+        getAqiBand(ranges[3], ranges[4], '#960032'),
+        getAqiBand(ranges[4], ranges[5], '#7d2181'),
+      ],
+    },
+    silent: true,
+    z: -1,
+  }
+}
+
+const getAqiBand = (
+  y0: number,
+  y1: number,
+  color: string,
+): MarkArea2DDataItemOption => {
+  return [
+    {
+      yAxis: y0,
+      itemStyle: {
+        color: color,
+        opacity: 0.25,
+      },
+    },
+    {
+      yAxis: y1,
+    },
+  ]
+}
 
 const createForecastSeries = (
   pollutantType: PollutantType,
@@ -23,7 +67,6 @@ const createForecastSeries = (
       width: 5,
       type: 'dashed',
     },
-    zlevel: 2,
     z: 2,
   }
 }
@@ -51,7 +94,6 @@ const createMeasurementSeries = (
       type: 'solid',
       opacity: 0.5,
     },
-    zlevel: 1,
     z: 1,
     symbol: 'roundRect',
   }))
@@ -61,6 +103,7 @@ const createChartOptions = (
   zoomPercent: number,
 ): EChartsOption => {
   return {
+    animation: false,
     title: {
       text: chartTitle,
       left: 'center',
@@ -104,6 +147,6 @@ export const generateMeasurementChart = (
 
   return {
     ...options,
-    series: [...series, forecast],
+    series: [...series, forecast, createBackgroundAqiZones(pollutantType)],
   }
 }
