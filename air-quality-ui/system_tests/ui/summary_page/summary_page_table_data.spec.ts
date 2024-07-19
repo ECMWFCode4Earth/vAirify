@@ -460,45 +460,6 @@ test.describe('Table data validation', () => {
 
       await summaryPage.assertGridAttributes('values', expectedTableContents)
     })
-    test('Verify if multiple pollutants share the max diff, the AQI values displayed will be the ones with highest overall AQI value', async ({
-      summaryPage,
-    }) => {
-      const forecastLondonValidTimeArray: object[] = [
-        createForecastResponseWithValidTimeAndAQI('2024-07-08T03:00:00Z', 1),
-      ]
-
-      const measurementsLondonArray: object[] = [
-        createMeasurementSummaryAPIResponseData({
-          measurement_base_time: '2024-07-08T03:00:00Z',
-          overall_aqi_level: { mean: CaseAQI3.aqiLevel },
-          no2: { mean: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.no2 } },
-          o3: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 } },
-          pm2_5: {
-            mean: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm2_5 },
-          },
-          pm10: {
-            mean: { aqi_level: CaseAQI5.aqiLevel, value: CaseAQI5.pm10 },
-          },
-          so2: { mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 } },
-        }),
-      ]
-
-      await summaryPage.setupPageWithMockData(
-        forecastLondonValidTimeArray,
-        measurementsLondonArray,
-      )
-
-      const expectedTableContents: string[][] = [
-        [
-          // AQI Level
-          CaseAQI1.aqiLevel.toString(), // Forecast
-          CaseAQI6.aqiLevel.toString(), // Measured
-          '-5', // Diff
-        ],
-      ]
-
-      await summaryPage.assertGridAttributes('values', expectedTableContents)
-    })
   })
   test('Verify the forecast AQI Level value is the highest overall AQI level in forecast response', async ({
     summaryPage,
@@ -526,6 +487,46 @@ test.describe('Table data validation', () => {
         '3', // Forecast
         '6', // Measured
         '-3', // Diff
+      ],
+    ]
+
+    await summaryPage.assertGridAttributes('values', expectedTableContents)
+  })
+
+  test('Verify if multiple pollutants share the max diff, the AQI values displayed will be the ones with highest overall AQI value', async ({
+    summaryPage,
+  }) => {
+    const forecastLondonValidTimeArray: object[] = [
+      createForecastResponseWithValidTimeAndAQI('2024-07-08T03:00:00Z', 1),
+    ]
+
+    const measurementsLondonArray: object[] = [
+      createMeasurementSummaryAPIResponseData({
+        measurement_base_time: '2024-07-08T03:00:00Z',
+        overall_aqi_level: { mean: CaseAQI3.aqiLevel },
+        no2: { mean: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.no2 } },
+        o3: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 } },
+        pm2_5: {
+          mean: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm2_5 },
+        },
+        pm10: {
+          mean: { aqi_level: CaseAQI5.aqiLevel, value: CaseAQI5.pm10 },
+        },
+        so2: { mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 } },
+      }),
+    ]
+
+    await summaryPage.setupPageWithMockData(
+      forecastLondonValidTimeArray,
+      measurementsLondonArray,
+    )
+
+    const expectedTableContents: string[][] = [
+      [
+        // AQI Level
+        CaseAQI1.aqiLevel.toString(), // Forecast
+        CaseAQI6.aqiLevel.toString(), // Measured
+        '-5', // Diff
       ],
     ]
 
