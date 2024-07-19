@@ -4,20 +4,20 @@ import { BasePage } from './base_page'
 
 export class SummaryPage extends BasePage {
   readonly page: Page
-  readonly title: Locator
-  readonly scroller: Locator
+
   readonly agCell: Locator
   readonly allCells: Locator
-  readonly forecastBaseTimeText: Locator
+  readonly scroller: Locator
+  readonly title: Locator
 
   constructor(page: Page) {
     super(page)
     this.page = page
-    this.title = this.page.locator('title')
-    this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')
-    this.agCell = this.page.locator('role=gridcell')
-    this.allCells = this.page.locator('[role=gridcell]')
-    this.forecastBaseTimeText = this.page.getByText('Forecast Base Time')
+
+    this.agCell = page.locator('role=gridcell')
+    this.allCells = page.locator('[role=gridcell]')
+    this.scroller = page.locator('.ag-body-horizontal-scroll-viewport')
+    this.title = page.locator('title')
   }
 
   async goTo() {
