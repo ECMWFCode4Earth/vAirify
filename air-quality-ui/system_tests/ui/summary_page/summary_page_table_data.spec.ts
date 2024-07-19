@@ -496,14 +496,13 @@ test.describe('Table data validation', () => {
   test('Verify if multiple pollutants share the max diff, the AQI values displayed will be the ones with highest overall AQI value', async ({
     summaryPage,
   }) => {
-    const forecastLondonValidTimeArray: object[] = [
+    const forecastArray: object[] = [
       createForecastResponseWithValidTimeAndAQI('2024-07-08T03:00:00Z', 1),
     ]
 
-    const measurementsLondonArray: object[] = [
+    const measurementsArray: object[] = [
       createMeasurementSummaryAPIResponseData({
         measurement_base_time: '2024-07-08T03:00:00Z',
-        overall_aqi_level: { mean: CaseAQI3.aqiLevel },
         no2: { mean: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.no2 } },
         o3: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 } },
         pm2_5: {
@@ -516,10 +515,7 @@ test.describe('Table data validation', () => {
       }),
     ]
 
-    await summaryPage.setupPageWithMockData(
-      forecastLondonValidTimeArray,
-      measurementsLondonArray,
-    )
+    await summaryPage.setupPageWithMockData(forecastArray, measurementsArray)
 
     const expectedTableContents: string[][] = [
       [
@@ -532,6 +528,50 @@ test.describe('Table data validation', () => {
 
     await summaryPage.assertGridAttributes('values', expectedTableContents)
   })
+
+  test('Verify if multiple pollutants share the max diff, and have the same overall AQIs (+ / -), positive difference is displayed', async ({
+    summaryPage,
+  }) => {
+    const forecastArray: object[] = [
+      createForecastAPIResponseData({
+        valid_time: '2024-07-08T03:00:00Z',
+        no2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.no2 },
+        o3: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.o3 },
+        pm2_5: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm2_5 },
+        pm10: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm10 },
+        so2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 },
+      }),
+    ]
+
+    const measurementsArray: object[] = [
+      createMeasurementSummaryAPIResponseData({
+        measurement_base_time: '2024-07-08T03:00:00Z',
+        no2: { mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.no2 } },
+        o3: { mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.o3 } },
+        pm2_5: {
+          mean: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.pm2_5 },
+        },
+        pm10: {
+          mean: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.pm10 },
+        },
+        so2: { mean: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.so2 } },
+      }),
+    ]
+
+    await summaryPage.setupPageWithMockData(forecastArray, measurementsArray)
+
+    const expectedTableContents: string[][] = [
+      [
+        // AQI Level
+        CaseAQI6.aqiLevel.toString(), // Forecast
+        CaseAQI1.aqiLevel.toString(), // Measured
+        '+5', // Diff
+      ],
+    ]
+
+    await summaryPage.assertGridAttributes('values', expectedTableContents)
+  })
+
   test.describe('Colour testing', () => {
     test.beforeEach(async ({ summaryPage }) => {
       await summaryPage.setupPageWithMockData(
