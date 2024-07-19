@@ -9,6 +9,10 @@ import { ForecastResponseDto } from '../../../services/types'
 
 export const getOptions = (): EChartsOption => {
   return {
+    title: {
+      text: 'AQI',
+      left: 'center',
+    },
     xAxis: {
       type: 'time',
       axisLabel: {
@@ -25,7 +29,10 @@ export const getOptions = (): EChartsOption => {
     tooltip: {
       trigger: 'axis',
     },
-    legend: {},
+    legend: {
+      left: 'right',
+      padding: [40, 60],
+    },
   }
 }
 

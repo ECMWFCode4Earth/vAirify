@@ -1,6 +1,7 @@
 import {
   DataZoomComponentOption,
   LineSeriesOption,
+  TitleComponentOption,
   YAXisComponentOption,
 } from 'echarts'
 
@@ -93,6 +94,26 @@ describe('Site Measurement Chart', () => {
       ...forecastBaseData,
     },
   ]
+  describe('title', () => {
+    it.each<[PollutantType, string]>([
+      ['no2', 'Nitrogen Dioxide'],
+      ['so2', 'Sulphur Dioxide'],
+      ['o3', 'Ozone'],
+      ['pm10', 'PM 10'],
+      ['pm2_5', 'PM 2.5'],
+    ])(
+      `shows the correct pollutant`,
+      async (title: PollutantType, expected: string) => {
+        const result = generateMeasurementChart(
+          title,
+          zoomPercent,
+          measurementsBySite,
+          forecastData,
+        )
+        expect((result.title as TitleComponentOption).text).toBe(expected)
+      },
+    )
+  })
 
   describe('yAxis', () => {
     it('label is AQI', async () => {
