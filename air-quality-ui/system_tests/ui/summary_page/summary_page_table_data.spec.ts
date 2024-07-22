@@ -15,25 +15,27 @@ import {
   createMeasurementSummaryAPIResponseData,
 } from '../../utils/mocked_api'
 
-test('Verify that Headers exist and Innertext matches', async ({
-  summaryPage,
-}) => {
-  await summaryPage.goTo()
-  await summaryPage.getColumnHeaderAndText('AQI Level', 'AQI Level')
-  await summaryPage.getColumnHeaderAndText('PM 2.5 (µg/m³)', 'PM 2.5 (µg/m³)')
-  await summaryPage.getColumnHeaderAndText('PM 10 (µg/m³)', 'PM 10 (µg/m³)')
-  await summaryPage.scrollToRightmostPosition()
-  await summaryPage.page.waitForTimeout(1000)
+test.describe('Table structure', () => {
+  test('Verify that headers exist and innertext matches', async ({
+    summaryPage,
+  }) => {
+    await summaryPage.goTo()
+    await summaryPage.getColumnHeaderAndText('AQI Level', 'AQI Level')
+    await summaryPage.getColumnHeaderAndText('PM 2.5 (µg/m³)', 'PM 2.5 (µg/m³)')
+    await summaryPage.getColumnHeaderAndText('PM 10 (µg/m³)', 'PM 10 (µg/m³)')
+    await summaryPage.scrollToRightmostPosition()
+    await summaryPage.page.waitForTimeout(1000)
 
-  await summaryPage.getColumnHeaderAndText(
-    'Nitrogen Dioxide (µg/m³)',
-    'Nitrogen Dioxide (µg/m³)',
-  )
-  await summaryPage.getColumnHeaderAndText('Ozone (µg/m³)', 'Ozone (µg/m³)')
-  await summaryPage.getColumnHeaderAndText(
-    'Sulphur Dioxide (µg/m³)',
-    'Sulphur Dioxide (µg/m³)',
-  )
+    await summaryPage.getColumnHeaderAndText(
+      'Nitrogen Dioxide (µg/m³)',
+      'Nitrogen Dioxide (µg/m³)',
+    )
+    await summaryPage.getColumnHeaderAndText('Ozone (µg/m³)', 'Ozone (µg/m³)')
+    await summaryPage.getColumnHeaderAndText(
+      'Sulphur Dioxide (µg/m³)',
+      'Sulphur Dioxide (µg/m³)',
+    )
+  })
 })
 
 test.describe('Table data validation', () => {
@@ -492,7 +494,7 @@ test.describe('Table data validation', () => {
 
     await summaryPage.assertGridAttributes('values', expectedTableContents)
   })
-  test.describe('Multiple pollutants share the max diff, and have different overall AQIs (+ / -)', () => {
+  test.describe('Multiple pollutants share the max diff, but have DIFFERENT overall AQIs (+ / -)', () => {
     test.beforeEach(async ({ summaryPage }) => {
       const forecastArray: object[] = [
         createForecastResponseWithValidTimeAndAQI('2024-07-08T03:00:00Z', 1),
@@ -548,7 +550,7 @@ test.describe('Table data validation', () => {
     })
   })
 
-  test.describe('Multiple pollutants share the max diff, and have the same overall AQIs (+ / -)', () => {
+  test.describe('Multiple pollutants share the max diff, and have the SAME overall AQIs (+ / -)', () => {
     test.beforeEach(async ({ summaryPage }) => {
       const forecastArray: object[] = [
         createForecastAPIResponseData({
