@@ -100,7 +100,7 @@ describe('Colour Cell', () => {
   it('if measurements is undefined do not colour (return false)', () => {
     const params = {
       column: { colId: 'forecast.pm2_5' },
-      value: undefined,
+      value: 1.0,
       data: {
         aqiDifference: '-5',
         forecast: {
@@ -112,14 +112,14 @@ describe('Colour Cell', () => {
         measurements: undefined,
       },
     }
-    const result = colourCell(true, params, 1)
+    const result = colourCell(false, params, 1)
     expect(result).toBeFalsy()
   })
 
   it('if the pollutant is not found in measurements object return false', () => {
     const params = {
       column: { colId: 'forecast.pm2_5' },
-      value: undefined,
+      value: 1.0,
       data: {
         aqiDifference: '-5',
         forecast: {
@@ -131,7 +131,26 @@ describe('Colour Cell', () => {
         measurements: {},
       },
     }
-    const result = colourCell(true, params, 1)
+    const result = colourCell(false, params, 1)
+    expect(result).toBeFalsy()
+  })
+
+  it('if current is measurement column returns correctly', () => {
+    const params = {
+      column: { colId: 'measurement.pm2_5' },
+      value: 1.0,
+      data: {
+        aqiDifference: '-5',
+        forecast: {
+          pm2_5: {
+            value: 1,
+            aqiLevel: 1,
+          },
+        },
+        measurements: {},
+      },
+    }
+    const result = colourCell(false, params, 1)
     expect(result).toBeFalsy()
   })
 })

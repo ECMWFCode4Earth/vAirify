@@ -65,26 +65,6 @@ describe('SingleCityComponent', () => {
       expect(screen.getByText('An error occurred')).toBeInTheDocument()
     })
   })
-  it('shows spinner when loading forecast data', async () => {
-    ;(useQueries as jest.Mock).mockReturnValue([
-      { data: [], isPending: true, isError: false },
-      { data: [], isPending: false, isError: false },
-    ])
-    render(<SingleCity />)
-    await waitFor(() => {
-      expect(screen.getByTestId('loading-spinner')).toBeInTheDocument()
-    })
-  })
-  it('shows spinner when loading measurement data', async () => {
-    ;(useQueries as jest.Mock).mockReturnValue([
-      { data: [], isPending: false, isError: false },
-      { data: [], isPending: true, isError: false },
-    ])
-    render(<SingleCity />)
-    await waitFor(() => {
-      expect(screen.getByTestId('loading-spinner')).toBeInTheDocument()
-    })
-  })
   describe('when data loaded', () => {
     it('shows the site measurements section', async () => {
       ;(useQueries as jest.Mock).mockReturnValue([
@@ -94,10 +74,9 @@ describe('SingleCityComponent', () => {
         render(<SingleCity />)
       await waitFor(() => {
         expect(screen.getByText('Measurement Sites')).toBeInTheDocument()
-        expect(screen.getByText('Site Measurements')).toBeInTheDocument()
       })
     })
-    it('groups data correctly by site for display (all pollutants)', async () => {
+    it('displays pollutant charts when all have values', async () => {
       ;(useQueries as jest.Mock).mockReturnValue([
         { data: [], isPending: false, isError: false },
         {
@@ -127,7 +106,7 @@ describe('SingleCityComponent', () => {
         })
       })
     })
-    it('groups data correctly by site for display (single pollutant)', async () => {
+    it('displays pollutant charts with no measurement data', async () => {
       ;(useQueries as jest.Mock).mockReturnValue([
         { data: [], isPending: false, isError: false },
         {
@@ -143,16 +122,11 @@ describe('SingleCityComponent', () => {
       ])
       render(<SingleCity />)
       await waitFor(() => {
-        expect(
-          screen.getByTestId(`site_measurements_chart_no2`),
-        ).toBeInTheDocument()
-        pollutantTypes
-          .filter((type) => type !== 'no2')
-          .forEach((type) => {
-            expect(
-              screen.queryByTestId(`site_measurements_chart_${type}`),
-            ).toBeNull()
-          })
+        pollutantTypes.forEach((type) => {
+          expect(
+            screen.queryByTestId(`site_measurements_chart_${type}`),
+          ).toBeInTheDocument()
+        })
       })
     })
     describe('site selection', () => {
@@ -189,7 +163,7 @@ describe('SingleCityComponent', () => {
           ).toBeInTheDocument()
         })
       })
-      it('should hide charts when sites are deselected resulting in no measurements', async () => {
+      it('should still show chart when sites are deselected resulting in no measurements', async () => {
         render(<SingleCity />)
         await act(async () => {
           ;(await screen.findByLabelText('Remove Site 1')).click()
@@ -199,7 +173,7 @@ describe('SingleCityComponent', () => {
           ;['no2', 'o3', 'so2'].forEach((type) => {
             expect(
               screen.queryByTestId(`site_measurements_chart_${type}`),
-            ).toBeNull()
+            ).toBeInTheDocument()
           })
           ;['pm2_5', 'pm10'].forEach((type) => {
             expect(

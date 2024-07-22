@@ -5,24 +5,22 @@ import { waitForIdleNetwork } from '../utils/helper_methods'
 
 export class CityPage extends BasePage {
   readonly page: Page
-  readonly title: Locator
-  readonly scroller: Locator
-  readonly apiForecastAqi: object
+
   readonly aqiChart: Locator
+  readonly apiForecastAqi: object
+  readonly scroller: Locator
+  readonly title: Locator
   readonly toolbarNavigation: Locator
 
   constructor(page: Page, apiForecastAqi: object) {
     super(page)
     this.page = page
-    this.title = this.page.locator('title')
-    this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')
+
+    this.aqiChart = page.getByTestId('main-comparison-chart').locator('canvas')
     this.apiForecastAqi = apiForecastAqi
-    this.aqiChart = this.page
-      .getByTestId('main-comparison-chart')
-      .locator('canvas')
-    this.toolbarNavigation = this.page.getByLabel(
-      'Toolbar with site navigation',
-    )
+    this.scroller = page.locator('.ag-body-horizontal-scroll-viewport')
+    this.title = page.locator('title')
+    this.toolbarNavigation = page.getByLabel('Toolbar with site navigation')
   }
 
   async captureChartScreenshot() {

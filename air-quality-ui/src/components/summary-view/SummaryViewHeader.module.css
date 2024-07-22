@@ -11,11 +11,10 @@
 }
 
 .table-switch-label {
-    padding-right: 15px;
+    padding-bottom: 3px;
 }
 
 .table-switch-container {
     display: flex;
     align-items: center;
-    padding-right: 10px;
 }
