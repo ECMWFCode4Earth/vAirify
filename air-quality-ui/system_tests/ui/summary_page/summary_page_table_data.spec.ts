@@ -51,6 +51,7 @@ test('Verify that a city with no in-situ data still show on grid', async ({
   await summaryPage.assertGridAttributes('values', expectedData)
 })
 
+// This test checks several things, including some of the behviour around pollutant values selected as detailed in the Summary Page Explained Wiki 'Pollutant difference rules'
 test('Check data over several rows is displayed correctly on grid, including +/- diffs', async ({
   summaryPage,
 }) => {
