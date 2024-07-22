@@ -14,7 +14,7 @@ jest.mock('../../../services/summary-comparison-service', () => ({
     locationName: 'London',
     forecast: {
       aqiLevel: 3,
-      no2: { value: 1.1, time: '2024-03-21T12:00:00Z', aqiLevel: 1 },
+      no2: { value: 0, time: '2024-03-21T12:00:00Z', aqiLevel: 1 },
       so2: { value: 1.2, time: '2024-03-22T12:00:00Z', aqiLevel: 1 },
       o3: { value: 33, time: '2024-03-23T12:00:00Z', aqiLevel: 3 },
       pm2_5: { value: 1.4, time: '2024-03-24T12:00:00Z', aqiLevel: 1 },
@@ -76,7 +76,7 @@ describe('GlobalSummaryTable component', () => {
         locationName: 'London',
         forecast: {
           aqiLevel: 3,
-          no2: { value: 1.1, time: '2024-03-21T12:00:00Z', aqiLevel: 1 },
+          no2: { value: 0, time: '2024-03-21T12:00:00Z', aqiLevel: 1 },
           so2: { value: 1.2, time: '2024-03-22T12:00:00Z', aqiLevel: 1 },
           o3: { value: 33, time: '2024-03-23T12:00:00Z', aqiLevel: 3 },
           pm2_5: { value: 1.4, time: '2024-03-24T12:00:00Z', aqiLevel: 1 },
@@ -102,7 +102,7 @@ describe('GlobalSummaryTable component', () => {
         expect(screen.getByText('-2')).toBeInTheDocument()
 
         expect(screen.getByText('3')).toBeInTheDocument()
-        expect(screen.getByText('1.1')).toBeInTheDocument()
+        expect(screen.getByText('0')).toBeInTheDocument()
         expect(screen.getByText('1.2')).toBeInTheDocument()
         expect(screen.getByText('33')).toBeInTheDocument()
         expect(screen.getByText('1.4')).toBeInTheDocument()
@@ -127,7 +127,7 @@ describe('GlobalSummaryTable component', () => {
 
       await waitFor(() => {
         expect(screen.getByText('3')).toHaveClass('cell-medium')
-        expect(screen.getByText('1.1')).toHaveClass('cell-very-good')
+        expect(screen.getByText('0')).toHaveClass('cell-very-good')
         expect(screen.getByText('1.2')).toHaveClass('cell-very-good')
         expect(screen.getByText('33')).toHaveClass('cell-medium')
         expect(screen.getByText('1.4')).toHaveClass('cell-very-good')
@@ -146,7 +146,7 @@ describe('GlobalSummaryTable component', () => {
 
       await waitFor(() => {
         expect(screen.getByText('3')).toHaveClass('cell-medium')
-        expect(screen.getByText('1.1')).not.toHaveClass('cell-very-good')
+        expect(screen.getByText('0')).not.toHaveClass('cell-very-good')
         expect(screen.getByText('1.2')).not.toHaveClass('cell-very-good')
         expect(screen.getByText('33')).toHaveClass('cell-medium')
         expect(screen.getByText('1.4')).not.toHaveClass('cell-very-good')
