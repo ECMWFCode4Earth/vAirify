@@ -72,6 +72,7 @@ test.describe('Colour testing', () => {
         ],
       )
     })
+
     test('Default Toggle: Highlight all AQI values', async ({
       summaryPage,
     }) => {
@@ -106,6 +107,7 @@ test.describe('Colour testing', () => {
 
       await summaryPage.assertGridAttributes('colours', expectedTableColours)
     })
+
     test('Toggle OFF: Highlight primary AQI values', async ({
       summaryPage,
     }) => {
@@ -141,6 +143,7 @@ test.describe('Colour testing', () => {
       await summaryPage.assertGridAttributes('colours', expectedTableColours)
     })
   })
+
   test.describe('No Data', () => {
     test.beforeEach(async ({ summaryPage }) => {
       await summaryPage.setupPageWithMockData([
@@ -156,7 +159,7 @@ test.describe('Colour testing', () => {
       ])
     })
 
-    test('Default Toggle: No data is correctly coloured', async ({
+    test('Default Toggle: If there is "no data", cell is coloured grey', async ({
       summaryPage,
     }) => {
       const expectedTableColours: string[][] = [
@@ -190,7 +193,8 @@ test.describe('Colour testing', () => {
 
       await summaryPage.assertGridAttributes('colours', expectedTableColours)
     })
-    test('Toggle OFF: No data is correctly coloured', async ({
+
+    test('Toggle OFF: If there is "no data", cell is coloured grey', async ({
       summaryPage,
     }) => {
       const expectedTableColours: string[][] = [

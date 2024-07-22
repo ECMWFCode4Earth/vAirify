@@ -14,7 +14,7 @@ import {
   CaseAQI6,
 } from '../../utils/test_enums'
 
-test('Verify that a city with no in-situ data still show on grid', async ({
+test('Verify that a city with no in-situ data still shown on grid', async ({
   summaryPage,
 }) => {
   const mockedForecastResponse = [
