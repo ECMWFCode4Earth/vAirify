@@ -65,25 +65,29 @@ const reduceComparisonData = (
   const forecastAqiLevel = forecastForPollutant.aqi_level
   const measurementAqiLevel = measurementForPollutant.mean.aqi_level
   const aqiDifference = Math.abs(forecastAqiLevel - measurementAqiLevel)
-  const newComparisonData = { ...currentComparison }
+  const reducedComparisonData = { ...currentComparison }
+
   if (
-    !newComparisonData.aqiDifference ||
-    newComparisonData.aqiDifference < aqiDifference
+    !reducedComparisonData.aqiDifference ||
+    reducedComparisonData.aqiDifference < aqiDifference ||
+    (reducedComparisonData.aqiDifference == aqiDifference &&
+      reducedComparisonData.forecastData.aqiLevel <
+        forecastForPollutant.aqi_level)
   ) {
-    newComparisonData.aqiDifference = aqiDifference
-    newComparisonData.forecastData = {
+    reducedComparisonData.aqiDifference = aqiDifference
+    reducedComparisonData.forecastData = {
       aqiLevel: forecastForPollutant.aqi_level,
       value: forecastForPollutant.value,
       validTime: comparisonTime,
     }
-    newComparisonData.measurementData = measurementForPollutant
+    reducedComparisonData.measurementData = measurementForPollutant
       ? {
           aqiLevel: measurementForPollutant.mean.aqi_level,
           value: measurementForPollutant.mean.value,
         }
       : undefined
   }
-  return newComparisonData
+  return reducedComparisonData
 }
 
 export const createComparisonData = (
@@ -131,4 +135,84 @@ export const createComparisonData = (
       defaultComparisonData,
     )
   })
+}
+
+type SummaryDetail = {
+  aqiLevel?: number
+} & {
+  [P in PollutantType]?: { value: number; time?: string; aqiLevel: number }
+}
+
+interface SummaryRow {
+  locationName: string
+  forecast: SummaryDetail
+  measurements?: SummaryDetail
+  aqiDifference?: string
+}
+
+function getPerformanceSymbol(
+  forecastAQILevel: number,
+  measurementsAQILevel: number,
+) {
+  if (forecastAQILevel > measurementsAQILevel) {
+    return '+'
+  } else if (forecastAQILevel === measurementsAQILevel) {
+    return ''
+  } else {
+    return '-'
+  }
+}
+
+export const createSummaryRow = ({
+  locationName,
+  ...data
+}: ForecastMeasurementComparison): SummaryRow => {
+  const row: SummaryRow = {
+    locationName,
+    forecast: {
+      aqiLevel: data.forecastOverallAqi,
+    },
+  }
+
+  pollutantTypes.forEach((pollutantType) => {
+    const { forecastData, measurementData } = data[pollutantType]
+    row.forecast[pollutantType] = {
+      value: parseFloat(forecastData.value.toFixed(1)),
+      aqiLevel: forecastData.aqiLevel,
+      time: forecastData.validTime,
+    }
+    if (measurementData) {
+      row.measurements = {
+        ...row.measurements,
+        [pollutantType]: {
+          value: parseFloat(measurementData.value.toFixed(1)),
+          aqiLevel: measurementData.aqiLevel,
+        },
+      }
+      const newDifference = Math.abs(
+        measurementData.aqiLevel - forecastData.aqiLevel,
+      )
+      const currentDifference = Math.abs(parseInt(row.aqiDifference ?? '0'))
+      const currentForecastAqi = row.forecast.aqiLevel!
+
+      if (
+        !row.aqiDifference ||
+        newDifference > currentDifference ||
+        (newDifference == currentDifference &&
+          forecastData.aqiLevel > currentForecastAqi)
+      ) {
+        const currentDifferenceWithSymbol =
+          getPerformanceSymbol(
+            forecastData.aqiLevel,
+            measurementData.aqiLevel,
+          ) + newDifference
+
+        row.aqiDifference = currentDifferenceWithSymbol
+        row.forecast.aqiLevel = forecastData.aqiLevel
+        row.measurements.aqiLevel = measurementData.aqiLevel
+      }
+    }
+  })
+
+  return row
 }

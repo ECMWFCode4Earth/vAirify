@@ -45,5 +45,6 @@
     background-color: #000000;
 }
 .empty-cell{
-    background-color:#ebebeb;
+    background-color:#6F6F6F;
+    color: white;
 }
