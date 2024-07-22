@@ -151,18 +151,20 @@ valid_time_to_string = format_datetime_as_string(
     "%Y-%m-%dT%H:%M:%S+00:00",
 )
 
-# Test Setup
-load_dotenv()
-delete_database_data("forecast_data")
-seed_api_test_data(
-    "forecast_data",
-    [
-        test_city_1_input_data,
-        test_city_2_input_data,
-        test_city_3_input_data,
-        invalid_forecast_document,
-    ],
-)
+
+@pytest.fixture
+def setup_test():
+    load_dotenv()
+    delete_database_data("forecast_data")
+    seed_api_test_data(
+        "forecast_data",
+        [
+            test_city_1_input_data,
+            test_city_2_input_data,
+            test_city_3_input_data,
+            invalid_forecast_document,
+        ],
+    )
 
 
 # Tests
@@ -215,6 +217,7 @@ seed_api_test_data(
     ],
 )
 def test__different_base_times__assert_correct_results_returned(
+    setup_test,
     parameters: dict,
     expected_cities: list,
 ):
@@ -318,7 +321,9 @@ def test__different_base_times__assert_correct_results_returned(
         ),
     ],
 )
-def test__base_time_bva__assert_number_of_results(parameters: dict, expected: int):
+def test__base_time_bva__assert_number_of_results(
+    setup_test, parameters: dict, expected: int
+):
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -391,6 +396,7 @@ def test__base_time_bva__assert_number_of_results(parameters: dict, expected: in
     ],
 )
 def test__different_valid_time_from_times__assert_correct_results(
+    setup_test,
     parameters: dict,
     expected_cities: list,
 ):
@@ -495,7 +501,7 @@ def test__different_valid_time_from_times__assert_correct_results(
     ],
 )
 def test__valid_time_from_bva__assert_number_of_results(
-    parameters: dict, expected: int
+    setup_test, parameters: dict, expected: int
 ):
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
@@ -569,6 +575,7 @@ def test__valid_time_from_bva__assert_number_of_results(
     ],
 )
 def test__different_valid_time_to_times__assert_correct_results(
+    setup_test,
     parameters: dict,
     expected_cities: list,
 ):
@@ -672,7 +679,9 @@ def test__different_valid_time_to_times__assert_correct_results(
         ),
     ],
 )
-def test__valid_time_to_bva__assert_number_of_results(parameters: dict, expected: int):
+def test__valid_time_to_bva__assert_number_of_results(
+    setup_test, parameters: dict, expected: int
+):
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -699,7 +708,7 @@ def test__valid_time_to_bva__assert_number_of_results(parameters: dict, expected
         },
     ),
 )
-def test__results_containing_relevant_base_time(parameters: dict):
+def test__results_containing_relevant_base_time(setup_test, parameters: dict):
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
     )
@@ -738,7 +747,7 @@ def test__results_containing_relevant_base_time(parameters: dict):
     ],
 )
 def test__assert_response_keys_and_values_are_correct(
-    parameters: dict, expected_response: list
+    setup_test, parameters: dict, expected_response: list
 ):
     response = requests.request(
         "GET", base_url, headers=headers, params=parameters, timeout=5.0
