@@ -1,4 +1,4 @@
-import { CaseAQI3 } from './enums'
+import { CaseAQI3 } from './test_enums'
 
 interface forecastAPIResponse {
   base_time: string
