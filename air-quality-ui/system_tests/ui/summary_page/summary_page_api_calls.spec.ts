@@ -1,4 +1,5 @@
 import { expect, test } from '../../utils/fixtures'
+import { gotoPage } from '../../utils/helper_methods'
 
 const httpMethodGet: string = 'GET'
 
@@ -39,7 +40,8 @@ test.describe('Using Mocked Data', () => {
             httpMethodGet,
             basePage.baseAPIURL + forecastAPIEndpoint,
           )
-        await summaryPage.goTo()
+        await gotoPage(page, 'city/summary')
+        await summaryPage.waitForLoad()
 
         const expectedRequestValidTimeFrom: string =
           expectedRequestForecastBaseTime
@@ -68,7 +70,8 @@ test.describe('Using Mocked Data', () => {
         basePage.baseAPIURL + forecastAPIEndpoint,
       )
       await page.clock.setFixedTime(systemTime)
-      await summaryPage.goTo()
+      await gotoPage(page, 'city/summary')
+      await summaryPage.waitForLoad()
       expect(requestArray.length).toEqual(1)
     })
 
@@ -83,7 +86,8 @@ test.describe('Using Mocked Data', () => {
         basePage.baseAPIURL + measurementSummaryAPIEndpoint,
       )
       await page.clock.setFixedTime(systemTime)
-      await summaryPage.goTo()
+      await gotoPage(page, 'city/summary')
+      await summaryPage.waitForLoad()
       const expectedMeasurementBaseTimeArray = [
         '2024-06-09T00%3A00%3A00.000Z',
         '2024-06-09T03%3A00%3A00.000Z',
@@ -119,7 +123,8 @@ test.describe('Using Mocked Data', () => {
         basePage.baseAPIURL + measurementSummaryAPIEndpoint,
       )
       await page.clock.setFixedTime(systemTime)
-      await summaryPage.goTo()
+      await gotoPage(page, 'city/summary')
+      await summaryPage.waitForLoad()
       expect(requestArray.length).toEqual(15)
     })
   })

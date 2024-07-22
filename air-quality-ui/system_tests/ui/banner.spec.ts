@@ -13,8 +13,8 @@ test.describe('City page', () => {
 })
 
 test.describe('Summary page', () => {
-  test.beforeEach(async ({ summaryPage }) => {
-    await summaryPage.goTo()
+  test.beforeEach(async ({ page }) => {
+    await gotoPage(page, '/city/summary')
   })
   test('vAirify logo is visible on summary page', async ({ banner }) => {
     await expect(banner.logo).toBeVisible()
@@ -74,20 +74,17 @@ test('Verify breadcrumb text is correct on each page', async ({
       location_name: 'Zurich',
     }),
   ]
-  await setupPageWithMockData(
-    page,
-    [
-      {
-        endpointUrl: '*/**/air-pollutant/forecast*',
-        mockedAPIResponse: mockedForecastResponse,
-      },
-      {
-        endpointUrl: '*/**/air-pollutant/measurements/summary*',
-        mockedAPIResponse: mockedMeasurementSummaryResponse,
-      },
-    ],
-    '/city/summary',
-  )
+  await setupPageWithMockData(page, [
+    {
+      endpointUrl: '*/**/air-pollutant/forecast*',
+      mockedAPIResponse: mockedForecastResponse,
+    },
+    {
+      endpointUrl: '*/**/air-pollutant/measurements/summary*',
+      mockedAPIResponse: mockedMeasurementSummaryResponse,
+    },
+  ])
+  await gotoPage(page, '/city/summary')
   await summaryPage.clickButton('Kampala')
   await expect(cityPage.toolbarTextFinder('Cities/Kampala')).toBeVisible()
   await summaryPage.clickButton('Cities')

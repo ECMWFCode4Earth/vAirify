@@ -46,21 +46,18 @@ test('legenda', async ({ page, cityPage }) => {
       site_name: 'Copacabana',
     }),
   ]
-  await setupPageWithMockData(
-    page,
-    [
-      {
-        endpointUrl: '*/**/air-pollutant/forecast*',
-        mockedAPIResponse: mockedForecastResponse,
-      },
-      {
-        endpointUrl: '*/**/air-pollutant/measurements*',
-        mockedAPIResponse: mockedMeasurementsCityPageResponse,
-      },
-    ],
-    '/city/Rio%20de%20Janeiro',
-  )
+  await setupPageWithMockData(page, [
+    {
+      endpointUrl: '*/**/air-pollutant/forecast*',
+      mockedAPIResponse: mockedForecastResponse,
+    },
+    {
+      endpointUrl: '*/**/air-pollutant/measurements*',
+      mockedAPIResponse: mockedMeasurementsCityPageResponse,
+    },
+  ])
 
+  await gotoPage(page, '/city/Rio%20de%20Janeiro')
   await cityPage.waitForAllGraphsToBeVisible()
   await expect(cityPage.textFinder('Tijuca')).toBeVisible()
   await expect(cityPage.textFinder('Centro')).toBeVisible()
@@ -274,20 +271,17 @@ test.describe('City graph snapshots', () => {
       }),
     ]
 
-    await setupPageWithMockData(
-      page,
-      [
-        {
-          endpointUrl: '*/**/air-pollutant/forecast*',
-          mockedAPIResponse: mockedForecastResponse,
-        },
-        {
-          endpointUrl: '*/**/air-pollutant/measurements*',
-          mockedAPIResponse: mockedMeasurementsCityPageResponse,
-        },
-      ],
-      '/city/Rio%20de%20Janeiro',
-    )
+    await setupPageWithMockData(page, [
+      {
+        endpointUrl: '*/**/air-pollutant/forecast*',
+        mockedAPIResponse: mockedForecastResponse,
+      },
+      {
+        endpointUrl: '*/**/air-pollutant/measurements*',
+        mockedAPIResponse: mockedMeasurementsCityPageResponse,
+      },
+    ])
+    await gotoPage(page, '/city/Rio%20de%20Janeiro')
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
   })

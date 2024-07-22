@@ -60,14 +60,12 @@ export async function setupPageWithMockData(
     endpointUrl: string
     mockedAPIResponse: object
   }[],
-  cityUrl: string,
 ): Promise<void> {
   for (const { endpointUrl, mockedAPIResponse } of mockResponseForEndpoint) {
     await setupApiRoute(page, endpointUrl, mockedAPIResponse)
   }
-  await page.goto(cityUrl)
 }
 
-export async function gotoPage(page, cityUrl: string): Promise<void> {
+export async function gotoPage(page: Page, cityUrl: string): Promise<void> {
   await page.goto(cityUrl)
 }
