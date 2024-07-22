@@ -85,36 +85,36 @@ test.describe('Table data validation', () => {
         valid_time: '2024-06-19T09:00:00Z',
         location_type: 'city',
         location_name: 'Kampala',
-        overall_aqi_level: 2,
-        no2: { aqi_level: 1, value: 0.3812829140487199 },
-        o3: { aqi_level: 2, value: 72.9086035913633 },
-        pm2_5: { aqi_level: 2, value: 16.067128848211063 },
-        pm10: { aqi_level: 2, value: 26.087666551144732 },
-        so2: { aqi_level: 1, value: 0.6314619719025142 },
+        overall_aqi_level: CaseAQI2.aqiLevel,
+        no2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.no2 },
+        o3: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.o3 },
+        pm2_5: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.pm2_5 },
+        pm10: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.pm10 },
+        so2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.so2 },
       }),
       createForecastAPIResponseData({
         base_time: '2024-06-19T00:00:00Z',
         valid_time: '2024-06-19T12:00:00Z',
         location_type: 'city',
         location_name: 'Abu Dhabi',
-        overall_aqi_level: 4,
-        no2: { aqi_level: 1, value: 5.871611751344455 },
-        o3: { aqi_level: 4, value: 213.04088459925424 },
-        pm2_5: { aqi_level: 5, value: 52.75 },
-        pm10: { aqi_level: 4, value: 58.25755291558235 },
-        so2: { aqi_level: 1, value: 8.497931484924965 },
+        overall_aqi_level: CaseAQI4.aqiLevel,
+        no2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.no2 },
+        o3: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.o3 },
+        pm2_5: { aqi_level: CaseAQI5.aqiLevel, value: CaseAQI5.pm2_5 },
+        pm10: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm10 },
+        so2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.so2 },
       }),
       createForecastAPIResponseData({
         base_time: '2024-06-19T00:00:00Z',
         valid_time: '2024-06-19T12:00:00Z',
         location_type: 'city',
         location_name: 'Zurich',
-        overall_aqi_level: 3,
-        no2: { aqi_level: 1, value: 1.2220194497781245 },
-        o3: { aqi_level: 3, value: 110.29793453644987 },
-        pm2_5: { aqi_level: 2, value: 17.161946368293673 },
-        pm10: { aqi_level: 2, value: 31.71802172436572 },
-        so2: { aqi_level: 1, value: 1.3459434727665889 },
+        overall_aqi_level: CaseAQI3.aqiLevel,
+        no2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.no2 },
+        o3: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 },
+        pm2_5: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.pm2_5 },
+        pm10: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.pm10 },
+        so2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.so2 },
       }),
     ]
 
@@ -122,32 +122,42 @@ test.describe('Table data validation', () => {
       createMeasurementSummaryAPIResponseData({
         measurement_base_time: '2024-06-19T09:00:00Z',
         location_name: 'Kampala',
-        overall_aqi_level: { mean: 6 },
-        no2: { mean: { aqi_level: 1, value: 0.3812829140487199 } },
-        o3: { mean: { aqi_level: 2, value: 72.9086035913633 } },
-        pm2_5: { mean: { aqi_level: 6, value: 76 } },
-        pm10: { mean: { aqi_level: 2, value: 26.087666551144732 } },
-        so2: { mean: { aqi_level: 1, value: 0.6314619719025142 } },
+        overall_aqi_level: { mean: CaseAQI6.aqiLevel },
+        no2: {
+          mean: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.no2 },
+        },
+        o3: { mean: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.o3 } },
+        pm2_5: {
+          mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm2_5 },
+        },
+        pm10: { mean: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.pm10 } },
+        so2: { mean: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.so2 } },
       }),
       createMeasurementSummaryAPIResponseData({
         measurement_base_time: '2024-06-19T12:00:00Z',
         location_name: 'Abu Dhabi',
-        overall_aqi_level: { mean: 5 },
-        no2: { mean: { aqi_level: 1, value: 5.871611751344455 } },
-        o3: { mean: { aqi_level: 4, value: 213.04088459925424 } },
-        pm2_5: { mean: { aqi_level: 4, value: 30.29016575805515 } },
-        pm10: { mean: { aqi_level: 4, value: 58.25755291558235 } },
-        so2: { mean: { aqi_level: 1, value: 8.497931484924965 } },
+        overall_aqi_level: { mean: CaseAQI4.aqiLevel },
+        no2: { mean: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.no2 } },
+        o3: { mean: { aqi_level: CaseAQI5.aqiLevel, value: CaseAQI5.o3 } },
+        pm2_5: {
+          mean: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm2_5 },
+        },
+        pm10: { mean: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm10 } },
+        so2: { mean: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.so2 } },
       }),
       createMeasurementSummaryAPIResponseData({
         measurement_base_time: '2024-06-19T12:00:00Z',
         location_name: 'Zurich',
-        overall_aqi_level: { mean: 3 },
-        no2: { mean: { aqi_level: 1, value: 1.2220194497781245 } },
-        o3: { mean: { aqi_level: 3, value: 110.29793453644987 } },
-        pm2_5: { mean: { aqi_level: 2, value: 15.764618078867594 } },
-        pm10: { mean: { aqi_level: 2, value: 31.71802172436572 } },
-        so2: { mean: { aqi_level: 1, value: 1.3459434727665889 } },
+        overall_aqi_level: { mean: CaseAQI3.aqiLevel },
+        no2: {
+          mean: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.no2 },
+        },
+        o3: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 } },
+        pm2_5: {
+          mean: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.pm2_5 },
+        },
+        pm10: { mean: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.pm10 } },
+        so2: { mean: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.so2 } },
       }),
     ]
     await summaryPage.setupPageWithMockData(
@@ -158,34 +168,34 @@ test.describe('Table data validation', () => {
       // Kampala
       [
         // AQI Level
-        '2', // Forecast
-        '6', // Measured
+        CaseAQI2.aqiLevel.toString(), // Forecast
+        CaseAQI6.aqiLevel.toString(), // Measured
         '-4', // Diff
         // pm2.5
-        '16.1', // Forecast
-        '76', // Measured
+        CaseAQI2.pm2_5.toString(), // Forecast
+        CaseAQI6.pm2_5.toString(), // Measured
         '19 Jun 09:00', // Time
       ],
       // Abu Dhabi
       [
         // AQI Level
-        '5', //Forecast
-        '4', //Measured
+        CaseAQI5.aqiLevel.toString(), //Forecast
+        CaseAQI4.aqiLevel.toString(), //Measured
         '+1', // Diff
         //pm2.5
-        '52.8', //Forecast
-        '30.3', // Measured
+        CaseAQI5.pm2_5.toString(), //Forecast
+        CaseAQI4.pm2_5.toString(), // Measured
         '19 Jun 12:00', //Time
       ],
       // Zurich
       [
         // AQI Level
-        '2', //Forecast
-        '2', //Measured
+        CaseAQI3.aqiLevel.toString(), //Forecast
+        CaseAQI3.aqiLevel.toString(), //Measured
         '0', // Diff
         //pm2.5
-        '17.2', //Forecast
-        '15.8', //Measured
+        CaseAQI2.pm2_5.toString(), //Forecast
+        CaseAQI2.pm2_5.toString(), //Measured
         '19 Jun 12:00', //Time
       ],
     ]
@@ -462,6 +472,106 @@ test.describe('Table data validation', () => {
 
       await summaryPage.assertGridAttributes('values', expectedTableContents)
     })
+
+    test('Verify if at multiple times a pollutant has a shared largest deviation (+ / -), pollutant value time displayed will have preference for + deviations', async ({
+      summaryPage,
+    }) => {
+      const forecastLondonValidTimeArray: object[] = [
+        createForecastAPIResponseData({
+          base_time: '2024-07-22T00:00:00Z',
+          valid_time: '2024-07-22T03:00:00Z',
+          overall_aqi_level: CaseAQI3.aqiLevel,
+          no2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.no2 },
+          o3: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 },
+          pm2_5: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
+          pm10: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm10 },
+          so2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 },
+        }),
+        createForecastAPIResponseData({
+          base_time: '2024-07-22T00:00:00Z',
+          valid_time: '2024-07-22T12:00:00Z',
+          overall_aqi_level: CaseAQI6.aqiLevel,
+          no2: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.no2 },
+          o3: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.o3 },
+          pm2_5: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm2_5 },
+          pm10: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm10 },
+          so2: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 },
+        }),
+      ]
+
+      const measurementsLondonArray: object[] = [
+        createMeasurementSummaryAPIResponseData({
+          measurement_base_time: '2024-07-22T03:00:00Z',
+          overall_aqi_level: { mean: CaseAQI6.aqiLevel },
+          no2: {
+            mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.no2 },
+          },
+          o3: { mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.o3 } },
+          pm2_5: {
+            mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm2_5 },
+          },
+          pm10: {
+            mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm10 },
+          },
+          so2: {
+            mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 },
+          },
+        }),
+        createMeasurementSummaryAPIResponseData({
+          measurement_base_time: '2024-07-22T12:00:00Z',
+          overall_aqi_level: { mean: CaseAQI3.aqiLevel },
+          no2: {
+            mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.no2 },
+          },
+          o3: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 } },
+          pm2_5: {
+            mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
+          },
+          pm10: {
+            mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm10 },
+          },
+          so2: {
+            mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 },
+          },
+        }),
+      ]
+
+      await summaryPage.setupPageWithMockData(
+        forecastLondonValidTimeArray,
+        measurementsLondonArray,
+      )
+
+      const expectedTableContents: string[][] = [
+        [
+          // AQI Level
+          CaseAQI6.aqiLevel.toString(), // Forecast
+          CaseAQI3.aqiLevel.toString(), // Measured
+          '+3', // Diff
+          // pm2.5
+          CaseAQI6.pm2_5.toString(), // Forecast
+          CaseAQI3.pm2_5.toString(), //Measured
+          '22 Jul 12:00', //Time
+          // pm10
+          CaseAQI6.pm10.toString(), // Forecast
+          CaseAQI3.pm10.toString(), //Measured
+          '22 Jul 12:00', //Time
+          // no2
+          CaseAQI6.no2.toString(), // Forecast
+          CaseAQI3.no2.toString(), //Measured
+          '22 Jul 12:00', //Time
+          // o3
+          CaseAQI6.o3.toString(), // Forecast
+          CaseAQI3.o3.toString(), //Measured
+          '22 Jul 12:00', //Time
+          // so2
+          CaseAQI6.so2.toString(), // Forecast
+          CaseAQI3.so2.toString(), //Measured
+          '22 Jul 12:00', //Time
+        ],
+      ]
+
+      await summaryPage.assertGridAttributes('values', expectedTableContents)
+    })
   })
   test('Verify the forecast AQI Level value is the highest overall AQI level in forecast response', async ({
     summaryPage,
@@ -489,105 +599,6 @@ test.describe('Table data validation', () => {
         '3', // Forecast
         '6', // Measured
         '-3', // Diff
-      ],
-    ]
-
-    await summaryPage.assertGridAttributes('values', expectedTableContents)
-  })
-  test('Verify if at multiple times a pollutant has a shared largest deviation (+ / -), pollutant value time displayed will have preference for + deviations', async ({
-    summaryPage,
-  }) => {
-    const forecastLondonValidTimeArray: object[] = [
-      createForecastAPIResponseData({
-        base_time: '2024-07-22T00:00:00Z',
-        valid_time: '2024-07-22T03:00:00Z',
-        overall_aqi_level: CaseAQI3.aqiLevel,
-        no2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.no2 },
-        o3: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 },
-        pm2_5: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
-        pm10: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm10 },
-        so2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 },
-      }),
-      createForecastAPIResponseData({
-        base_time: '2024-07-22T00:00:00Z',
-        valid_time: '2024-07-22T12:00:00Z',
-        overall_aqi_level: CaseAQI6.aqiLevel,
-        no2: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.no2 },
-        o3: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.o3 },
-        pm2_5: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm2_5 },
-        pm10: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm10 },
-        so2: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 },
-      }),
-    ]
-
-    const measurementsLondonArray: object[] = [
-      createMeasurementSummaryAPIResponseData({
-        measurement_base_time: '2024-07-22T03:00:00Z',
-        overall_aqi_level: { mean: CaseAQI6.aqiLevel },
-        no2: {
-          mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.no2 },
-        },
-        o3: { mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.o3 } },
-        pm2_5: {
-          mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm2_5 },
-        },
-        pm10: {
-          mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm10 },
-        },
-        so2: {
-          mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 },
-        },
-      }),
-      createMeasurementSummaryAPIResponseData({
-        measurement_base_time: '2024-07-22T12:00:00Z',
-        overall_aqi_level: { mean: CaseAQI3.aqiLevel },
-        no2: {
-          mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.no2 },
-        },
-        o3: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 } },
-        pm2_5: {
-          mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
-        },
-        pm10: {
-          mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm10 },
-        },
-        so2: {
-          mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 },
-        },
-      }),
-    ]
-
-    await summaryPage.setupPageWithMockData(
-      forecastLondonValidTimeArray,
-      measurementsLondonArray,
-    )
-
-    const expectedTableContents: string[][] = [
-      [
-        // AQI Level
-        CaseAQI6.aqiLevel.toString(), // Forecast
-        CaseAQI3.aqiLevel.toString(), // Measured
-        '+3', // Diff
-        // pm2.5
-        CaseAQI6.pm2_5.toString(), // Forecast
-        CaseAQI3.pm2_5.toString(), //Measured
-        '22 Jul 12:00', //Time
-        // pm10
-        CaseAQI6.pm10.toString(), // Forecast
-        CaseAQI3.pm10.toString(), //Measured
-        '22 Jul 12:00', //Time
-        // no2
-        CaseAQI6.no2.toString(), // Forecast
-        CaseAQI3.no2.toString(), //Measured
-        '22 Jul 12:00', //Time
-        // o3
-        CaseAQI6.o3.toString(), // Forecast
-        CaseAQI3.o3.toString(), //Measured
-        '22 Jul 12:00', //Time
-        // so2
-        CaseAQI6.so2.toString(), // Forecast
-        CaseAQI3.so2.toString(), //Measured
-        '22 Jul 12:00', //Time
       ],
     ]
 
