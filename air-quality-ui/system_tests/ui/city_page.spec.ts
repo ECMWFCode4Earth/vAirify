@@ -5,6 +5,10 @@ import {
   createMeasurementsCityPageResponseData,
 } from '../utils/mocked_api'
 
+test.use({
+  viewport: { width: 1920, height: 1080 },
+})
+
 test('vAirify logo is visible', async ({ page, banner }) => {
   await gotoPage(page, '/city/Rio%20de%20Janeiro')
   await expect(banner.logo).toBeVisible()
@@ -62,7 +66,7 @@ test('legenda', async ({ page, cityPage }) => {
   await expect(cityPage.textFinder('Centro')).toBeVisible()
   await expect(cityPage.textFinder('Copacabana')).toBeVisible()
   await cityPage.siteRemover('Centro')
-  expect(cityPage.textFinder('Centro')).toBeUndefined()
+  expect(cityPage.textFinder('Centro')).not.toBeVisible()
 })
 
 test.describe('City graph snapshots', () => {

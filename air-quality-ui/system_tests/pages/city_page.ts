@@ -4,11 +4,12 @@ import { BasePage } from './base_page'
 import { waitForIdleNetwork } from '../utils/helper_methods'
 
 export class CityPage extends BasePage {
+  readonly page: Page
+
   readonly aqiChart: Locator
   readonly datePicker: Locator
   readonly no2Chart: Locator
   readonly o3Chart: Locator
-  readonly page: Page
   readonly pm10Chart: Locator
   readonly pm2_5Chart: Locator
   readonly scroller: Locator
@@ -19,22 +20,19 @@ export class CityPage extends BasePage {
 
   constructor(page: Page) {
     super(page)
-    this.aqiChart = this.page
-      .getByTestId('main-comparison-chart')
-      .locator('canvas')
-    this.datePicker = this.page.getByPlaceholder('DD/MM/YYYY hh:mm')
-    this.no2Chart = this.page.getByTestId('site_measurements_chart_no2')
-    this.o3Chart = this.page.getByTestId('site_measurements_chart_o3')
     this.page = page
-    this.pm10Chart = this.page.getByTestId('site_measurements_chart_pm10')
-    this.pm2_5Chart = this.page.getByTestId('site_measurements_chart_pm2_5')
-    this.scroller = this.page.locator('.ag-body-horizontal-scroll-viewport')
-    this.siteForm = this.page.getByTestId('sites-form')
-    this.so2Chart = this.page.getByTestId('site_measurements_chart_so2')
-    this.title = this.page.locator('title')
-    this.toolbarNavigation = this.page.getByLabel(
-      'Toolbar with site navigation',
-    )
+
+    this.aqiChart = page.getByTestId('aqi_chart').locator('canvas')
+    this.datePicker = page.getByPlaceholder('DD/MM/YYYY hh:mm')
+    this.no2Chart = page.getByTestId('site_measurements_chart_no2')
+    this.o3Chart = page.getByTestId('site_measurements_chart_o3')
+    this.pm10Chart = page.getByTestId('site_measurements_chart_pm10')
+    this.pm2_5Chart = page.getByTestId('site_measurements_chart_pm2_5')
+    this.scroller = page.locator('.ag-body-horizontal-scroll-viewport')
+    this.siteForm = page.getByTestId('sites-form')
+    this.so2Chart = page.getByTestId('site_measurements_chart_so2')
+    this.title = page.locator('title')
+    this.toolbarNavigation = page.getByLabel('Toolbar with site navigation')
   }
   async setBaseTime(baseTime: string) {
     return this.datePicker.fill(baseTime)
