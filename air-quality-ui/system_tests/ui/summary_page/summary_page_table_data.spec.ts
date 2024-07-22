@@ -572,7 +572,108 @@ test.describe('Table data validation', () => {
 
       await summaryPage.assertGridAttributes('values', expectedTableContents)
     })
+
+    test('Verify if at multiple times a pollutant has a shared largest deviation with no +/- to prefer, pollutant value time displayed will have preference for earliest time', async ({
+      summaryPage,
+    }) => {
+      const forecastLondonValidTimeArray: object[] = [
+        createForecastAPIResponseData({
+          base_time: '2024-07-22T00:00:00Z',
+          valid_time: '2024-07-22T03:00:00Z',
+          overall_aqi_level: CaseAQI3.aqiLevel,
+          no2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.no2 },
+          o3: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 },
+          pm2_5: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
+          pm10: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm10 },
+          so2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 },
+        }),
+        createForecastAPIResponseData({
+          base_time: '2024-07-22T00:00:00Z',
+          valid_time: '2024-07-22T12:00:00Z',
+          overall_aqi_level: CaseAQI3.aqiLevel,
+          no2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.no2 },
+          o3: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 },
+          pm2_5: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
+          pm10: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm10 },
+          so2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 },
+        }),
+      ]
+
+      const measurementsLondonArray: object[] = [
+        createMeasurementSummaryAPIResponseData({
+          measurement_base_time: '2024-07-22T03:00:00Z',
+          overall_aqi_level: { mean: CaseAQI6.aqiLevel },
+          no2: {
+            mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.no2 },
+          },
+          o3: { mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.o3 } },
+          pm2_5: {
+            mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm2_5 },
+          },
+          pm10: {
+            mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm10 },
+          },
+          so2: {
+            mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 },
+          },
+        }),
+        createMeasurementSummaryAPIResponseData({
+          measurement_base_time: '2024-07-22T12:00:00Z',
+          overall_aqi_level: { mean: CaseAQI6.aqiLevel },
+          no2: {
+            mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.no2 },
+          },
+          o3: { mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.o3 } },
+          pm2_5: {
+            mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm2_5 },
+          },
+          pm10: {
+            mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm10 },
+          },
+          so2: {
+            mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 },
+          },
+        }),
+      ]
+
+      await summaryPage.setupPageWithMockData(
+        forecastLondonValidTimeArray,
+        measurementsLondonArray,
+      )
+
+      const expectedTableContents: string[][] = [
+        [
+          // AQI Level
+          CaseAQI3.aqiLevel.toString(), // Forecast
+          CaseAQI6.aqiLevel.toString(), // Measured
+          '-3', // Diff
+          // pm2.5
+          CaseAQI3.pm2_5.toString(), // Forecast
+          CaseAQI6.pm2_5.toString(), //Measured
+          '22 Jul 03:00', //Time
+          // pm10
+          CaseAQI3.pm10.toString(), // Forecast
+          CaseAQI6.pm10.toString(), //Measured
+          '22 Jul 03:00', //Time
+          // no2
+          CaseAQI3.no2.toString(), // Forecast
+          CaseAQI6.no2.toString(), //Measured
+          '22 Jul 03:00', //Time
+          // o3
+          CaseAQI3.o3.toString(), // Forecast
+          CaseAQI6.o3.toString(), //Measured
+          '22 Jul 03:00', //Time
+          // so2
+          CaseAQI3.so2.toString(), // Forecast
+          CaseAQI6.so2.toString(), //Measured
+          '22 Jul 03:00', //Time
+        ],
+      ]
+
+      await summaryPage.assertGridAttributes('values', expectedTableContents)
+    })
   })
+
   test('Verify the forecast AQI Level value is the highest overall AQI level in forecast response', async ({
     summaryPage,
   }) => {
