@@ -1,4 +1,4 @@
-from datetime import timezone, datetime
+from datetime import timezone, datetime, timedelta
 import pytest
 
 from etl.scripts.run_forecast_etl import main
@@ -118,13 +118,22 @@ def test__that_each_document_has_location_type_city(setup_data):
     for document in dict_result:
         assert (
                 document["location_type"] == "city"
-        ), f"location_type '{document['location_type']}' is not a city!"
+        ), f"location_type '{document['location_type']}' is not city"
 
 
-def test__document_count_for_single_day_matches_expected(setup_data):
+def test__that_each_document_has_source_cams_production(setup_data):
     dict_result = get_database_data("forecast_data", data_query)
 
-    # no of locations * expected doc count
+    for document in dict_result:
+        assert (
+                document["source"] == "cams-production"
+        ), f"source '{document['source']}' is not cams-production"
+
+
+def test__document_count_matches_expected(setup_data):
+    dict_result = get_database_data("forecast_data", data_query)
+
+    # no of locations * no of forecast times
     expected_doc_count = 153 * 41
 
     assert (
@@ -135,7 +144,29 @@ def test__document_count_for_single_day_matches_expected(setup_data):
 def test__created_time_exists(setup_data):
     dict_result = get_database_data("forecast_data", data_query)
     for document in dict_result:
-        assert "created_time" in document, "A document is missing the created_time key!"
+        assert "created_time" in document, "A document is missing the created_time key"
+
+
+def test__forecast_base_time_is_correct(setup_data):
+    dict_result = get_database_data("forecast_data", data_query)
+    for document in dict_result:
+        assert (
+                document["forecast_base_time"] == forecast_base_time
+        ), "A document does not have the correct forecast base time"
+
+
+def test__forecast_valid_time_and_range_is_valid(setup_data):
+    dict_result = get_database_data("forecast_data", data_query)
+    for document in dict_result:
+        forecast_range = document["forecast_range"]
+        assert forecast_range % 3 == 0, \
+            "Forecast range found that isn't a multiple of 3"
+        expected_valid_time = forecast_base_time + timedelta(hours=forecast_range)
+
+        assert (
+
+                document["forecast_valid_time"] == expected_valid_time
+        ), "A document does not have a valid forecast_valid_time for the range"
 
 
 # Helper function to assert if a subset dictionary is contained within a superset
