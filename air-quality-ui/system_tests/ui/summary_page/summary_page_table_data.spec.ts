@@ -48,12 +48,12 @@ test.describe('Table data validation', () => {
         valid_time: '2024-06-24T09:00:00Z',
         location_type: 'city',
         location_name: 'Kyiv',
-        overall_aqi_level: 2,
-        no2: { aqi_level: 1, value: 0.7852695955767444 },
-        o3: { aqi_level: 2, value: 80.0214446372413 },
-        pm2_5: { aqi_level: 1, value: 7.024702103355023 },
-        pm10: { aqi_level: 1, value: 10.313057730041718 },
-        so2: { aqi_level: 1, value: 0.465807542763243 },
+        overall_aqi_level: CaseAQI2.aqiLevel,
+        no2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.no2 },
+        o3: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.o3 },
+        pm2_5: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.pm2_5 },
+        pm10: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.pm10 },
+        so2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.so2 },
       }),
     ]
 
@@ -62,11 +62,11 @@ test.describe('Table data validation', () => {
     const expectedData: string[][] = [
       [
         // AQI Level
-        '2', // Forecast
+        CaseAQI2.aqiLevel.toString(), // Forecast
         '-', // Measured
         '-', // Diff
         // pm2.5
-        '7', // Forecast
+        CaseAQI1.pm2_5.toString(), // Forecast
         '-', // Measured
         '24 Jun 09:00', // Time
       ],
