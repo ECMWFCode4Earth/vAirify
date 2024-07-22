@@ -7,6 +7,7 @@ export enum Colours {
   aqi6 = 'rgb(125, 33, 129)',
   aqiNa = 'rgb(235, 235, 235)',
   notColoured = 'rgba(0, 0, 0, 0)',
+  noData = 'rgb(111, 111, 111)',
 }
 
 export enum CaseAQI1 {
