@@ -49,7 +49,7 @@ export default function colourCell(
   targetAqiValue: number,
 ): boolean {
   const aqiValues = fetchAqiValue(params)
-  if (!params.value || aqiValues.currentFieldAqiValue === -1) {
+  if (params.value === undefined || aqiValues.currentFieldAqiValue === -1) {
     return false
   }
 
