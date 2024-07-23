@@ -139,7 +139,9 @@ def test__save_data_textures(
     mock_create_output_directory.return_value = "/mock/output/directory"
 
     mock_write_texture_to_disk.side_effect = (
-        lambda chunk, output_directory, forecast_date, variable_name, chunk_num, total_chunks, file_format: f"/mock/output/directory/{forecast_date}_{variable_name}_chunk{chunk_num}."
+        lambda chunk, output_directory, forecast_date, variable_name, chunk_num,
+        total_chunks, file_format:
+        f"/mock/output/directory/{forecast_date}_{variable_name}_chunk{chunk_num}."
         f"{file_format}"
     )
 
