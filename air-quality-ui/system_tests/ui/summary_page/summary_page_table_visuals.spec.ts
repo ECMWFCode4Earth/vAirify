@@ -1,6 +1,8 @@
 import { test } from '../../utils/fixtures'
 import {
   createForecastAPIResponseData,
+  createForecastResponseWithValidTimeAndAQI,
+  createMeasurementSumResponseWithTimeAndAQI,
   createMeasurementSummaryAPIResponseData,
 } from '../../utils/mocked_api'
 import {
@@ -228,5 +230,52 @@ test.describe('Colour testing', () => {
       await summaryPage.highlightValuesToggle.click()
       await summaryPage.assertGridAttributes('colours', expectedTableColours)
     })
+  })
+  test('Verify a pollutant value of 0 is assigned AQI 1 colour', async ({
+    summaryPage,
+  }) => {
+    const forecastLondonValidTimeArray: object[] = [
+      createForecastResponseWithValidTimeAndAQI('2024-07-08T03:00:00Z', 1),
+    ]
+
+    const measurementsLondonArray: object[] = [
+      createMeasurementSumResponseWithTimeAndAQI('2024-07-08T03:00:00Z', 1),
+    ]
+
+    await summaryPage.setupPageWithMockData(
+      forecastLondonValidTimeArray,
+      measurementsLondonArray,
+    )
+
+    const expectedTableContents: string[][] = [
+      [
+        // AQI Level
+        Colours.aqi1, // Forecast
+        Colours.aqi1, // Measured
+        Colours.notColoured, // Diff
+        // pm2.5
+        Colours.aqi1, // Forecast
+        Colours.aqi1, // Measured
+        Colours.notColoured, // Time
+        // pm10
+        Colours.aqi1, // Forecast
+        Colours.aqi1, // Measured
+        Colours.notColoured, // Time
+        // no2
+        Colours.aqi1, // Forecast
+        Colours.aqi1, // Measured
+        Colours.notColoured, // Time
+        // o3
+        Colours.aqi1, // Forecast
+        Colours.aqi1, // Measured
+        Colours.notColoured, // Time
+        // so2
+        Colours.aqi1, // Forecast
+        Colours.aqi1, // Measured
+        Colours.notColoured, // Time
+      ],
+    ]
+
+    await summaryPage.assertGridAttributes('colours', expectedTableContents)
   })
 })
