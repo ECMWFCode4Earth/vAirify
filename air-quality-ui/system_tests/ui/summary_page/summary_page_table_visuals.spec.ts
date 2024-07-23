@@ -1,4 +1,5 @@
 import { test } from '../../utils/fixtures'
+import { gotoPage, setupPageWithMockData } from '../../utils/helper_methods'
 import {
   createForecastAPIResponseData,
   createMeasurementSummaryAPIResponseData,
@@ -16,8 +17,9 @@ import {
 test.describe('Table structure', () => {
   test('Verify that headers exist and innertext matches', async ({
     summaryPage,
+    page,
   }) => {
-    await summaryPage.goTo()
+    await gotoPage(page, '/city/summary')
     await summaryPage.getColumnHeaderAndText('AQI Level', 'AQI Level')
     await summaryPage.getColumnHeaderAndText('PM 2.5 (µg/m³)', 'PM 2.5 (µg/m³)')
     await summaryPage.getColumnHeaderAndText('PM 10 (µg/m³)', 'PM 10 (µg/m³)')
@@ -38,39 +40,49 @@ test.describe('Table structure', () => {
 
 test.describe('Colour testing', () => {
   test.describe('Valid data', () => {
-    test.beforeEach(async ({ summaryPage }) => {
-      await summaryPage.setupPageWithMockData(
-        [
-          createForecastAPIResponseData({
-            valid_time: '2024-07-08T03:00:00Z',
-            no2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.no2 },
-            o3: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.o3 },
-            pm2_5: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
-            pm10: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm10 },
-            so2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.so2 },
-          }),
-        ],
-        [
-          createMeasurementSummaryAPIResponseData({
-            measurement_base_time: '2024-07-08T03:00:00Z',
-            no2: {
-              mean: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.no2 },
-            },
-            o3: {
-              mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 },
-            },
-            pm2_5: {
-              mean: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm2_5 },
-            },
-            pm10: {
-              mean: { aqi_level: CaseAQI5.aqiLevel, value: CaseAQI5.pm10 },
-            },
-            so2: {
-              mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 },
-            },
-          }),
-        ],
-      )
+    test.beforeEach(async ({ page }) => {
+      const mockedForecastResponse = [
+        createForecastAPIResponseData({
+          valid_time: '2024-07-08T03:00:00Z',
+          no2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.no2 },
+          o3: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.o3 },
+          pm2_5: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
+          pm10: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm10 },
+          so2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.so2 },
+        }),
+      ]
+      const mockedMeasurementSummaryResponse = [
+        createMeasurementSummaryAPIResponseData({
+          measurement_base_time: '2024-07-08T03:00:00Z',
+          no2: {
+            mean: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.no2 },
+          },
+          o3: {
+            mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 },
+          },
+          pm2_5: {
+            mean: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm2_5 },
+          },
+          pm10: {
+            mean: { aqi_level: CaseAQI5.aqiLevel, value: CaseAQI5.pm10 },
+          },
+          so2: {
+            mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 },
+          },
+        }),
+      ]
+
+      await setupPageWithMockData(page, [
+        {
+          endpointUrl: '*/**/air-pollutant/forecast*',
+          mockedAPIResponse: mockedForecastResponse,
+        },
+        {
+          endpointUrl: '*/**/air-pollutant/measurements/summary*',
+          mockedAPIResponse: mockedMeasurementSummaryResponse,
+        },
+      ])
+      await gotoPage(page, '/city/summary')
     })
 
     test('Default Toggle: Highlight all AQI values', async ({
@@ -104,7 +116,7 @@ test.describe('Colour testing', () => {
           Colours.notColoured, // Time
         ],
       ]
-
+      await summaryPage.waitForLoad()
       await summaryPage.assertGridAttributes('colours', expectedTableColours)
     })
 
@@ -145,8 +157,8 @@ test.describe('Colour testing', () => {
   })
 
   test.describe('No Data', () => {
-    test.beforeEach(async ({ summaryPage }) => {
-      await summaryPage.setupPageWithMockData([
+    test.beforeEach(async ({ page }) => {
+      const mockedForecastResponse = [
         createForecastAPIResponseData({
           valid_time: '2024-07-08T03:00:00Z',
           location_name: 'Berlin',
@@ -156,7 +168,14 @@ test.describe('Colour testing', () => {
           pm10: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm10 },
           so2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 },
         }),
+      ]
+      await setupPageWithMockData(page, [
+        {
+          endpointUrl: '*/**/air-pollutant/forecast*',
+          mockedAPIResponse: mockedForecastResponse,
+        },
       ])
+      await gotoPage(page, '/city/summary')
     })
 
     test('Default Toggle: If there is "no data", cell is coloured grey', async ({
@@ -190,7 +209,7 @@ test.describe('Colour testing', () => {
           Colours.notColoured, // Time
         ],
       ]
-
+      await summaryPage.waitForLoad()
       await summaryPage.assertGridAttributes('colours', expectedTableColours)
     })
 
@@ -225,35 +244,47 @@ test.describe('Colour testing', () => {
           Colours.notColoured, // Time
         ],
       ]
+      await summaryPage.waitForLoad()
       await summaryPage.highlightValuesToggle.click()
       await summaryPage.assertGridAttributes('colours', expectedTableColours)
     })
   })
   test('Verify a pollutant value of 0 is assigned AQI 1 colour', async ({
+    page,
     summaryPage,
   }) => {
-    await summaryPage.setupPageWithMockData(
-      [
-        createForecastAPIResponseData({
-          valid_time: '2024-07-08T03:00:00Z',
-          no2: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
-          o3: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
-          pm2_5: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
-          pm10: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
-          so2: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
-        }),
-      ],
-      [
-        createMeasurementSummaryAPIResponseData({
-          measurement_base_time: '2024-07-08T03:00:00Z',
-          no2: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
-          o3: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
-          pm2_5: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
-          pm10: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
-          so2: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
-        }),
-      ],
-    )
+    const mockedForecastResponse = [
+      createForecastAPIResponseData({
+        valid_time: '2024-07-08T03:00:00Z',
+        no2: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
+        o3: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
+        pm2_5: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
+        pm10: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
+        so2: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
+      }),
+    ]
+    const mockedMeasurementSummaryResponse = [
+      createMeasurementSummaryAPIResponseData({
+        measurement_base_time: '2024-07-08T03:00:00Z',
+        no2: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
+        o3: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
+        pm2_5: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
+        pm10: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
+        so2: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
+      }),
+    ]
+    await setupPageWithMockData(page, [
+      {
+        endpointUrl: '*/**/air-pollutant/forecast*',
+        mockedAPIResponse: mockedForecastResponse,
+      },
+      {
+        endpointUrl: '*/**/air-pollutant/measurements/summary*',
+        mockedAPIResponse: mockedMeasurementSummaryResponse,
+      },
+    ])
+
+    await gotoPage(page, '/city/summary')
 
     const expectedTableContents: string[][] = [
       [
@@ -283,7 +314,7 @@ test.describe('Colour testing', () => {
         Colours.notColoured, // Time
       ],
     ]
-
+    await summaryPage.waitForLoad()
     await summaryPage.assertGridAttributes('colours', expectedTableContents)
   })
 })

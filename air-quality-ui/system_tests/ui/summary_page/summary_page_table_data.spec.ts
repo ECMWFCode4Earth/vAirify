@@ -1,4 +1,5 @@
 import { expect, test } from '../../utils/fixtures'
+import { gotoPage, setupPageWithMockData } from '../../utils/helper_methods'
 import {
   createForecastAPIResponseData,
   createForecastResponseWithValidTimeAndAQI,
@@ -16,6 +17,7 @@ import {
 
 test('Verify that a city with no in-situ data still shown on grid', async ({
   summaryPage,
+  page,
 }) => {
   const mockedForecastResponse = [
     createForecastAPIResponseData({
@@ -32,7 +34,15 @@ test('Verify that a city with no in-situ data still shown on grid', async ({
     }),
   ]
 
-  await summaryPage.setupPageWithMockData(mockedForecastResponse)
+  await setupPageWithMockData(page, [
+    {
+      endpointUrl: '*/**/air-pollutant/forecast*',
+      mockedAPIResponse: mockedForecastResponse,
+    },
+  ])
+
+  await gotoPage(page, '/city/summary')
+  await summaryPage.waitForLoad()
   const count: number = await summaryPage.textCellSearch('Kyiv')
   const expectedData: string[][] = [
     [
@@ -54,6 +64,7 @@ test('Verify that a city with no in-situ data still shown on grid', async ({
 // This test checks several things, including some of the behviour around pollutant values selected as detailed in the Summary Page Explained Wiki 'Pollutant difference rules'
 test('Check data over several rows is displayed correctly on grid, including +/- diffs', async ({
   summaryPage,
+  page,
 }) => {
   const mockedForecastResponse = [
     createForecastAPIResponseData({
@@ -136,10 +147,19 @@ test('Check data over several rows is displayed correctly on grid, including +/-
       so2: { mean: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.so2 } },
     }),
   ]
-  await summaryPage.setupPageWithMockData(
-    mockedForecastResponse,
-    mockedMeasurementSummaryResponse,
-  )
+  await setupPageWithMockData(page, [
+    {
+      endpointUrl: '*/**/air-pollutant/forecast*',
+      mockedAPIResponse: mockedForecastResponse,
+    },
+    {
+      endpointUrl: '*/**/air-pollutant/measurements/summary*',
+      mockedAPIResponse: mockedMeasurementSummaryResponse,
+    },
+  ])
+
+  await gotoPage(page, '/city/summary')
+
   const expectedData = [
     // Kampala
     [
@@ -175,12 +195,13 @@ test('Check data over several rows is displayed correctly on grid, including +/-
       '19 Jun 12:00', //Time
     ],
   ]
-
+  await summaryPage.waitForLoad()
   await summaryPage.assertGridAttributes('values', expectedData)
 })
 
 test('Verify pollutant level diff 0 does not override a larger diff for calculation of overall AQI level', async ({
   summaryPage,
+  page,
 }) => {
   // Specific polutant values used to replicate example in bug, however simplified to one valid_time
   const mockedForecastResponse = [
@@ -208,11 +229,19 @@ test('Verify pollutant level diff 0 does not override a larger diff for calculat
     }),
   ]
 
-  await summaryPage.setupPageWithMockData(
-    mockedForecastResponse,
-    measurementSummaryResponse,
-  )
+  await setupPageWithMockData(page, [
+    {
+      endpointUrl: '*/**/air-pollutant/forecast*',
+      mockedAPIResponse: mockedForecastResponse,
+    },
+    {
+      endpointUrl: '*/**/air-pollutant/measurements/summary*',
+      mockedAPIResponse: measurementSummaryResponse,
+    },
+  ])
 
+  await gotoPage(page, '/city/summary')
+  await summaryPage.waitForLoad()
   const expectedTableContents: string[][] = [
     [
       // AQI Level
@@ -228,6 +257,7 @@ test('Verify pollutant level diff 0 does not override a larger diff for calculat
 test.describe('Verifying a full row is correct', () => {
   test('Verify table shows pollutant data for the timestamp that has the largest deviation - forecast AQI 6, measurement AQI 3', async ({
     summaryPage,
+    page,
   }) => {
     const forecastLondonValidTimeArray: object[] = [
       createForecastResponseWithValidTimeAndAQI('2024-07-08T00:00:00Z', 3),
@@ -269,10 +299,18 @@ test.describe('Verifying a full row is correct', () => {
       createMeasurementSumResponseWithTimeAndAQI('2024-07-08T12:00:00Z', 3),
     ]
 
-    await summaryPage.setupPageWithMockData(
-      forecastLondonValidTimeArray,
-      measurementsLondonArray,
-    )
+    await setupPageWithMockData(page, [
+      {
+        endpointUrl: '*/**/air-pollutant/forecast*',
+        mockedAPIResponse: forecastLondonValidTimeArray,
+      },
+      {
+        endpointUrl: '*/**/air-pollutant/measurements/summary*',
+        mockedAPIResponse: measurementsLondonArray,
+      },
+    ])
+
+    await gotoPage(page, '/city/summary')
 
     const expectedTableContents: string[][] = [
       [
@@ -302,11 +340,13 @@ test.describe('Verifying a full row is correct', () => {
         '08 Jul 06:00', // Time
       ],
     ]
+    await summaryPage.waitForLoad()
     await summaryPage.assertGridAttributes('values', expectedTableContents)
   })
 
   test('Verify table shows pollutant data for the timestamp that has the largest deviation - forecast AQI 3, measurement AQI 6', async ({
     summaryPage,
+    page,
   }) => {
     const forecastLondonValidTimeArray: object[] = [
       createForecastAPIResponseData({
@@ -343,11 +383,18 @@ test.describe('Verifying a full row is correct', () => {
       createMeasurementSumResponseWithTimeAndAQI('2024-07-08T12:00:00Z', 4),
     ]
 
-    await summaryPage.setupPageWithMockData(
-      forecastLondonValidTimeArray,
-      measurementsLondonArray,
-    )
+    await setupPageWithMockData(page, [
+      {
+        endpointUrl: '*/**/air-pollutant/forecast*',
+        mockedAPIResponse: forecastLondonValidTimeArray,
+      },
+      {
+        endpointUrl: '*/**/air-pollutant/measurements/summary*',
+        mockedAPIResponse: measurementsLondonArray,
+      },
+    ])
 
+    await gotoPage(page, '/city/summary')
     const expectedTableContents: string[][] = [
       [
         // AQI Level
@@ -376,12 +423,13 @@ test.describe('Verifying a full row is correct', () => {
         '08 Jul 09:00', //Time
       ],
     ]
-
+    await summaryPage.waitForLoad()
     await summaryPage.assertGridAttributes('values', expectedTableContents)
   })
 
   test('Verify table shows pollutant data for the timestamp that has the largest deviation - diff 0 - forecast AQI 3, measurement AQI 3', async ({
     summaryPage,
+    page,
   }) => {
     const forecastLondonValidTimeArray: object[] = [
       createForecastResponseWithValidTimeAndAQI('2024-07-08T03:00:00Z', 3),
@@ -412,11 +460,18 @@ test.describe('Verifying a full row is correct', () => {
       }),
     ]
 
-    await summaryPage.setupPageWithMockData(
-      forecastLondonValidTimeArray,
-      measurementsLondonArray,
-    )
+    await setupPageWithMockData(page, [
+      {
+        endpointUrl: '*/**/air-pollutant/forecast*',
+        mockedAPIResponse: forecastLondonValidTimeArray,
+      },
+      {
+        endpointUrl: '*/**/air-pollutant/measurements/summary*',
+        mockedAPIResponse: measurementsLondonArray,
+      },
+    ])
 
+    await gotoPage(page, '/city/summary')
     const expectedTableContents: string[][] = [
       [
         // AQI Level
@@ -445,12 +500,14 @@ test.describe('Verifying a full row is correct', () => {
         '08 Jul 12:00', //Time
       ],
     ]
+    await summaryPage.waitForLoad()
 
     await summaryPage.assertGridAttributes('values', expectedTableContents)
   })
 
   test('Verify if at multiple times a pollutant has a shared largest deviation (+ / -), pollutant value time displayed will have preference for + deviations', async ({
     summaryPage,
+    page,
   }) => {
     const forecastLondonValidTimeArray: object[] = [
       createForecastAPIResponseData({
@@ -512,11 +569,19 @@ test.describe('Verifying a full row is correct', () => {
       }),
     ]
 
-    await summaryPage.setupPageWithMockData(
-      forecastLondonValidTimeArray,
-      measurementsLondonArray,
-    )
+    await setupPageWithMockData(page, [
+      {
+        endpointUrl: '*/**/air-pollutant/forecast*',
+        mockedAPIResponse: forecastLondonValidTimeArray,
+      },
+      {
+        endpointUrl: '*/**/air-pollutant/measurements/summary*',
+        mockedAPIResponse: measurementsLondonArray,
+      },
+    ])
 
+    await gotoPage(page, '/city/summary')
+    await summaryPage.waitForLoad()
     const expectedTableContents: string[][] = [
       [
         // AQI Level
@@ -551,6 +616,7 @@ test.describe('Verifying a full row is correct', () => {
 
   test('Verify if at multiple times a pollutant has a shared largest deviation with no +/- to prefer, pollutant value time displayed will have preference for earliest time', async ({
     summaryPage,
+    page,
   }) => {
     const forecastLondonValidTimeArray: object[] = [
       createForecastAPIResponseData({
@@ -612,10 +678,19 @@ test.describe('Verifying a full row is correct', () => {
       }),
     ]
 
-    await summaryPage.setupPageWithMockData(
-      forecastLondonValidTimeArray,
-      measurementsLondonArray,
-    )
+    await setupPageWithMockData(page, [
+      {
+        endpointUrl: '*/**/air-pollutant/forecast*',
+        mockedAPIResponse: forecastLondonValidTimeArray,
+      },
+      {
+        endpointUrl: '*/**/air-pollutant/measurements/summary*',
+        mockedAPIResponse: measurementsLondonArray,
+      },
+    ])
+
+    await gotoPage(page, '/city/summary')
+    await summaryPage.waitForLoad()
 
     const expectedTableContents: string[][] = [
       [
@@ -652,6 +727,7 @@ test.describe('Verifying a full row is correct', () => {
 
 test('Verify the forecast AQI Level value is the highest overall AQI level in forecast response', async ({
   summaryPage,
+  page,
 }) => {
   const forecastLondonValidTimeArray: object[] = [
     // AQI 3 default forecast
@@ -665,10 +741,18 @@ test('Verify the forecast AQI Level value is the highest overall AQI level in fo
     createMeasurementSumResponseWithTimeAndAQI('2024-07-08T12:00:00Z', 6),
   ]
 
-  await summaryPage.setupPageWithMockData(
-    forecastLondonValidTimeArray,
-    measurementsLondonArray,
-  )
+  await setupPageWithMockData(page, [
+    {
+      endpointUrl: '*/**/air-pollutant/forecast*',
+      mockedAPIResponse: forecastLondonValidTimeArray,
+    },
+    {
+      endpointUrl: '*/**/air-pollutant/measurements/summary*',
+      mockedAPIResponse: measurementsLondonArray,
+    },
+  ])
+
+  await gotoPage(page, '/city/summary')
 
   const expectedTableContents: string[][] = [
     [
@@ -678,44 +762,55 @@ test('Verify the forecast AQI Level value is the highest overall AQI level in fo
       '-3', // Diff
     ],
   ]
+  await summaryPage.waitForLoad()
 
   await summaryPage.assertGridAttributes('values', expectedTableContents)
 })
 
 test.describe('Multiple pollutants share the max diff, but have DIFFERENT overall AQIs (+ / -)', () => {
-  test.beforeEach(async ({ summaryPage }) => {
-    await summaryPage.setupPageWithMockData(
-      [
-        createForecastAPIResponseData({
-          valid_time: '2024-07-08T03:00:00Z',
-          no2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.no2 },
-          o3: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.o3 },
-          pm2_5: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
-          pm10: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm10 },
-          so2: { aqi_level: CaseAQI5.aqiLevel, value: CaseAQI5.so2 },
-        }),
-      ],
-      [
-        createMeasurementSummaryAPIResponseData({
-          measurement_base_time: '2024-07-08T03:00:00Z',
-          no2: {
-            mean: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.no2 },
-          },
-          o3: {
-            mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 },
-          },
-          pm2_5: {
-            mean: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm2_5 },
-          },
-          pm10: {
-            mean: { aqi_level: CaseAQI5.aqiLevel, value: CaseAQI5.pm10 },
-          },
-          so2: {
-            mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 },
-          },
-        }),
-      ],
-    )
+  test.beforeEach(async ({ page }) => {
+    const forecastArray: object[] = [
+      createForecastAPIResponseData({
+        valid_time: '2024-07-08T03:00:00Z',
+        no2: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.no2 },
+        o3: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.o3 },
+        pm2_5: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
+        pm10: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm10 },
+        so2: { aqi_level: CaseAQI5.aqiLevel, value: CaseAQI5.so2 },
+      }),
+    ]
+    const measurementsArray: object[] = [
+      createMeasurementSummaryAPIResponseData({
+        measurement_base_time: '2024-07-08T03:00:00Z',
+        no2: {
+          mean: { aqi_level: CaseAQI2.aqiLevel, value: CaseAQI2.no2 },
+        },
+        o3: {
+          mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 },
+        },
+        pm2_5: {
+          mean: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm2_5 },
+        },
+        pm10: {
+          mean: { aqi_level: CaseAQI5.aqiLevel, value: CaseAQI5.pm10 },
+        },
+        so2: {
+          mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 },
+        },
+      }),
+    ]
+    await setupPageWithMockData(page, [
+      {
+        endpointUrl: '*/**/air-pollutant/forecast*',
+        mockedAPIResponse: forecastArray,
+      },
+      {
+        endpointUrl: '*/**/air-pollutant/measurements/summary*',
+        mockedAPIResponse: measurementsArray,
+      },
+    ])
+
+    await gotoPage(page, '/city/summary')
   })
 
   test('Default Toggle: Verify if multiple pollutants share the max diff, the AQI values displayed will be the ones with highest overall AQI value', async ({
@@ -729,6 +824,7 @@ test.describe('Multiple pollutants share the max diff, but have DIFFERENT overal
         '-1', // Diff
       ],
     ]
+    await summaryPage.waitForLoad()
 
     await summaryPage.assertGridAttributes('values', expectedTableContents)
   })
@@ -744,6 +840,7 @@ test.describe('Multiple pollutants share the max diff, but have DIFFERENT overal
         '-1', // Diff
       ],
     ]
+    await summaryPage.waitForLoad()
 
     await summaryPage.highlightValuesToggle.click()
     await summaryPage.assertGridAttributes('values', expectedTableContents)
@@ -751,7 +848,7 @@ test.describe('Multiple pollutants share the max diff, but have DIFFERENT overal
 })
 
 test.describe('Multiple pollutants share the max diff, and have the SAME overall AQIs (+ / -)', () => {
-  test.beforeEach(async ({ summaryPage }) => {
+  test.beforeEach(async ({ page }) => {
     const forecastArray: object[] = [
       createForecastAPIResponseData({
         valid_time: '2024-07-08T03:00:00Z',
@@ -778,7 +875,18 @@ test.describe('Multiple pollutants share the max diff, and have the SAME overall
       }),
     ]
 
-    await summaryPage.setupPageWithMockData(forecastArray, measurementsArray)
+    await setupPageWithMockData(page, [
+      {
+        endpointUrl: '*/**/air-pollutant/forecast*',
+        mockedAPIResponse: forecastArray,
+      },
+      {
+        endpointUrl: '*/**/air-pollutant/measurements/summary*',
+        mockedAPIResponse: measurementsArray,
+      },
+    ])
+
+    await gotoPage(page, '/city/summary')
   })
   test('Default Toggle: Verify if multiple pollutants share the max diff, and have the same overall AQIs (+ / -), positive difference is displayed', async ({
     summaryPage,
@@ -791,6 +899,7 @@ test.describe('Multiple pollutants share the max diff, and have the SAME overall
         '+5', // Diff
       ],
     ]
+    await summaryPage.waitForLoad()
 
     await summaryPage.assertGridAttributes('values', expectedTableContents)
   })
@@ -806,6 +915,7 @@ test.describe('Multiple pollutants share the max diff, and have the SAME overall
         '+5', // Diff
       ],
     ]
+    await summaryPage.waitForLoad()
 
     await summaryPage.highlightValuesToggle.click()
     await summaryPage.assertGridAttributes('values', expectedTableContents)

@@ -22,10 +22,11 @@ export class SummaryPage extends BasePage {
     this.title = page.locator('title')
   }
 
-  async goTo() {
-    await this.page.goto('/city/summary')
+  async waitForLoad() {
     await this.page.waitForSelector('.ag-root', { state: 'visible' })
-    await this.page.waitForSelector('.ag-header-cell', { state: 'visible' })
+    await this.page.waitForSelector('.ag-header-cell', {
+      state: 'visible',
+    })
   }
 
   async getColumnHeaderAndText(name: string, expectedText: string) {
@@ -114,22 +115,5 @@ export class SummaryPage extends BasePage {
       differences.push(calculation)
     }
     return differences.filter((d) => !isNaN(d))
-  }
-
-  async setupPageWithMockData(
-    mockedForecastResponse: object,
-    mockedMeasurementSummaryResponse?: object,
-  ) {
-    if (typeof mockedMeasurementSummaryResponse !== 'undefined') {
-      await this.setupApiRoute(
-        '*/**/air-pollutant/measurements/summary*',
-        mockedMeasurementSummaryResponse,
-      )
-    }
-    await this.setupApiRoute(
-      '*/**/air-pollutant/forecast*',
-      mockedForecastResponse,
-    )
-    await this.goTo()
   }
 }
