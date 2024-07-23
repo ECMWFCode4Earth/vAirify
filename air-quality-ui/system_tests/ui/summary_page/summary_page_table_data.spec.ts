@@ -179,7 +179,7 @@ test('Check data over several rows is displayed correctly on grid, including +/-
   await summaryPage.assertGridAttributes('values', expectedData)
 })
 
-test('(BugFix #191) Verify pollutant level diff 0 does not override a larger diff for calculation of overall AQI level', async ({
+test('Verify pollutant level diff 0 does not override a larger diff for calculation of overall AQI level', async ({
   summaryPage,
 }) => {
   // Specific polutant values used to replicate example in bug, however simplified to one valid_time
