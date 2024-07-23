@@ -1,8 +1,6 @@
 import { test } from '../../utils/fixtures'
 import {
   createForecastAPIResponseData,
-  createForecastResponseWithValidTimeAndAQI,
-  createMeasurementSumResponseWithTimeAndAQI,
   createMeasurementSummaryAPIResponseData,
 } from '../../utils/mocked_api'
 import {
