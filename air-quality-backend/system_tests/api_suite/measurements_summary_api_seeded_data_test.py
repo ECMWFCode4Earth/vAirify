@@ -266,27 +266,30 @@ invalid_in_situ_document: dict = {
 }
 
 
-# Test Setup
-load_dotenv()
-delete_database_data("in_situ_data")
-seed_api_test_data(
-    "in_situ_data",
-    [
-        test_city_1_site_1_2024_6_11_14_0_0,
-        test_city_2_site_1_2024_6_12_14_0_0,
-        test_city_2_site_2_2024_6_12_15_0_0,
-        test_city_3_site_1_2024_6_12_13_0_0,
-        test_city_a_site_1_2024_7_20_13_0_0,
-        test_city_a_site_2_2024_7_20_14_0_0,
-        test_city_a_site_3_2024_7_20_15_0_0,
-        test_city_a_site_4_2024_7_20_16_0_0,
-        test_city_b_site_1_2024_7_20_13_30_0,
-        test_city_b_site_2_2024_7_20_16_30_0,
-        test_city_c_site_1_2024_8_20_16_30_0,
-        test_city_c_site_2_2024_8_20_17_0_0,
-        invalid_in_situ_document,
-    ],
-)
+@pytest.fixture()
+def setup_test():
+    # Test Setup
+    load_dotenv()
+    delete_database_data("in_situ_data")
+    seed_api_test_data(
+        "in_situ_data",
+        [
+            test_city_1_site_1_2024_6_11_14_0_0,
+            test_city_2_site_1_2024_6_12_14_0_0,
+            test_city_2_site_2_2024_6_12_15_0_0,
+            test_city_3_site_1_2024_6_12_13_0_0,
+            test_city_a_site_1_2024_7_20_13_0_0,
+            test_city_a_site_2_2024_7_20_14_0_0,
+            test_city_a_site_3_2024_7_20_15_0_0,
+            test_city_a_site_4_2024_7_20_16_0_0,
+            test_city_b_site_1_2024_7_20_13_30_0,
+            test_city_b_site_2_2024_7_20_16_30_0,
+            test_city_c_site_1_2024_8_20_16_30_0,
+            test_city_c_site_2_2024_8_20_17_0_0,
+            invalid_in_situ_document,
+        ],
+    )
+
 
 # API GET request setup
 base_url = Routes.measurements_summary_api_endpoint
@@ -474,7 +477,7 @@ measurement_time_range = 90
     ],
 )
 def test__different_base_times__assert_data_filtered_appropriately(
-    api_parameters: dict, expected_city_names: str
+    setup_test, api_parameters: dict, expected_city_names: str
 ):
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
     actual_locations = get_list_of_key_values(response.json(), "location_name")
@@ -529,7 +532,7 @@ def test__different_base_times__assert_data_filtered_appropriately(
     ],
 )
 def test__different_measurement_time_range__assert_data_filtered_appropriately(
-    api_parameters: dict, expected_city_names: str
+    setup_test, api_parameters: dict, expected_city_names: str
 ):
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
     actual_locations = get_list_of_key_values(response.json(), "location_name")
@@ -663,6 +666,7 @@ def test__different_measurement_time_range__assert_data_filtered_appropriately(
     ],
 )
 def test__response_contains_correct_pollutant_mean_values(
+    setup_test,
     test_measurement_base_time_string: dict,
     expected_test_city_a_no2_mean: float,
     expected_test_city_b_no2_mean: float,
@@ -727,6 +731,7 @@ def test__response_contains_correct_pollutant_mean_values(
     ],
 )
 def test__response_contains_correct_pollutant_mean_aqi_level(
+    setup_test,
     test_measurement_base_time_string: str,
     expected_test_city_a_no2_mean_aqi_level: int,
     expected_test_city_b_no2_mean_aqi_level: int,
@@ -818,6 +823,7 @@ def test__response_contains_correct_pollutant_mean_aqi_level(
     ],
 )
 def test__response_contains_correct_mean_overall_aqi_level(
+    setup_test,
     test_measurement_base_time_string,
     expected_test_city_a_mean_overall_aqi: float | None,
     expected_test_city_b_mean_overall_aqi: float | None,
@@ -866,6 +872,7 @@ def test__response_contains_correct_mean_overall_aqi_level(
     ],
 )
 def test__check_measurement_base_time_in_response_is_correct(
+    setup_test,
     test_measurement_base_time_string: str,
 ):
     api_parameters: dict = {
@@ -883,7 +890,7 @@ def test__check_measurement_base_time_in_response_is_correct(
         assert city.get("measurement_base_time") == test_measurement_base_time_string
 
 
-def test__invalid_document_in_database__assert_500():
+def test__invalid_document_in_database__assert_500(setup_test):
     api_parameters: dict = {
         "location_type": location_type,
         "measurement_base_time": datetime.datetime(

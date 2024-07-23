@@ -34,7 +34,7 @@ export enum CaseAQI6 {
   so2 = 800,
 }
 
-export enum valueEnum {
+export enum defaultCitySnapshotValues {
   no2 = 51,
   o3 = 52,
   pm2_5 = 53,

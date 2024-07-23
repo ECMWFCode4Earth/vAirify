@@ -1,4 +1,4 @@
-import { CaseAQI3, valueEnum } from './default_aqi_enums'
+import { CaseAQI3, defaultCitySnapshotValues } from './default_aqi_enums'
 
 interface forecastAPIResponse {
   base_time: string
@@ -49,11 +49,11 @@ export function createMeasurementsCityPageResponseData(
     location_type: 'city',
     location_name: 'Rio de Janeiro',
     api_source: 'OpenAQ',
-    no2: valueEnum.no2,
-    o3: valueEnum.o3,
-    pm2_5: valueEnum.pm2_5,
-    pm10: valueEnum.pm10,
-    so2: valueEnum.so2,
+    no2: defaultCitySnapshotValues.no2,
+    o3: defaultCitySnapshotValues.o3,
+    pm2_5: defaultCitySnapshotValues.pm2_5,
+    pm10: defaultCitySnapshotValues.pm10,
+    so2: defaultCitySnapshotValues.so2,
     entity: 'Governmental Organisation',
     sensor_type: 'reference grade',
     site_name: 'Centro',

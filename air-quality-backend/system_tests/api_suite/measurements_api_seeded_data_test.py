@@ -205,26 +205,29 @@ location_names_test_city_1 = "Test City 1"
 location_names_test_city_2 = "Test City 2"
 location_names_test_city_3 = "Test City 3"
 
-# Test Setup
-load_dotenv()
-delete_database_data("in_situ_data")
-seed_api_test_data(
-    "in_situ_data",
-    [
-        test_city_1_site_1_2024_5_6_4_0_0,
-        test_city_2_site_1_2024_6_21_13_59_0,
-        test_city_2_site_1_2024_6_21_14_0_0,
-        test_city_3_site_1_2024_6_21_14_30_0,
-        test_city_3_site_1_2024_6_21_14_45_0,
-        test_city_3_site_2_2024_6_21_15_30_0,
-        test_city_1_site_1_2024_6_21_15_0_0,
-        test_city_2_site_2_2024_6_21_16_0_0,
-        test_city_1_site_2_2024_6_21_16_1_0,
-        test_city_2_site_3_2024_7_28_9_0_0,
-        test_city_5_site_1_2024_9_1_9_0_0,
-        invalid_in_situ_document,
-    ],
-)
+
+@pytest.fixture()
+def setup_test():
+    # Test Setup
+    load_dotenv()
+    delete_database_data("in_situ_data")
+    seed_api_test_data(
+        "in_situ_data",
+        [
+            test_city_1_site_1_2024_5_6_4_0_0,
+            test_city_2_site_1_2024_6_21_13_59_0,
+            test_city_2_site_1_2024_6_21_14_0_0,
+            test_city_3_site_1_2024_6_21_14_30_0,
+            test_city_3_site_1_2024_6_21_14_45_0,
+            test_city_3_site_2_2024_6_21_15_30_0,
+            test_city_1_site_1_2024_6_21_15_0_0,
+            test_city_2_site_2_2024_6_21_16_0_0,
+            test_city_1_site_2_2024_6_21_16_1_0,
+            test_city_2_site_3_2024_7_28_9_0_0,
+            test_city_5_site_1_2024_9_1_9_0_0,
+            invalid_in_situ_document,
+        ],
+    )
 
 
 @pytest.mark.parametrize(
@@ -262,7 +265,7 @@ seed_api_test_data(
     ],
 )
 def test__date_from_and_date_to_ranges__assert_response_location_names_are_correct(
-    api_parameters: dict, expected_location_names: str
+    setup_test, api_parameters: dict, expected_location_names: str
 ):
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
 
@@ -307,7 +310,7 @@ def test__date_from_and_date_to_ranges__assert_response_location_names_are_corre
     ],
 )
 def test__date_from_and_date_to_ranges__assert_response_site_names_are_correct(
-    api_parameters: dict, expected_site_names: str
+    setup_test, api_parameters: dict, expected_site_names: str
 ):
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
 
@@ -385,7 +388,7 @@ def test__date_from_and_date_to_ranges__assert_response_site_names_are_correct(
     ],
 )
 def test__date_from_and_date_to_ranges__assert_response_measurement_dates_are_correct(
-    api_parameters: dict, expected_measurement_dates: str
+    setup_test, api_parameters: dict, expected_measurement_dates: str
 ):
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
 
@@ -509,7 +512,7 @@ def test__date_from_and_date_to_ranges__assert_response_measurement_dates_are_co
     ],
 )
 def test__different_location_names__assert_response_location_names_are_correct(
-    api_parameters: dict, expected_location_names: str
+    setup_test, api_parameters: dict, expected_location_names: str
 ):
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
 
@@ -631,7 +634,7 @@ def test__different_location_names__assert_response_location_names_are_correct(
     ],
 )
 def test__different_location_names__assert_response_site_names_are_correct(
-    api_parameters: dict, expected_site_names: str
+    setup_test, api_parameters: dict, expected_site_names: str
 ):
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
 
@@ -664,6 +667,7 @@ def test__different_location_names__assert_response_site_names_are_correct(
     ],
 )
 def test__api_source_not_openaq__assert_fail_validation_422(
+    setup_test,
     api_parameters: dict,
 ):
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
@@ -693,13 +697,14 @@ def test__api_source_not_openaq__assert_fail_validation_422(
     ],
 )
 def test__api_source_missing_with_invalid_db_value__assert_500(
+    setup_test,
     api_parameters: dict,
 ):
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
     assert response.status_code == 500
 
 
-def test__valid_api_source__assert_number_of_responses_is_correct():
+def test__valid_api_source__assert_number_of_responses_is_correct(setup_test):
     api_parameters = {
         "date_from": date_string_24_6_21_16_0_0,
         "date_to": date_string_24_7_29_15_0_0,
@@ -746,7 +751,7 @@ def test__valid_api_source__assert_number_of_responses_is_correct():
         },
     ],
 )
-def test__assert_response_keys_and_values_are_correct(api_parameters: dict):
+def test__assert_response_keys_and_values_are_correct(setup_test, api_parameters: dict):
     parameters = {
         "date_from": date_string_24_6_21_14_0_0,
         "date_to": date_string_24_6_21_16_0_0,
@@ -784,7 +789,7 @@ def test__assert_response_keys_and_values_are_correct(api_parameters: dict):
     assert response_json == expected_response
 
 
-def test__invalid_document_in_database__assert_500():
+def test__invalid_document_in_database__assert_500(setup_test):
     parameters: dict = {
         "date_from": datetime.datetime(
             2024, 1, 25, 7, 0, 0, tzinfo=datetime.timezone.utc

@@ -13,14 +13,10 @@ import '../cell/cell-rules/GridRules.css'
 
 import classes from './GlobalSummaryTable.module.css'
 import sortAQIComparator from './sorting/SortingAQIComparator'
+import { pollutantTypeDisplay, pollutantTypes } from '../../../models'
 import {
-  PollutantType,
-  pollutantTypeDisplay,
-  pollutantTypes,
-} from '../../../models'
-import {
-  ForecastMeasurementComparison,
   createComparisonData,
+  createSummaryRow,
 } from '../../../services/summary-comparison-service'
 import {
   ForecastResponseDto,
@@ -28,19 +24,6 @@ import {
 } from '../../../services/types'
 import { aqiCellRules, pollutantCellRules } from '../cell/cell-rules/CellRules'
 import { LocationCellRenderer } from '../cell/location-cell-renderer/LocationCellRenderer'
-
-type SummaryDetail = {
-  aqiLevel?: number
-} & {
-  [P in PollutantType]?: { value: number; time?: string; aqiLevel: number }
-}
-
-interface SummaryRow {
-  locationName: string
-  forecast: SummaryDetail
-  measurements?: SummaryDetail
-  aqiDifference?: string
-}
 
 export interface GlobalSummaryTableProps {
   forecast: Record<string, ForecastResponseDto[]>
@@ -50,18 +33,6 @@ export interface GlobalSummaryTableProps {
 
 const maxWidth = 115
 
-function getPerformanceSymbol(
-  forecastAQILevel: number,
-  measurementsAQILevel: number,
-) {
-  if (forecastAQILevel > measurementsAQILevel) {
-    return '+'
-  } else if (forecastAQILevel === measurementsAQILevel) {
-    return ''
-  } else {
-    return '-'
-  }
-}
 function insertEmptyValueDash(value: number | undefined): string {
   if (value === undefined) {
     return '-'
@@ -167,53 +138,6 @@ const createGridOptions = (): GridOptions => ({
     type: 'fitCellContents',
   },
 })
-
-const createSummaryRow = ({
-  locationName,
-  ...data
-}: ForecastMeasurementComparison): SummaryRow => {
-  const row: SummaryRow = {
-    locationName,
-    forecast: {
-      aqiLevel: data.forecastOverallAqi,
-    },
-  }
-
-  pollutantTypes.forEach((pollutantType) => {
-    const { forecastData, measurementData } = data[pollutantType]
-    row.forecast[pollutantType] = {
-      value: parseFloat(forecastData.value.toFixed(1)),
-      aqiLevel: forecastData.aqiLevel,
-      time: forecastData.validTime,
-    }
-    if (measurementData) {
-      row.measurements = {
-        ...row.measurements,
-        [pollutantType]: {
-          value: parseFloat(measurementData.value.toFixed(1)),
-          aqiLevel: measurementData.aqiLevel,
-        },
-      }
-      const numericalDifference = Math.abs(
-        measurementData.aqiLevel - forecastData.aqiLevel,
-      )
-      const currentDifferenceWithSymbol =
-        getPerformanceSymbol(forecastData.aqiLevel, measurementData.aqiLevel) +
-        numericalDifference
-
-      if (
-        !row.aqiDifference ||
-        numericalDifference > Math.abs(parseInt(row.aqiDifference))
-      ) {
-        row.aqiDifference = currentDifferenceWithSymbol
-        row.forecast.aqiLevel = forecastData.aqiLevel
-        row.measurements.aqiLevel = measurementData.aqiLevel
-      }
-    }
-  })
-
-  return row
-}
 
 const GlobalSummaryTable = ({
   forecast,
