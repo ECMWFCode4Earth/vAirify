@@ -27,6 +27,8 @@
     grid-template-columns: 1fr 1fr 1fr;
     padding: 0 0 32px 0;
     row-gap: 16px;
+    overflow-x: auto;
+    width: 100%;
 }
 
 .site-measurements-section {
