@@ -159,7 +159,7 @@ test('Check data over several rows is displayed correctly on grid, including +/-
   ])
 
   await gotoPage(page, '/city/summary')
-  await summaryPage.waitForLoad()
+
   const expectedData = [
     // Kampala
     [
@@ -195,7 +195,7 @@ test('Check data over several rows is displayed correctly on grid, including +/-
       '19 Jun 12:00', //Time
     ],
   ]
-
+  await summaryPage.waitForLoad()
   await summaryPage.assertGridAttributes('values', expectedData)
 })
 
@@ -241,6 +241,7 @@ test('Verify pollutant level diff 0 does not override a larger diff for calculat
   ])
 
   await gotoPage(page, '/city/summary')
+  await summaryPage.waitForLoad()
   const expectedTableContents: string[][] = [
     [
       // AQI Level
@@ -249,7 +250,6 @@ test('Verify pollutant level diff 0 does not override a larger diff for calculat
       '+2', // Diff
     ],
   ]
-  await summaryPage.waitForLoad()
 
   await summaryPage.assertGridAttributes('values', expectedTableContents)
 })
@@ -582,7 +582,7 @@ test.describe('Verifying a full row is correct', () => {
     ])
 
     await gotoPage(page, '/city/summary')
-
+    await summaryPage.waitForLoad()
     const expectedTableContents: string[][] = [
       [
         // AQI Level
@@ -691,6 +691,7 @@ test.describe('Verifying a full row is correct', () => {
     ])
 
     await gotoPage(page, '/city/summary')
+    await summaryPage.waitForLoad()
 
     const expectedTableContents: string[][] = [
       [
@@ -824,6 +825,7 @@ test.describe('Multiple pollutants share the max diff, but have DIFFERENT overal
         '-1', // Diff
       ],
     ]
+    await summaryPage.waitForLoad()
 
     await summaryPage.assertGridAttributes('values', expectedTableContents)
   })
@@ -839,6 +841,7 @@ test.describe('Multiple pollutants share the max diff, but have DIFFERENT overal
         '-1', // Diff
       ],
     ]
+    await summaryPage.waitForLoad()
 
     await summaryPage.highlightValuesToggle.click()
     await summaryPage.assertGridAttributes('values', expectedTableContents)
@@ -897,6 +900,7 @@ test.describe('Multiple pollutants share the max diff, and have the SAME overall
         '+5', // Diff
       ],
     ]
+    await summaryPage.waitForLoad()
 
     await summaryPage.assertGridAttributes('values', expectedTableContents)
   })
@@ -912,6 +916,7 @@ test.describe('Multiple pollutants share the max diff, and have the SAME overall
         '+5', // Diff
       ],
     ]
+    await summaryPage.waitForLoad()
 
     await summaryPage.highlightValuesToggle.click()
     await summaryPage.assertGridAttributes('values', expectedTableContents)

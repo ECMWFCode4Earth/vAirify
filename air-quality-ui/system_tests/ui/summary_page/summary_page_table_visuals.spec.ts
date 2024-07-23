@@ -82,7 +82,6 @@ test.describe('Colour testing', () => {
           mockedAPIResponse: mockedMeasurementSummaryResponse,
         },
       ])
-
       await gotoPage(page, '/city/summary')
     })
 
@@ -209,7 +208,7 @@ test.describe('Colour testing', () => {
           Colours.notColoured, // Time
         ],
       ]
-
+      await summaryPage.waitForLoad()
       await summaryPage.assertGridAttributes('colours', expectedTableColours)
     })
 
@@ -244,6 +243,7 @@ test.describe('Colour testing', () => {
           Colours.notColoured, // Time
         ],
       ]
+      await summaryPage.waitForLoad()
       await summaryPage.highlightValuesToggle.click()
       await summaryPage.assertGridAttributes('colours', expectedTableColours)
     })
@@ -313,7 +313,7 @@ test.describe('Colour testing', () => {
         Colours.notColoured, // Time
       ],
     ]
-
+    await summaryPage.waitForLoad()
     await summaryPage.assertGridAttributes('colours', expectedTableContents)
   })
 })
