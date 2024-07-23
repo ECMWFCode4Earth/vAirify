@@ -7,6 +7,7 @@ export class SummaryPage extends BasePage {
 
   readonly agCell: Locator
   readonly allCells: Locator
+  readonly highlightValuesToggle: Locator
   readonly scroller: Locator
   readonly title: Locator
 
@@ -16,6 +17,7 @@ export class SummaryPage extends BasePage {
 
     this.agCell = page.locator('role=gridcell')
     this.allCells = page.locator('[role=gridcell]')
+    this.highlightValuesToggle = page.getByRole('checkbox')
     this.scroller = page.locator('.ag-body-horizontal-scroll-viewport')
     this.title = page.locator('title')
   }
@@ -68,16 +70,22 @@ export class SummaryPage extends BasePage {
     return count
   }
 
-  async assertGridValues(expectedData: string[][]) {
+  async assertGridAttributes(attribute: string, expectedData: string[][]) {
     for (let rowIndex = 0; rowIndex < expectedData.length; rowIndex++) {
-      const row = expectedData[rowIndex]
+      const row: string[] = expectedData[rowIndex]
       for (let colIndex = 0; colIndex < row.length; colIndex++) {
-        const cellLocator = this.page.locator(
+        const cellLocator: Locator = this.page.locator(
           `//div[@aria-rowindex='${rowIndex + 3}']//div[@aria-colindex='${colIndex + 2}']`,
         )
         await cellLocator.scrollIntoViewIfNeeded()
-        const cellText = await cellLocator.innerText()
-        expect(cellText.trim()).toBe(row[colIndex])
+        if (attribute == 'values') {
+          const cellText: string = await cellLocator.innerText()
+          expect(cellText.trim()).toBe(row[colIndex])
+        } else if (attribute == 'colours') {
+          await expect(cellLocator).toHaveCSS('background-color', row[colIndex])
+        } else {
+          throw new Error('Invalid attribute value')
+        }
       }
     }
   }
