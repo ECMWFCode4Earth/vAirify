@@ -1,24 +1,17 @@
-import { EChartsOption } from 'echarts'
+import { EChartsOption, SeriesOption } from 'echarts'
 
 import { AverageAqiValues } from '../../../services/calculate-measurements-aqi-averages/calculate-measurement-aqi-averages-service'
-import {
-  convertToLocalTime,
-  xAxisFormat,
-} from '../../../services/echarts-service'
+import { convertToLocalTime } from '../../../services/echarts-service'
 import { ForecastResponseDto } from '../../../services/types'
+import {
+  baseOptions,
+  forecastLine,
+  measurementLine,
+} from '../base-chart-builder'
 
 export const getOptions = (): EChartsOption => {
   return {
-    title: {
-      text: 'AQI',
-      left: 'center',
-    },
-    xAxis: {
-      type: 'time',
-      axisLabel: {
-        formatter: xAxisFormat,
-      },
-    },
+    ...baseOptions('AQI'),
     yAxis: {
       type: 'value',
       name: 'AQI',
@@ -36,14 +29,15 @@ export const getOptions = (): EChartsOption => {
   }
 }
 
-const generateForecastLine = (forecastData?: ForecastResponseDto[]) => {
+const generateForecastLine = (
+  forecastData?: ForecastResponseDto[],
+): SeriesOption => {
   return {
+    ...forecastLine(),
     data: forecastData?.map((dataToPlot) => [
       convertToLocalTime(dataToPlot.valid_time),
       dataToPlot.overall_aqi_level,
     ]),
-    type: 'line',
-    name: 'Forecast',
   }
 }
 
@@ -57,6 +51,7 @@ const generateMeasurementLine = (
     ]),
     type: 'line',
     name: 'Measurement',
+    ...measurementLine(),
   }
 }
 

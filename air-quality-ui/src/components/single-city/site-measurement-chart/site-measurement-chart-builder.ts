@@ -9,6 +9,11 @@ import {
   ForecastResponseDto,
   MeasurementsResponseDto,
 } from '../../../services/types'
+import {
+  baseOptions,
+  forecastLine,
+  measurementLine,
+} from '../base-chart-builder'
 
 const createBackgroundAqiZones = (pollutant: PollutantType): SeriesOption => {
   const ranges = aqiRangesByPollutant[pollutant]
@@ -56,18 +61,11 @@ const createForecastSeries = (
   forecastData: ForecastResponseDto[],
 ): SeriesOption => {
   return {
-    type: 'line',
+    ...forecastLine(),
     data: forecastData.map((data) => [
       convertToLocalTime(data.valid_time),
       data[pollutantType].value.toFixed(1),
     ]),
-    name: 'Forecast',
-    color: 'black',
-    lineStyle: {
-      width: 5,
-      type: 'dashed',
-    },
-    z: 2,
   }
 }
 
@@ -89,13 +87,7 @@ const createMeasurementSeries = (
       color: seriesColorsBySite[siteName],
     }),
     triggerLineEvent: true,
-    lineStyle: {
-      width: 1,
-      type: 'solid',
-      opacity: 0.5,
-    },
-    z: 1,
-    symbol: 'roundRect',
+    ...measurementLine(),
   }))
 
 const createChartOptions = (
@@ -103,27 +95,20 @@ const createChartOptions = (
   zoomPercent: number,
 ): EChartsOption => {
   return {
-    animation: false,
-    title: {
-      text: chartTitle,
-      left: 'center',
-    },
-    xAxis: {
-      type: 'time',
-    },
+    ...baseOptions(chartTitle),
     yAxis: {
       type: 'value',
       name: 'µg/m³',
       nameGap: 50,
       nameLocation: 'middle',
     },
+    tooltip: {
+      trigger: 'item',
+    },
     dataZoom: {
       show: true,
       realtime: false,
       end: zoomPercent,
-    },
-    tooltip: {
-      trigger: 'item',
     },
   }
 }
