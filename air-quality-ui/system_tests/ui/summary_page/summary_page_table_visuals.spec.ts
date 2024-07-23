@@ -116,7 +116,7 @@ test.describe('Colour testing', () => {
           Colours.notColoured, // Time
         ],
       ]
-
+      await summaryPage.waitForLoad()
       await summaryPage.assertGridAttributes('colours', expectedTableColours)
     })
 
@@ -175,6 +175,7 @@ test.describe('Colour testing', () => {
           mockedAPIResponse: mockedForecastResponse,
         },
       ])
+      await gotoPage(page, '/city/summary')
     })
 
     test('Default Toggle: If there is "no data", cell is coloured grey', async ({

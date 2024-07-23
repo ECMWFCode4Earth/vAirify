@@ -424,7 +424,6 @@ test.describe('Verifying a full row is correct', () => {
       ],
     ]
     await summaryPage.waitForLoad()
-
     await summaryPage.assertGridAttributes('values', expectedTableContents)
   })
 
