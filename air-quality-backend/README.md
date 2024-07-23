@@ -12,7 +12,7 @@ Please follow [Local Development Setup](#local-development-setup) instructions i
 `python -m flake8`
 
 ### Run code formatter
-`python -m black src tests scripts`
+`python -m black api etl system_tests`
 
 ### Run tests
 ```

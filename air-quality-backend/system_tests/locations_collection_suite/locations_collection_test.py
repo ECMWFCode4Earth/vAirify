@@ -16,17 +16,20 @@ def test__locations_collection__all_marked_city():
 
 
 def test__locations_collection__represents_all_cities_from_the_setup_file():
+    def db_location_converter(loc):
+        return f"{loc['name']}|{loc['country']}|{loc['latitude']}|{loc['longitude']}"
+
+    def file_location_converter(loc):
+        return f"{loc['city']}|{loc['country']}|{loc['latitude']}|{loc['longitude']}"
+
     locations_collection = get_database_data(collection_name)
-    db_location_converter = \
-        lambda loc: f"{loc['name']}|{loc['country']}|{loc['latitude']}|{loc['longitude']}"
     stored_locations = list(map(db_location_converter, locations_collection))
 
     config_source = "../deployment/database/CAMS_locations_V1.csv"
-    with open(config_source, newline='', encoding='UTF-8') as f:
+    with open(config_source, newline="", encoding="UTF-8") as f:
         reader = csv.DictReader(f)
         file_locations = list(reader)
-    file_location_converter = \
-        lambda loc: f"{loc['city']}|{loc['country']}|{loc['latitude']}|{loc['longitude']}"
+
     expected_locations = list(map(file_location_converter, file_locations))
 
     assert stored_locations == expected_locations

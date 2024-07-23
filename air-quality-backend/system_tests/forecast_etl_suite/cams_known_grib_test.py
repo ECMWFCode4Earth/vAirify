@@ -64,10 +64,10 @@ def setup_data():
                 "pm2_5": {"value": 17.1565041916872, "aqi_level": 2},
             },
         ),
-    ]
+    ],
 )
 def test__cities_at_extreme_longitudes__have_correct_forecast_values(
-        city_name, forecast_valid_time, expected_values, setup_data
+    city_name, forecast_valid_time, expected_values, setup_data
 ):
     query = {
         "name": city_name,
@@ -95,12 +95,12 @@ def test__individual_aqi_levels_are_between_1_and_6(setup_data):
     for document in dict_result:
         for key in pollutant_keys:
             assert (
-                    1 <= document[key]["aqi_level"] <= 6
+                1 <= document[key]["aqi_level"] <= 6
             ), f"{key} {document[key]['aqi_level']} is out of range"
 
 
 def test__overall_aqi_level_is_highest_value_of_individual_pollutant_aqi_levels(
-        setup_data,
+    setup_data,
 ):
     dict_result = get_database_data("forecast_data", data_query)
     pollutant_keys = ["no2", "so2", "o3", "pm10", "pm2_5"]
@@ -108,7 +108,7 @@ def test__overall_aqi_level_is_highest_value_of_individual_pollutant_aqi_levels(
     for document in dict_result:
         highest_aqi = max(document[key]["aqi_level"] for key in pollutant_keys)
         assert (
-                document["overall_aqi_level"] == highest_aqi
+            document["overall_aqi_level"] == highest_aqi
         ), f"{document['overall_aqi_level']} is not equal to {highest_aqi}"
 
 
@@ -117,7 +117,7 @@ def test__that_each_document_has_location_type_city(setup_data):
 
     for document in dict_result:
         assert (
-                document["location_type"] == "city"
+            document["location_type"] == "city"
         ), f"location_type '{document['location_type']}' is not city"
 
 
@@ -126,7 +126,7 @@ def test__that_each_document_has_source_cams_production(setup_data):
 
     for document in dict_result:
         assert (
-                document["source"] == "cams-production"
+            document["source"] == "cams-production"
         ), f"source '{document['source']}' is not cams-production"
 
 
@@ -137,7 +137,7 @@ def test__document_count_matches_expected(setup_data):
     expected_doc_count = 153 * 41
 
     assert (
-            len(dict_result) == expected_doc_count
+        len(dict_result) == expected_doc_count
     ), f"Expected {expected_doc_count} documents, but got {len(dict_result)}"
 
 
@@ -151,7 +151,7 @@ def test__forecast_base_time_is_correct(setup_data):
     dict_result = get_database_data("forecast_data", data_query)
     for document in dict_result:
         assert (
-                document["forecast_base_time"] == forecast_base_time
+            document["forecast_base_time"] == forecast_base_time
         ), "A document does not have the correct forecast base time"
 
 
@@ -159,13 +159,13 @@ def test__forecast_valid_time_and_range_is_valid(setup_data):
     dict_result = get_database_data("forecast_data", data_query)
     for document in dict_result:
         forecast_range = document["forecast_range"]
-        assert forecast_range % 3 == 0, \
-            "Forecast range found that isn't a multiple of 3"
+        assert (
+            forecast_range % 3 == 0
+        ), "Forecast range found that isn't a multiple of 3"
         expected_valid_time = forecast_base_time + timedelta(hours=forecast_range)
 
         assert (
-
-                document["forecast_valid_time"] == expected_valid_time
+            document["forecast_valid_time"] == expected_valid_time
         ), "A document does not have a valid forecast_valid_time for the range"
 
 
