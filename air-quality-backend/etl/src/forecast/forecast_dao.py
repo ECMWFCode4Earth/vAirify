@@ -9,10 +9,13 @@ CAMS_FORECAST_INTERVAL_HOURS = 3
 CAMS_UPDATE_INTERVAL_HOURS = 12
 CAMS_INTERVALS_PER_5_DAY_FORECAST = 41
 
+
 class CamsRequestDetails:
 
     def __init__(
-        self, base_forecast_datetime: datetime, no_of_forecast_times: int = CAMS_INTERVALS_PER_5_DAY_FORECAST
+        self,
+        base_forecast_datetime: datetime,
+        no_of_forecast_times: int = CAMS_INTERVALS_PER_5_DAY_FORECAST,
     ):
         self.base_forecast_datetime = base_forecast_datetime
         self.no_of_forecast_times = no_of_forecast_times

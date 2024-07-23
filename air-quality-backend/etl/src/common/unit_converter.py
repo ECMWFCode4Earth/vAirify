@@ -19,7 +19,11 @@ def convert_ppm_to_mgm3(
     surface_pressure_hpa = surface_pressure_pa / 100
 
     molecular_weight = get_molecular_weight(pollutant_type)
-    molecular_volume = VOLUME_OF_AN_IDEAL_GAS_AT_STP * (temperature_k / ZERO_CENTIGRADE_IN_KELVIN) * (ONE_ATMOSPHERE_IN_HPA / surface_pressure_hpa)
+    molecular_volume = (
+        VOLUME_OF_AN_IDEAL_GAS_AT_STP
+        * (temperature_k / ZERO_CENTIGRADE_IN_KELVIN)
+        * (ONE_ATMOSPHERE_IN_HPA / surface_pressure_hpa)
+    )
 
     mgm3 = ppb * (molecular_weight / molecular_volume)
 
