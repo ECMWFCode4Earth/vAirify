@@ -129,7 +129,8 @@ def save_data_textures(
     )
 
     # WebP has better compression, but maximum pixel dimension is 16383 x 16383.
-    if (num_lon * chunks_per_texture) > 16383:
+    max_webP_pixel_dimension = 16383
+    if (num_lon * chunks_per_texture) > max_webP_pixel_dimension:
         file_format = "png"
 
     output_directory = _create_output_directory(forecast_date)
