@@ -3,10 +3,7 @@ import { DateTime } from 'luxon'
 
 import { getForecastOptions } from './average-composition-chart-builder'
 import classes from './AverageComparisonChart.module.css'
-import {
-  averageAqiValues,
-  sortMeasurements,
-} from '../../../services/calculate-measurements-aqi-averages/calculate-measurement-aqi-averages-service'
+import { averageAqiValues } from '../../../services/calculate-measurements-aqi-averages/calculate-measurement-aqi-averages-service'
 import {
   ForecastResponseDto,
   MeasurementsResponseDto,
@@ -23,11 +20,10 @@ export const AverageComparisonChart = (
 ): JSX.Element => {
   let measurementsAveragedData
   if (props.measurementsData) {
-    const sortedMeasurements = sortMeasurements(
+    measurementsAveragedData = averageAqiValues(
       props.measurementsData,
       props.forecastBaseTime,
     )
-    measurementsAveragedData = averageAqiValues(sortedMeasurements)
   }
   return (
     <ReactECharts
