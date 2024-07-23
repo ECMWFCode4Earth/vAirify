@@ -229,4 +229,61 @@ test.describe('Colour testing', () => {
       await summaryPage.assertGridAttributes('colours', expectedTableColours)
     })
   })
+  test('Verify a pollutant value of 0 is assigned AQI 1 colour', async ({
+    summaryPage,
+  }) => {
+    await summaryPage.setupPageWithMockData(
+      [
+        createForecastAPIResponseData({
+          valid_time: '2024-07-08T03:00:00Z',
+          no2: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
+          o3: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
+          pm2_5: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
+          pm10: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
+          so2: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
+        }),
+      ],
+      [
+        createMeasurementSummaryAPIResponseData({
+          measurement_base_time: '2024-07-08T03:00:00Z',
+          no2: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
+          o3: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
+          pm2_5: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
+          pm10: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
+          so2: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
+        }),
+      ],
+    )
+
+    const expectedTableContents: string[][] = [
+      [
+        // AQI Level
+        Colours.aqi1, // Forecast
+        Colours.aqi1, // Measured
+        Colours.notColoured, // Diff
+        // pm2.5
+        Colours.aqi1, // Forecast
+        Colours.aqi1, // Measured
+        Colours.notColoured, // Time
+        // pm10
+        Colours.aqi1, // Forecast
+        Colours.aqi1, // Measured
+        Colours.notColoured, // Time
+        // no2
+        Colours.aqi1, // Forecast
+        Colours.aqi1, // Measured
+        Colours.notColoured, // Time
+        // o3
+        Colours.aqi1, // Forecast
+        Colours.aqi1, // Measured
+        Colours.notColoured, // Time
+        // so2
+        Colours.aqi1, // Forecast
+        Colours.aqi1, // Measured
+        Colours.notColoured, // Time
+      ],
+    ]
+
+    await summaryPage.assertGridAttributes('colours', expectedTableContents)
+  })
 })
