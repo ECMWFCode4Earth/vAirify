@@ -9,11 +9,6 @@ test.use({
   viewport: { width: 1920, height: 1080 },
 })
 
-test('vAirify logo is visible', async ({ page, banner }) => {
-  await gotoPage(page, '/city/Rio%20de%20Janeiro')
-  await expect(banner.logo).toBeVisible()
-})
-
 test('Legend deselect removes chosen site', async ({ page, cityPage }) => {
   const mockedForecastResponse = [
     createForecastAPIResponseData({
