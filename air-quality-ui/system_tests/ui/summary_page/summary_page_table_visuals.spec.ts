@@ -234,17 +234,27 @@ test.describe('Colour testing', () => {
   test('Verify a pollutant value of 0 is assigned AQI 1 colour', async ({
     summaryPage,
   }) => {
-    const forecastLondonValidTimeArray: object[] = [
-      createForecastResponseWithValidTimeAndAQI('2024-07-08T03:00:00Z', 1),
-    ]
-
-    const measurementsLondonArray: object[] = [
-      createMeasurementSumResponseWithTimeAndAQI('2024-07-08T03:00:00Z', 1),
-    ]
-
     await summaryPage.setupPageWithMockData(
-      forecastLondonValidTimeArray,
-      measurementsLondonArray,
+      [
+        createForecastAPIResponseData({
+          valid_time: '2024-07-08T03:00:00Z',
+          no2: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
+          o3: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
+          pm2_5: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
+          pm10: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
+          so2: { aqi_level: CaseAQI1.aqiLevel, value: 0 },
+        }),
+      ],
+      [
+        createMeasurementSummaryAPIResponseData({
+          measurement_base_time: '2024-07-08T03:00:00Z',
+          no2: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
+          o3: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
+          pm2_5: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
+          pm10: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
+          so2: { mean: { aqi_level: CaseAQI1.aqiLevel, value: 0 } },
+        }),
+      ],
     )
 
     const expectedTableContents: string[][] = [
