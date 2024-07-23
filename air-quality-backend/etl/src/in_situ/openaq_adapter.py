@@ -19,6 +19,9 @@ required_pollutant_data = {
     "pm25": PollutantType.PARTICULATE_MATTER_2_5,
 }
 
+MAX_MEASUREMENT_VALUE = 9999
+MIN_MEASUREMENT_VALUE = 0
+
 
 def measurement_is_valid(measurement):
     pollutant = required_pollutant_data[measurement["parameter"]]
@@ -36,7 +39,11 @@ def measurement_is_valid(measurement):
     if not valid_unit:
         logging.info(f"Unsupported unit found {measurement['unit']}")
 
-    return valid_unit and measurement["value"] > 0 and measurement["value"] != 9999
+    return (
+        valid_unit
+        and measurement["value"] > MIN_MEASUREMENT_VALUE
+        and measurement["value"] != MAX_MEASUREMENT_VALUE
+    )
 
 
 def _create_document(

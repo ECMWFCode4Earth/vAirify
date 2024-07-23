@@ -27,6 +27,13 @@ def convert_east_only_longitude_to_east_west(longitude_value: float) -> float:
     return longitude_value
 
 
+SPECIFIC_GAS_CONSTANT = 287.0
+LEVEL136_B_CONSTANT = 0.997630
+LEVEL136_A_CONSTANT = 0
+LEVEL137_B_CONSTANT = 1.0
+LEVEL137_A_CONSTANT = 0
+
+
 def convert_mmr_to_mass_concentration(
     single_level_data: xr.Dataset, multi_level_data: xr.Dataset
 ):
@@ -34,11 +41,11 @@ def convert_mmr_to_mass_concentration(
     # get pressure on model level 137 from surface pressure
     # https://confluence.ecmwf.int/display/CKB/ERA5%3A+compute+pressure+and+geopotential
     # +on+model+levels%2C+geopotential+height+and+geometric+height
-    p_half_above = 0 + 0.997630 * single_level_data["sp"]
-    p_half_below = 0 + 1.0 * single_level_data["sp"]
+    p_half_above = LEVEL136_A_CONSTANT + LEVEL136_B_CONSTANT * single_level_data["sp"]
+    p_half_below = LEVEL137_A_CONSTANT + LEVEL137_B_CONSTANT * single_level_data["sp"]
     p_ml = (p_half_above + p_half_below) / 2
     # surface density: rho = p_ml / (R * T)
-    rho = p_ml / (287.0 * multi_level_data["t"])
+    rho = p_ml / (SPECIFIC_GAS_CONSTANT * multi_level_data["t"])
     for result in [single_level_data, multi_level_data]:
         for variable in result.variables:
             if result[variable].attrs.get("units") == "kg kg**-1":
