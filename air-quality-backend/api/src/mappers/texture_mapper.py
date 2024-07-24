@@ -9,7 +9,7 @@ import os
 def database_to_api_result(measurement: DataTexture) -> TextureDto:
 
     relative_uri = measurement["texture_uri"].replace("/app/data_textures/", "")
-    absolute_uri = f'{os.getenv("UI_URL")}/{relative_uri}'
+    # absolute_uri = f'{os.getenv("UI_URL")}/{relative_uri}'
 
     return {
         "base_time": measurement["forecast_base_time"].astimezone(UTC),
@@ -19,7 +19,7 @@ def database_to_api_result(measurement: DataTexture) -> TextureDto:
         "chunk": measurement["chunk"],
         "source": measurement["source"],
         "chunk": measurement["chunk"],
-        "texture_uri": absolute_uri,
+        "texture_uri": f"/{relative_uri}",
         "min_value": measurement["min_value"],
         "max_value": measurement["max_value"],
     }
