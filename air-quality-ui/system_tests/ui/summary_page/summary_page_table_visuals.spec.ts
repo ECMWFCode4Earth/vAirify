@@ -21,8 +21,8 @@ test.describe('Table structure', () => {
   }) => {
     await gotoPage(page, '/city/summary')
     await summaryPage.getColumnHeaderAndText('AQI Level', 'AQI Level')
-    await summaryPage.getColumnHeaderAndText('PM 2.5 (µg/m³)', 'PM 2.5 (µg/m³)')
-    await summaryPage.getColumnHeaderAndText('PM 10 (µg/m³)', 'PM 10 (µg/m³)')
+    await summaryPage.getColumnHeaderAndText('PM2.5 (µg/m³)', 'PM2.5 (µg/m³)')
+    await summaryPage.getColumnHeaderAndText('PM10 (µg/m³)', 'PM10 (µg/m³)')
     await summaryPage.scrollToRightmostPosition()
     await summaryPage.page.waitForTimeout(1000)
 
