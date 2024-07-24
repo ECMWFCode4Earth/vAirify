@@ -1,5 +1,6 @@
 import {
   DataZoomComponentOption,
+  LineSeriesOption,
   TitleComponentOption,
   YAXisComponentOption,
 } from 'echarts'
@@ -187,6 +188,21 @@ describe('AverageComparisonChart', () => {
         expect(result.series.find((x) => x.name === 'Measurement')?.type).toBe(
           'line',
         )
+      })
+
+      it('line has correct width', async () => {
+        const result = getForecastOptions(
+          zoomPercent,
+          testForecastData,
+          testMeasurementData,
+        )
+        expect(
+          (
+            result.series.find(
+              (x) => x.name === 'Measurement',
+            ) as LineSeriesOption
+          ).lineStyle?.width,
+        ).toBe(5)
       })
 
       it('has the correct number of datapoints', async () => {

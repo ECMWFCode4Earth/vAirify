@@ -15,10 +15,12 @@ export const forecastLine = (): LineSeriesOption => {
   }
 }
 
-export const measurementLine = (): LineSeriesOption => {
+export const measurementLine = (
+  width: number | undefined = 1,
+): LineSeriesOption => {
   return {
     lineStyle: {
-      width: 1,
+      width,
       type: 'solid',
       opacity: 0.5,
     },

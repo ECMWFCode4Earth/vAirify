@@ -42,7 +42,7 @@ const generateMeasurementLine = (
     ]),
     type: 'line',
     name: 'Measurement',
-    ...measurementLine(),
+    ...measurementLine(5),
   }
 }
 
