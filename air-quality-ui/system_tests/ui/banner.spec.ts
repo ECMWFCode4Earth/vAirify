@@ -85,15 +85,15 @@ test('Verify breadcrumb text is correct on each page', async ({
     },
   ])
   await gotoPage(page, '/city/summary')
-  await summaryPage.clickButton('Kampala')
+  await summaryPage.clickLinkByText('Kampala')
   await expect(cityPage.toolbarTextFinder('Cities/Kampala')).toBeVisible()
-  await summaryPage.clickButton('Cities')
+  await summaryPage.clickLinkByText('Cities')
 
-  await summaryPage.clickButton('Abu Dhabi')
+  await summaryPage.clickLinkByText('Abu Dhabi')
   await expect(cityPage.toolbarTextFinder('Cities/Abu Dhabi')).toBeVisible()
-  await summaryPage.clickButton('Cities')
+  await summaryPage.clickLinkByText('Cities')
 
-  await summaryPage.clickButton('Zurich')
+  await summaryPage.clickLinkByText('Zurich')
   await expect(cityPage.toolbarTextFinder('Cities/Zurich')).toBeVisible()
-  await summaryPage.clickButton('Cities')
+  await summaryPage.clickLinkByText('Cities')
 })
