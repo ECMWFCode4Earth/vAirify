@@ -38,6 +38,7 @@ class MeasurementDto(TypedDict):
     sensor_type: NotRequired[str]
     site_name: str
 
+
 class TextureDto(TypedDict):
     base_time: datetime
     variable: str
@@ -49,6 +50,7 @@ class TextureDto(TypedDict):
     texture_uri: str
     min_value: float
     max_value: float
+
 
 T = TypeVar("T")
 
