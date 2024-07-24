@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from datetime import datetime, timezone
@@ -25,8 +26,6 @@ from etl.scripts.run_in_situ_etl import main
 
 from dotenv import load_dotenv
 
-from system_tests.utils.file_utilities import write_to_file
-
 open_aq_cache_location = "system_tests/in_situ_etl_suite"
 collection_name = "in_situ_data"
 load_dotenv()
@@ -42,12 +41,6 @@ def test__in_situ_etl__calling_actual_api_returns_values_and_stores():
     results = get_database_data(collection_name, query)
     assert results[0]["name"] == "London"
     assert results[-1]["name"] == "London"
-
-
-def remove_file(filename: str):
-    if os.path.exists(filename):
-        logging.info(f"Test removing cached file '{filename}'")
-        os.remove(filename)
 
 
 @pytest.fixture(scope="module")
@@ -90,9 +83,7 @@ def test__in_situ_etl__combines_pollutants_for_location_times(ensure_forecast_ca
         create_measurement(date2, "o3", 4),
     ]
 
-    write_to_file(london_data, london_file)
-    main()
-    os.remove(london_file)
+    run_with_data_in_files({london_file: london_data})
 
     results = get_database_data(collection_name, query)
     assert len(results) == 2
@@ -129,28 +120,21 @@ def test__in_situ_etl__stores_all_data_correctly(ensure_forecast_cache):
         create_measurement(date1, "pm10", 5),
     ]
 
-    write_to_file(london_openaq_data, london_file)
-    main()
-    os.remove(london_file)
+    run_with_data_in_files({london_file: london_openaq_data})
 
     results = get_database_data(collection_name, query)
     assert len(results) == 1
     stored: InSituMeasurement = results[0]
 
+    current_time = datetime(2024, 5, 25, 13, 14, 15, tzinfo=timezone.utc)
+
     assert stored["measurement_date"] == parse(date1)
     assert stored["name"] == "London"
     assert stored["location_name"] == london_openaq_data[0]["location"]
-    assert stored["metadata"]["entity"] == london_openaq_data[0]["entity"]
-    assert stored["metadata"]["sensor_type"] == london_openaq_data[0]["sensorType"]
-    assert stored["location_type"] == "city"
     assert stored["api_source"] == "OpenAQ"
+    assert stored["created_time"] == current_time
+    assert stored["last_modified_time"] == current_time
     assert stored["location"]["type"] == "point"
-    assert stored["last_modified_time"] == datetime(
-        2024, 5, 25, 13, 14, 15, tzinfo=timezone.utc
-    )
-    assert stored["created_time"] == datetime(
-        2024, 5, 25, 13, 14, 15, tzinfo=timezone.utc
-    )
     assert (
         stored["location"]["coordinates"][0]
         == london_openaq_data[0]["coordinates"]["longitude"]
@@ -159,6 +143,10 @@ def test__in_situ_etl__stores_all_data_correctly(ensure_forecast_cache):
         stored["location"]["coordinates"][1]
         == london_openaq_data[0]["coordinates"]["latitude"]
     )
+    assert stored["location_type"] == "city"
+    assert stored["metadata"]["entity"] == london_openaq_data[0]["entity"]
+    assert stored["metadata"]["sensor_type"] == london_openaq_data[0]["sensorType"]
+    # estimated_surface_pressure_pa and estimated_temperature_k have a separate test
 
     assert_pollutant_value(stored["no2"], 1, "µg/m³", 1, "µg/m³")
     assert_pollutant_value(stored["o3"], 2, "µg/m³", 2, "µg/m³")
@@ -175,46 +163,65 @@ def test__in_situ_etl__stores_all_data_correctly(ensure_forecast_cache):
         "STORE_GRIB_FILES": "True",
     },
 )
+def test__in_situ_etl__with_only_one_pollutant_still_stores(ensure_forecast_cache):
+    query = {"name": "London"}
+    delete_database_data(collection_name, query)
+
+    date1 = "2024-05-24T13:14:15+00:00"
+    london_file = f"{open_aq_cache_location}/London_2024052413_2024052513.json"
+
+    london_openaq_data = [create_measurement(date1, "pm25", 4)]
+
+    run_with_data_in_files({london_file: london_openaq_data})
+
+    results = get_database_data(collection_name, query)
+    assert len(results) == 1
+    stored: InSituMeasurement = results[0]
+
+    assert stored["name"] == "London"
+    assert_pollutant_value(stored["pm2_5"], 4, "µg/m³", 4, "µg/m³")
+
+    assert "no2" not in stored.keys()
+    assert "o3" not in stored.keys()
+    assert "so2" not in stored.keys()
+    assert "pm10" not in stored.keys()
+
+
+@mock.patch.dict(
+    os.environ,
+    {
+        "OPEN_AQ_CITIES": "London",
+        "OPEN_AQ_CACHE": open_aq_cache_location,
+        "STORE_GRIB_FILES": "True",
+    },
+)
 def test__in_situ_etl__does_store_9998_pollutant_readings(ensure_forecast_cache):
     query = {"name": "London"}
     delete_database_data(collection_name, query)
 
     date1 = "2024-05-24T13:14:15+00:00"
     london_file = f"{open_aq_cache_location}/London_2024052413_2024052513.json"
-    pollutant_value_9998: int = 9998
 
     london_openaq_data = [
-        create_measurement(date1, "no2", pollutant_value_9998),
-        create_measurement(date1, "o3", pollutant_value_9998),
-        create_measurement(date1, "so2", pollutant_value_9998),
-        create_measurement(date1, "pm25", pollutant_value_9998),
-        create_measurement(date1, "pm10", pollutant_value_9998),
+        create_measurement(date1, "no2", 9998),
+        create_measurement(date1, "o3", 9998),
+        create_measurement(date1, "so2", 9998),
+        create_measurement(date1, "pm25", 9998),
+        create_measurement(date1, "pm10", 9998),
     ]
 
-    write_to_file(london_openaq_data, london_file)
-    main()
-    os.remove(london_file)
+    run_with_data_in_files({london_file: london_openaq_data})
 
     results = get_database_data(collection_name, query)
     assert len(results) == 1
 
     stored: InSituMeasurement = results[0]
 
-    assert_pollutant_value(
-        stored["no2"], pollutant_value_9998, "µg/m³", pollutant_value_9998, "µg/m³"
-    )
-    assert_pollutant_value(
-        stored["o3"], pollutant_value_9998, "µg/m³", pollutant_value_9998, "µg/m³"
-    )
-    assert_pollutant_value(
-        stored["so2"], pollutant_value_9998, "µg/m³", pollutant_value_9998, "µg/m³"
-    )
-    assert_pollutant_value(
-        stored["pm2_5"], pollutant_value_9998, "µg/m³", pollutant_value_9998, "µg/m³"
-    )
-    assert_pollutant_value(
-        stored["pm10"], pollutant_value_9998, "µg/m³", pollutant_value_9998, "µg/m³"
-    )
+    assert_pollutant_value(stored["no2"], 9998, "µg/m³", 9998, "µg/m³")
+    assert_pollutant_value(stored["o3"], 9998, "µg/m³", 9998, "µg/m³")
+    assert_pollutant_value(stored["so2"], 9998, "µg/m³", 9998, "µg/m³")
+    assert_pollutant_value(stored["pm2_5"], 9998, "µg/m³", 9998, "µg/m³")
+    assert_pollutant_value(stored["pm10"], 9998, "µg/m³", 9998, "µg/m³")
 
 
 @mock.patch.dict(
@@ -233,19 +240,16 @@ def test__in_situ_etl__does_not_create_entry_if_all_readings_are_9999(
 
     date1 = "2024-05-24T13:14:15+00:00"
     london_file = f"{open_aq_cache_location}/London_2024052413_2024052513.json"
-    pollutant_value_9999: int = 9999
 
     london_openaq_data = [
-        create_measurement(date1, "no2", pollutant_value_9999),
-        create_measurement(date1, "o3", pollutant_value_9999),
-        create_measurement(date1, "so2", pollutant_value_9999),
-        create_measurement(date1, "pm25", pollutant_value_9999),
-        create_measurement(date1, "pm10", pollutant_value_9999),
+        create_measurement(date1, "no2", 9999),
+        create_measurement(date1, "o3", 9999),
+        create_measurement(date1, "so2", 9999),
+        create_measurement(date1, "pm25", 9999),
+        create_measurement(date1, "pm10", 9999),
     ]
 
-    write_to_file(london_openaq_data, london_file)
-    main()
-    os.remove(london_file)
+    run_with_data_in_files({london_file: london_openaq_data})
 
     results = get_database_data(collection_name, query)
     assert len(results) == 0
@@ -265,20 +269,16 @@ def test__in_situ_etl__does_not_store_9999_pollutant_readings(ensure_forecast_ca
 
     date1 = "2024-05-24T13:14:15+00:00"
     london_file = f"{open_aq_cache_location}/London_2024052413_2024052513.json"
-    pollutant_value_9999: int = 9999
-    pollutant_value_1: int = 1
 
     london_openaq_data = [
-        create_measurement(date1, "no2", pollutant_value_9999),
-        create_measurement(date1, "o3", pollutant_value_9999),
-        create_measurement(date1, "so2", pollutant_value_9999),
-        create_measurement(date1, "pm25", pollutant_value_9999),
-        create_measurement(date1, "pm10", pollutant_value_1),
+        create_measurement(date1, "no2", 9999),
+        create_measurement(date1, "o3", 9999),
+        create_measurement(date1, "so2", 9999),
+        create_measurement(date1, "pm25", 9999),
+        create_measurement(date1, "pm10", 1),
     ]
 
-    write_to_file(london_openaq_data, london_file)
-    main()
-    os.remove(london_file)
+    run_with_data_in_files({london_file: london_openaq_data})
 
     results = get_database_data(collection_name, query)
     assert len(results) == 1
@@ -289,9 +289,7 @@ def test__in_situ_etl__does_not_store_9999_pollutant_readings(ensure_forecast_ca
     assert "o3" not in stored
     assert "so2" not in stored
     assert "pm25" not in stored
-    assert_pollutant_value(
-        stored["pm10"], pollutant_value_1, "µg/m³", pollutant_value_1, "µg/m³"
-    )
+    assert_pollutant_value(stored["pm10"], 1, "µg/m³", 1, "µg/m³")
 
 
 @mock.patch.dict(
@@ -310,14 +308,10 @@ def test__in_situ_etl__handles_multiple_cities(ensure_forecast_cache):
     london_file = f"{open_aq_cache_location}/London_2024052413_2024052513.json"
     melbourne_file = f"{open_aq_cache_location}/Melbourne_2024052413_2024052513.json"
 
-    london_openaq_data = [create_measurement(date1, "no2", 123)]
-    melbourne_openaq_data = [create_measurement(date1, "no2", 456, "melbourne")]
+    london_data = [create_measurement(date1, "no2", 123)]
+    melbourne_data = [create_measurement(date1, "no2", 456, "melbourne")]
 
-    write_to_file(london_openaq_data, london_file)
-    write_to_file(melbourne_openaq_data, melbourne_file)
-    main()
-    os.remove(london_file)
-    os.remove(melbourne_file)
+    run_with_data_in_files({london_file: london_data, melbourne_file: melbourne_data})
 
     results = get_database_data(collection_name, query)
     assert len(results) == 2
@@ -337,7 +331,7 @@ def test__in_situ_etl__handles_multiple_cities(ensure_forecast_cache):
         "STORE_GRIB_FILES": "True",
     },
 )
-def test__in_situ_etl__updates_existing_data(ensure_forecast_cache):
+def test__in_situ_etl__handles_update_to_existing_pollutant(ensure_forecast_cache):
     query = {"name": "London"}
     delete_database_data(collection_name, query)
     date1 = "2024-05-24T13:14:15+00:00"
@@ -347,15 +341,12 @@ def test__in_situ_etl__updates_existing_data(ensure_forecast_cache):
         "measurement_date": parse(date1),
         "location": {"type": "point", "coordinates": (1, 2)},
         "location_name": "london_test_station",
-        "api_source": "test",
+        "api_source": "test_source",
         "location_type": AirQualityLocationType.CITY.value,
         "metadata": {},
         "last_modified_time": datetime(2024, 2, 22, 12, 0, 0),
         "no2": {
-            "value": 17,
-            "unit": "test",
-            "original_value": 17,
-            "original_unit": "test",
+            "value": 17, "unit": "test", "original_value": 17, "original_unit": "test",
         },
     }
     seed_api_test_data(collection_name, [existing_measurement])
@@ -363,13 +354,53 @@ def test__in_situ_etl__updates_existing_data(ensure_forecast_cache):
     london_file = f"{open_aq_cache_location}/London_2024052413_2024052513.json"
     london_data = [create_measurement(date1, "no2", 116)]
 
-    write_to_file(london_data, london_file)
-    main()
-    os.remove(london_file)
+    run_with_data_in_files({london_file: london_data})
 
     results = get_database_data(collection_name, query)
     assert len(results) == 1
     assert results[0]["no2"]["value"] == 116
+    assert results[0]["last_modified_time"] == datetime(
+        2024, 5, 25, 13, 14, 15, tzinfo=timezone.utc
+    )
+
+
+@mock.patch.dict(
+    os.environ,
+    {
+        "OPEN_AQ_CITIES": "London",
+        "OPEN_AQ_CACHE": open_aq_cache_location,
+        "STORE_GRIB_FILES": "True",
+    },
+)
+def test__in_situ_etl__handles_update_for_new_pollutant(ensure_forecast_cache):
+    query = {"name": "London"}
+    delete_database_data(collection_name, query)
+    date1 = "2024-05-24T13:14:15+00:00"
+
+    existing_measurement: InSituMeasurement = {
+        "name": "London",
+        "measurement_date": parse(date1),
+        "location": {"type": "point", "coordinates": (1, 2)},
+        "location_name": "london_test_station",
+        "api_source": "test_source",
+        "location_type": AirQualityLocationType.CITY.value,
+        "metadata": {},
+        "last_modified_time": datetime(2024, 2, 22, 12, 0, 0),
+        "no2": {
+            "value": 17, "unit": "test", "original_value": 17, "original_unit": "test",
+        },
+    }
+    seed_api_test_data(collection_name, [existing_measurement])
+
+    london_file = f"{open_aq_cache_location}/London_2024052413_2024052513.json"
+    london_data = [create_measurement(date1, "so2", 116)]
+
+    run_with_data_in_files({london_file: london_data})
+
+    results = get_database_data(collection_name, query)
+    assert len(results) == 1
+    assert results[0]["no2"]["value"] == 17
+    assert results[0]["so2"]["value"] == 116
     assert results[0]["last_modified_time"] == datetime(
         2024, 5, 25, 13, 14, 15, tzinfo=timezone.utc
     )
@@ -393,10 +424,8 @@ def test__in_situ_etl__invalid_data_raises_error_and_does_not_store(
 
     london_openaq_data = [{"invalid_data": 1234}]
 
-    write_to_file(london_openaq_data, london_file)
     with pytest.raises(KeyError):
-        main()
-    os.remove(london_file)
+        run_with_data_in_files({london_file: london_openaq_data})
 
     results = get_database_data(collection_name, query)
     assert len(results) == 0
@@ -531,11 +560,7 @@ def test__convert_ppm_to_ugm3_and_store__only_no2_so2_o3():
         ),
     ]
 
-    write_to_file(berlin_openaq_data, berlin_file)
-
-    # run in situ ETL process, use file as cached response from OpenAQ for Berlin
-    main()
-    os.remove(berlin_file)
+    run_with_data_in_files({berlin_file: berlin_openaq_data})
 
     # investigating data stored for Berlin
     results = get_database_data(collection_name, query)
@@ -565,6 +590,12 @@ def test__convert_ppm_to_ugm3_and_store__only_no2_so2_o3():
     assert_pollutant_value(stored["so2"], expected_so2_ugm3, "µg/m³", 1000, "ppm")
     assert "pm10" not in stored
     assert "pm2_5" not in stored
+
+
+def remove_file(filename: str):
+    if os.path.exists(filename):
+        logging.info(f"Test removing cached file '{filename}'")
+        os.remove(filename)
 
 
 def mock_response_for_status(status):
@@ -621,3 +652,16 @@ def create_measurement(
         "coordinates": {"longitude": longitude, "latitude": latitude},
     }
     return create_open_aq_measurement(overrides)
+
+
+def run_with_data_in_files(files_and_data: dict[str, list[dict]]):
+    try:
+        for (filename, data) in files_and_data.items():
+            with open(filename, "w", encoding="utf-8") as f:
+                json.dump(data, f)
+
+        main()
+
+    finally:
+        for filename in files_and_data:
+            os.remove(filename)
