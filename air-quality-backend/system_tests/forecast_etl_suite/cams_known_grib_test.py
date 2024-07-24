@@ -1,3 +1,5 @@
+import copy
+import random
 from datetime import timezone, datetime, timedelta
 import pytest
 
@@ -69,11 +71,10 @@ def setup_data():
 def test__cities_at_extreme_longitudes__have_correct_forecast_values(
     city_name, forecast_valid_time, expected_values, setup_data
 ):
-    query = {
-        "name": city_name,
-        "forecast_valid_time": {"$eq": forecast_valid_time},
-        "forecast_base_time": {"$eq": forecast_base_time},
-    }
+    query = copy.deepcopy(data_query)
+    query["name"] = city_name
+    query["forecast_valid_time"] = {"$eq": forecast_valid_time}
+
     stored_results = get_database_data("forecast_data", query)
     assert len(stored_results) == 1
 
@@ -130,7 +131,7 @@ def test__that_each_document_has_source_cams_production(setup_data):
         ), f"source '{document['source']}' is not cams-production"
 
 
-def test__document_count_matches_expected(setup_data):
+def test__document_count_matches_expected_for_all_documents(setup_data):
     dict_result = get_database_data("forecast_data", data_query)
 
     # no of locations * no of forecast times
@@ -139,6 +140,33 @@ def test__document_count_matches_expected(setup_data):
     assert (
         len(dict_result) == expected_doc_count
     ), f"Expected {expected_doc_count} documents, but got {len(dict_result)}"
+
+
+def test__document_count_matches_expected_for_a_single_city(setup_data):
+    # Get a random city to check
+    city_names = list(map(lambda x: x["name"], get_database_data("locations")))
+    rand_city = city_names[random.randint(0, len(city_names) - 1)]
+
+    query = copy.deepcopy(data_query)
+    query["name"] = rand_city
+
+    # Check 41 forecasts overall for the city
+    dict_result = get_database_data("forecast_data", query)
+    assert (
+            len(dict_result) == 41
+    ), f"Expected 41 documents for city {rand_city}, but got {len(dict_result)}"
+
+    # Check 8 forecasts for the city in a day randomly picked from the forecast
+    offset = random.randint(0, 4)
+    forecast_date = datetime(2024, 6, 4, tzinfo=timezone.utc) + timedelta(days=offset)
+    query["forecast_valid_time"] = {
+        "$gte": forecast_date, "$lt": forecast_date + timedelta(days=1)
+    }
+
+    dict_result = get_database_data("forecast_data", query)
+    assert (
+            len(dict_result) == 8
+    ), f"Expected 8 documents for {rand_city}, day {offset}, but got {len(dict_result)}"
 
 
 def test__created_time_exists(setup_data):
