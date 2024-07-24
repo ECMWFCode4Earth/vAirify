@@ -22,10 +22,6 @@ export const getOptions = (): EChartsOption => {
     tooltip: {
       trigger: 'axis',
     },
-    legend: {
-      left: 'right',
-      padding: [40, 60],
-    },
   }
 }
 
