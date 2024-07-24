@@ -43,12 +43,6 @@ def _chunk_data_array(
         chunk = rgb_data_array[:, start_index:end_index, :]
         chunks.append(chunk)
 
-        # time_start = pd.to_datetime(
-        #     time_vector.data[start_time_step:end_time_step].min(), unit="s"
-        # ).strftime("%Y-%m-%d %H:%M:%S")
-        # time_end = pd.to_datetime(
-        #     time_vector.data[start_time_step:end_time_step].max(), unit="s"
-        # ).strftime("%Y-%m-%d %H:%M:%S")
         time_start = pd.to_datetime(
             time_vector.data[start_time_step:end_time_step].min(), unit="s"
         ).isoformat(timespec='milliseconds') + '+00:00'
