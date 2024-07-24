@@ -1,6 +1,6 @@
 import { TitleComponentOption, YAXisComponentOption } from 'echarts'
 
-import { getForecastOptions } from './average-composition-chart-builder'
+import { getForecastOptions } from './average-comparison-chart-builder'
 import { AverageAqiValues } from '../../../services/calculate-measurements-aqi-averages/calculate-measurement-aqi-averages-service'
 import { ForecastResponseDto } from '../../../services/types'
 

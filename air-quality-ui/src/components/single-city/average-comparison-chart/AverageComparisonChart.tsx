@@ -1,7 +1,7 @@
 import ReactECharts from 'echarts-for-react'
 import { DateTime } from 'luxon'
 
-import { getForecastOptions } from './average-composition-chart-builder'
+import { getForecastOptions } from './average-comparison-chart-builder'
 import classes from './AverageComparisonChart.module.css'
 import {
   averageAqiValues,
