@@ -30,6 +30,13 @@ open_aq_cache_location = "system_tests/in_situ_etl_suite"
 collection_name = "in_situ_data"
 load_dotenv()
 
+# Env variables to use to mocked and cached London data - used for most tests
+cache_london_env_vars = {
+    "OPEN_AQ_CITIES": "London",
+    "OPEN_AQ_CACHE": open_aq_cache_location,
+    "STORE_GRIB_FILES": "True",
+}
+
 
 @mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London"})
 def test__in_situ_etl__calling_actual_api_returns_values_and_stores():
@@ -48,29 +55,22 @@ def ensure_forecast_cache():
     # With a time of 2024-05-25 13:14:15 our GRIB files will be for 2024-05-24 12:00:00
     with freeze_time("2024-05-25T13:14:15"):
         with mock.patch.dict(os.environ, {"STORE_GRIB_FILES": "True"}):
-            # Set up code
             # Ensure the cached files are present by fetching the grib files
             single_file = "single_level_16_from_2024-05-24_12.grib"
             multi_file = "multi_level_16_from_2024-05-24_12.grib"
             if not os.path.exists(single_file) or not os.path.exists(multi_file):
                 fetch_forecast_data(datetime(2024, 5, 24, 12), 16)
         yield
-        # Remove any cached files
-        remove_file("single_level_16_from_2024-05-24_12.grib")
-        remove_file("multi_level_16_from_2024-05-24_12.grib")
+
+        if os.path.exists(single_file):
+            os.remove(single_file)
+        if os.path.exists(multi_file):
+            os.remove(multi_file)
 
 
-@mock.patch.dict(
-    os.environ,
-    {
-        "OPEN_AQ_CITIES": "London",
-        "OPEN_AQ_CACHE": open_aq_cache_location,
-        "STORE_GRIB_FILES": "True",
-    },
-)
+@mock.patch.dict(os.environ, cache_london_env_vars)
 def test__in_situ_etl__combines_pollutants_for_location_times(ensure_forecast_cache):
-    query = {"name": "London"}
-    delete_database_data(collection_name, query)
+    delete_database_data(collection_name, {"name": "London"})
 
     date1 = "2024-05-24T13:14:15+00:00"
     date2 = "2024-05-25T13:14:15+00:00"
@@ -85,7 +85,7 @@ def test__in_situ_etl__combines_pollutants_for_location_times(ensure_forecast_ca
 
     run_with_data_in_files({london_file: london_data})
 
-    results = get_database_data(collection_name, query)
+    results = get_database_data(collection_name, {"name": "London"})
     assert len(results) == 2
 
     date1_res = retrieve_single(results, "measurement_date", parse(date1))
@@ -97,17 +97,9 @@ def test__in_situ_etl__combines_pollutants_for_location_times(ensure_forecast_ca
     assert date2_res["o3"]["value"] == 4
 
 
-@mock.patch.dict(
-    os.environ,
-    {
-        "OPEN_AQ_CITIES": "London",
-        "OPEN_AQ_CACHE": open_aq_cache_location,
-        "STORE_GRIB_FILES": "True",
-    },
-)
+@mock.patch.dict(os.environ, cache_london_env_vars)
 def test__in_situ_etl__stores_all_data_correctly(ensure_forecast_cache):
-    query = {"name": "London"}
-    delete_database_data(collection_name, query)
+    delete_database_data(collection_name, {"name": "London"})
 
     date1 = "2024-05-24T13:14:15+00:00"
     london_file = f"{open_aq_cache_location}/London_2024052413_2024052513.json"
@@ -122,7 +114,7 @@ def test__in_situ_etl__stores_all_data_correctly(ensure_forecast_cache):
 
     run_with_data_in_files({london_file: london_openaq_data})
 
-    results = get_database_data(collection_name, query)
+    results = get_database_data(collection_name, {"name": "London"})
     assert len(results) == 1
     stored: InSituMeasurement = results[0]
 
@@ -135,14 +127,11 @@ def test__in_situ_etl__stores_all_data_correctly(ensure_forecast_cache):
     assert stored["created_time"] == current_time
     assert stored["last_modified_time"] == current_time
     assert stored["location"]["type"] == "point"
-    assert (
-        stored["location"]["coordinates"][0]
-        == london_openaq_data[0]["coordinates"]["longitude"]
-    )
-    assert (
-        stored["location"]["coordinates"][1]
-        == london_openaq_data[0]["coordinates"]["latitude"]
-    )
+
+    stored_coordinates = stored["location"]["coordinates"]
+    assert stored_coordinates[0] == london_openaq_data[0]["coordinates"]["longitude"]
+    assert stored_coordinates[1] == london_openaq_data[0]["coordinates"]["latitude"]
+
     assert stored["location_type"] == "city"
     assert stored["metadata"]["entity"] == london_openaq_data[0]["entity"]
     assert stored["metadata"]["sensor_type"] == london_openaq_data[0]["sensorType"]
@@ -155,14 +144,7 @@ def test__in_situ_etl__stores_all_data_correctly(ensure_forecast_cache):
     assert_pollutant_value(stored["pm10"], 5, "µg/m³", 5, "µg/m³")
 
 
-@mock.patch.dict(
-    os.environ,
-    {
-        "OPEN_AQ_CITIES": "London",
-        "OPEN_AQ_CACHE": open_aq_cache_location,
-        "STORE_GRIB_FILES": "True",
-    },
-)
+@mock.patch.dict(os.environ, cache_london_env_vars)
 def test__in_situ_etl__with_only_one_pollutant_still_stores(ensure_forecast_cache):
     query = {"name": "London"}
     delete_database_data(collection_name, query)
@@ -187,14 +169,7 @@ def test__in_situ_etl__with_only_one_pollutant_still_stores(ensure_forecast_cach
     assert "pm10" not in stored.keys()
 
 
-@mock.patch.dict(
-    os.environ,
-    {
-        "OPEN_AQ_CITIES": "London",
-        "OPEN_AQ_CACHE": open_aq_cache_location,
-        "STORE_GRIB_FILES": "True",
-    },
-)
+@mock.patch.dict(os.environ, cache_london_env_vars)
 def test__in_situ_etl__does_store_9998_pollutant_readings(ensure_forecast_cache):
     query = {"name": "London"}
     delete_database_data(collection_name, query)
@@ -224,14 +199,7 @@ def test__in_situ_etl__does_store_9998_pollutant_readings(ensure_forecast_cache)
     assert_pollutant_value(stored["pm10"], 9998, "µg/m³", 9998, "µg/m³")
 
 
-@mock.patch.dict(
-    os.environ,
-    {
-        "OPEN_AQ_CITIES": "London",
-        "OPEN_AQ_CACHE": open_aq_cache_location,
-        "STORE_GRIB_FILES": "True",
-    },
-)
+@mock.patch.dict(os.environ, cache_london_env_vars)
 def test__in_situ_etl__does_not_create_entry_if_all_readings_are_9999(
     ensure_forecast_cache,
 ):
@@ -255,14 +223,7 @@ def test__in_situ_etl__does_not_create_entry_if_all_readings_are_9999(
     assert len(results) == 0
 
 
-@mock.patch.dict(
-    os.environ,
-    {
-        "OPEN_AQ_CITIES": "London",
-        "OPEN_AQ_CACHE": open_aq_cache_location,
-        "STORE_GRIB_FILES": "True",
-    },
-)
+@mock.patch.dict(os.environ, cache_london_env_vars)
 def test__in_situ_etl__does_not_store_9999_pollutant_readings(ensure_forecast_cache):
     query = {"name": "London"}
     delete_database_data(collection_name, query)
@@ -323,14 +284,7 @@ def test__in_situ_etl__handles_multiple_cities(ensure_forecast_cache):
     assert melbourne_result["no2"]["value"] == 456
 
 
-@mock.patch.dict(
-    os.environ,
-    {
-        "OPEN_AQ_CITIES": "London",
-        "OPEN_AQ_CACHE": open_aq_cache_location,
-        "STORE_GRIB_FILES": "True",
-    },
-)
+@mock.patch.dict(os.environ, cache_london_env_vars)
 def test__in_situ_etl__handles_update_to_existing_pollutant(ensure_forecast_cache):
     query = {"name": "London"}
     delete_database_data(collection_name, query)
@@ -364,14 +318,7 @@ def test__in_situ_etl__handles_update_to_existing_pollutant(ensure_forecast_cach
     )
 
 
-@mock.patch.dict(
-    os.environ,
-    {
-        "OPEN_AQ_CITIES": "London",
-        "OPEN_AQ_CACHE": open_aq_cache_location,
-        "STORE_GRIB_FILES": "True",
-    },
-)
+@mock.patch.dict(os.environ, cache_london_env_vars)
 def test__in_situ_etl__handles_update_for_new_pollutant(ensure_forecast_cache):
     query = {"name": "London"}
     delete_database_data(collection_name, query)
@@ -406,14 +353,7 @@ def test__in_situ_etl__handles_update_for_new_pollutant(ensure_forecast_cache):
     )
 
 
-@mock.patch.dict(
-    os.environ,
-    {
-        "OPEN_AQ_CITIES": "London",
-        "OPEN_AQ_CACHE": open_aq_cache_location,
-        "STORE_GRIB_FILES": "True",
-    },
-)
+@mock.patch.dict(os.environ, cache_london_env_vars)
 def test__in_situ_etl__invalid_data_raises_error_and_does_not_store(
     ensure_forecast_cache,
 ):
@@ -506,59 +446,25 @@ def test__convert_ppm_to_ugm3_and_store__only_no2_so2_o3():
     delete_database_data(collection_name, query)
     berlin_file = f"{open_aq_cache_location}/Berlin_2024062613_2024062713.json"
 
-    location_berlin = "berlin"
-    latitude_berlin = 52.52437
-    longitude_berlin = 13.41053
-    unit_ppm = "ppm"
-    date_utc = "2024-06-26T13:10:20+00:00"
+    berlin_openaq_data= []
+    overrides = {
+        "location": "berlin",
+        "date": {"utc": "2024-06-26T13:10:20+00:00"},
+        "value": 1000,
+        "unit": "ppm",
+        "coordinates": {"longitude": 13.41053, "latitude": 52.52437},
+        "parameter": "no2"
+    }
 
-    berlin_openaq_data = [
-        create_measurement(
-            date_utc,
-            "no2",
-            1000,
-            location_berlin,
-            unit_ppm,
-            longitude_berlin,
-            latitude_berlin,
-        ),
-        create_measurement(
-            date_utc,
-            "o3",
-            1000,
-            location_berlin,
-            unit_ppm,
-            longitude_berlin,
-            latitude_berlin,
-        ),
-        create_measurement(
-            date_utc,
-            "so2",
-            1000,
-            location_berlin,
-            unit_ppm,
-            longitude_berlin,
-            latitude_berlin,
-        ),
-        create_measurement(
-            date_utc,
-            "pm25",
-            1000,
-            location_berlin,
-            unit_ppm,
-            longitude_berlin,
-            latitude_berlin,
-        ),
-        create_measurement(
-            date_utc,
-            "pm10",
-            1000,
-            location_berlin,
-            unit_ppm,
-            longitude_berlin,
-            latitude_berlin,
-        ),
-    ]
+    berlin_openaq_data.append(create_open_aq_measurement(overrides))
+    overrides["parameter"] = "o3"
+    berlin_openaq_data.append(create_open_aq_measurement(overrides))
+    overrides["parameter"] = "so2"
+    berlin_openaq_data.append(create_open_aq_measurement(overrides))
+    overrides["parameter"] = "pm25"
+    berlin_openaq_data.append(create_open_aq_measurement(overrides))
+    overrides["parameter"] = "pm10"
+    berlin_openaq_data.append(create_open_aq_measurement(overrides))
 
     run_with_data_in_files({berlin_file: berlin_openaq_data})
 
@@ -592,10 +498,9 @@ def test__convert_ppm_to_ugm3_and_store__only_no2_so2_o3():
     assert "pm2_5" not in stored
 
 
-def remove_file(filename: str):
-    if os.path.exists(filename):
-        logging.info(f"Test removing cached file '{filename}'")
-        os.remove(filename)
+#
+# PRIVATE TEST FUNCTIONS
+#
 
 
 def mock_response_for_status(status):
