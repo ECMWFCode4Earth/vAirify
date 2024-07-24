@@ -1,4 +1,4 @@
-import { EChartsOption, LineSeriesOption } from 'echarts'
+import { EChartsOption, LineSeriesOption, YAXisComponentOption } from 'echarts'
 
 import { xAxisFormat } from '../../services/echarts-service'
 
@@ -24,6 +24,19 @@ export const measurementLine = (): LineSeriesOption => {
     },
     z: 1,
     symbol: 'roundRect',
+  }
+}
+
+export const yAxis = (
+  name: string,
+  max: number | undefined = undefined,
+): YAXisComponentOption => {
+  return {
+    type: 'value',
+    nameGap: 35,
+    nameLocation: 'middle',
+    name,
+    max,
   }
 }
 

@@ -7,18 +7,13 @@ import {
   baseOptions,
   forecastLine,
   measurementLine,
+  yAxis,
 } from '../base-chart-builder'
 
 export const getOptions = (): EChartsOption => {
   return {
     ...baseOptions('AQI'),
-    yAxis: {
-      type: 'value',
-      name: 'AQI',
-      max: 6,
-      nameGap: 30,
-      nameLocation: 'middle',
-    },
+    yAxis: yAxis('AQI', 6),
     tooltip: {
       trigger: 'axis',
     },
