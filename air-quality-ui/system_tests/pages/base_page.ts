@@ -19,12 +19,6 @@ export class BasePage {
     await this.page.getByRole('link', { name: buttonName }).click()
   }
 
-  async setupApiRoute(endpointUrl: string, mockedAPIResponse: object) {
-    await this.page.route(endpointUrl, async (route) => {
-      await route.fulfill({ json: mockedAPIResponse })
-    })
-  }
-
   async captureNetworkRequestsAsArray(
     page: Page,
     expectedRequestMethod: string,

@@ -1,49 +1,34 @@
-import { EChartsOption } from 'echarts'
+import { EChartsOption, SeriesOption } from 'echarts'
 
 import { AverageAqiValues } from '../../../services/calculate-measurements-aqi-averages/calculate-measurement-aqi-averages-service'
-import {
-  convertToLocalTime,
-  xAxisFormat,
-} from '../../../services/echarts-service'
+import { convertToLocalTime } from '../../../services/echarts-service'
 import { ForecastResponseDto } from '../../../services/types'
+import {
+  baseOptions,
+  forecastLine,
+  measurementLine,
+  yAxisOptions,
+} from '../base-chart-builder'
 
-export const getOptions = (): EChartsOption => {
+export const getOptions = (zoomPercent: number): EChartsOption => {
   return {
-    title: {
-      text: 'AQI',
-      left: 'center',
-    },
-    xAxis: {
-      type: 'time',
-      axisLabel: {
-        formatter: xAxisFormat,
-      },
-    },
-    yAxis: {
-      type: 'value',
-      name: 'AQI',
-      max: 6,
-      nameGap: 30,
-      nameLocation: 'middle',
-    },
+    ...baseOptions('AQI', zoomPercent),
+    yAxis: yAxisOptions('AQI', 6),
     tooltip: {
       trigger: 'axis',
-    },
-    legend: {
-      left: 'right',
-      padding: [40, 60],
     },
   }
 }
 
-const generateForecastLine = (forecastData?: ForecastResponseDto[]) => {
+const generateForecastLine = (
+  forecastData?: ForecastResponseDto[],
+): SeriesOption => {
   return {
+    ...forecastLine(),
     data: forecastData?.map((dataToPlot) => [
       convertToLocalTime(dataToPlot.valid_time),
       dataToPlot.overall_aqi_level,
     ]),
-    type: 'line',
-    name: 'Forecast',
   }
 }
 
@@ -57,16 +42,18 @@ const generateMeasurementLine = (
     ]),
     type: 'line',
     name: 'Measurement',
+    ...measurementLine(5),
   }
 }
 
 export const getForecastOptions = (
+  zoomPercent: number,
   forecastData?: ForecastResponseDto[],
   measurementsAveragedData?: AverageAqiValues[] | undefined,
 ) => {
   const forecastPlot = generateForecastLine(forecastData)
   const measurementPlot = generateMeasurementLine(measurementsAveragedData)
-  const options = getOptions()
+  const options = getOptions(zoomPercent)
 
   return {
     ...options,

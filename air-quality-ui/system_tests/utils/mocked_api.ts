@@ -1,4 +1,4 @@
-import { CaseAQI3 } from './default_aqi_enums'
+import { CaseAQI3, defaultCitySnapshotValues } from './default_aqi_enums'
 
 interface forecastAPIResponse {
   base_time: string
@@ -25,6 +25,40 @@ interface measurementSummaryAPIResponse {
   pm2_5: { mean: { aqi_level: number; value: number } }
   pm10: { mean: { aqi_level: number; value: number } }
   so2: { mean: { aqi_level: number; value: number } }
+}
+
+interface measurementsCityPageAPIresponse {
+  measurement_date: string
+  location_type: string
+  location_name: string
+  api_source: string
+  no2: number
+  o3: number
+  pm2_5: number
+  pm10: number
+  so2: number
+  entity: string
+  sensor_type: string
+  site_name: string
+}
+export function createMeasurementsCityPageResponseData(
+  overrides: Partial<measurementsCityPageAPIresponse> = {},
+): measurementsCityPageAPIresponse {
+  const defaultMeasurementsCityPageResponse = {
+    measurement_date: '2024-07-01T00:00:00Z',
+    location_type: 'city',
+    location_name: 'Rio de Janeiro',
+    api_source: 'OpenAQ',
+    no2: defaultCitySnapshotValues.no2,
+    o3: defaultCitySnapshotValues.o3,
+    pm2_5: defaultCitySnapshotValues.pm2_5,
+    pm10: defaultCitySnapshotValues.pm10,
+    so2: defaultCitySnapshotValues.so2,
+    entity: 'Governmental Organisation',
+    sensor_type: 'reference grade',
+    site_name: 'Centro',
+  }
+  return { ...defaultMeasurementsCityPageResponse, ...overrides }
 }
 
 export function createForecastAPIResponseData(

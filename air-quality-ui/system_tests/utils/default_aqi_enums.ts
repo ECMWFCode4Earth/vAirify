@@ -33,3 +33,11 @@ export enum CaseAQI6 {
   pm10 = 160,
   so2 = 800,
 }
+
+export enum defaultCitySnapshotValues {
+  no2 = 51,
+  o3 = 52,
+  pm2_5 = 53,
+  pm10 = 54,
+  so2 = 55,
+}

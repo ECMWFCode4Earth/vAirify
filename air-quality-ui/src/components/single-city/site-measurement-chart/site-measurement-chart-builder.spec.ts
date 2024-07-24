@@ -1,9 +1,12 @@
 import {
   DataZoomComponentOption,
   LineSeriesOption,
+  MarkAreaComponentOption,
   TitleComponentOption,
   YAXisComponentOption,
 } from 'echarts'
+// eslint-disable-next-line import/no-unresolved
+import { MarkArea2DDataItemOption } from 'echarts/types/src/component/marker/MarkAreaModel.js'
 
 import { generateMeasurementChart } from './site-measurement-chart-builder'
 import { PollutantType } from '../../../models'
@@ -99,8 +102,8 @@ describe('Site Measurement Chart', () => {
       ['no2', 'Nitrogen Dioxide'],
       ['so2', 'Sulphur Dioxide'],
       ['o3', 'Ozone'],
-      ['pm10', 'PM 10'],
-      ['pm2_5', 'PM 2.5'],
+      ['pm10', 'PM10'],
+      ['pm2_5', 'PM2.5'],
     ])(
       `shows the correct pollutant`,
       async (title: PollutantType, expected: string) => {
@@ -156,6 +159,97 @@ describe('Site Measurement Chart', () => {
         forecastData,
       )
       expect((result.dataZoom as DataZoomComponentOption).end).toBe(zoomPercent)
+    })
+  })
+
+  describe('background colors', () => {
+    const aqiRangesByPollutant: { [key: string]: number[] } = {
+      o3: [0, 50, 100, 130, 240, 380, 800],
+      no2: [0, 40, 90, 120, 230, 340, 1000],
+      so2: [0, 100, 200, 350, 500, 750, 1250],
+      pm10: [0, 20, 40, 50, 100, 150, 1200],
+      pm2_5: [0, 10, 20, 25, 50, 75, 800],
+    }
+
+    const colours: { [key: string]: string } = {
+      aqi1: '#50f0e5',
+      aqi2: '#50ccaa',
+      aqi3: '#f0e641',
+      aqi4: '#ff505080',
+      aqi5: '#960032',
+      aqi6: '#7d2181',
+    }
+
+    it.each<PollutantType>(['no2', 'so2', 'o3', 'pm10', 'pm2_5'])(
+      'has correct aqi highlighting',
+      async (pollutant) => {
+        const result = generateMeasurementChart(
+          pollutant,
+          zoomPercent,
+          measurementsBySite,
+          forecastData,
+          seriesColorsBySite,
+        )
+
+        const aqiBars = (
+          result.series.find((x) => x.name === 'Background')
+            ?.markArea as MarkAreaComponentOption
+        ).data as MarkArea2DDataItemOption[]
+
+        const expectedBoundaries = aqiRangesByPollutant[pollutant]
+        aqiBars.forEach((con, index) => {
+          if (index !== expectedBoundaries.length) {
+            expect(con[0].yAxis).toBe(expectedBoundaries[index])
+            expect(con[0].itemStyle?.color).toBe(colours[`aqi${index + 1}`])
+            expect(con[0].itemStyle?.opacity).toBe(0.25)
+            expect(con[1].yAxis).toBe(expectedBoundaries[index + 1])
+          }
+        })
+      },
+    )
+
+    it.each<PollutantType>(['no2', 'so2', 'o3', 'pm10', 'pm2_5'])(
+      'has correct number of colours',
+      async (pollutant) => {
+        const result = generateMeasurementChart(
+          pollutant,
+          zoomPercent,
+          measurementsBySite,
+          forecastData,
+          seriesColorsBySite,
+        )
+
+        expect(
+          (
+            result.series.find((x) => x.name === 'Background')
+              ?.markArea as MarkAreaComponentOption
+          ).data,
+        ).toHaveLength(6)
+      },
+    )
+
+    it('other series are in front', async () => {
+      const result = generateMeasurementChart(
+        pollutantType,
+        zoomPercent,
+        measurementsBySite,
+        forecastData,
+        seriesColorsBySite,
+      )
+      expect(result.series.find((x) => x.name === 'Background')?.z).toBe(-1)
+    })
+
+    it("shouldn't be interactive", async () => {
+      const result = generateMeasurementChart(
+        pollutantType,
+        zoomPercent,
+        measurementsBySite,
+        forecastData,
+        seriesColorsBySite,
+      )
+      expect(result.series.find((x) => x.name === 'Background')?.silent).toBe(
+        true,
+      )
     })
   })
 
@@ -234,6 +328,23 @@ describe('Site Measurement Chart', () => {
         )
       })
 
+      it('should have the correct width line', async () => {
+        const result = generateMeasurementChart(
+          pollutantType,
+          zoomPercent,
+          measurementsBySite,
+          forecastData,
+          seriesColorsBySite,
+        )
+        expect(
+          (
+            result.series.find(
+              (x) => x.name === 'locationA',
+            ) as LineSeriesOption
+          ).lineStyle?.width,
+        ).toBe(1)
+      })
+
       it('line should be blue', async () => {
         const result = generateMeasurementChart(
           pollutantType,
@@ -247,7 +358,7 @@ describe('Site Measurement Chart', () => {
         )
       })
 
-      it('line should be dashed', async () => {
+      it('line should be solid', async () => {
         const result = generateMeasurementChart(
           pollutantType,
           zoomPercent,

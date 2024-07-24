@@ -27,6 +27,13 @@
     grid-template-columns: 1fr 1fr 1fr;
     padding: 0 0 32px 0;
     row-gap: 16px;
+    overflow-x: auto;
+    width: 100%;
+}
+
+.chart {
+    width: 600px;
+    height: 400px;
 }
 
 .site-measurements-section {
