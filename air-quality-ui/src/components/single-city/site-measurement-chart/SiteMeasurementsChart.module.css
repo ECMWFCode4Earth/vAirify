@@ -1,9 +1,4 @@
-.chart-label {
-    display: flex;
-    justify-content: center;
-}
-
 .chart {
-    height: 400px !important;
-    width: 600px;
+    height: 100% !important;
+    width: 100%;
 }

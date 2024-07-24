@@ -31,6 +31,11 @@
     width: 100%;
 }
 
+.chart {
+    width: 600px;
+    height: 400px;
+}
+
 .site-measurements-section {
     align-items: center;
     padding: 32px 0 32px 0;

@@ -1,5 +1,6 @@
 import ReactECharts from 'echarts-for-react'
 import { DateTime } from 'luxon'
+import { useMemo } from 'react'
 
 import { getForecastOptions } from './average-composition-chart-builder'
 import classes from './AverageComparisonChart.module.css'
@@ -21,14 +22,15 @@ interface AverageComparisonChartProps {
 export const AverageComparisonChart = (
   props: AverageComparisonChartProps,
 ): JSX.Element => {
-  let measurementsAveragedData
-  if (props.measurementsData) {
-    const sortedMeasurements = sortMeasurements(
-      props.measurementsData,
-      props.forecastBaseTime,
-    )
-    measurementsAveragedData = averageAqiValues(sortedMeasurements)
-  }
+  const measurementsAveragedData = useMemo(() => {
+    if (props.measurementsData) {
+      const sortedMeasurements = sortMeasurements(
+        props.measurementsData,
+        props.forecastBaseTime,
+      )
+      return averageAqiValues(sortedMeasurements)
+    }
+  }, [props.measurementsData, props.forecastBaseTime])
   return (
     <ReactECharts
       className={classes['chart']}
