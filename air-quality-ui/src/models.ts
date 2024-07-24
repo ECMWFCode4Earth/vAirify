@@ -15,8 +15,8 @@ export const pollutantTypes = createLiteralArray<PollutantType>(
 export const pollutantTypeDisplay: Record<PollutantType, string> = {
   no2: 'Nitrogen Dioxide',
   o3: 'Ozone',
-  pm2_5: 'PM 2.5',
-  pm10: 'PM 10',
+  pm2_5: 'PM2.5',
+  pm10: 'PM10',
   so2: 'Sulphur Dioxide',
 }
 

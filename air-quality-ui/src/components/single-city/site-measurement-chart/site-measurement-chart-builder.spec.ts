@@ -102,8 +102,8 @@ describe('Site Measurement Chart', () => {
       ['no2', 'Nitrogen Dioxide'],
       ['so2', 'Sulphur Dioxide'],
       ['o3', 'Ozone'],
-      ['pm10', 'PM 10'],
-      ['pm2_5', 'PM 2.5'],
+      ['pm10', 'PM10'],
+      ['pm2_5', 'PM2.5'],
     ])(
       `shows the correct pollutant`,
       async (title: PollutantType, expected: string) => {
