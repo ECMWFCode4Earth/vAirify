@@ -1,5 +1,6 @@
 import ReactECharts from 'echarts-for-react'
 import { DateTime } from 'luxon'
+import { useMemo } from 'react'
 
 import { getForecastOptions } from './average-comparison-chart-builder'
 import classes from './AverageComparisonChart.module.css'
@@ -26,14 +27,15 @@ export const AverageComparisonChart = (
   const { forecastBaseDate, maxForecastDate, maxInSituDate } =
     useForecastContext()
 
-  let measurementsAveragedData
-  if (props.measurementsData) {
-    const sortedMeasurements = sortMeasurements(
-      props.measurementsData,
-      props.forecastBaseTime,
-    )
-    measurementsAveragedData = averageAqiValues(sortedMeasurements)
-  }
+  const measurementsAveragedData = useMemo(() => {
+    if (props.measurementsData) {
+      const sortedMeasurements = sortMeasurements(
+        props.measurementsData,
+        props.forecastBaseTime,
+      )
+      return averageAqiValues(sortedMeasurements)
+    }
+  }, [props.measurementsData, props.forecastBaseTime])
 
   const zoomPercent = getInSituPercentage(
     forecastBaseDate,

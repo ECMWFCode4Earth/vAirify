@@ -156,7 +156,11 @@ export const SingleCity = () => {
       {!forecastDataPending && !measurementDataPending && (
         <>
           <section className={classes['chart-section']}>
-            <div key="aqi_chart" data-testid="aqi_chart">
+            <div
+              key="aqi_chart"
+              data-testid="aqi_chart"
+              className={classes['chart']}
+            >
               <AverageComparisonChart
                 forecastData={forecastData}
                 measurementsData={measurements}
@@ -169,6 +173,7 @@ export const SingleCity = () => {
                   <div
                     key={`site_measurements_chart_${pollutantType}`}
                     data-testid={`site_measurements_chart_${pollutantType}`}
+                    className={classes['chart']}
                   >
                     <SiteMeasurementsChart
                       forecastData={forecastData}
