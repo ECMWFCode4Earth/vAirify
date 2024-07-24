@@ -27,7 +27,7 @@ export const measurementLine = (): LineSeriesOption => {
   }
 }
 
-export const yAxis = (
+export const yAxisOptions = (
   name: string,
   max: number | undefined = undefined,
 ): YAXisComponentOption => {
@@ -40,7 +40,10 @@ export const yAxis = (
   }
 }
 
-export const baseOptions = (titleText: string): EChartsOption => {
+export const baseOptions = (
+  titleText: string,
+  zoomPercent: number,
+): EChartsOption => {
   return {
     title: {
       text: titleText,
@@ -51,6 +54,10 @@ export const baseOptions = (titleText: string): EChartsOption => {
       axisLabel: {
         formatter: xAxisFormat,
       },
+    },
+    dataZoom: {
+      show: true,
+      end: zoomPercent,
     },
     animation: false,
   }

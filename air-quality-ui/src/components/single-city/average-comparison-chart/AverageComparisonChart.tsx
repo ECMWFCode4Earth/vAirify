@@ -3,10 +3,12 @@ import { DateTime } from 'luxon'
 
 import { getForecastOptions } from './average-comparison-chart-builder'
 import classes from './AverageComparisonChart.module.css'
+import { useForecastContext } from '../../../context'
 import {
   averageAqiValues,
   sortMeasurements,
 } from '../../../services/calculate-measurements-aqi-averages/calculate-measurement-aqi-averages-service'
+import { getInSituPercentage } from '../../../services/forecast-time-service'
 import {
   ForecastResponseDto,
   MeasurementsResponseDto,
@@ -21,6 +23,9 @@ interface AverageComparisonChartProps {
 export const AverageComparisonChart = (
   props: AverageComparisonChartProps,
 ): JSX.Element => {
+  const { forecastBaseDate, maxForecastDate, maxInSituDate } =
+    useForecastContext()
+
   let measurementsAveragedData
   if (props.measurementsData) {
     const sortedMeasurements = sortMeasurements(
@@ -29,10 +34,21 @@ export const AverageComparisonChart = (
     )
     measurementsAveragedData = averageAqiValues(sortedMeasurements)
   }
+
+  const zoomPercent = getInSituPercentage(
+    forecastBaseDate,
+    maxForecastDate,
+    maxInSituDate,
+  )
+
   return (
     <ReactECharts
       className={classes['chart']}
-      option={getForecastOptions(props.forecastData, measurementsAveragedData)}
+      option={getForecastOptions(
+        zoomPercent,
+        props.forecastData,
+        measurementsAveragedData,
+      )}
       notMerge
     />
   )

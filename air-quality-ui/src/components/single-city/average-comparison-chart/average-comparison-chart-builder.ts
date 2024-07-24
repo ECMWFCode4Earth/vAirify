@@ -7,13 +7,13 @@ import {
   baseOptions,
   forecastLine,
   measurementLine,
-  yAxis,
+  yAxisOptions,
 } from '../base-chart-builder'
 
-export const getOptions = (): EChartsOption => {
+export const getOptions = (zoomPercent: number): EChartsOption => {
   return {
-    ...baseOptions('AQI'),
-    yAxis: yAxis('AQI', 6),
+    ...baseOptions('AQI', zoomPercent),
+    yAxis: yAxisOptions('AQI', 6),
     tooltip: {
       trigger: 'axis',
     },
@@ -47,12 +47,13 @@ const generateMeasurementLine = (
 }
 
 export const getForecastOptions = (
+  zoomPercent: number,
   forecastData?: ForecastResponseDto[],
   measurementsAveragedData?: AverageAqiValues[] | undefined,
 ) => {
   const forecastPlot = generateForecastLine(forecastData)
   const measurementPlot = generateMeasurementLine(measurementsAveragedData)
-  const options = getOptions()
+  const options = getOptions(zoomPercent)
 
   return {
     ...options,

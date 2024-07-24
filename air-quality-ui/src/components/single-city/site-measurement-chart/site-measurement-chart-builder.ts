@@ -13,7 +13,7 @@ import {
   baseOptions,
   forecastLine,
   measurementLine,
-  yAxis,
+  yAxisOptions,
 } from '../base-chart-builder'
 
 const createBackgroundAqiZones = (pollutant: PollutantType): SeriesOption => {
@@ -96,15 +96,10 @@ const createChartOptions = (
   zoomPercent: number,
 ): EChartsOption => {
   return {
-    ...baseOptions(chartTitle),
-    yAxis: yAxis('µg/m³'),
+    ...baseOptions(chartTitle, zoomPercent),
+    yAxis: yAxisOptions('µg/m³'),
     tooltip: {
       trigger: 'item',
-    },
-    dataZoom: {
-      show: true,
-      realtime: false,
-      end: zoomPercent,
     },
   }
 }
