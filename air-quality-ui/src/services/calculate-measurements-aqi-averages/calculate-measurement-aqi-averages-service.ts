@@ -17,7 +17,7 @@ export type AverageAqiValues = { measurementDate: string; meanAqiValue: number }
 const generatePreAveragedDataStructure = (baseTime: DateTime<boolean>) => {
   const sortedMeasurements: SortMeasurementsType = {}
 
-  for (let i = 0; i < 5 * 24; i++) {
+  for (let i = 0; i <= 5 * 24; i++) {
     const time = baseTime.plus({ hours: i })
     const time_str = time.toISO()
 
