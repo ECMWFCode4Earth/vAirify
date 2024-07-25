@@ -42,11 +42,11 @@ export const sortMeasurements = (
   const sortedMeasurements: SortMeasurementsType =
     generatePreAveragedDataStructure(baseTime)
   for (let i = 0; i < measurementsData.length; i++) {
+    const measurementDataTime = DateTime.fromISO(
+      measurementsData[i].measurement_date,
+    )
     for (const timeOffset in sortedMeasurements) {
       const bucket = sortedMeasurements[timeOffset]
-      const measurementDataTime = DateTime.fromISO(
-        measurementsData[i].measurement_date,
-      )
       if (
         bucket.lowerBound < measurementDataTime &&
         bucket.upperBound > measurementDataTime
