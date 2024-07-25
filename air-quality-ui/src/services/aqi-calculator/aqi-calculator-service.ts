@@ -17,7 +17,7 @@ export default function getPollutantIndexLevel(
     return 0
   }
   const ranges = aqiRangesByPollutant[pollutantType]
-  for (let i = 0; ranges.length; i++) {
+  for (let i = 0; i < ranges.length; i++) {
     if (value <= ranges[i]) {
       return i + 1
     }
