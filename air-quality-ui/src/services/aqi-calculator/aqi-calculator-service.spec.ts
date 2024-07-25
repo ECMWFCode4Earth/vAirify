@@ -20,6 +20,8 @@ describe('Aqi Calculator', () => {
     [381, 'o3', 6],
     [800, 'o3', 6],
 
+    [801, 'o3', 6],
+
     [1, 'no2', 1],
     [40, 'no2', 1],
 
@@ -37,6 +39,8 @@ describe('Aqi Calculator', () => {
 
     [341, 'no2', 6],
     [1000, 'no2', 6],
+
+    [1001, 'no2', 6],
 
     [1, 'so2', 1],
     [100, 'so2', 1],
@@ -56,6 +60,8 @@ describe('Aqi Calculator', () => {
     [751, 'so2', 6],
     [1250, 'so2', 6],
 
+    [1251, 'so2', 6],
+
     [1, 'pm10', 1],
     [20, 'pm10', 1],
 
@@ -74,6 +80,8 @@ describe('Aqi Calculator', () => {
     [151, 'pm10', 6],
     [1200, 'pm10', 6],
 
+    [1201, 'pm10', 6],
+
     [1, 'pm2_5', 1],
     [10, 'pm2_5', 1],
 
@@ -91,6 +99,8 @@ describe('Aqi Calculator', () => {
 
     [76, 'pm2_5', 6],
     [800, 'pm2_5', 6],
+
+    [801, 'pm2_5', 6],
   ])(
     `If value is %d and pollutant type is %s return aqi value as %d`,
     (valueA, pollutantType, expected) => {

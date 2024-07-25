@@ -328,6 +328,23 @@ describe('Site Measurement Chart', () => {
         )
       })
 
+      it('should have the correct width line', async () => {
+        const result = generateMeasurementChart(
+          pollutantType,
+          zoomPercent,
+          measurementsBySite,
+          forecastData,
+          seriesColorsBySite,
+        )
+        expect(
+          (
+            result.series.find(
+              (x) => x.name === 'locationA',
+            ) as LineSeriesOption
+          ).lineStyle?.width,
+        ).toBe(1)
+      })
+
       it('line should be blue', async () => {
         const result = generateMeasurementChart(
           pollutantType,
@@ -341,7 +358,7 @@ describe('Site Measurement Chart', () => {
         )
       })
 
-      it('line should be dashed', async () => {
+      it('line should be solid', async () => {
         const result = generateMeasurementChart(
           pollutantType,
           zoomPercent,
