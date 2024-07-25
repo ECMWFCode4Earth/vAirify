@@ -280,6 +280,7 @@ test.describe('City graph snapshots', () => {
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
   })
+
   test('AQI snapshot', async ({ cityPage }) => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.aqiChart)
     expect(chartShot).toMatchSnapshot('rio-aqi-graph.png')

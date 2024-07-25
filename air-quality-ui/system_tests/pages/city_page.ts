@@ -45,6 +45,10 @@ export class CityPage extends BasePage {
     await siteDeselect.click()
   }
 
+  async waitForIdleCharts(chartElement: Locator) {
+    await waitForIdleNetwork(this.page, chartElement)
+  }
+
   async captureChartScreenshot(chartElement: Locator) {
     await waitForIdleNetwork(this.page, chartElement)
     return await chartElement.screenshot()
