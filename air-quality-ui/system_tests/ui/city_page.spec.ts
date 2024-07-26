@@ -355,7 +355,7 @@ test.describe('City graph snapshots', () => {
 test.use({
   viewport: { width: 1920, height: 1080 },
 })
-test.describe('Charts are visible in immediate view', () => {
+test.describe('Charts are fully visible in 1920x1080 viewport', () => {
   test.beforeEach(async ({ page, cityPage }) => {
     const mockedForecastResponse = [
       createForecastAPIResponseData({
