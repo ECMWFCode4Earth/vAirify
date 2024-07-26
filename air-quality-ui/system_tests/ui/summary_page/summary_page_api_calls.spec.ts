@@ -1,14 +1,12 @@
 import { expect, test } from '../../utils/fixtures'
 import { encodeDateToURIComponent, gotoPage } from '../../utils/helper_methods'
 
-const httpMethodGet: string = 'GET'
-
+const systemDate: Date = new Date('2024-07-18T14:00:00Z')
 const forecastAPIEndpoint = '/forecast'
 const measurementSummaryAPIEndpoint = '/measurements/summary'
+const httpMethodGet: string = 'GET'
 
 test.describe('API calls on page load', () => {
-  const systemDate: Date = new Date('2024-06-10T20:00:00Z')
-
   test.describe('Forecast endpoint', () => {
     test.describe('Forecast base time boundary value analysis using mocked system time', () => {
       ;[
@@ -88,26 +86,24 @@ test.describe('API calls on page load', () => {
     })
 
     test('Verify on page load the measurement summary API is called proportionately', async () => {
-      expect(requestArray.length).toEqual(15)
+      expect(requestArray.length).toEqual(13)
     })
 
     test('Verify on page load the measurement summary API calls have correct params', async () => {
       const expectedMeasurementBaseTimeArray = [
-        '2024-06-09T00%3A00%3A00.000Z',
-        '2024-06-09T03%3A00%3A00.000Z',
-        '2024-06-09T06%3A00%3A00.000Z',
-        '2024-06-09T09%3A00%3A00.000Z',
-        '2024-06-09T12%3A00%3A00.000Z',
-        '2024-06-09T15%3A00%3A00.000Z',
-        '2024-06-09T18%3A00%3A00.000Z',
-        '2024-06-09T21%3A00%3A00.000Z',
-        '2024-06-10T00%3A00%3A00.000Z',
-        '2024-06-10T03%3A00%3A00.000Z',
-        '2024-06-10T06%3A00%3A00.000Z',
-        '2024-06-10T09%3A00%3A00.000Z',
-        '2024-06-10T12%3A00%3A00.000Z',
-        '2024-06-10T15%3A00%3A00.000Z',
-        '2024-06-10T18%3A00%3A00.000Z',
+        '2024-07-17T00%3A00%3A00.000Z',
+        '2024-07-17T03%3A00%3A00.000Z',
+        '2024-07-17T06%3A00%3A00.000Z',
+        '2024-07-17T09%3A00%3A00.000Z',
+        '2024-07-17T12%3A00%3A00.000Z',
+        '2024-07-17T15%3A00%3A00.000Z',
+        '2024-07-17T18%3A00%3A00.000Z',
+        '2024-07-17T21%3A00%3A00.000Z',
+        '2024-07-18T00%3A00%3A00.000Z',
+        '2024-07-18T03%3A00%3A00.000Z',
+        '2024-07-18T06%3A00%3A00.000Z',
+        '2024-07-18T09%3A00%3A00.000Z',
+        '2024-07-18T12%3A00%3A00.000Z',
       ]
       for (const request in requestArray) {
         expect(requestArray[request]).toContain(
@@ -118,7 +114,6 @@ test.describe('API calls on page load', () => {
   })
 })
 test.describe('API calls on changing forecast base time in UI', () => {
-  const systemDate: Date = new Date('2024-07-18T14:00:00Z')
   let requestArray: string[]
 
   test.describe('Forecast endpoint', () => {
