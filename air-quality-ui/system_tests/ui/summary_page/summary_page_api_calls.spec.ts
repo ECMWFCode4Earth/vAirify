@@ -119,7 +119,6 @@ test.describe('API calls on page load', () => {
 })
 test.describe('API calls on changing forecast base time in UI', () => {
   const systemDate: Date = new Date('2024-07-18T14:00:00Z')
-  const newForecastBaseTimeDay: number = 3
   let requestArray: string[]
 
   test.describe('Forecast endpoint', () => {
@@ -129,7 +128,9 @@ test.describe('API calls on changing forecast base time in UI', () => {
       await gotoPage(page, 'city/summary')
       await summaryPage.waitForLoad()
       await banner.calendarIcon.click()
-      // Select forecast base date UTC 2024-07-03T00:00:00
+      // Select forecast base date UTC 2024-07-03T12:00:00
+      await banner.clickOnTime('12:00')
+      await banner.calendarIcon.click()
       requestArray = await summaryPage.captureNetworkRequestsAsArray(
         page,
         httpMethodGet,
@@ -140,7 +141,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
     test('Verify on changing the forecast base time, the forecast API is called once', async ({
       banner,
     }) => {
-      await banner.clickOnDay(newForecastBaseTimeDay)
+      await banner.clickOnDay(3)
       expect(requestArray.length).toEqual(1)
     })
 
@@ -148,13 +149,13 @@ test.describe('API calls on changing forecast base time in UI', () => {
       banner,
     }) => {
       const expectedForecastBaseTime: string = await encodeDateToURIComponent(
-        new Date(`2024-07-0${newForecastBaseTimeDay}T00:00:00Z`),
+        new Date(`2024-07-03T12:00:00Z`),
       )
       const expectedValidTimeFrom: string = expectedForecastBaseTime
       const systemDateUriEncoded: string =
         await encodeDateToURIComponent(systemDate)
 
-      await banner.clickOnDay(newForecastBaseTimeDay)
+      await banner.clickOnDay(3)
       expect(requestArray[0]).toContain(
         `location_type=city&valid_time_from=${expectedValidTimeFrom}&valid_time_to=${systemDateUriEncoded}&base_time=${expectedForecastBaseTime}`,
       )
@@ -227,7 +228,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
         '2024-07-07T18%3A00%3A00.000Z',
         '2024-07-07T21%3A00%3A00.000Z',
         '2024-07-08T00%3A00%3A00.000Z',
-        '2024-07-08T03%3A0%3A00.000Z',
+        '2024-07-08T03%3A00%3A00.000Z',
         '2024-07-08T06%3A00%3A00.000Z',
         '2024-07-08T09%3A00%3A00.000Z',
         '2024-07-08T12%3A00%3A00.000Z',
