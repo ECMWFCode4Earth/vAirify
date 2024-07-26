@@ -7,6 +7,8 @@ export class Banner extends BasePage {
 
   readonly calendarIcon: Locator
   readonly datePicker: Locator
+  readonly datePickerOptionTime0000: Locator
+  readonly datePickerOptionTime1200: Locator
   readonly logo: Locator
 
   constructor(page: Page) {
@@ -15,6 +17,8 @@ export class Banner extends BasePage {
 
     this.calendarIcon = page.getByTestId('CalendarIcon')
     this.datePicker = page.getByRole('textbox', { name: 'Forecast Base Date' })
+    this.datePickerOptionTime0000 = page.getByRole('option', { name: '00:00' })
+    this.datePickerOptionTime1200 = page.getByRole('option', { name: '12:00' })
     this.logo = page.getByAltText('vAirify')
   }
 
@@ -33,7 +37,7 @@ export class Banner extends BasePage {
         column = day % 7
       }
     } else {
-      throw new Error('invalid day')
+      throw new Error('Invalid day provided')
     }
     await this.page
       .locator(
@@ -41,6 +45,17 @@ export class Banner extends BasePage {
       )
       .click()
   }
+
+  async clickOnTime(time: string): Promise<void> {
+    if (time == '00:00') {
+      await this.datePickerOptionTime0000.click()
+    } else if (time == '12:00') {
+      await this.datePickerOptionTime1200.click()
+    } else {
+      throw new Error('Invalid time provided')
+    }
+  }
+
   async setBaseTime(baseTime: string): Promise<void> {
     await this.datePicker.fill(baseTime)
   }

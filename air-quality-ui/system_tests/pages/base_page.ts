@@ -1,4 +1,4 @@
-import { Locator, type Page } from '@playwright/test'
+import { type Page } from '@playwright/test'
 
 export class BasePage {
   readonly page: Page
@@ -31,10 +31,6 @@ export class BasePage {
 
   async clickLinkByText(buttonName: string): Promise<void> {
     await this.page.getByRole('link', { name: buttonName }).click()
-  }
-
-  async clickLocator(locator: Locator): Promise<void> {
-    await locator.click()
   }
 
   async getTitle(): Promise<string> {
