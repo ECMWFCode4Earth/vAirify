@@ -1,0 +1,20 @@
+.table-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 20px;
+}
+
+.table-date {
+    display: flex;
+    align-items: center;
+}
+
+.table-switch-label {
+    padding-bottom: 3px;
+}
+
+.table-switch-container {
+    display: flex;
+    align-items: center;
+}

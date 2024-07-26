@@ -12,15 +12,19 @@ Please follow [Local Development Setup](#local-development-setup) instructions i
 `python -m flake8`
 
 ### Run code formatter
-`python -m black src tests scripts`
+`python -m black api etl system_tests`
 
-### Run all tests
-`python -m pytest --cov=src/air_quality --cov=scripts tests`
-
+### Run tests
+```
+python -m pytest api/tests --cov=api
+python -m pytest etl/tests --cov=etl
+python -m pytest shared/tests --cov=shared
+```
 ### Run Fast API
 Follow the tutorial [here](docs/run_fast_api_tutorial.md)
 
-## Local Development Setup
+# Dev setup
+## ETL Local Development Setup
 
 ### 1. Install Conda
 Follow the [installation instructions](https://docs.anaconda.com/free/miniconda/) for conda.
@@ -28,7 +32,7 @@ Follow the [installation instructions](https://docs.anaconda.com/free/miniconda/
 ### 2. Setup Conda Environment
 
 #### Create Conda environment
-From within air-quality-backend:
+From within air-quality-backend/etl:
 
 `conda env create -f conda/environment.yml -n air-quality-dev`
 
@@ -41,7 +45,32 @@ Follow these [instructions](https://www.jetbrains.com/help/pycharm/conda-support
 ### 3. Install dependencies
 `poetry install`
 
-### 4. Setup .env file
+## API Local Development Setup
+from air-quality-backend/api:
+
+ensure version of python installed is at least 3.11
+
+create python venv
+`python -m venv .venv`
+
+activate the venv
+```
+linux - `source .venv/bin/activate`
+
+windows - `.venv/bin/activate`
+```
+for windows you may need to run the following to run the activate command
+`Set-ExecutionPolicy AllSigned`
+
+when activated install dependecies
+
+`pip install -r requirements-dev.txt`
+
+to run the shared unit tests also run 
+`pip install -r requirements-test.txt`
+from the shared directory
+
+## Setup .env file
 
 #### Create .env file
 
@@ -49,19 +78,47 @@ Follow these [instructions](https://www.jetbrains.com/help/pycharm/conda-support
 
 Add in the following environment variables e.g.
 ```
-MONGO_DB_URI=mongodb+srv://<username:password>@cluster0.ch5gkk4.mongodb.net/
+MONGO_DB_URI=mongodb://localhost:27017
 MONGO_DB_NAME=air_quality_dashboard_db
+OPEN_AQ_API_URL=https://api.openaq.org
 OPEN_AQ_API_KEY=<api_key>
+CDSAPI_URL=https://ads.atmosphere.copernicus.eu/api/v2
+CDSAPI_KEY=<cds_api_key>
 ```
 
-### 5. Get CDS API access (CAMS)
-Create your .cdsapirc file as detailed [here](https://ads.atmosphere.copernicus.eu/api-how-to).
-
-### 6. Get OpenAQ access
+#### Get OpenAQ access
 Register for a key [here](https://api.openaq.org/register).
 
 Once you receive your key, place it in your **.env** file
 
+
+## Docker
+### Locally
+from the root directory, ensure a valid .env file is in the directory and then run. 
+```
+docker compose up -d
+```
+There is a separate compose file for deployments found in the deployment directory
+
+### build individual images
+
+You can build the docker image with the following... 
+```
+    docker build . -t <image_name> -f <dockerfile>
+
+    e.g. 
+    docker build . -t forecast_etl -f Dockerfile.forecast
+```
+
+To run the docker image (from the base air-quality-backend directory)
+```
+    docker run --env-file <environment_file> <image_name>
+
+    e.g.
+    docker run --env_file .env forecast_etl
+```
+
+# Other
 ### 7. Setup auto format on save (optional) 
 
 #### PyCharm
@@ -69,3 +126,4 @@ Once you receive your key, place it in your **.env** file
 - Select your conda env as the python interpreter
 - Check 'On save'
 - Press Apply
+

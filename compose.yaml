@@ -1,0 +1,86 @@
+services:
+  db:
+    container_name: mongo
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - database:/data/db
+
+  etl-insitu:
+    container_name: etl-insitu
+    depends_on:
+      - db
+    build:
+      context: ./air-quality-backend/
+      dockerfile: Dockerfile.insitu
+      target: development
+    environment:
+      - MONGO_DB_URI=mongodb://mongo:27017
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - OPEN_AQ_API_URL=${OPEN_AQ_API_URL}
+      - OPEN_AQ_API_KEY=${OPEN_AQ_API_KEY}
+      - CDSAPI_URL=${CDSAPI_URL}
+      - CDSAPI_KEY=${CDSAPI_KEY}
+      - STORE_GRIB_FILES=${STORE_GRIB_FILES}
+      
+  etl-forecast:
+    container_name: etl-forecast
+    depends_on:
+      - db
+    build: 
+      context: ./air-quality-backend/
+      dockerfile: Dockerfile.forecast
+      target: development
+    environment:
+      - MONGO_DB_URI=mongodb://mongo:27017
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - CDSAPI_URL=${CDSAPI_URL}
+      - CDSAPI_KEY=${CDSAPI_KEY}
+      - STORE_GRIB_FILES=${STORE_GRIB_FILES}
+    volumes:
+      - data_textures:/app/data_textures
+
+  api:
+    container_name: backend-api
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+    build:
+      context: ./air-quality-backend/
+      dockerfile: Dockerfile.api
+    environment:
+      - MONGO_DB_URI=mongodb://mongo:27017
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+    entrypoint: 
+      - fastapi
+      - dev
+      - ./api/src/main.py
+      - --host
+      - 0.0.0.0
+    volumes:
+      - ./air-quality-backend/src/:/usr/src/app/src/
+      - data_textures:/app/data_textures
+
+  ui:
+    container_name: frontend-ui
+    depends_on:
+      - api
+    ports:
+      - 5173:5173
+    build:
+      context: ./air-quality-ui
+      dockerfile: Dockerfile
+      target: development
+    environment:
+      - VITE_AIR_QUALITY_API_URL=${VITE_AIR_QUALITY_API_URL}
+    volumes:
+      - ./air-quality-ui/:/app/
+      - nodemodules:/app/node_modules
+      
+volumes:
+  database: {}
+  nodemodules: {}
+  data_textures: {}

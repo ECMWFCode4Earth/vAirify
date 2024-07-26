@@ -1,0 +1,10 @@
+.toolbar-section {
+    align-items: center;
+    background-color: black;
+    border-top: solid 1px white;
+    color: white;
+    display: flex;
+    height: 72px;
+    padding: 0 32px 0 32px;
+    justify-content: space-between;
+}

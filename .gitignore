@@ -162,7 +162,16 @@ cython_debug/
 **/*.grib
 **/*.nc
 **/coverage/*
-air-quality-backend/liquibase/liquibase.properties
+**liquibase.properties
 
 # Mac OS specific
 .DS_Store
+
+# vscode
+.vscode
+
+# data textures
+**/*CAMS_global*png
+**/*CAMS_global*webp
+
+.vite

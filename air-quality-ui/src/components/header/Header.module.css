@@ -1,0 +1,13 @@
+.header-section {
+    align-items: center;
+    background-color: black;
+    color: white;
+    display: flex;
+    height: 42px;
+    padding: 0 32px 0 32px;
+    justify-content: space-between;
+}
+.vairify-logo{
+    height: 30px;
+    width: auto;
+}
