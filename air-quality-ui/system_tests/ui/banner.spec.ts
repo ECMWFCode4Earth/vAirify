@@ -13,8 +13,21 @@ test.describe('City page', () => {
     await expect(banner.logo).toBeVisible()
   })
 
-  test('Date picker is visible on city page', async ({ banner }) => {
+  test('Date picker cannot select a future day on city page', async ({
+    page,
+    banner,
+  }) => {
+    const mockSystemDate: Date = new Date('2024-07-26T10:00:00Z')
+    await page.clock.setFixedTime(mockSystemDate)
+
     await expect(banner.datePicker).toBeVisible()
+
+    await banner.calendarIcon.click()
+    await expect(banner.day27).toBeDisabled()
+    await expect(banner.datePickerNextMonthButton).toBeDisabled()
+
+    await banner.datePickerYearButton.click()
+    await expect(banner.year2025).toBeDisabled()
   })
 })
 

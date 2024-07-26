@@ -9,7 +9,11 @@ export class Banner extends BasePage {
   readonly datePicker: Locator
   readonly datePickerOptionTime0000: Locator
   readonly datePickerOptionTime1200: Locator
+  readonly datePickerNextMonthButton: Locator
+  readonly datePickerYearButton: Locator
+  readonly day27: Locator
   readonly logo: Locator
+  readonly year2025: Locator
 
   constructor(page: Page) {
     super(page)
@@ -19,7 +23,13 @@ export class Banner extends BasePage {
     this.datePicker = page.getByRole('textbox', { name: 'Forecast Base Date' })
     this.datePickerOptionTime0000 = page.getByRole('option', { name: '00:00' })
     this.datePickerOptionTime1200 = page.getByRole('option', { name: '12:00' })
+    this.datePickerNextMonthButton = page.getByLabel('Next month')
+    this.datePickerYearButton = page.getByLabel('calendar view is open, switch')
+    this.day27 = page.locator(
+      '//div[@aria-rowindex="4"] //button[@aria-colindex="6"]',
+    )
     this.logo = page.getByAltText('vAirify')
+    this.year2025 = page.locator('//div //button').filter({ hasText: /^2025$/ })
   }
 
   async clickOnDay(day: number): Promise<void> {
