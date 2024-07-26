@@ -65,12 +65,10 @@ test.describe('City page resolution tests', () => {
     {
       resolutionWidth: 960,
       resolutionHeight: 1080,
-      screenCenter: { x: 480, y: 540 },
     },
     {
       resolutionWidth: 1366,
       resolutionHeight: 768,
-      screenCenter: { x: 683, y: 384 },
     },
   ].forEach(({ resolutionWidth, resolutionHeight }) => {
     test.use({
