@@ -128,7 +128,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
       await page.clock.setFixedTime(systemDate)
       await gotoPage(page, 'city/summary')
       await summaryPage.waitForLoad()
-      await basePage.clickLocator(banner.calendarIcon)
+      await banner.calendarIcon.click()
       // Select forecast base date UTC 2024-07-03T00:00:00
       requestArray = await summaryPage.captureNetworkRequestsAsArray(
         page,
@@ -168,8 +168,10 @@ test.describe('API calls on changing forecast base time in UI', () => {
       await page.clock.setFixedTime(systemDate)
       await gotoPage(page, 'city/summary')
       await summaryPage.waitForLoad()
-      await basePage.clickLocator(banner.calendarIcon)
-      // Select forecast base date UTC 2024-07-03T00:00:00
+      await banner.calendarIcon.click()
+      // Select forecast base date UTC 2024-07-03T12:00:00
+      await banner.clickOnTime('12:00')
+      await banner.calendarIcon.click()
       requestArray = await summaryPage.captureNetworkRequestsAsArray(
         page,
         httpMethodGet,
@@ -177,55 +179,60 @@ test.describe('API calls on changing forecast base time in UI', () => {
       )
     })
 
-    test.describe('On changing the forecast base time, the measurement summary API is called proportionately', () => {
-      ;[
-        {
-          day: (systemDate.getDay() - 2),
-          expectedNumberOfRequests: '2024-07-02T00%3A00%3A00.000Z',
-        },
-        {
-          dateTime: systemDate.getDay() - 6,
-          expectedNumberOfRequests: '2024-07-01T12%3A00%3A00.000Z',
-        },
-      ].forEach(({ day, expectedNumberOfRequests }) => {
-    test('Verify on changing the forecast base time, the measurement summary API is called proportionately', async ({
+    test(`Verify on changing the forecast base time, the measurement summary API is called proportionately`, async ({
       banner,
     }) => {
-      await banner.clickOnDay(day)
-      console.log(requestArray)
-      expect(requestArray.length).toEqual(expectedNumberOfRequests)
+      await banner.clickOnDay(3)
+      expect(requestArray.length).toEqual(41)
     })
 
     test('Verify on changing the forecast base time, the measurement summary API calls have correct params', async ({
-      summaryPage,
-      page,
-      basePage,
+      banner,
     }) => {
-      const requestArray = await summaryPage.captureNetworkRequestsAsArray(
-        page,
-        httpMethodGet,
-        basePage.baseAPIURL + measurementSummaryAPIEndpoint,
-      )
-      await page.clock.setFixedTime(systemTime)
-      await gotoPage(page, 'city/summary')
-      await summaryPage.waitForLoad()
       const expectedMeasurementBaseTimeArray = [
-        '2024-06-09T00%3A00%3A00.000Z',
-        '2024-06-09T03%3A00%3A00.000Z',
-        '2024-06-09T06%3A00%3A00.000Z',
-        '2024-06-09T09%3A00%3A00.000Z',
-        '2024-06-09T12%3A00%3A00.000Z',
-        '2024-06-09T15%3A00%3A00.000Z',
-        '2024-06-09T18%3A00%3A00.000Z',
-        '2024-06-09T21%3A00%3A00.000Z',
-        '2024-06-10T00%3A00%3A00.000Z',
-        '2024-06-10T03%3A00%3A00.000Z',
-        '2024-06-10T06%3A00%3A00.000Z',
-        '2024-06-10T09%3A00%3A00.000Z',
-        '2024-06-10T12%3A00%3A00.000Z',
-        '2024-06-10T15%3A00%3A00.000Z',
-        '2024-06-10T18%3A00%3A00.000Z',
+        '2024-07-03T12%3A00%3A00.000Z',
+        '2024-07-03T15%3A00%3A00.000Z',
+        '2024-07-03T18%3A00%3A00.000Z',
+        '2024-07-03T21%3A00%3A00.000Z',
+        '2024-07-04T00%3A00%3A00.000Z',
+        '2024-07-04T03%3A00%3A00.000Z',
+        '2024-07-04T06%3A00%3A00.000Z',
+        '2024-07-04T09%3A00%3A00.000Z',
+        '2024-07-04T12%3A00%3A00.000Z',
+        '2024-07-04T15%3A00%3A00.000Z',
+        '2024-07-04T18%3A00%3A00.000Z',
+        '2024-07-04T21%3A00%3A00.000Z',
+        '2024-07-05T00%3A00%3A00.000Z',
+        '2024-07-05T03%3A00%3A00.000Z',
+        '2024-07-05T06%3A00%3A00.000Z',
+        '2024-07-05T09%3A00%3A00.000Z',
+        '2024-07-05T12%3A00%3A00.000Z',
+        '2024-07-05T15%3A00%3A00.000Z',
+        '2024-07-05T18%3A00%3A00.000Z',
+        '2024-07-05T21%3A00%3A00.000Z',
+        '2024-07-06T00%3A00%3A00.000Z',
+        '2024-07-06T03%3A00%3A00.000Z',
+        '2024-07-06T06%3A00%3A00.000Z',
+        '2024-07-06T09%3A00%3A00.000Z',
+        '2024-07-06T12%3A00%3A00.000Z',
+        '2024-07-06T15%3A00%3A00.000Z',
+        '2024-07-06T18%3A00%3A00.000Z',
+        '2024-07-06T21%3A00%3A00.000Z',
+        '2024-07-07T00%3A00%3A00.000Z',
+        '2024-07-07T03%3A00%3A00.000Z',
+        '2024-07-07T06%3A00%3A00.000Z',
+        '2024-07-07T09%3A00%3A00.000Z',
+        '2024-07-07T12%3A00%3A00.000Z',
+        '2024-07-07T15%3A00%3A00.000Z',
+        '2024-07-07T18%3A00%3A00.000Z',
+        '2024-07-07T21%3A00%3A00.000Z',
+        '2024-07-08T00%3A00%3A00.000Z',
+        '2024-07-08T03%3A0%3A00.000Z',
+        '2024-07-08T06%3A00%3A00.000Z',
+        '2024-07-08T09%3A00%3A00.000Z',
+        '2024-07-08T12%3A00%3A00.000Z',
       ]
+      await banner.clickOnDay(3)
       for (const request in requestArray) {
         expect(requestArray[request]).toContain(
           `measurement_base_time=${expectedMeasurementBaseTimeArray[request]}&measurement_time_range=90&location_type=city`,
