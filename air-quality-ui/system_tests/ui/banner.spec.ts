@@ -6,9 +6,15 @@ import {
 } from '../utils/mocked_api'
 
 test.describe('City page', () => {
-  test('vAirify logo is visible on city page', async ({ page, banner }) => {
+  test.beforeEach(async ({ page }) => {
     await gotoPage(page, '/city/Rio%20de%20Janeiro')
+  })
+  test('vAirify logo is visible on city page', async ({ banner }) => {
     await expect(banner.logo).toBeVisible()
+  })
+
+  test('Date picker is visible on city page', async ({ banner }) => {
+    await expect(banner.datePicker).toBeVisible()
   })
 })
 
@@ -18,6 +24,10 @@ test.describe('Summary page', () => {
   })
   test('vAirify logo is visible on summary page', async ({ banner }) => {
     await expect(banner.logo).toBeVisible()
+  })
+
+  test('Date picker is visible on summary page', async ({ banner }) => {
+    await expect(banner.datePicker).toBeVisible()
   })
 
   test('Verify page title is vAirify on summary page', async ({
