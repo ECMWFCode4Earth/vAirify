@@ -1,5 +1,9 @@
 import { expect, test } from '../utils/fixtures'
-import { gotoPage, setupPageWithMockData } from '../utils/helper_methods'
+import {
+  gotoPage,
+  setupPageWithMockData,
+  waitForIdleNetwork,
+} from '../utils/helper_methods'
 import {
   createForecastAPIResponseData,
   createMeasurementsCityPageResponseData,
@@ -348,6 +352,9 @@ test.describe('City graph snapshots', () => {
   })
 })
 
+test.use({
+  viewport: { width: 1920, height: 1080 },
+})
 test.describe('Charts are visible in immediate view', () => {
   test.beforeEach(async ({ page, cityPage }) => {
     const mockedForecastResponse = [
@@ -383,39 +390,46 @@ test.describe('Charts are visible in immediate view', () => {
   })
   test('AQI chart element is visible in fullscreen view', async ({
     cityPage,
+    page,
   }) => {
-    await cityPage.waitForIdleCharts(cityPage.aqiChart)
-    await expect(cityPage.aqiChart).toBeInViewport()
+    await waitForIdleNetwork(page, cityPage.aqiChart)
+    await expect(cityPage.aqiChart).toBeInViewport({ ratio: 1 })
   })
   test('pm2.5 chart element is visible in fullscreen view', async ({
     cityPage,
+    page,
   }) => {
-    await cityPage.waitForIdleCharts(cityPage.pm2_5Chart)
-    await expect(cityPage.pm2_5Chart).toBeInViewport()
+    await waitForIdleNetwork(page, cityPage.pm2_5Chart)
+
+    await expect(cityPage.pm2_5Chart).toBeInViewport({ ratio: 1 })
   })
   test('pm10 chart element is visible in fullscreen view', async ({
     cityPage,
+    page,
   }) => {
-    await cityPage.waitForIdleCharts(cityPage.pm10Chart)
-    await expect(cityPage.pm10Chart).toBeInViewport()
+    await waitForIdleNetwork(page, cityPage.pm10Chart)
+    await expect(cityPage.pm10Chart).toBeInViewport({ ratio: 1 })
   })
   test('o3 chart element is visible in fullscreen view', async ({
     cityPage,
+    page,
   }) => {
-    await cityPage.waitForIdleCharts(cityPage.o3Chart)
-    await expect(cityPage.o3Chart).toBeInViewport()
+    await waitForIdleNetwork(page, cityPage.o3Chart)
+    await expect(cityPage.o3Chart).toBeInViewport({ ratio: 1 })
   })
   test('no2 chart element is visible in fullscreen view', async ({
     cityPage,
+    page,
   }) => {
-    await cityPage.waitForIdleCharts(cityPage.no2Chart)
-    await expect(cityPage.no2Chart).toBeInViewport()
+    await waitForIdleNetwork(page, cityPage.no2Chart)
+    await expect(cityPage.no2Chart).toBeInViewport({ ratio: 1 })
   })
   test('so2 chart element is visible in fullscreen view', async ({
     cityPage,
+    page,
   }) => {
-    await cityPage.waitForIdleCharts(cityPage.so2Chart)
-    await expect(cityPage.so2Chart).toBeInViewport()
+    await waitForIdleNetwork(page, cityPage.so2Chart)
+    await expect(cityPage.so2Chart).toBeInViewport({ ratio: 1 })
   })
 
   test.describe('No in-situ snapshots', () => {
