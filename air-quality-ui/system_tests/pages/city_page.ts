@@ -64,5 +64,6 @@ export class CityPage extends BasePage {
     await this.pm10Chart.waitFor({ state: 'visible' })
     await this.o3Chart.waitFor({ state: 'visible' })
     await this.no2Chart.waitFor({ state: 'visible' })
+    await this.so2Chart.waitFor({ state: 'visible' })
   }
 }

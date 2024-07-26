@@ -1,5 +1,9 @@
 import { expect, test } from '../utils/fixtures'
-import { gotoPage, setupPageWithMockData } from '../utils/helper_methods'
+import {
+  gotoPage,
+  setupPageWithMockData,
+  waitForIdleNetwork,
+} from '../utils/helper_methods'
 import {
   createForecastAPIResponseData,
   createMeasurementsCityPageResponseData,
@@ -280,6 +284,7 @@ test.describe('City graph snapshots', () => {
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
   })
+
   test('AQI snapshot', async ({ cityPage }) => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.aqiChart)
     expect(chartShot).toMatchSnapshot('rio-aqi-graph.png')
@@ -344,5 +349,122 @@ test.describe('City graph snapshots', () => {
     await cityPage.siteRemover('Centro')
     const chartShot = await cityPage.captureChartScreenshot(cityPage.so2Chart)
     expect(chartShot).toMatchSnapshot('rio-so2-graph-without-centro.png')
+  })
+})
+
+test.use({
+  viewport: { width: 1920, height: 1080 },
+})
+test.describe('Charts are fully visible in 1920x1080 viewport', () => {
+  test.beforeEach(async ({ page, cityPage }) => {
+    const mockedForecastResponse = [
+      createForecastAPIResponseData({
+        base_time: '2024-07-01T00:00:00Z',
+        valid_time: '2024-07-01T00:00:00Z',
+        location_name: 'Rio de Janeiro',
+        overall_aqi_level: 1,
+      }),
+      createForecastAPIResponseData({
+        base_time: '2024-07-01T00:00:00Z',
+        valid_time: '2024-07-01T03:00:00Z',
+        location_name: 'Rio de Janeiro',
+        overall_aqi_level: 4,
+      }),
+      createForecastAPIResponseData({
+        base_time: '2024-07-01T00:00:00Z',
+        valid_time: '2024-07-01T06:00:00Z',
+        location_name: 'Rio de Janeiro',
+        overall_aqi_level: 3,
+      }),
+    ]
+    await setupPageWithMockData(page, [
+      {
+        endpointUrl: '*/**/air-pollutant/forecast*',
+        mockedAPIResponse: mockedForecastResponse,
+      },
+    ])
+    await gotoPage(page, '/city/Rio%20de%20Janeiro')
+
+    await cityPage.waitForAllGraphsToBeVisible()
+    await cityPage.setBaseTime('01/07/2024 00:00')
+  })
+  test('AQI chart element is visible in fullscreen view', async ({
+    cityPage,
+    page,
+  }) => {
+    await waitForIdleNetwork(page, cityPage.aqiChart)
+    await expect(cityPage.aqiChart).toBeInViewport({ ratio: 1 })
+  })
+  test('pm2.5 chart element is visible in fullscreen view', async ({
+    cityPage,
+    page,
+  }) => {
+    await waitForIdleNetwork(page, cityPage.pm2_5Chart)
+
+    await expect(cityPage.pm2_5Chart).toBeInViewport({ ratio: 1 })
+  })
+  test('pm10 chart element is visible in fullscreen view', async ({
+    cityPage,
+    page,
+  }) => {
+    await waitForIdleNetwork(page, cityPage.pm10Chart)
+    await expect(cityPage.pm10Chart).toBeInViewport({ ratio: 1 })
+  })
+  test('o3 chart element is visible in fullscreen view', async ({
+    cityPage,
+    page,
+  }) => {
+    await waitForIdleNetwork(page, cityPage.o3Chart)
+    await expect(cityPage.o3Chart).toBeInViewport({ ratio: 1 })
+  })
+  test('no2 chart element is visible in fullscreen view', async ({
+    cityPage,
+    page,
+  }) => {
+    await waitForIdleNetwork(page, cityPage.no2Chart)
+    await expect(cityPage.no2Chart).toBeInViewport({ ratio: 1 })
+  })
+  test('so2 chart element is visible in fullscreen view', async ({
+    cityPage,
+    page,
+  }) => {
+    await waitForIdleNetwork(page, cityPage.so2Chart)
+    await expect(cityPage.so2Chart).toBeInViewport({ ratio: 1 })
+  })
+
+  test.describe('No in-situ snapshots', () => {
+    test('AQI snapshot without in-situ', async ({ cityPage }) => {
+      const chartShot = await cityPage.captureChartScreenshot(cityPage.aqiChart)
+      expect(chartShot).toMatchSnapshot('rio-aqi-no-insitu.png')
+    })
+
+    test('pm2.5 snapshot without in-situ', async ({ cityPage }) => {
+      const chartShot = await cityPage.captureChartScreenshot(
+        cityPage.pm2_5Chart,
+      )
+      expect(chartShot).toMatchSnapshot('rio-pm2_5-no-insitu.png')
+    })
+
+    test('pm10 snapshot without in-situ', async ({ cityPage }) => {
+      const chartShot = await cityPage.captureChartScreenshot(
+        cityPage.pm10Chart,
+      )
+      expect(chartShot).toMatchSnapshot('rio-pm10-no-insitu.png')
+    })
+
+    test('o3 snapshot without in-situ', async ({ cityPage, page }) => {
+      const chartShot = await cityPage.captureChartScreenshot(cityPage.o3Chart)
+      expect(chartShot).toMatchSnapshot('rio-o3-no-insitu.png')
+      await page.pause()
+    })
+
+    test('no2 snapshot without in-situ', async ({ cityPage }) => {
+      const chartShot = await cityPage.captureChartScreenshot(cityPage.no2Chart)
+      expect(chartShot).toMatchSnapshot('rio-no2-no-insitu.png')
+    })
+    test('so2 snapshot without in-situ', async ({ cityPage }) => {
+      const chartShot = await cityPage.captureChartScreenshot(cityPage.so2Chart)
+      expect(chartShot).toMatchSnapshot('rio-so2-no-insitu.png')
+    })
   })
 })
