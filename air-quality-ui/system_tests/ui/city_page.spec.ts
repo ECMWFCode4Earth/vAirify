@@ -12,7 +12,6 @@ import {
 test.use({
   viewport: { width: 1920, height: 1080 },
 })
-
 test('Legend deselect removes chosen site', async ({ page, cityPage }) => {
   const mockedForecastResponse = [
     createForecastAPIResponseData({
@@ -65,6 +64,45 @@ test('Legend deselect removes chosen site', async ({ page, cityPage }) => {
   await expect(cityPage.textFinder('Centro')).not.toBeVisible()
 })
 
+test.describe('City page resolution tests', () => {
+  ;[
+    {
+      resolutionWidth: 960,
+      resolutionHeight: 1080,
+    },
+    {
+      resolutionWidth: 1366,
+      resolutionHeight: 768,
+    },
+  ].forEach(({ resolutionWidth, resolutionHeight }) => {
+    test.use({
+      viewport: { width: resolutionWidth, height: resolutionHeight },
+    })
+    test(`Verify that the resolution (width: ${resolutionWidth} height: ${resolutionHeight}) does not affect the ability to view the charts`, async ({
+      page,
+      cityPage,
+    }) => {
+      const charts = [
+        'aqiChart',
+        'no2Chart',
+        'pm2_5Chart',
+        'o3Chart',
+        'pm10Chart',
+        'so2Chart',
+      ]
+      page.setViewportSize({ width: resolutionWidth, height: resolutionHeight })
+      await gotoPage(page, 'city/Rio%20de%20Janeiro')
+      await cityPage.waitForAllGraphsToBeVisible()
+      for (let i = 0; i < charts.length; i++) {
+        await cityPage[charts[i]].scrollIntoViewIfNeeded()
+        expect(cityPage[charts[i]]).toBeInViewport({ ratio: 1 })
+      }
+    })
+  })
+})
+test.use({
+  viewport: { width: 1920, height: 1080 },
+})
 test.describe('City graph snapshots', () => {
   test.beforeEach(async ({ cityPage, page }) => {
     const mockedForecastResponse = [
