@@ -5,6 +5,9 @@ import {
   createMeasurementsCityPageResponseData,
 } from '../utils/mocked_api'
 
+test.use({
+  viewport: { width: 1920, height: 1080 },
+})
 test('Legend deselect removes chosen site', async ({ page, cityPage }) => {
   const mockedForecastResponse = [
     createForecastAPIResponseData({
@@ -60,34 +63,38 @@ test('Legend deselect removes chosen site', async ({ page, cityPage }) => {
 test.describe('City page resolution tests', () => {
   ;[
     {
-      width: 960,
-      height: 1080,
+      resolutionWidth: 960,
+      resolutionHeight: 1080,
       screenCenter: { x: 480, y: 540 },
     },
     {
-      width: 1366,
-      height: 768,
+      resolutionWidth: 1366,
+      resolutionHeight: 768,
       screenCenter: { x: 683, y: 384 },
     },
-  ].forEach(({ width, height, screenCenter }) => {
+  ].forEach(({ resolutionWidth, resolutionHeight }) => {
     test.use({
-      viewport: { width: width, height: height },
+      viewport: { width: resolutionWidth, height: resolutionHeight },
     })
-    test(`Verify that the resolution (width: ${width} height: ${height}) does not affect the ability to view the charts`, async ({
+    test(`Verify that the resolution (width: ${resolutionWidth} height: ${resolutionHeight}) does not affect the ability to view the charts`, async ({
       page,
       cityPage,
     }) => {
+      const charts = [
+        'aqiChart',
+        'no2Chart',
+        'pm2_5Chart',
+        'o3Chart',
+        'pm10Chart',
+        'so2Chart',
+      ]
+      page.setViewportSize({ width: resolutionWidth, height: resolutionHeight })
       await gotoPage(page, 'city/Rio%20de%20Janeiro')
       await cityPage.waitForAllGraphsToBeVisible()
-
-      expect(cityPage.aqiChart).toBeInViewport()
-      expect(cityPage.no2Chart).toBeInViewport()
-      expect(cityPage.pm2_5Chart).toBeInViewport()
-      expect(cityPage.o3Chart).toBeInViewport()
-      await page.mouse.move(screenCenter.x, screenCenter.y)
-      await page.mouse.wheel(1080, 0)
-      expect(cityPage.pm10Chart).toBeInViewport()
-      expect(cityPage.so2Chart).toBeInViewport()
+      for (let i = 0; i < charts.length; i++) {
+        await cityPage[charts[i]].scrollIntoViewIfNeeded()
+        expect(cityPage[charts[i]]).toBeInViewport({ ratio: 1 })
+      }
     })
   })
 })
