@@ -22,7 +22,7 @@
 }
 
 .chart-section {
-    align-items: center;
+    justify-items: center;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     padding: 0 0 32px 0;
@@ -32,6 +32,7 @@
 }
 
 .chart {
+    align-content: center;
     width: 600px;
     height: 400px;
 }
