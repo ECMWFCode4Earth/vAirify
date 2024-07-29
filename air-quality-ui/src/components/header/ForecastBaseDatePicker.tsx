@@ -14,6 +14,10 @@ export const ForecastBaseDatePicker = (): JSX.Element => {
     },
   })
 
+  const IsTimeInvalid = (value: DateTime) => {
+    return value.minute != 0 || (value.hour != 0 && value.hour != 12)
+  }
+
   return (
     <LocalizationProvider dateAdapter={AdapterLuxon} adapterLocale="en-gb">
       <ThemeProvider theme={darkTheme}>
@@ -21,11 +25,16 @@ export const ForecastBaseDatePicker = (): JSX.Element => {
           sx={{ '.MuiFormLabel-root': { color: 'white' } }}
           label="Forecast Base Date"
           disableFuture={true}
+          shouldDisableTime={IsTimeInvalid}
           skipDisabled={true}
           timeSteps={{ minutes: 720 }}
           value={forecastBaseDate}
           onChange={(newValue) => {
-            if (newValue != null && newValue < DateTime.utc()) {
+            if (
+              newValue != null &&
+              newValue < DateTime.utc() &&
+              !IsTimeInvalid(newValue)
+            ) {
               setForecastBaseDate(newValue)
             }
           }}
