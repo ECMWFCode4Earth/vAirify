@@ -10,12 +10,17 @@ class PollutantDataDto(TypedDict):
     aqi_level: int
     value: float
 
+class Coordinates(TypedDict):
+    longitude: float
+    latitude: float
+
 
 class ForecastDto(TypedDict):
     base_time: datetime
     valid_time: datetime
     location_type: AirQualityLocationType
     location_name: str
+    coordinates: Coordinates
     overall_aqi_level: float
     no2: PollutantDataDto
     o3: PollutantDataDto

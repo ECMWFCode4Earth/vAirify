@@ -55,6 +55,7 @@ describe('Site Measurement Chart', () => {
 
   const forecastBaseData = {
     location_name: 'LocationA',
+    coordinates: { longitude: 10, latitude: 20 },
     no2: {
       aqi_level: 2,
       value: 2,

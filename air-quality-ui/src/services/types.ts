@@ -21,10 +21,16 @@ type SummaryMeasurementPollutantDataDto = {
   [P in PollutantType]?: PollutantAverageDataDto<PollutantDataDto>
 }
 
+type Coordinates = {
+  longitude: number
+  latitude: number
+}
+
 export type ForecastResponseDto = {
   base_time: string
   valid_time: string
   location_type: LocationType
+  coordinates: Coordinates
   location_name: string
   overall_aqi_level: number
 } & ForecastPollutantDataDto

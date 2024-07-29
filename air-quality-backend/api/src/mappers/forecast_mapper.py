@@ -11,6 +11,10 @@ def database_to_api_result(measurement: Forecast) -> ForecastDto:
         "valid_time": measurement["forecast_valid_time"].astimezone(UTC),
         "location_type": measurement["location_type"],
         "location_name": measurement["name"],
+        "coordinates": {
+            "longitude": measurement["location"]["coordinates"][0],
+            "latitude": measurement["location"]["coordinates"][1],
+        },
         "overall_aqi_level": measurement["overall_aqi_level"],
         "no2": measurement["no2"],
         "o3": measurement["o3"],
