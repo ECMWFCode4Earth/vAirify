@@ -10,6 +10,7 @@ class PollutantDataDto(TypedDict):
     aqi_level: int
     value: float
 
+
 class Coordinates(TypedDict):
     longitude: float
     latitude: float
@@ -33,6 +34,7 @@ class MeasurementDto(TypedDict):
     measurement_date: datetime
     location_type: AirQualityLocationType
     location_name: str
+    location: Coordinates
     api_source: ApiSource
     no2: NotRequired[float]
     o3: NotRequired[float]

@@ -12,6 +12,10 @@ def map_measurement(measurement: InSituMeasurement) -> MeasurementDto:
         "measurement_date": measurement["measurement_date"].astimezone(UTC),
         "location_type": measurement["location_type"],
         "location_name": measurement["name"],
+        "location": {
+            "longitude": measurement["location"]["coordinates"][0],
+            "latitude": measurement["location"]["coordinates"][1],
+        },
         **{
             pollutant_type.value: measurement[pollutant_type.literal()]["value"]
             for pollutant_type in PollutantType
