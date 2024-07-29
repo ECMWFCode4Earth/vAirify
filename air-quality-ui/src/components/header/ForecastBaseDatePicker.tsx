@@ -25,8 +25,9 @@ export const ForecastBaseDatePicker = (): JSX.Element => {
           timeSteps={{ minutes: 720 }}
           value={forecastBaseDate}
           onChange={(newValue) => {
-            const valueToSet = newValue == null ? DateTime.utc() : newValue
-            setForecastBaseDate(valueToSet)
+            if (newValue != null && newValue < DateTime.utc()) {
+              setForecastBaseDate(newValue)
+            }
           }}
         />
       </ThemeProvider>

@@ -22,11 +22,26 @@ describe('ForecastBaseDatePicker component', () => {
   it('Sets forecast base date on change', async () => {
     render(<ForecastBaseDatePicker />)
     const datePicker = screen.getByLabelText('Forecast Base Date')
-    const updatedDate = DateTime.fromISO('2024-06-03T12:00:00', { zone: 'UTC' })
+    const pastDate = DateTime.utc().startOf('minute').plus({ days: -1 })
 
-    fireEvent.change(datePicker, { target: { value: '03/06/2024 12:00' } })
+    fireEvent.change(datePicker, {
+      target: { value: pastDate.toFormat("dd'/'LL'/'yyyy' 'HH':'mm") },
+    })
     await waitFor(() => {
-      expect(mockSetForecastBaseDate).toHaveBeenCalledWith(updatedDate)
+      expect(mockSetForecastBaseDate).toHaveBeenCalledWith(pastDate)
+    })
+  })
+  it('Does not update forecast base date to future', async () => {
+    render(<ForecastBaseDatePicker />)
+    const futureDate = DateTime.utc().startOf('minute').plus({ days: 1 })
+
+    const datePicker = screen.getByLabelText('Forecast Base Date')
+
+    fireEvent.change(datePicker, {
+      target: { value: futureDate.toFormat("dd'/'LL'/'yyyy' 'HH':'mm") },
+    })
+    await waitFor(() => {
+      expect(mockSetForecastBaseDate).not.toHaveBeenCalledWith(futureDate)
     })
   })
 })
