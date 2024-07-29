@@ -95,7 +95,7 @@ test.describe('City page resolution tests', () => {
       await cityPage.waitForAllGraphsToBeVisible()
       for (let i = 0; i < charts.length; i++) {
         await cityPage[charts[i]].scrollIntoViewIfNeeded()
-        expect(cityPage[charts[i]]).toBeInViewport({ ratio: 1 })
+        await expect(cityPage[charts[i]]).toBeInViewport({ ratio: 1 })
       }
     })
   })
