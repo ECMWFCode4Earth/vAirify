@@ -15,7 +15,7 @@ export const ForecastBaseDatePicker = (): JSX.Element => {
   })
 
   const IsTimeInvalid = (value: DateTime) => {
-    return value.minute != 0 || (value.hour != 0 && value.hour != 12)
+    return value.minute != 0 || value.hour % 12 != 0
   }
 
   return (

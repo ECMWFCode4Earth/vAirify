@@ -72,7 +72,9 @@ describe('ForecastBaseDatePicker component', () => {
       })
     },
   )
-  it.each<number>([2, 3, 4, 5, 6, 7, 8, 9, 10, 11])(
+  it.each<number>([
+    2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+  ])(
     'Does not update forecast base date to include invalid hours',
     async (test_hour: number) => {
       render(<ForecastBaseDatePicker />)
