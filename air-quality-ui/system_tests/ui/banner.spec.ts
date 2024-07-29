@@ -4,39 +4,23 @@ import {
   createForecastAPIResponseData,
   createMeasurementSummaryAPIResponseData,
 } from '../utils/mocked_api'
-
-test.describe('Logo visibility', () => {
-  ;[
-    {
-      url: '/city/Rio%20de%20Janeiro',
-      pageType: 'city',
-    },
-    {
-      url: '/city/summary',
-      pageType: 'summary',
-    },
-  ].forEach(({ url, pageType }) => {
-    test(`vAirify logo is visible on ${pageType} page`, async ({
-      page,
-      banner,
-    }) => {
-      await gotoPage(page, url)
-      await expect(banner.logo).toBeVisible()
-    })
-  })
-})
-
-test.describe('Date Picker', () => {
-  ;[
-    {
-      url: '/city/Rio%20de%20Janeiro',
-      pageType: 'city',
-    },
-    {
-      url: '/city/summary',
-      pageType: 'summary',
-    },
-  ].forEach(({ url, pageType }) => {
+;[
+  {
+    url: '/city/Rio%20de%20Janeiro',
+    pageType: 'city',
+  },
+  {
+    url: '/city/summary',
+    pageType: 'summary',
+  },
+].forEach(({ url, pageType }) => {
+  test(`vAirify logo is visible on ${pageType} page`, async ({
+    page,
+    banner,
+  }) => {
+    await gotoPage(page, url)
+    await expect(banner.logo).toBeVisible()
+  }),
     test(`Date picker is visible and cannot select a future day on ${pageType} page`, async ({
       page,
       banner,
@@ -55,8 +39,20 @@ test.describe('Date Picker', () => {
       await expect(banner.year2025).toBeDisabled()
       // add assertion you can't send keys for a future date, blocked by bug
     })
-  })
 })
+
+// test.describe('Date Picker', () => {
+//   ;[
+//     {
+//       url: '/city/Rio%20de%20Janeiro',
+//       pageType: 'city',
+//     },
+//     {
+//       url: '/city/summary',
+//       pageType: 'summary',
+//     },
+//   ].forEach(({ url, pageType }) => {})
+// })
 
 test('Verify breadcrumb text is correct on each page', async ({
   summaryPage,
