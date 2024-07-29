@@ -10,6 +10,7 @@ export class SummaryPage extends BasePage {
   readonly grid: Locator
   readonly highlightValuesToggle: Locator
   readonly scroller: Locator
+  readonly timeRange: Locator
   readonly title: Locator
 
   constructor(page: Page) {
@@ -21,6 +22,7 @@ export class SummaryPage extends BasePage {
     this.grid = page.getByTestId('summary-grid')
     this.highlightValuesToggle = page.getByRole('checkbox')
     this.scroller = page.locator('.ag-body-horizontal-scroll-viewport')
+    this.timeRange = page.getByText('Time Range:')
     this.title = page.locator('title')
   }
 

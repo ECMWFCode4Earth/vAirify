@@ -53,6 +53,34 @@ import {
     })
 })
 
+test.describe('Range label', () => {
+  test.beforeEach(async ({ page }) => {
+    const mockSystemDate: Date = new Date('2024-07-26T10:00:00Z')
+    await page.clock.setFixedTime(mockSystemDate)
+
+    await gotoPage(page, '/city/summary')
+  })
+
+  test('On load, label accurately displays forecast range on summary page', async ({
+    summaryPage,
+  }) => {
+    await expect(summaryPage.timeRange).toContainText(
+      'Time Range: 25 Jul 00:00 - 26 Jul 09:00 UTC',
+    )
+  })
+
+  test('On changing to historic forecast base time (T-6), label accurately displays forecast range on summary page', async ({
+    summaryPage,
+    banner,
+  }) => {
+    await banner.setBaseTime('20/07/2024 00:00')
+
+    await expect(summaryPage.timeRange).toContainText(
+      'Time Range: 20 Jul 00:00 - 25 Jul 00:00 UTC',
+    )
+  })
+})
+
 test('Verify breadcrumb text is correct on each page', async ({
   summaryPage,
   cityPage,
