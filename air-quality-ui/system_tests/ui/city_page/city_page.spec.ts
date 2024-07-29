@@ -1,13 +1,13 @@
-import { expect, test } from '../utils/fixtures'
+import { expect, test } from '../../utils/fixtures'
 import {
   gotoPage,
   setupPageWithMockData,
   waitForIdleNetwork,
-} from '../utils/helper_methods'
+} from '../../utils/helper_methods'
 import {
   createForecastAPIResponseData,
   createMeasurementsCityPageResponseData,
-} from '../utils/mocked_api'
+} from '../../utils/mocked_api'
 
 test.use({
   viewport: { width: 1920, height: 1080 },
