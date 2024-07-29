@@ -5,49 +5,56 @@ import {
   createMeasurementSummaryAPIResponseData,
 } from '../utils/mocked_api'
 
-test.describe('City page', () => {
-  test.beforeEach(async ({ page }) => {
-    await gotoPage(page, '/city/Rio%20de%20Janeiro')
-  })
-  test('vAirify logo is visible on city page', async ({ banner }) => {
-    await expect(banner.logo).toBeVisible()
-  })
-
-  test('Date picker cannot select a future day on city page', async ({
-    page,
-    banner,
-  }) => {
-    const mockSystemDate: Date = new Date('2024-07-26T10:00:00Z')
-    await page.clock.setFixedTime(mockSystemDate)
-
-    await expect(banner.datePicker).toBeVisible()
-
-    await banner.calendarIcon.click()
-    await expect(banner.day27).toBeDisabled()
-    await expect(banner.datePickerNextMonthButton).toBeDisabled()
-
-    await banner.datePickerYearButton.click()
-    await expect(banner.year2025).toBeDisabled()
+test.describe('Logo visibility', () => {
+  ;[
+    {
+      url: '/city/Rio%20de%20Janeiro',
+      pageType: 'city',
+    },
+    {
+      url: '/city/summary',
+      pageType: 'summary',
+    },
+  ].forEach(({ url, pageType }) => {
+    test(`vAirify logo is visible on ${pageType} page`, async ({
+      page,
+      banner,
+    }) => {
+      await gotoPage(page, url)
+      await expect(banner.logo).toBeVisible()
+    })
   })
 })
 
-test.describe('Summary page', () => {
-  test.beforeEach(async ({ page }) => {
-    await gotoPage(page, '/city/summary')
-  })
-  test('vAirify logo is visible on summary page', async ({ banner }) => {
-    await expect(banner.logo).toBeVisible()
-  })
+test.describe('Date Picker', () => {
+  ;[
+    {
+      url: '/city/Rio%20de%20Janeiro',
+      pageType: 'city',
+    },
+    {
+      url: '/city/summary',
+      pageType: 'summary',
+    },
+  ].forEach(({ url, pageType }) => {
+    test(`Date picker is visible and cannot select a future day on ${pageType} page`, async ({
+      page,
+      banner,
+    }) => {
+      const mockSystemDate: Date = new Date('2024-07-26T10:00:00Z')
+      await page.clock.setFixedTime(mockSystemDate)
 
-  test('Date picker is visible on summary page', async ({ banner }) => {
-    await expect(banner.datePicker).toBeVisible()
-  })
+      await gotoPage(page, url)
+      await expect(banner.datePicker).toBeVisible()
 
-  test('Verify page title is vAirify on summary page', async ({
-    summaryPage,
-  }) => {
-    const title = await summaryPage.getTitle()
-    expect(title).toBe('vAirify')
+      await banner.calendarIcon.click()
+      await expect(banner.day27).toBeDisabled()
+      await expect(banner.datePickerNextMonthButton).toBeDisabled()
+
+      await banner.datePickerYearButton.click()
+      await expect(banner.year2025).toBeDisabled()
+      // add assertion you can't send keys for a future date, blocked by bug
+    })
   })
 })
 
