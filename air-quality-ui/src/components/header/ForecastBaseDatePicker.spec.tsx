@@ -25,6 +25,7 @@ describe('ForecastBaseDatePicker component', () => {
     const updatedDate = DateTime.fromISO('2024-06-03T12:00:00', { zone: 'UTC' })
 
     fireEvent.change(datePicker, { target: { value: '03/06/2024 12:00' } })
+    fireEvent.click(screen.getByText('Ok'))
     await waitFor(() => {
       expect(mockSetForecastBaseDate).toHaveBeenCalledWith(updatedDate)
     })
