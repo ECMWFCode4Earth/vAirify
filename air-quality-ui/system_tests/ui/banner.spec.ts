@@ -21,6 +21,18 @@ import {
     await gotoPage(page, url)
     await expect(banner.logo).toBeVisible()
   }),
+    test(`Verify times can only be 12:00 or 00:00 on ${pageType} page`, async ({
+      page,
+      banner,
+    }) => {
+      await gotoPage(page, url)
+      await banner.calendarIcon.click()
+
+      await expect(banner.datePickerTimeOptions).toHaveCount(2)
+      await expect(banner.datePickerTimeOption0000).toBeVisible()
+      await expect(banner.datePickerTimeOption1200).toBeVisible()
+      // add assertion you can't click 12 when most recent forecast is 00
+    }),
     test(`Date picker is visible and cannot select a future day on ${pageType} page`, async ({
       page,
       banner,
@@ -40,19 +52,6 @@ import {
       // add assertion you can't send keys for a future date, blocked by bug
     })
 })
-
-// test.describe('Date Picker', () => {
-//   ;[
-//     {
-//       url: '/city/Rio%20de%20Janeiro',
-//       pageType: 'city',
-//     },
-//     {
-//       url: '/city/summary',
-//       pageType: 'summary',
-//     },
-//   ].forEach(({ url, pageType }) => {})
-// })
 
 test('Verify breadcrumb text is correct on each page', async ({
   summaryPage,

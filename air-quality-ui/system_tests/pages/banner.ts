@@ -7,9 +7,10 @@ export class Banner extends BasePage {
 
   readonly calendarIcon: Locator
   readonly datePicker: Locator
-  readonly datePickerOptionTime0000: Locator
-  readonly datePickerOptionTime1200: Locator
   readonly datePickerNextMonthButton: Locator
+  readonly datePickerTimeOptions: Locator
+  readonly datePickerTimeOption0000: Locator
+  readonly datePickerTimeOption1200: Locator
   readonly datePickerYearButton: Locator
   readonly day27: Locator
   readonly logo: Locator
@@ -21,9 +22,10 @@ export class Banner extends BasePage {
 
     this.calendarIcon = page.getByTestId('CalendarIcon')
     this.datePicker = page.getByRole('textbox', { name: 'Forecast Base Date' })
-    this.datePickerOptionTime0000 = page.getByRole('option', { name: '00:00' })
-    this.datePickerOptionTime1200 = page.getByRole('option', { name: '12:00' })
     this.datePickerNextMonthButton = page.getByLabel('Next month')
+    this.datePickerTimeOptions = page.locator('ul > [role="option"]')
+    this.datePickerTimeOption0000 = page.getByRole('option', { name: '00:00' })
+    this.datePickerTimeOption1200 = page.getByRole('option', { name: '12:00' })
     this.datePickerYearButton = page.getByLabel('calendar view is open, switch')
     this.day27 = page.locator(
       '//div[@aria-rowindex="4"] //button[@aria-colindex="6"]',
@@ -58,9 +60,9 @@ export class Banner extends BasePage {
 
   async clickOnTime(time: string): Promise<void> {
     if (time == '00:00') {
-      await this.datePickerOptionTime0000.click()
+      await this.datePickerTimeOption0000.click()
     } else if (time == '12:00') {
-      await this.datePickerOptionTime1200.click()
+      await this.datePickerTimeOption1200.click()
     } else {
       throw new Error('Invalid time provided')
     }
