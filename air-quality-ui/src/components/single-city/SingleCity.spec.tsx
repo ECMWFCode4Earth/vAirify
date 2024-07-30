@@ -23,6 +23,9 @@ jest.mock('../../context', () => ({
 }))
 
 jest.mock('echarts-for-react', () => () => <div>Mock Chart</div>)
+jest.mock('./station-map/StationMap', () => ({
+  StationMap: () => 'mocked map',
+}))
 
 describe('SingleCityComponent', () => {
   it('shows loading spinner when forecast data loading', async () => {

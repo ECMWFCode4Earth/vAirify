@@ -39,6 +39,7 @@ export type MeasurementsResponseDto = {
   measurement_date: string
   location_type: LocationType
   location_name: string
+  location: Coordinates
   api_source: string
   entity: string
   sensor_type: string

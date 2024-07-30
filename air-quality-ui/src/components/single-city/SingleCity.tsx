@@ -6,6 +6,7 @@ import Select, { ActionMeta, MultiValue, OnChangeValue } from 'react-select'
 import { AverageComparisonChart } from './average-comparison-chart/AverageComparisonChart'
 import classes from './SingleCity.module.css'
 import { SiteMeasurementsChart } from './site-measurement-chart/SiteMeasurementsChart'
+import { StationMap } from './station-map/StationMap'
 import { useForecastContext } from '../../context'
 import { PollutantType, pollutantTypes } from '../../models'
 import { textToColor } from '../../services/echarts-service'
@@ -91,6 +92,28 @@ export const SingleCity = () => {
     [],
   )
 
+  const siteLocations = useMemo(() => {
+    const result = new Map<string, { longitude: number; latitude: number }>()
+    measurementData
+      ?.filter((measurement) =>
+        selectedSites.find(
+          (site) => site && site.value === getSiteName(measurement),
+        ),
+      )
+      .forEach((measurement) => {
+        const siteName = getSiteName(measurement)
+        const site = result.has(siteName)
+        if (!site) {
+          result.set(siteName, {
+            longitude: measurement.location.longitude,
+            latitude: measurement.location.latitude,
+          })
+        }
+      })
+
+    return result
+  }, [measurementData, selectedSites])
+
   const measurementsByPollutantBySite = useMemo(() => {
     return measurementData
       ?.filter((measurement) =>
@@ -156,6 +179,16 @@ export const SingleCity = () => {
       {!forecastDataPending && !measurementDataPending && (
         <>
           <section className={classes['chart-section']}>
+            <div
+              key="station_map"
+              data-testid="station_map"
+              className={classes['chart']}
+            >
+              <StationMap
+                forecastData={forecastData}
+                locations={siteLocations}
+              ></StationMap>
+            </div>
             <div
               key="aqi_chart"
               data-testid="aqi_chart"
