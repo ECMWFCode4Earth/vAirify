@@ -134,8 +134,6 @@ test('PM2.5 creates AQI 3 at 00:00', async ({ page, cityPage }) => {
       mockedAPIResponse: mockedMeasurementsCityPageResponse,
     },
   ])
-  // const screenshotPath = path.join(__dirname,'air-quality-ui\system_tests\ui\epicsnapshots')
-
   await gotoPage(page, '/city/Rio%20de%20Janeiro')
   await cityPage.waitForAllGraphsToBeVisible()
   await waitForIdleNetwork(page, cityPage.aqiChart)
