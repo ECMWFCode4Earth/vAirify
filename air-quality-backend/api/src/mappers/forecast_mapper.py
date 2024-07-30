@@ -11,7 +11,7 @@ def database_to_api_result(measurement: Forecast) -> ForecastDto:
         "valid_time": measurement["forecast_valid_time"].astimezone(UTC),
         "location_type": measurement["location_type"],
         "location_name": measurement["name"],
-        "coordinates": {
+        "location": {
             "longitude": measurement["location"]["coordinates"][0],
             "latitude": measurement["location"]["coordinates"][1],
         },

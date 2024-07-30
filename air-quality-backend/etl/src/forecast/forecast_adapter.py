@@ -113,7 +113,7 @@ def transform(forecast_data: ForecastData, locations: list[AirQualityLocation]) 
                 "location_type": location_type,
                 "location": {
                     "type": "Point",
-                    "coordinates": [location["longitude"], location["latitude"]],
+                    "location": [location["longitude"], location["latitude"]],
                 },
                 "forecast_base_time": model_base_time,
                 "forecast_valid_time": measurement_date,

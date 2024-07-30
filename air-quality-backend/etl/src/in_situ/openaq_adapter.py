@@ -59,9 +59,9 @@ def _create_document(
         "location_name": measurement["location"],
         "location": {
             "type": "point",
-            "coordinates": (
-                measurement["coordinates"]["longitude"],
-                measurement["coordinates"]["latitude"],
+            "location": (
+                measurement["location"]["longitude"],
+                measurement["location"]["latitude"],
             ),
         },
         "metadata": {

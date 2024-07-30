@@ -21,7 +21,7 @@ class ForecastDto(TypedDict):
     valid_time: datetime
     location_type: AirQualityLocationType
     location_name: str
-    coordinates: Coordinates
+    location: Coordinates
     overall_aqi_level: float
     no2: PollutantDataDto
     o3: PollutantDataDto

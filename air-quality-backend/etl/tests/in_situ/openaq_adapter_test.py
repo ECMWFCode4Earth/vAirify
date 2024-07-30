@@ -38,7 +38,7 @@ def test__transform_city__multiple_sites_in_city():
                         "location": "Dublin 2",
                         "parameter": "so2",
                         "value": 11.0,
-                        "coordinates": {
+                        "location": {
                             "latitude": 1.0,
                             "longitude": 1.0,
                         },

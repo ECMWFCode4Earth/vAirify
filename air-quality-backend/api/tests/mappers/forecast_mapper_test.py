@@ -15,7 +15,7 @@ def test__map_forecast_database_data_to_api_output_data():
         "base_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
         "location_type": "city",
         "overall_aqi_level": 1,
-        "coordinates": {"latitude": 50, "longitude": 90},
+        "location": {"latitude": 50, "longitude": 90},
         "o3": {"aqi_level": 1, "value": 1.0},
         "no2": {"aqi_level": 1, "value": 2.0},
         "so2": {"aqi_level": 1, "value": 3.0},
