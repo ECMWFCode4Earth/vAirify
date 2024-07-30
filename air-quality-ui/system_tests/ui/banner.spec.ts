@@ -31,25 +31,33 @@ import {
       await expect(banner.datePickerTimeOptions).toHaveCount(2)
       await expect(banner.datePickerTimeOption0000).toBeVisible()
       await expect(banner.datePickerTimeOption1200).toBeVisible()
-      // add assertion you can't click 12 when most recent forecast is 00
     }),
-    test(`Date picker is visible and cannot select a future day on ${pageType} page`, async ({
-      page,
-      banner,
-    }) => {
+    test.beforeEach(async ({ page }) => {
       const mockSystemDate: Date = new Date('2024-07-26T10:00:00Z')
       await page.clock.setFixedTime(mockSystemDate)
 
       await gotoPage(page, url)
+    }),
+    test(`Date picker is visible and cannot select a future day ${pageType} page`, async ({
+      banner,
+    }) => {
       await expect(banner.datePicker).toBeVisible()
 
       await banner.calendarIcon.click()
       await expect(banner.day27).toBeDisabled()
       await expect(banner.datePickerNextMonthButton).toBeDisabled()
 
-      await banner.datePickerYearButton.click()
+      await banner.datePickerYearOpenButton.click()
       await expect(banner.year2025).toBeDisabled()
-      // add assertion you can't send keys for a future date, blocked by bug
+    }),
+    test(`Date picker is visible and cannot select a future time on ${pageType} page`, async ({
+      banner,
+    }) => {
+      await banner.calendarIcon.click()
+      await banner.day26.click()
+
+      await expect(banner.datePickerTimeOptions).toHaveCount(1)
+      await expect(banner.datePickerTimeOption1200).not.toBeVisible()
     })
 })
 
