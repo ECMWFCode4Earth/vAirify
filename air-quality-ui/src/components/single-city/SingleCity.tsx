@@ -178,17 +178,7 @@ export const SingleCity = () => {
       {(forecastDataPending || measurementDataPending) && <LoadingSpinner />}
       {!forecastDataPending && !measurementDataPending && (
         <>
-          <section className={classes['chart-section']}>
-            <div
-              key="station_map"
-              data-testid="station_map"
-              className={classes['chart']}
-            >
-              <StationMap
-                forecastData={forecastData}
-                locations={siteLocations}
-              ></StationMap>
-            </div>
+          <section className={classes['section-columns']}>
             <div
               key="aqi_chart"
               data-testid="aqi_chart"
@@ -220,27 +210,36 @@ export const SingleCity = () => {
               )}
           </section>
           <section className={classes['site-measurements-section']}>
-            <form
-              className={classes['site-select-form']}
-              data-testid="sites-form"
-            >
-              <label
-                className={classes['site-select-label']}
-                htmlFor="sites-select"
+            <div className={classes['site-measurements-title']}>
+              Measurement Sites
+            </div>
+            <div className={classes['section-columns']}>
+              <div
+                key="station_map"
+                data-testid="station_map"
+                className={`${classes['site-select']} ${classes['map']}`}
               >
-                Measurement Sites
-              </label>
-              <Select
-                className={classes['site-select']}
-                inputId="sites-select"
-                isClearable={false}
-                isMulti
-                name="sites-select"
-                onChange={onSelectionChange}
-                options={sites}
-                value={selectedSites}
-              />
-            </form>
+                <StationMap
+                  forecastData={forecastData}
+                  locations={siteLocations}
+                ></StationMap>
+              </div>
+              <form
+                className={classes['site-select-form']}
+                data-testid="sites-form"
+              >
+                <Select
+                  className={classes['site-select']}
+                  inputId="sites-select"
+                  isClearable={false}
+                  isMulti
+                  name="sites-select"
+                  onChange={onSelectionChange}
+                  options={sites}
+                  value={selectedSites}
+                />
+              </form>
+            </div>
           </section>
         </>
       )}

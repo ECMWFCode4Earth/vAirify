@@ -21,13 +21,12 @@
     flex-direction: column;
 }
 
-.chart-section {
+.section-columns {
     justify-items: center;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
     padding: 0 0 32px 0;
     row-gap: 16px;
-    overflow-x: auto;
     width: 100%;
 }
 
@@ -37,21 +36,30 @@
     height: 400px;
 }
 
+.map {
+    width: 100%;
+    max-width: 800px;
+    min-width: 600px;
+    height: 500px;
+}
+
 .site-measurements-section {
     align-items: center;
+    width: 100%;
     padding: 32px 0 32px 0;
-    min-width: 600px;
-    max-width: 800px;   
 }
 
 .site-select-form {
-    align-items: center;
     display: flex;
     flex-direction: column;
+    max-width: 800px;
 }
 
-.site-select-label {
+.site-measurements-title {
     font-weight: bold;
+    padding-bottom: 20px;
+    font-size: x-large;
+    text-align: center;
 }
 
 .site-select {
