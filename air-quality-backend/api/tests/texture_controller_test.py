@@ -38,7 +38,7 @@ def test__get_data_texture__with_results():
         {
             'time_start': datetime(2024, 7, 24, 0, 0),
             'source': 'cams-production',
-            'forecast_base_time': datetime(2024, 7, 24, 1, 0).astimezone(UTC),
+            'forecast_base_time': datetime(2024, 7, 24, 0, 0).astimezone(UTC),
             'variable': 'no2',
             'time_end': datetime(2024, 7, 25, 21, 0),
             'chunk': '1 of 3',
@@ -49,7 +49,7 @@ def test__get_data_texture__with_results():
         },
         {
             'time_start': datetime(2024, 7, 24, 0, 0),
-            'forecast_base_time': datetime(2024, 7, 24, 1, 0).astimezone(UTC),
+            'forecast_base_time': datetime(2024, 7, 24, 0, 0).astimezone(UTC),
             'source': 'cams-production',
             'variable': 'o3',
             'time_end': datetime(2024, 7, 25, 21, 0),
