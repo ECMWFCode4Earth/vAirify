@@ -44,6 +44,8 @@ export const StationMap = (props: AverageComparisonChartProps) => {
       zoom,
     })
 
+    mapconfig.addControl(new maplibregl.FullscreenControl())
+
     props.locations.forEach((value) => {
       new Marker({ color: 'blue' })
         .setLngLat([value.longitude, value.latitude])
