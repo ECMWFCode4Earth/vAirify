@@ -44,7 +44,7 @@ import {
       await expect(banner.datePicker).toBeVisible()
 
       await banner.calendarIcon.click()
-      await expect(banner.day27).toBeDisabled()
+      await expect(banner.futureDay27).toBeDisabled()
       await expect(banner.datePickerNextMonthButton).toBeDisabled()
 
       await banner.datePickerYearOpenButton.click()
@@ -54,7 +54,7 @@ import {
       banner,
     }) => {
       await banner.calendarIcon.click()
-      await banner.day26.click()
+      await banner.clickOnDay(26)
 
       await expect(banner.datePickerTimeOptions).toHaveCount(1)
       await expect(banner.datePickerTimeOption1200).not.toBeVisible()

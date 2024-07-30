@@ -11,8 +11,9 @@ export class Banner extends BasePage {
   readonly datePickerTimeOptions: Locator
   readonly datePickerTimeOption0000: Locator
   readonly datePickerTimeOption1200: Locator
-  readonly datePickerYearButton: Locator
-  readonly day27: Locator
+  readonly datePickerYearOpenButton: Locator
+  readonly datePickerYearCloseButton: Locator
+  readonly futureDay27: Locator
   readonly logo: Locator
   readonly year2025: Locator
 
@@ -26,8 +27,10 @@ export class Banner extends BasePage {
     this.datePickerTimeOptions = page.locator('ul > [role="option"]')
     this.datePickerTimeOption0000 = page.getByRole('option', { name: '00:00' })
     this.datePickerTimeOption1200 = page.getByRole('option', { name: '12:00' })
-    this.datePickerYearButton = page.getByLabel('calendar view is open, switch')
-    this.day27 = page.locator(
+    this.datePickerYearOpenButton = page.getByLabel(
+      'calendar view is open, switch',
+    )
+    this.futureDay27 = page.locator(
       '//div[@aria-rowindex="4"] //button[@aria-colindex="6"]',
     )
     this.logo = page.getByAltText('vAirify')
@@ -42,7 +45,7 @@ export class Banner extends BasePage {
       row = 1
       column = day
     } else if (day >= 8 && day < 32) {
-      row = Math.floor(day / 7)
+      row = Math.floor(day / 7 + 1)
       if (day % 7 == 0) {
         column = 7
       } else {
