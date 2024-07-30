@@ -8,7 +8,6 @@ from shared.src.database.forecasts import DataTexture
 def database_to_api_result(measurement: DataTexture) -> TextureDto:
 
     relative_uri = measurement["texture_uri"].replace("/app/data_textures/", "")
-    # absolute_uri = f'{os.getenv("UI_URL")}/{relative_uri}'
 
     return {
         "base_time": measurement["forecast_base_time"].astimezone(UTC),

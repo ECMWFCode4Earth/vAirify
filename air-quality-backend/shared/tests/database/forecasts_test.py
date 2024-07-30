@@ -6,14 +6,23 @@ import pytest
 from bson.tz_util import utc
 from freezegun import freeze_time
 
-from shared.src.database.forecasts import get_forecast_data_from_database
+from shared.src.database.forecasts import (
+    get_forecast_data_from_database,
+    get_data_textures_from_database,
+)
 from shared.src.database.forecasts import insert_data, delete_data_before
 from shared.tests.util.mock_forecast_data import create_mock_forecast_document
+from shared.tests.util.mock_texture_data import create_mock_texture_document
 
 
 @pytest.fixture
 def mock_collection():
     yield mongomock.MongoClient(tz_aware=True).db.collection
+
+
+# @pytest.fixture
+# def mock_texture_collection():
+#     yield mongomock.MongoClient(tz_aware=True).db.collection
 
 
 @freeze_time("2024-05-24")
@@ -113,3 +122,98 @@ def test__get_forecast_from_database__with_location(mock_collection):
 
         assert len(result) == 1
         assert result[0]["name"] == "Abidjan"
+
+
+def test__get_data_textures_from_database__single_match(mock_collection):
+    with patch(
+        "shared.src.database.forecasts.get_collection",
+        return_value=mock_collection,
+    ):
+        mock_collection.insert_many(
+            [
+                create_mock_texture_document(
+                    {
+                        "forecast_base_time": datetime(
+                            2024, 5, 20, 12, 0, tzinfo=timezone.utc
+                        )
+                    }
+                ),
+                create_mock_texture_document(
+                    {
+                        "forecast_base_time": datetime(
+                            2024, 5, 27, 12, 0, tzinfo=timezone.utc
+                        )
+                    }
+                ),
+            ]
+        )
+        print(mock_collection.find({}))
+        result = get_data_textures_from_database(
+            datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
+        )
+
+        assert len(result) == 1
+
+
+def test__get_data_textures_from_database__multiple_match(mock_collection):
+    with patch(
+        "shared.src.database.forecasts.get_collection",
+        return_value=mock_collection,
+    ):
+        mock_collection.insert_many(
+            [
+                create_mock_texture_document(
+                    {
+                        "variable": "no2",
+                        "forecast_base_time": datetime(
+                            2024, 5, 27, 12, 0, tzinfo=timezone.utc
+                        ),
+                    }
+                ),
+                create_mock_texture_document(
+                    {
+                        "variable": "pm10",
+                        "forecast_base_time": datetime(
+                            2024, 5, 27, 12, 0, tzinfo=timezone.utc
+                        ),
+                    }
+                ),
+            ]
+        )
+        print(mock_collection.find({}))
+        result = get_data_textures_from_database(
+            datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
+        )
+
+        assert len(result) == 2
+
+
+def test__get_data_textures_from_database__no_match(mock_collection):
+    with patch(
+        "shared.src.database.forecasts.get_collection",
+        return_value=mock_collection,
+    ):
+        mock_collection.insert_many(
+            [
+                create_mock_texture_document(
+                    {
+                        "forecast_base_time": datetime(
+                            2024, 5, 20, 12, 0, tzinfo=timezone.utc
+                        )
+                    }
+                ),
+                create_mock_texture_document(
+                    {
+                        "forecast_base_time": datetime(
+                            2024, 5, 27, 12, 0, tzinfo=timezone.utc
+                        )
+                    }
+                ),
+            ]
+        )
+        print(mock_collection.find({}))
+        result = get_data_textures_from_database(
+            datetime(2024, 5, 17, 12, 0, tzinfo=timezone.utc),
+        )
+
+        assert len(result) == 0

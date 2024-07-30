@@ -18,7 +18,6 @@ async def get_data_texture(base_time: datetime) -> List[TextureDto]:
         log.info(f"Fetching forecast data texture URIs for base time {base_time}")
 
         db_results = get_data_textures_from_database(base_time)
-        print(db_results)
         log.info(f"Fetched {len(db_results)} results from the database")
 
         if not db_results:
