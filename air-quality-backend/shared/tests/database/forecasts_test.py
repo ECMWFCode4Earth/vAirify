@@ -20,11 +20,6 @@ def mock_collection():
     yield mongomock.MongoClient(tz_aware=True).db.collection
 
 
-# @pytest.fixture
-# def mock_texture_collection():
-#     yield mongomock.MongoClient(tz_aware=True).db.collection
-
-
 @freeze_time("2024-05-24")
 def test__insert_new_data(mock_collection):
     with patch(
