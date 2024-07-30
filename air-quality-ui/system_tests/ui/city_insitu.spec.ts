@@ -12,7 +12,7 @@ import {
 test.use({
   viewport: { width: 1920, height: 1080 },
 })
-test('Mock Test', async ({ page, cityPage }) => {
+test('PM2.5 creates AQI 3 at 00:00', async ({ page, cityPage }) => {
   const mockedForecastResponse = [
     createForecastAPIResponseData({
       base_time: '2024-07-01T00:00:00Z',
@@ -134,12 +134,12 @@ test('Mock Test', async ({ page, cityPage }) => {
       mockedAPIResponse: mockedMeasurementsCityPageResponse,
     },
   ])
+  // const screenshotPath = path.join(__dirname,'air-quality-ui\system_tests\ui\epicsnapshots')
+
   await gotoPage(page, '/city/Rio%20de%20Janeiro')
   await cityPage.waitForAllGraphsToBeVisible()
-
-  await expect(cityPage.textFinder('Tijuca')).toBeVisible()
-  await expect(cityPage.textFinder('Centro')).toBeVisible()
-  await expect(cityPage.textFinder('Copacabana')).toBeVisible()
-  await cityPage.siteRemover('Centro')
-  await expect(cityPage.textFinder('Centro')).not.toBeVisible()
+  await waitForIdleNetwork(page, cityPage.aqiChart)
+  await cityPage.setBaseTime('01/07/2024 00:00')
+  const chartShot = await cityPage.captureChartScreenshot(cityPage.aqiChart)
+  await expect(chartShot).toMatchSnapshot('Midnight-AQI-3.png')
 })
