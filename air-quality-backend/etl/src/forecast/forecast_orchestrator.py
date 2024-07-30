@@ -7,7 +7,7 @@ from shared.src.database.forecasts import insert_data, insert_textures
 from shared.src.database.locations import AirQualityLocation
 
 
-def retrieve_forecast(cities: list[AirQualityLocation], base_date: datetime):
+def process_forecast(cities: list[AirQualityLocation], base_date: datetime):
     base_date_str = base_date.strftime("%Y-%m-%d %H:%M:%S")
 
     logging.info(f"Extracting pollutant forecast data for base date {base_date_str}")
