@@ -231,6 +231,74 @@ describe('sortMeasurements function', () => {
     )
     expect(result).toStrictEqual(expected)
   })
+  it(`Includes measurements on lower bound but not upper`, () => {
+    const utc_tz = { zone: 'utc' }
+    const measurementsData: MeasurementsResponseDto[] = [
+      {
+        measurement_date: '2024-07-10T04:29:00Z',
+        location_type: 'city',
+        location_name: 'São Paulo',
+        api_source: 'OpenAQ',
+        pm2_5: 2.9,
+        entity: 'Governmental Organization',
+        sensor_type: 'reference grade',
+        site_name: 'Sao Paulo',
+      },
+      {
+        measurement_date: '2024-07-10T04:30:00Z',
+        location_type: 'city',
+        location_name: 'São Paulo',
+        api_source: 'OpenAQ',
+        pm2_5: 3.0,
+        entity: 'Governmental Organization',
+        sensor_type: 'reference grade',
+        site_name: 'Sao Paulo',
+      },
+    ]
+    const expected = {
+      4: {
+        measurements: [
+          {
+            api_source: 'OpenAQ',
+            entity: 'Governmental Organization',
+            location_name: 'São Paulo',
+            location_type: 'city',
+            measurement_date: '2024-07-10T04:29:00Z',
+            pm2_5: 2.9,
+            sensor_type: 'reference grade',
+            site_name: 'Sao Paulo',
+          },
+        ],
+        time_str: '2024-07-10T04:00:00.000Z',
+        time: DateTime.fromISO('2024-07-10T04:00:00.000Z', utc_tz),
+        lowerBound: DateTime.fromISO('2024-07-10T03:30:00.000Z', utc_tz),
+        upperBound: DateTime.fromISO('2024-07-10T04:30:00.000Z', utc_tz),
+      },
+      5: {
+        measurements: [
+          {
+            api_source: 'OpenAQ',
+            entity: 'Governmental Organization',
+            location_name: 'São Paulo',
+            location_type: 'city',
+            measurement_date: '2024-07-10T04:30:00Z',
+            pm2_5: 3.0,
+            sensor_type: 'reference grade',
+            site_name: 'Sao Paulo',
+          },
+        ],
+        time_str: '2024-07-10T05:00:00.000Z',
+        time: DateTime.fromISO('2024-07-10T05:00:00.000Z', utc_tz),
+        lowerBound: DateTime.fromISO('2024-07-10T04:30:00.000Z', utc_tz),
+        upperBound: DateTime.fromISO('2024-07-10T05:30:00.000Z', utc_tz),
+      },
+    }
+    const result = sortMeasurements(
+      measurementsData,
+      DateTime.fromISO('2024-07-10T00:00:00Z', utc_tz),
+    )
+    expect(result).toStrictEqual(expected)
+  })
 })
 describe('averageAqiValues function', () => {
   it(`Average all values within time buckets`, () => {

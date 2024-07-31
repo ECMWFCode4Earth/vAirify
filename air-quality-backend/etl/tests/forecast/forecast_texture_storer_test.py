@@ -158,7 +158,9 @@ def test__save_data_textures(
 
     assert len(documents) == 3
     for i, doc in enumerate(documents):
-        assert doc["forecast_base_time"] == forecast_date
+        expected_date = datetime.strptime(forecast_date, '%Y-%m-%d_%H')
+        actual_date = doc["forecast_base_time"]
+        assert actual_date == expected_date
         assert doc["variable"] == variable_name
         assert doc["source"] == "cams-production"
         assert doc["min_value"] == min_value
@@ -168,8 +170,12 @@ def test__save_data_textures(
             doc["texture_uri"]
             == f"/mock/output/directory/{forecast_date}_{variable_name}_chunk{i+1}.webp"
         )
+        time_start_datetime = datetime.fromisoformat(
+            mock_chunk_data_array.return_value[1][i]["time_start"])
         assert (
-            doc["time_start"] == mock_chunk_data_array.return_value[1][i]["time_start"]
+            doc["time_start"] == time_start_datetime
         )
-        assert doc["time_end"] == mock_chunk_data_array.return_value[1][i]["time_end"]
+        time_end_datetime = datetime.fromisoformat(
+            mock_chunk_data_array.return_value[1][i]["time_end"])
+        assert doc["time_end"] == time_end_datetime
         assert doc["chunk"] == f"{i+1} of 3"

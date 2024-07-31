@@ -10,14 +10,6 @@ export class BasePage {
 
     this.baseAPIURL = 'http://localhost:8000/air-pollutant'
   }
-  async getTitle() {
-    const title = await this.page.title()
-    return title
-  }
-
-  async clickButton(buttonName: string) {
-    await this.page.getByRole('link', { name: buttonName }).click()
-  }
 
   async captureNetworkRequestsAsArray(
     page: Page,
@@ -35,5 +27,14 @@ export class BasePage {
       }
     })
     return requestArray
+  }
+
+  async clickLinkByText(buttonName: string): Promise<void> {
+    await this.page.getByRole('link', { name: buttonName }).click()
+  }
+
+  async getTitle(): Promise<string> {
+    const title = await this.page.title()
+    return title
   }
 }

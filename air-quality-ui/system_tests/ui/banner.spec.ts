@@ -4,27 +4,88 @@ import {
   createForecastAPIResponseData,
   createMeasurementSummaryAPIResponseData,
 } from '../utils/mocked_api'
-
-test.describe('City page', () => {
-  test('vAirify logo is visible on city page', async ({ page, banner }) => {
-    await gotoPage(page, '/city/Rio%20de%20Janeiro')
+;[
+  {
+    url: '/city/Rio%20de%20Janeiro',
+    pageType: 'city',
+  },
+  {
+    url: '/city/summary',
+    pageType: 'summary',
+  },
+].forEach(({ url, pageType }) => {
+  test(`vAirify logo is visible on ${pageType} page`, async ({
+    page,
+    banner,
+  }) => {
+    await gotoPage(page, url)
     await expect(banner.logo).toBeVisible()
-  })
+  }),
+    test(`Verify times can only be 12:00 or 00:00 on ${pageType} page`, async ({
+      page,
+      banner,
+    }) => {
+      await gotoPage(page, url)
+      await banner.calendarIcon.click()
+
+      await expect(banner.datePickerTimeOptions).toHaveCount(2)
+      await expect(banner.datePickerTimeOption0000).toBeVisible()
+      await expect(banner.datePickerTimeOption1200).toBeVisible()
+    }),
+    test.beforeEach(async ({ page }) => {
+      const mockSystemDate: Date = new Date('2024-07-26T10:00:00Z')
+      await page.clock.setFixedTime(mockSystemDate)
+
+      await gotoPage(page, url)
+    }),
+    test(`Date picker is visible and cannot select a future day ${pageType} page`, async ({
+      banner,
+    }) => {
+      await expect(banner.datePicker).toBeVisible()
+
+      await banner.calendarIcon.click()
+      await expect(banner.futureDay27).toBeDisabled()
+      await expect(banner.datePickerNextMonthButton).toBeDisabled()
+
+      await banner.datePickerYearOpenButton.click()
+      await expect(banner.year2025).toBeDisabled()
+    }),
+    test(`Date picker is visible and cannot select a future time on ${pageType} page`, async ({
+      banner,
+    }) => {
+      await banner.calendarIcon.click()
+      await banner.clickOnDay(26)
+
+      await expect(banner.datePickerTimeOptions).toHaveCount(1)
+      await expect(banner.datePickerTimeOption1200).not.toBeVisible()
+    })
 })
 
-test.describe('Summary page', () => {
+test.describe('Range label', () => {
   test.beforeEach(async ({ page }) => {
+    const mockSystemDate: Date = new Date('2024-07-26T10:00:00Z')
+    await page.clock.setFixedTime(mockSystemDate)
+
     await gotoPage(page, '/city/summary')
   })
-  test('vAirify logo is visible on summary page', async ({ banner }) => {
-    await expect(banner.logo).toBeVisible()
-  })
 
-  test('Verify page title is vAirify on summary page', async ({
+  test('On load, label accurately displays forecast range on summary page', async ({
     summaryPage,
   }) => {
-    const title = await summaryPage.getTitle()
-    expect(title).toBe('vAirify')
+    await expect(summaryPage.timeRange).toContainText(
+      'Time Range: 25 Jul 00:00 - 26 Jul 09:00 UTC',
+    )
+  })
+
+  test('On changing to historic forecast base time (T-6), label accurately displays forecast range on summary page', async ({
+    summaryPage,
+    banner,
+  }) => {
+    await banner.setBaseTime('20/07/2024 00:00')
+
+    await expect(summaryPage.timeRange).toContainText(
+      'Time Range: 20 Jul 00:00 - 25 Jul 00:00 UTC',
+    )
   })
 })
 
@@ -85,15 +146,15 @@ test('Verify breadcrumb text is correct on each page', async ({
     },
   ])
   await gotoPage(page, '/city/summary')
-  await summaryPage.clickButton('Kampala')
+  await summaryPage.clickLinkByText('Kampala')
   await expect(cityPage.toolbarTextFinder('Cities/Kampala')).toBeVisible()
-  await summaryPage.clickButton('Cities')
+  await summaryPage.clickLinkByText('Cities')
 
-  await summaryPage.clickButton('Abu Dhabi')
+  await summaryPage.clickLinkByText('Abu Dhabi')
   await expect(cityPage.toolbarTextFinder('Cities/Abu Dhabi')).toBeVisible()
-  await summaryPage.clickButton('Cities')
+  await summaryPage.clickLinkByText('Cities')
 
-  await summaryPage.clickButton('Zurich')
+  await summaryPage.clickLinkByText('Zurich')
   await expect(cityPage.toolbarTextFinder('Cities/Zurich')).toBeVisible()
-  await summaryPage.clickButton('Cities')
+  await summaryPage.clickLinkByText('Cities')
 })

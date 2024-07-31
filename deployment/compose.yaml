@@ -46,8 +46,6 @@ services:
     environment:
       - MONGO_DB_URI=mongodb://mongo:27017
       - MONGO_DB_NAME=${MONGO_DB_NAME}
-    volumes:
-      - data_textures:/app/data_textures
 
   ui:
     container_name: frontend-ui
@@ -56,6 +54,9 @@ services:
       - api
     ports:
       - 8001:80
+    volumes:
+      - data_textures:/app/data_textures
+
 
 volumes:
   database: {}

@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from logging import config
-from . import forecast_controller, measurements_controller
+from . import forecast_controller, measurements_controller, texture_controller
 
 origins = [
     "http://localhost:5173",
@@ -22,3 +22,4 @@ app.add_middleware(
 )
 app.include_router(forecast_controller.router)
 app.include_router(measurements_controller.router)
+app.include_router(texture_controller.router)

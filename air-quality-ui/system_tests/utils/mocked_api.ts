@@ -1,4 +1,4 @@
-import { CaseAQI3, defaultCitySnapshotValues } from './default_aqi_enums'
+import { CaseAQI3, defaultCitySnapshotValues } from './test_enums'
 
 interface forecastAPIResponse {
   base_time: string

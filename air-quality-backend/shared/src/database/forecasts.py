@@ -32,6 +32,22 @@ class Forecast(TypedDict):
     so2: PollutantData
 
 
+class DataTexture(TypedDict):
+    _id: ObjectId
+    forecast_base_time: datetime
+    source: str
+    time_start: datetime
+    variable: str
+    time_end: datetime
+    chunk: str
+    last_modified_time: datetime
+    max_value: float
+    min_value: float
+    texture_uri: str
+    units: str
+    created_time: datetime
+
+
 def insert_data(data):
     upsert_data(
         "forecast_data",
@@ -79,4 +95,15 @@ def get_forecast_data_from_database(
     }
     if location_name is not None:
         query["name"] = location_name
+    return list(collection.find(query))
+
+
+def get_data_textures_from_database(
+    forecast_base_time: datetime,
+) -> List[DataTexture]:
+    collection = get_collection("data_textures")
+    query = {
+        "forecast_base_time": forecast_base_time,
+    }
+
     return list(collection.find(query))
