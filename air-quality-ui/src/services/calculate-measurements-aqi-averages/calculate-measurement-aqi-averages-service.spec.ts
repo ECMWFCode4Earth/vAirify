@@ -301,6 +301,10 @@ describe('sortMeasurements function', () => {
             entity: 'Governmental Organization',
             location_name: 'São Paulo',
             location_type: 'city',
+            location: {
+              latitude: 10,
+              longitude: 20,
+            },
             measurement_date: '2024-07-10T04:29:00Z',
             pm2_5: 2.9,
             sensor_type: 'reference grade',
@@ -319,6 +323,10 @@ describe('sortMeasurements function', () => {
             entity: 'Governmental Organization',
             location_name: 'São Paulo',
             location_type: 'city',
+            location: {
+              latitude: 10,
+              longitude: 20,
+            },
             measurement_date: '2024-07-10T04:30:00Z',
             pm2_5: 3.0,
             sensor_type: 'reference grade',
