@@ -18,6 +18,7 @@ import { createForecastAPIResponseData } from '../../utils/mocked_api'
       test(`vAirify logo is correct on ${pageType} page`, async ({
         banner,
       }) => {
+        await banner.logo.scrollIntoViewIfNeeded()
         const logoShot = await banner.logo.screenshot()
         expect(logoShot).toMatchSnapshot('vAirify-logo.png')
       }),
