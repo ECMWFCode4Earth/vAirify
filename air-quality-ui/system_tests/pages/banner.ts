@@ -6,6 +6,7 @@ export class Banner extends BasePage {
   readonly page: Page
 
   readonly calendarIcon: Locator
+  readonly dateOkButton: Locator
   readonly datePicker: Locator
   readonly datePickerNextMonthButton: Locator
   readonly datePickerTimeOptions: Locator
@@ -22,6 +23,7 @@ export class Banner extends BasePage {
     this.page = page
 
     this.calendarIcon = page.getByTestId('CalendarIcon')
+    this.dateOkButton = page.getByRole('button', { name: 'Ok' })
     this.datePicker = page.getByRole('textbox', { name: 'Forecast Base Date' })
     this.datePickerNextMonthButton = page.getByLabel('Next month')
     this.datePickerTimeOptions = page.locator('ul > [role="option"]')
@@ -35,6 +37,10 @@ export class Banner extends BasePage {
     )
     this.logo = page.getByAltText('vAirify')
     this.year2025 = page.locator('//div //button').filter({ hasText: /^2025$/ })
+  }
+
+  async confirmDate() {
+    await this.dateOkButton.click()
   }
 
   async clickOnDay(day: number): Promise<void> {
