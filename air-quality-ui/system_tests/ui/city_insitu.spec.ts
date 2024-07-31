@@ -39,7 +39,7 @@ test.describe('AQI is 3 at 00:00', () => {
     const mockedMeasurementsCityPageResponse = [
       //Extreme boundary values
       createMeasurementsCityPageResponseData({
-        measurement_date: '2024-06-30T23:29:00Z',
+        measurement_date: '2024-06-30T23:29:59Z',
         pm2_5: 800,
         pm10: 1200,
         so2: 1250,
