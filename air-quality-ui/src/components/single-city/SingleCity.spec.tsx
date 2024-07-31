@@ -96,6 +96,16 @@ describe('SingleCityComponent', () => {
         expect(screen.getByText('mocked map')).toBeInTheDocument()
       })
     })
+    it('does not show the map if no forecast data', async () => {
+      ;(useQueries as jest.Mock).mockReturnValue([
+        { data: [], isPending: false, isError: false },
+        { data: [], isPending: false, isError: false },
+      ]),
+        render(<SingleCity />)
+      await waitFor(() => {
+        expect(screen.queryByText('mocked map')).not.toBeInTheDocument()
+      })
+    })
     it('displays pollutant charts when all have values', async () => {
       ;(useQueries as jest.Mock).mockReturnValue([
         { data: [], isPending: false, isError: false },
