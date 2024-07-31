@@ -1,18 +1,24 @@
-import { type Page } from '@playwright/test'
+import { Locator, type Page } from '@playwright/test'
 
 export class BasePage {
   readonly page: Page
 
   readonly baseAPIURL: string
+  readonly dateOkButton: Locator
 
   constructor(page: Page) {
     this.page = page
 
     this.baseAPIURL = 'http://localhost:8000/air-pollutant'
+    this.dateOkButton = page.getByRole('button', { name: 'Ok' })
   }
   async getTitle() {
     const title = await this.page.title()
     return title
+  }
+
+  async confirmDate() {
+    await this.dateOkButton.click()
   }
 
   async clickButton(buttonName: string) {

@@ -90,7 +90,10 @@ test.describe('City page resolution tests', () => {
         'pm10Chart',
         'so2Chart',
       ]
-      page.setViewportSize({ width: resolutionWidth, height: resolutionHeight })
+      page.setViewportSize({
+        width: resolutionWidth,
+        height: resolutionHeight,
+      })
       await gotoPage(page, 'city/Rio%20de%20Janeiro')
       await cityPage.waitForAllGraphsToBeVisible()
       for (let i = 0; i < charts.length; i++) {
@@ -104,7 +107,7 @@ test.use({
   viewport: { width: 1920, height: 1080 },
 })
 test.describe('City graph snapshots', () => {
-  test.beforeEach(async ({ cityPage, page }) => {
+  test.beforeEach(async ({ cityPage, page, basePage }) => {
     const mockedForecastResponse = [
       createForecastAPIResponseData({
         base_time: '2024-07-01T00:00:00Z',
@@ -321,6 +324,7 @@ test.describe('City graph snapshots', () => {
     await gotoPage(page, '/city/Rio%20de%20Janeiro')
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
+    await basePage.confirmDate()
   })
 
   test('AQI snapshot', async ({ cityPage }) => {
@@ -394,7 +398,7 @@ test.use({
   viewport: { width: 1920, height: 1080 },
 })
 test.describe('Charts are fully visible in 1920x1080 viewport', () => {
-  test.beforeEach(async ({ page, cityPage }) => {
+  test.beforeEach(async ({ page, cityPage, basePage }) => {
     const mockedForecastResponse = [
       createForecastAPIResponseData({
         base_time: '2024-07-01T00:00:00Z',
@@ -425,6 +429,7 @@ test.describe('Charts are fully visible in 1920x1080 viewport', () => {
 
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
+    await basePage.confirmDate()
   })
   test('AQI chart element is visible in fullscreen view', async ({
     cityPage,
