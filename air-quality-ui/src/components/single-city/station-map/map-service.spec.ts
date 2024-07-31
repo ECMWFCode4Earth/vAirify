@@ -1,4 +1,9 @@
-import { MapOptions, RasterSourceSpecification, StyleSpecification } from 'maplibre-gl'
+import {
+  MapOptions,
+  RasterSourceSpecification,
+  StyleSpecification,
+} from 'maplibre-gl'
+
 import { createMapConfig } from './map-service'
 
 describe('map config', () => {
