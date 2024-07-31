@@ -1,4 +1,4 @@
-import maplibregl, { Marker } from 'maplibre-gl'
+import maplibregl, { FullscreenControl, Marker } from 'maplibre-gl'
 import { useEffect, useRef } from 'react'
 
 import { createMapConfig } from './map-service'
@@ -28,7 +28,7 @@ export const StationMap = (props: AverageComparisonChartProps) => {
       ),
     )
 
-    mapconfig.addControl(new maplibregl.FullscreenControl())
+    mapconfig.addControl(new FullscreenControl())
 
     props.locations.forEach((value) => {
       new Marker({ color: 'blue' })
@@ -39,5 +39,5 @@ export const StationMap = (props: AverageComparisonChartProps) => {
     map.current = mapconfig
   }, [city_longitude, city_latitude, zoom, props.locations])
 
-  return <div ref={mapContainer} className={classes['map']} />
+  return <div ref={mapContainer} data-testid="map" className={classes['map']} />
 }
