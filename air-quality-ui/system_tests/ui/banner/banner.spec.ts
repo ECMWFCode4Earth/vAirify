@@ -58,17 +58,11 @@ import { createForecastAPIResponseData } from '../../utils/mocked_api'
         banner,
       }) => {
         await expect(banner.futureDay27).toBeDisabled()
-
-        await banner.datePickerYearOpenButton.click()
-        await expect(banner.year2025).toBeDisabled()
       }),
       test(`Date picker cannot select a future month on ${pageType} page`, async ({
         banner,
       }) => {
         await expect(banner.datePickerNextMonthButton).toBeDisabled()
-
-        await banner.datePickerYearOpenButton.click()
-        await expect(banner.year2025).toBeDisabled()
       }),
       test(`Date picker cannot select a future year on ${pageType} page`, async ({
         banner,
