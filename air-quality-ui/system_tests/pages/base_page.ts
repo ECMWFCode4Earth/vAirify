@@ -42,4 +42,13 @@ export class BasePage {
     })
     return requestArray
   }
+
+  async clickLinkByText(buttonName: string): Promise<void> {
+    await this.page.getByRole('link', { name: buttonName }).click()
+  }
+
+  async getTitle(): Promise<string> {
+    const title = await this.page.title()
+    return title
+  }
 }
