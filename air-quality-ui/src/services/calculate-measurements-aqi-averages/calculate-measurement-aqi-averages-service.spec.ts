@@ -268,6 +268,10 @@ describe('sortMeasurements function', () => {
         measurement_date: '2024-07-10T04:29:00Z',
         location_type: 'city',
         location_name: 'São Paulo',
+        location: {
+          latitude: 10,
+          longitude: 20,
+        },
         api_source: 'OpenAQ',
         pm2_5: 2.9,
         entity: 'Governmental Organization',
@@ -278,6 +282,10 @@ describe('sortMeasurements function', () => {
         measurement_date: '2024-07-10T04:30:00Z',
         location_type: 'city',
         location_name: 'São Paulo',
+        location: {
+          latitude: 10,
+          longitude: 20,
+        },
         api_source: 'OpenAQ',
         pm2_5: 3.0,
         entity: 'Governmental Organization',
