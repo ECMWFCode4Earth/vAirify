@@ -1,6 +1,6 @@
-import { expect, test } from '../utils/fixtures'
-import { gotoPage, setupPageWithMockData } from '../utils/helper_methods'
-import { createForecastAPIResponseData } from '../utils/mocked_api'
+import { expect, test } from '../../utils/fixtures'
+import { gotoPage, setupPageWithMockData } from '../../utils/helper_methods'
+import { createForecastAPIResponseData } from '../../utils/mocked_api'
 ;[
   {
     url: '/city/Rio%20de%20Janeiro',
@@ -15,10 +15,11 @@ import { createForecastAPIResponseData } from '../utils/mocked_api'
     test.beforeEach(async ({ page }) => {
       await gotoPage(page, url)
     }),
-      test(`vAirify logo is visible on ${pageType} page`, async ({
+      test(`vAirify logo is correct on ${pageType} page`, async ({
         banner,
       }) => {
-        await expect(banner.logo).toBeVisible()
+        const logoShot = await banner.logo.screenshot()
+        expect(logoShot).toMatchSnapshot('vAirify-logo.png')
       }),
       test(`Date picker is visible on ${pageType} page`, async ({ banner }) => {
         await expect(banner.datePicker).toBeVisible()
