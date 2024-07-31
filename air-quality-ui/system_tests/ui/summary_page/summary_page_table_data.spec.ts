@@ -921,3 +921,114 @@ test.describe('Multiple pollutants share the max diff, and have the SAME overall
     await summaryPage.assertGridAttributes('values', expectedTableContents)
   })
 })
+
+test('Verify changing date in date picker triggers change of data displayed', async ({
+  summaryPage,
+  page,
+  banner,
+}) => {
+  // on page load data
+  const originalForecastArray: object[] = [
+    createForecastAPIResponseData({
+      base_time: '2024-07-08T00:00:00Z',
+      valid_time: '2024-07-08T09:00:00Z',
+      location_name: 'Los Angeles',
+      overall_aqi_level: CaseAQI3.aqiLevel,
+      no2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.no2 },
+      o3: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 },
+      pm2_5: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
+      pm10: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm10 },
+      so2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 },
+    }),
+  ]
+
+  const originalMeasurementsArray: object[] = [
+    createMeasurementSummaryAPIResponseData({
+      measurement_base_time: '2024-07-08T09:00:00Z',
+      overall_aqi_level: { mean: CaseAQI6.aqiLevel },
+      no2: { mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.no2 } },
+      o3: { mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.o3 } },
+      pm2_5: { mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm2_5 } },
+      pm10: { mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm10 } },
+      so2: { mean: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 } },
+    }),
+  ]
+
+  const expectedInitialTableContents: string[][] = [
+    [
+      // AQI Level
+      CaseAQI3.aqiLevel.toString(), // Forecast
+      CaseAQI6.aqiLevel.toString(), // Measured
+      '-3', // Diff
+    ],
+  ]
+
+  // change forecast base time data
+  const newForecastArray: object[] = [
+    createForecastAPIResponseData({
+      base_time: '2024-06-25T00:00:00Z',
+      valid_time: '2024-06-25T09:00:00Z',
+      location_name: 'Los Angeles',
+      overall_aqi_level: CaseAQI6.aqiLevel,
+      no2: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.no2 },
+      o3: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.o3 },
+      pm2_5: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm2_5 },
+      pm10: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.pm10 },
+      so2: { aqi_level: CaseAQI6.aqiLevel, value: CaseAQI6.so2 },
+    }),
+  ]
+
+  const newMeasurementsArray: object[] = [
+    createMeasurementSummaryAPIResponseData({
+      measurement_base_time: '2024-06-25T09:00:00Z',
+      overall_aqi_level: { mean: CaseAQI1.aqiLevel },
+      no2: { mean: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.no2 } },
+      o3: { mean: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.o3 } },
+      pm2_5: { mean: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.pm2_5 } },
+      pm10: { mean: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.pm10 } },
+      so2: { mean: { aqi_level: CaseAQI1.aqiLevel, value: CaseAQI1.so2 } },
+    }),
+  ]
+
+  const newExpectedTableContents: string[][] = [
+    [
+      // AQI Level
+      CaseAQI6.aqiLevel.toString(), // Forecast
+      CaseAQI1.aqiLevel.toString(), // Measured
+      '+5', // Diff
+    ],
+  ]
+
+  // set up on load data
+  await setupPageWithMockData(page, [
+    {
+      endpointUrl: '*/**/air-pollutant/forecast*',
+      mockedAPIResponse: originalForecastArray,
+    },
+    {
+      endpointUrl: '*/**/air-pollutant/measurements/summary*',
+      mockedAPIResponse: originalMeasurementsArray,
+    },
+  ])
+
+  await gotoPage(page, '/city/summary')
+  await summaryPage.waitForLoad()
+  await summaryPage.assertGridAttributes('values', expectedInitialTableContents)
+
+  // Select forecast base date UTC 2024-06-25T00:00:00
+
+  await setupPageWithMockData(page, [
+    {
+      endpointUrl: '*/**/air-pollutant/forecast*',
+      mockedAPIResponse: newForecastArray,
+    },
+    {
+      endpointUrl: '*/**/air-pollutant/measurements/summary*',
+      mockedAPIResponse: newMeasurementsArray,
+    },
+  ])
+
+  await banner.setBaseTime('25/06/2024 00:00')
+  await summaryPage.waitForLoad()
+  await summaryPage.assertGridAttributes('values', newExpectedTableContents)
+})
