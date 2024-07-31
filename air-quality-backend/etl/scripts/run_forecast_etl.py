@@ -14,9 +14,10 @@ def main():
     load_dotenv()
 
     cities = get_locations_by_type(AirQualityLocationType.CITY)
-    logging.info(f"Finding data for {cities.__len__()} cities")
+    logging.info(f"Finding data for {len(cities)} cities")
 
     base_dates = retrieve_dates_requiring_forecast()
+    logging.info(f"Finding data for {len(base_dates)} dates")
 
     for base_date in base_dates:
         process_forecast(cities, base_date)
