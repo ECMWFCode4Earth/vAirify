@@ -74,7 +74,6 @@ export class Banner extends BasePage {
 
   async setBaseTime(baseTime: string): Promise<void> {
     await this.datePicker.fill(baseTime)
-    this.dateOkButton = page.getByRole('button', { name: 'Ok' })
   }
 
   async confirmDate() {
