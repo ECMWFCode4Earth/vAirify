@@ -1,4 +1,4 @@
-import maplibregl, { FullscreenControl, Marker } from 'maplibre-gl'
+import maplibregl, { FullscreenControl, Marker, Popup } from 'maplibre-gl'
 import { useEffect, useRef } from 'react'
 
 import { createMapConfig } from './map-service'
@@ -30,9 +30,10 @@ export const StationMap = (props: AverageComparisonChartProps) => {
 
     mapconfig.addControl(new FullscreenControl())
 
-    props.locations.forEach((value) => {
-      new Marker({ color: 'blue' })
+    props.locations.forEach((value, name) => {
+      new Marker()
         .setLngLat([value.longitude, value.latitude])
+        .setPopup(new Popup().setText(name))
         .addTo(mapconfig)
     })
 
