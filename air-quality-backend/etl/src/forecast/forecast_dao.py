@@ -4,6 +4,7 @@ import logging
 import os
 import xarray as xr
 from .forecast_data import ForecastData
+from .forecast_date_retriever import align_to_cams_publish_time
 
 CAMS_FORECAST_INTERVAL_HOURS = 3
 CAMS_UPDATE_INTERVAL_HOURS = 12
@@ -73,38 +74,6 @@ def fetch_cams_data(request_body, file_name) -> xr.Dataset:
         )
     return xr.open_dataset(
         file_name, decode_times=False, engine="cfgrib", backend_kwargs={"indexpath": ""}
-    )
-
-
-def align_to_cams_publish_time(forecast_base_time: datetime) -> datetime:
-    now = datetime.utcnow()
-    if forecast_base_time > now:
-        raise ValueError("forecast base data cannot be in the future")
-
-    request_for_today = forecast_base_time.date() == now.date()
-
-    current_hour = int(now.strftime("%H"))
-    requested_hour = int(forecast_base_time.strftime("%H"))
-
-    if request_for_today:
-        if 0 <= current_hour < 10:
-            # If asking before 10am, only yesterdays is available
-            forecast_base_time -= timedelta(days=1)
-            hour = 12
-        elif requested_hour >= 12 and current_hour >= 22:
-            # If requesting post midday data, it must be past 10pm
-            hour = 12
-        else:
-            # Either the request was for morning data, or that's all that is available
-            hour = 0
-    else:
-        if requested_hour < 12:
-            hour = 0
-        else:
-            hour = 12
-
-    return datetime(
-        forecast_base_time.year, forecast_base_time.month, forecast_base_time.day, hour
     )
 
 
