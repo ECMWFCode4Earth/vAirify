@@ -108,7 +108,7 @@ jobs:
         working-directory: ./air-quality-backend/api
 
       - name: Run unit tests
-        run: python -m pytest --cov=api --cov-report= api/tests
+        run: python -m pytest --cov=api/src --cov-report= api/tests
         working-directory: ./air-quality-backend/
 
       - name: Convert to report 
@@ -153,7 +153,7 @@ jobs:
         working-directory: ./air-quality-backend/shared
 
       - name: Run unit tests
-        run: python -m pytest --cov=shared --cov-report= shared/tests
+        run: python -m pytest --cov=shared/src --cov-report= shared/tests
         working-directory: ./air-quality-backend/
 
       - name: Convert to report 

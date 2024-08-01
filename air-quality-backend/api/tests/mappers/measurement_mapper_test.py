@@ -30,6 +30,7 @@ def test__map_measurements():
             "measurement_date": datetime(2024, 6, 4, 0, 0, tzinfo=timezone.utc),
             "location_type": "city",
             "location_name": "City Name",
+            "location": {"longitude": 0, "latitude": 10},
             "no2": 0.0,
             "o3": 0.0,
             "pm10": 0.0,

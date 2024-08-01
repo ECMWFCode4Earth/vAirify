@@ -108,4 +108,11 @@ describe('Aqi Calculator', () => {
       expect(result).toBe(expected)
     },
   )
+  it.each(['o3', 'no2', 'so2', 'pm10', 'pm2_5'])(
+    'is undefined',
+    (pollutant: string) => {
+      const result = getPollutantIndexLevel(undefined, pollutant)
+      expect(result).toBe(0)
+    },
+  )
 })
