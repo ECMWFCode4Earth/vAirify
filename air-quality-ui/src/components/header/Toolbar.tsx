@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import { Breadcrumbs } from './Breadcrumbs'
 import { ForecastBaseDatePicker } from './ForecastBaseDatePicker'
@@ -11,22 +11,8 @@ export const Toolbar = () => {
   const { forecastBaseDate, setForecastBaseDate } = useForecastContext()
   const [selectedForecastBaseDate, setSelectedForecastBaseDate] =
     React.useState<DateTime<boolean>>(forecastBaseDate)
-  const [invalidDateTime, setInvalidDateTime] = React.useState<boolean>(false)
-
-  const isTimeInvalid = (value: DateTime) => {
-    return value.minute != 0 || value.hour % 12 != 0
-  }
-
-  useEffect(() => {
-    if (
-      (selectedForecastBaseDate && selectedForecastBaseDate > DateTime.now()) ||
-      isTimeInvalid(selectedForecastBaseDate)
-    ) {
-      setInvalidDateTime(true)
-    } else {
-      setInvalidDateTime(false)
-    }
-  }, [selectedForecastBaseDate])
+  const [isInvalidDateTime, setIsInvalidDateTime] =
+    React.useState<boolean>(false)
 
   return (
     <section
@@ -40,8 +26,8 @@ export const Toolbar = () => {
       <div className={classes['forecast-base-date-picker-div']}>
         <ForecastBaseDatePicker
           setSelectedForecastBaseDate={setSelectedForecastBaseDate}
+          setIsInvalidDateTime={setIsInvalidDateTime}
           forecastBaseDate={forecastBaseDate}
-          isTimeInvalid={isTimeInvalid}
         />
       </div>
       <div className={classes['forecast-base-date-picker-button-div']}>
@@ -52,7 +38,7 @@ export const Toolbar = () => {
             }
           }}
           text={'Ok'}
-          isButtonDisabled={invalidDateTime}
+          isButtonDisabled={isInvalidDateTime}
         />
       </div>
     </section>

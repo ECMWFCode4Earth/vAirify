@@ -6,7 +6,7 @@ import { DateTime } from 'luxon'
 
 interface Props {
   setSelectedForecastBaseDate: (valueToSet: DateTime<boolean>) => void
-  isTimeInvalid: (value: DateTime) => boolean
+  setIsInvalidDateTime: (value: boolean) => void
   forecastBaseDate: DateTime<boolean>
 }
 export const ForecastBaseDatePicker = (props: Props): JSX.Element => {
@@ -15,6 +15,10 @@ export const ForecastBaseDatePicker = (props: Props): JSX.Element => {
       mode: 'dark',
     },
   })
+
+  const isTimeInvalid = (value: DateTime) => {
+    return value > DateTime.utc() || value.minute != 0 || value.hour % 12 != 0
+  }
 
   return (
     <LocalizationProvider dateAdapter={AdapterLuxon} adapterLocale="en-gb">
@@ -26,9 +30,10 @@ export const ForecastBaseDatePicker = (props: Props): JSX.Element => {
           skipDisabled={true}
           timeSteps={{ minutes: 720 }}
           value={props.forecastBaseDate}
-          shouldDisableTime={props.isTimeInvalid}
+          shouldDisableTime={isTimeInvalid}
           onChange={(newValue) => {
             if (newValue) {
+              props.setIsInvalidDateTime(isTimeInvalid(newValue))
               props.setSelectedForecastBaseDate(newValue)
             }
           }}

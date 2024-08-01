@@ -4,6 +4,7 @@ import { DateTime, Settings } from 'luxon'
 import React from 'react'
 
 import { Toolbar } from './Toolbar'
+import { ForecastBaseDatePicker } from './ForecastBaseDatePicker'
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -28,20 +29,13 @@ jest.mock('./ForecastBaseDatePicker', () => ({
   ForecastBaseDatePicker: () => 'mocked ForecastBaseDatePicker',
 }))
 describe('Toolbar component', () => {
-  // it('renders toolbar', () => {
-  //   render(<Toolbar />)
-  //   expect(screen.getByRole('toolbar')).toBeInTheDocument()
-  // })
+  it('renders toolbar', () => {
+    render(<Toolbar />)
 
-  // it('Updates date when date picker is used and ok button is clicked', () => {
-  //   render(<Toolbar />)
-  //   const datePicker = screen.getByLabelText('Forecast Base Date')
-  //   const updatedDate = DateTime.fromISO('2024-05-26T12:00:00', { zone: 'UTC' })
+    expect(screen.getByRole('toolbar')).toBeInTheDocument()
 
-  //   fireEvent.change(datePicker, { target: { value: '26/05/2024 12:00' } })
-  //   fireEvent.click(screen.getByText('Ok'))
-  //   expect(mockSetForecastBaseDate).toHaveBeenCalledWith(updatedDate)
-  // })
+    ForecastBaseDatePicker
+  })
   React.useState = jest
     .fn()
     .mockReturnValueOnce([
