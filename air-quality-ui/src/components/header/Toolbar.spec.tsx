@@ -1,14 +1,9 @@
 import '@testing-library/jest-dom'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { DateTime, Settings } from 'luxon'
 
 import { ForecastBaseDatePickerProps } from './ForecastBaseDatePicker'
 import { Toolbar } from './Toolbar'
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useMatches: jest.fn().mockReturnValue([]),
-}))
 
 const mockSetForecastBaseDate: (val: DateTime) => void = jest.fn()
 
@@ -30,9 +25,12 @@ const mockForecastBaseDatePicker = jest
   .mockReturnValue(<span>mock ForecastBaseDatePicker</span>)
 
 let setIsInvalidDateTime: (val: boolean) => void
+let setSelectedForecastBaseDate: (val: DateTime<boolean>) => void
+
 jest.mock('./ForecastBaseDatePicker', () => ({
   ForecastBaseDatePicker: (props: ForecastBaseDatePickerProps) => {
     setIsInvalidDateTime = props.setIsInvalidDateTime
+    setSelectedForecastBaseDate = props.setSelectedForecastBaseDate
     return mockForecastBaseDatePicker(props)
   },
 }))
@@ -42,23 +40,49 @@ describe('Toolbar component', () => {
     render(<Toolbar />)
     expect(screen.getByRole('toolbar')).toBeInTheDocument()
   })
-  it('Invalid date stops button from being used, selected time should not have change', () => {
+  it('Invalid date stops button from being used', async () => {
     render(<Toolbar />)
     setIsInvalidDateTime(true)
-    //fireEvent.click(screen.getByText('Ok'))
-    //expect(mockSetForecastBaseDate).not.toHaveBeenCalled()
-    expect(screen.getByRole('button')).toHaveAttribute('disabled')
+    await waitFor(() => {
+      expect(screen.getByRole('button')).toHaveAttribute('disabled')
+    })
   })
-  //.each<number>([
-  //   2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
-  // ])
-  // it('Invalid time stops button from being used, selected time should not have change', () => {
-  //   render(<Toolbar />)
-  //   const datePicker = screen.getByLabelText('Forecast Base Date')
-  //   fireEvent.change(datePicker, {
-  //     target: { value: '03/04/2024 10:00' },
-  //   })
-  //   fireEvent.click(screen.getByText('Ok'))
-  //   expect(mockSetForecastBaseDate).not.toHaveBeenCalled()
-  // })
+  it('Valid date allows button to be used', async () => {
+    render(<Toolbar />)
+    setIsInvalidDateTime(false)
+    await waitFor(() => {
+      expect(screen.getByRole('button')).not.toHaveAttribute('disabled')
+    })
+  })
+  it('Setting valid date and clicking button updates context', async () => {
+    render(<Toolbar />)
+    await waitFor(() => {
+      setSelectedForecastBaseDate(
+        DateTime.fromISO('2024-06-10T09:00:00', { zone: 'utc' }),
+      )
+    })
+    fireEvent.click(screen.getByText('Ok'))
+    await waitFor(() => {
+      expect(mockSetForecastBaseDate).toHaveBeenCalledWith(
+        DateTime.fromISO('2024-06-10T09:00:00', { zone: 'utc' }),
+      )
+    })
+  })
+  it('Setting invalid date and clicking button does not update context', async () => {
+    render(<Toolbar />)
+    await waitFor(() => {
+      setSelectedForecastBaseDate(
+        DateTime.fromISO('2024-08-10T09:00:00', { zone: 'utc' }),
+      )
+    })
+    await waitFor(() => {
+      setIsInvalidDateTime(true)
+    })
+    fireEvent.click(screen.getByText('Ok'))
+    await waitFor(() => {
+      expect(mockSetForecastBaseDate).not.toHaveBeenCalledWith(
+        DateTime.fromISO('2024-08-10T09:00:00', { zone: 'utc' }),
+      )
+    })
+  })
 })
