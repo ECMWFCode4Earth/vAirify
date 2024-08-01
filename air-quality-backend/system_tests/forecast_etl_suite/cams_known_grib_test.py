@@ -21,7 +21,10 @@ data_query = {"forecast_base_time": {"$eq": forecast_base_time}}
 @pytest.fixture(scope="module")
 def setup_data():
     # Set up code
-    with mock.patch.dict(os.environ, {"FORECAST_BASE_TIME": "2024-6-4 00"}):
+    with mock.patch.dict(os.environ, {
+        "FORECAST_BASE_TIME": "2024-6-4 00",
+        "FORECAST_RETRIEVAL_PERIOD": "0"
+    }):
         delete_database_data("forecast_data", data_query)
         main()
         yield
