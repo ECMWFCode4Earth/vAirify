@@ -13,7 +13,7 @@ test.use({
   viewport: { width: 1920, height: 1080 },
 })
 
-test.describe('AQI is 3 at 00:00', () => {
+test.describe('PM2.5 influences AQI plot', () => {
   test.beforeEach(async ({ page, cityPage }) => {
     const mockedForecastResponse = [
       createForecastAPIResponseData({
@@ -37,7 +37,7 @@ test.describe('AQI is 3 at 00:00', () => {
     ]
 
     const mockedMeasurementsCityPageResponse = [
-      //Lower bound 00:00
+      //Lower bound of 00:00
       createMeasurementsCityPageResponseData({
         measurement_date: '2024-06-30T23:29:59Z',
         pm2_5: 800,
@@ -57,7 +57,7 @@ test.describe('AQI is 3 at 00:00', () => {
         o3: 50,
         site_name: 'Tijuca',
       }),
-      // upper bound of 00:00
+      // Upper bound of 00:00
       createMeasurementsCityPageResponseData({
         measurement_date: '2024-07-01T00:30:00Z',
         pm2_5: 800,
