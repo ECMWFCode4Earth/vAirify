@@ -159,9 +159,7 @@ test.describe('AQI is 3 at 00:00', () => {
     ])
     await gotoPage(page, '/city/Rio%20de%20Janeiro')
     await cityPage.waitForAllGraphsToBeVisible()
-    // await waitForIdleNetwork(page, cityPage.aqiChart)
     await cityPage.setBaseTime('01/07/2024 00:00')
-    // await banner.confirmDate();
   })
 
   test('Expect in-situ AQI 3 plot at 00:00 due to PM2.5', async ({
