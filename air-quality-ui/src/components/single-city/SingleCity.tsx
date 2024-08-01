@@ -93,26 +93,21 @@ export const SingleCity = () => {
   )
 
   const siteLocations = useMemo(() => {
-    const result = new Map<string, { longitude: number; latitude: number }>()
-    measurementData
-      ?.filter((measurement) =>
-        selectedSites.find(
-          (site) => site && site.value === getSiteName(measurement),
-        ),
-      )
-      .forEach((measurement) => {
-        const siteName = getSiteName(measurement)
-        const site = result.has(siteName)
-        if (!site) {
-          result.set(siteName, {
-            longitude: measurement.location.longitude,
-            latitude: measurement.location.latitude,
-          })
+    return measurementData?.reduce<
+      Record<string, { name: string; longitude: number; latitude: number }>
+    >((acc, measurement) => {
+      const siteName = getSiteName(measurement)
+      const check = acc[siteName]
+      if (!check) {
+        acc[siteName] = {
+          name: siteName,
+          longitude: measurement.location.longitude,
+          latitude: measurement.location.latitude,
         }
-      })
-
-    return result
-  }, [measurementData, selectedSites])
+      }
+      return acc
+    }, {})
+  }, [measurementData])
 
   const measurementsByPollutantBySite = useMemo(() => {
     return measurementData
@@ -222,7 +217,8 @@ export const SingleCity = () => {
                 >
                   <StationMap
                     mapCenter={forecastData[0].location}
-                    locations={siteLocations}
+                    stations={siteLocations!}
+                    visibleLocations={selectedSites.map((site) => site.label)}
                   ></StationMap>
                 </div>
               )}

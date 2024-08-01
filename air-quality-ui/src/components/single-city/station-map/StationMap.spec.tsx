@@ -25,7 +25,8 @@ describe('StationMap', () => {
     render(
       <StationMap
         mapCenter={{ latitude: 1, longitude: 2 }}
-        locations={new Map()}
+        stations={{}}
+        visibleLocations={['']}
       />,
     )
     await waitFor(() => {

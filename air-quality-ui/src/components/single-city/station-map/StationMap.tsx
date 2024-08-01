@@ -8,37 +8,54 @@ import { Coordinates } from '../../../services/types'
 
 interface AverageComparisonChartProps {
   mapCenter: Coordinates
-  locations: Map<string, { longitude: number; latitude: number }>
+  stations: Record<
+    string,
+    { name: string; longitude: number; latitude: number }
+  >
+  visibleLocations: string[]
 }
 
 export const StationMap = (props: AverageComparisonChartProps) => {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<maplibregl.Map | null>(null)
-  const mapCenterLongitude = props.mapCenter.longitude
-  const mapCenterLatitude = props.mapCenter.latitude
-  const zoom = 9
+  const markers = useRef(new Map<string, Marker>())
 
   useEffect(() => {
+    const zoom = 9
     const mapconfig = new maplibregl.Map(
       createMapConfig(
         mapContainer.current!,
-        mapCenterLatitude,
-        mapCenterLongitude,
+        props.mapCenter.latitude,
+        props.mapCenter.longitude,
         zoom,
       ),
     )
 
     mapconfig.addControl(new FullscreenControl())
 
-    props.locations.forEach((value, name) => {
-      new Marker()
-        .setLngLat([value.longitude, value.latitude])
-        .setPopup(new Popup().setText(name))
-        .addTo(mapconfig)
-    })
-
     map.current = mapconfig
-  }, [mapCenterLongitude, mapCenterLatitude, zoom, props.locations])
+  }, [props.mapCenter.latitude, props.mapCenter.longitude])
+
+  useEffect(() => {
+    Object.values(props.stations).forEach((station) => {
+      const marker = new Marker()
+        .setLngLat([station.longitude, station.latitude])
+        .setPopup(new Popup().setText(station.name))
+        .addTo(map.current!)
+
+      markers.current?.set(station.name, marker)
+    })
+  }, [props.stations])
+
+  useEffect(() => {
+    for (const name of markers.current.keys()) {
+      if (props.visibleLocations.includes(name)) {
+        markers.current.get(name)?.addTo(map.current!)
+      } else {
+        markers.current.get(name)?.remove()
+      }
+    }
+  }, [props.visibleLocations])
 
   return <div ref={mapContainer} data-testid="map" className={classes['map']} />
 }
