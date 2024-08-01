@@ -1,10 +1,9 @@
 import cdsapi
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 import os
 import xarray as xr
 from .forecast_data import ForecastData
-from .forecast_date_retriever import align_to_cams_publish_time
 
 CAMS_FORECAST_INTERVAL_HOURS = 3
 CAMS_UPDATE_INTERVAL_HOURS = 12
@@ -78,11 +77,10 @@ def fetch_cams_data(request_body, file_name) -> xr.Dataset:
 
 
 def fetch_forecast_data(
-    base_datetime: datetime = datetime.utcnow(),
+    base_datetime: datetime,
     no_of_forecast_times: int = CAMS_INTERVALS_PER_5_DAY_FORECAST,
 ) -> ForecastData:
 
-    base_datetime = align_to_cams_publish_time(base_datetime)
     request_details = CamsRequestDetails(base_datetime, no_of_forecast_times)
     file_ident = f"{no_of_forecast_times}_from_{base_datetime.strftime('%Y-%m-%d_%H')}"
 
