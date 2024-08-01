@@ -1,39 +1,7 @@
-import { Button as BaseButton } from '@mui/base/Button'
-import { styled } from '@mui/system'
+import { Button } from '@mui/base/Button'
 
-const Button = styled(BaseButton)(
-  () => `
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-weight: 600;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    background-color: #0000;
-    padding: 8px 16px;
-    border-radius: 8px;
-    color: white;
-    transition: all 150ms ease;
-    cursor: pointer;
-    border: 1px solid #6F6F6F;
-  
-    &:hover {
-      background-color: #6F6F6F;
-    }
-  
-    &.active {
-      background-color: #6F6F6F;
-      box-shadow: none;
-      transform: scale(0.99);
-    }
+import './VAirifyButton.css'
 
-    &:disabled {
-      background-color: #0000;
-      color: #f44336;
-      box-shadow: none;
-      transform: scale(0.99);
-      border: 1px solid #f44336;
-    }
-  `,
-)
 interface Props {
   text: string
   onClick: () => void
@@ -41,7 +9,11 @@ interface Props {
 }
 export const VAirifyButton = (props: Props) => {
   return (
-    <Button onClick={props.onClick} disabled={props.isButtonDisabled}>
+    <Button
+      onClick={props.onClick}
+      disabled={props.isButtonDisabled}
+      className={'vairify-button'}
+    >
       {props.text}
     </Button>
   )

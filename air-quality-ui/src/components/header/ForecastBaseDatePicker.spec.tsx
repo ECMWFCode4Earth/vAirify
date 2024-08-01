@@ -20,7 +20,7 @@ describe('ForecastBaseDatePicker component', () => {
     expect(screen.getByLabelText('Forecast Base Date')).toBeInTheDocument()
   })
   it.each<number>([0, 12])(
-    'If valid time (%d) is selected isinvalidDateTime is set to true',
+    'If valid time (%d) is selected isinvalidDateTime is set to false',
     async (test_hour: number) => {
       render(
         <ForecastBaseDatePicker
@@ -43,7 +43,7 @@ describe('ForecastBaseDatePicker component', () => {
       expect(mockSetIsInvalidDateTime).toHaveBeenCalledWith(false)
     },
   )
-  it('If invalid time is selected isinvalidDateTime is set to true', async () => {
+  it('If future date is selected isInvalidDateTime is set to true', async () => {
     render(
       <ForecastBaseDatePicker
         setSelectedForecastBaseDate={mockSetSelectedForecastBaseDate}
