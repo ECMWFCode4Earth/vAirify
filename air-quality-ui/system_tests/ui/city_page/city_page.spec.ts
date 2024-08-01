@@ -519,3 +519,196 @@ test.describe('Charts are fully visible in 1920x1080 viewport', () => {
     })
   })
 })
+
+test.describe('High value measurements', () => {
+  test.beforeEach(async ({ page, cityPage }) => {
+    const mockedForecastResponse = [
+      createForecastAPIResponseData({
+        base_time: '2024-07-01T00:00:00Z',
+        valid_time: '2024-07-01T00:00:00Z',
+        location_name: 'Rio de Janeiro',
+        overall_aqi_level: 1,
+      }),
+      createForecastAPIResponseData({
+        base_time: '2024-07-01T00:00:00Z',
+        valid_time: '2024-07-01T03:00:00Z',
+        location_name: 'Rio de Janeiro',
+        overall_aqi_level: 4,
+      }),
+      createForecastAPIResponseData({
+        base_time: '2024-07-01T00:00:00Z',
+        valid_time: '2024-07-01T06:00:00Z',
+        location_name: 'Rio de Janeiro',
+        overall_aqi_level: 3,
+      }),
+    ]
+    const mockedMeasurementsCityPageResponse = highValuedMeasurementData
+
+    await setupPageWithMockData(page, [
+      {
+        endpointUrl: '*/**/air-pollutant/forecast*',
+        mockedAPIResponse: mockedForecastResponse,
+      },
+      {
+        endpointUrl: '*/**/air-pollutant/measurements*',
+        mockedAPIResponse: mockedMeasurementsCityPageResponse,
+      },
+    ])
+    await gotoPage(page, '/city/Rio%20de%20Janeiro')
+    await cityPage.waitForAllGraphsToBeVisible()
+    await cityPage.setBaseTime('01/07/2024 00:00')
+  })
+
+  test('AQI chart loads', async ({ cityPage }) => {
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.aqiChart)
+    expect(chartShot).toMatchSnapshot('rio-high-aqi-graph.png')
+  })
+
+  test('pm2.5 snapshot', async ({ cityPage }) => {
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.pm2_5Chart)
+    expect(chartShot).toMatchSnapshot('rio-high-pm2_5-graph.png')
+  })
+
+  test('pm10 snapshot', async ({ cityPage }) => {
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.pm10Chart)
+    expect(chartShot).toMatchSnapshot('rio-high-pm10-graph.png')
+  })
+
+  test('o3 snapshot', async ({ cityPage, page }) => {
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.o3Chart)
+    expect(chartShot).toMatchSnapshot('rio-high-o3-graph.png')
+    await page.pause()
+  })
+
+  test('no2 snapshot', async ({ cityPage }) => {
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.no2Chart)
+    expect(chartShot).toMatchSnapshot('rio-high-no2-graph.png')
+  })
+
+  test('so2 snapshot', async ({ cityPage }) => {
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.so2Chart)
+    expect(chartShot).toMatchSnapshot('rio-high-so2-graph.png')
+  })
+})
+
+const highValuedMeasurementData = [
+  createMeasurementsCityPageResponseData({
+    measurement_date: '2024-07-01T00:00:00Z',
+    no2: 990,
+    o3: 700,
+    so2: 1250,
+    pm2_5: 850,
+    pm10: 1175,
+  }),
+  createMeasurementsCityPageResponseData({
+    measurement_date: '2024-07-01T01:00:00Z',
+    no2: 1000,
+    o3: 750,
+    so2: 1300,
+    pm2_5: 825,
+    pm10: 1200,
+  }),
+  createMeasurementsCityPageResponseData({
+    measurement_date: '2024-07-01T02:00:00Z',
+    no2: 1010,
+    o3: 800,
+    so2: 1300,
+    pm2_5: 800,
+    pm10: 1255,
+  }),
+  createMeasurementsCityPageResponseData({
+    measurement_date: '2024-07-01T03:00:00Z',
+    no2: 1000,
+    o3: 850,
+    so2: 1250,
+    pm2_5: 775,
+    pm10: 1220,
+  }),
+  createMeasurementsCityPageResponseData({
+    measurement_date: '2024-07-01T04:00:00Z',
+    no2: 1100,
+    o3: 900,
+    so2: 1225,
+    pm2_5: 775,
+    pm10: 1200,
+  }),
+  createMeasurementsCityPageResponseData({
+    measurement_date: '2024-07-01T05:00:00Z',
+    no2: 980,
+    o3: 850,
+    so2: 1225,
+    pm2_5: 775,
+    pm10: 1175,
+  }),
+  createMeasurementsCityPageResponseData({
+    measurement_date: '2024-07-01T06:00:00Z',
+    no2: 1001,
+    o3: 800,
+    so2: 1250,
+    pm2_5: 801,
+    pm10: 1175,
+  }),
+  createMeasurementsCityPageResponseData({
+    measurement_date: '2024-07-01T00:00:00Z',
+    no2: 900,
+    o3: 900,
+    so2: 1200,
+    pm2_5: 775,
+    pm10: 1175,
+    site_name: 'Tijuca',
+  }),
+  createMeasurementsCityPageResponseData({
+    measurement_date: '2024-07-01T01:00:00Z',
+    no2: 1000,
+    o3: 850,
+    so2: 1200,
+    pm2_5: 775,
+    pm10: 1200,
+    site_name: 'Tijuca',
+  }),
+  createMeasurementsCityPageResponseData({
+    measurement_date: '2024-07-01T02:00:00Z',
+    no2: 999,
+    o3: 800,
+    so2: 1225,
+    pm2_5: 800,
+    pm10: 1225,
+    site_name: 'Tijuca',
+  }),
+  createMeasurementsCityPageResponseData({
+    measurement_date: '2024-07-01T03:00:00Z',
+    no2: 1000,
+    o3: 750,
+    so2: 1250,
+    pm2_5: 825,
+    pm10: 1250,
+    site_name: 'Tijuca',
+  }),
+  createMeasurementsCityPageResponseData({
+    measurement_date: '2024-07-01T04:00:00Z',
+    no2: 1100,
+    o3: 750,
+    so2: 1275,
+    pm2_5: 825,
+    pm10: 1200,
+    site_name: 'Tijuca',
+  }),
+  createMeasurementsCityPageResponseData({
+    measurement_date: '2024-07-01T05:00:00Z',
+    no2: 1100,
+    o3: 800,
+    so2: 1275,
+    pm2_5: 800,
+    pm10: 1175,
+    site_name: 'Tijuca',
+  }),
+  createMeasurementsCityPageResponseData({
+    measurement_date: '2024-07-01T06:00:00Z',
+    no2: 1100,
+    o3: 850,
+    so2: 1200,
+    pm2_5: 775,
+    pm10: 1150,
+    site_name: 'Tijuca',
+  }),
+]
