@@ -520,7 +520,7 @@ test.describe('Charts are fully visible in 1920x1080 viewport', () => {
   })
 })
 
-test.describe('High value measurements', () => {
+test.describe('High value measurements are displayed correctly', () => {
   test.beforeEach(async ({ page, cityPage }) => {
     const mockedForecastResponse = [
       createForecastAPIResponseData({
