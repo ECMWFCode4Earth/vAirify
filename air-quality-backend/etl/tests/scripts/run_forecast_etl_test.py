@@ -27,22 +27,6 @@ def test__run_forecast_etl__no_dates_returns_without_processing(
 @patch("etl.scripts.run_forecast_etl.get_locations_by_type")
 @patch("etl.scripts.run_forecast_etl.retrieve_dates_requiring_forecast")
 @patch("etl.scripts.run_forecast_etl.process_forecast")
-def test__run_forecast_etl__no_dates_returns_without_processing(
-    mock_process_forecast,
-    mock_get_dates,
-    mock_get_locations
-):
-    mock_get_locations.return_value = cities
-    mock_get_dates.return_value = []
-
-    main()
-
-    mock_process_forecast.assert_not_called()
-
-
-@patch("etl.scripts.run_forecast_etl.get_locations_by_type")
-@patch("etl.scripts.run_forecast_etl.retrieve_dates_requiring_forecast")
-@patch("etl.scripts.run_forecast_etl.process_forecast")
 def test__run_forecast_etl__single_date_processed(
     mock_process_forecast,
     mock_get_dates,

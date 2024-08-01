@@ -153,7 +153,7 @@ def test__document_count_matches_expected_for_a_single_city(setup_data):
     # Check 41 forecasts overall for the city
     dict_result = get_database_data("forecast_data", query)
     assert (
-            len(dict_result) == 41
+        len(dict_result) == 41
     ), f"Expected 41 documents for city {rand_city}, but got {len(dict_result)}"
 
     # Check 8 forecasts for the city in a day randomly picked from the forecast
@@ -165,7 +165,7 @@ def test__document_count_matches_expected_for_a_single_city(setup_data):
 
     dict_result = get_database_data("forecast_data", query)
     assert (
-            len(dict_result) == 8
+        len(dict_result) == 8
     ), f"Expected 8 documents for {rand_city}, day {offset}, but got {len(dict_result)}"
 
 

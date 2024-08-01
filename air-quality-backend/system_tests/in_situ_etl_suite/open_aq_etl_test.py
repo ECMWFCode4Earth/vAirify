@@ -446,7 +446,7 @@ def test__convert_ppm_to_ugm3_and_store__only_no2_so2_o3():
     delete_database_data(collection_name, query)
     berlin_file = f"{open_aq_cache_location}/Berlin_2024062613_2024062713.json"
 
-    berlin_openaq_data= []
+    berlin_openaq_data = []
     overrides = {
         "location": "berlin",
         "date": {"utc": "2024-06-26T13:10:20+00:00"},
