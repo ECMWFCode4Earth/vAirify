@@ -6,7 +6,7 @@ import Select, { ActionMeta, MultiValue, OnChangeValue } from 'react-select'
 import { AverageComparisonChart } from './average-comparison-chart/AverageComparisonChart'
 import classes from './SingleCity.module.css'
 import { SiteMeasurementsChart } from './site-measurement-chart/SiteMeasurementsChart'
-import { StationMap } from './station-map/StationMap'
+import { Station, StationMap } from './station-map/StationMap'
 import { useForecastContext } from '../../context'
 import { PollutantType, pollutantTypes } from '../../models'
 import { textToColor } from '../../services/echarts-service'
@@ -93,20 +93,21 @@ export const SingleCity = () => {
   )
 
   const siteLocations = useMemo(() => {
-    return measurementData?.reduce<
-      Record<string, { name: string; longitude: number; latitude: number }>
-    >((acc, measurement) => {
-      const siteName = getSiteName(measurement)
-      const check = acc[siteName]
-      if (!check) {
-        acc[siteName] = {
-          name: siteName,
-          longitude: measurement.location.longitude,
-          latitude: measurement.location.latitude,
+    return measurementData?.reduce<Record<string, Station>>(
+      (acc, measurement) => {
+        const siteName = getSiteName(measurement)
+        const check = acc[siteName]
+        if (!check) {
+          acc[siteName] = {
+            name: siteName,
+            longitude: measurement.location.longitude,
+            latitude: measurement.location.latitude,
+          }
         }
-      }
-      return acc
-    }, {})
+        return acc
+      },
+      {},
+    )
   }, [measurementData])
 
   const measurementsByPollutantBySite = useMemo(() => {

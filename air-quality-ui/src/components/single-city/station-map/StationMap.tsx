@@ -6,12 +6,11 @@ import classes from './StationMap.module.css'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { Coordinates } from '../../../services/types'
 
+export type Station = { name: string; latitude: number; longitude: number }
+
 interface AverageComparisonChartProps {
   mapCenter: Coordinates
-  stations: Record<
-    string,
-    { name: string; longitude: number; latitude: number }
-  >
+  stations: Record<string, Station>
   visibleLocations: string[]
 }
 
