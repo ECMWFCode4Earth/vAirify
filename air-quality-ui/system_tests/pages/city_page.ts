@@ -13,6 +13,7 @@ export class CityPage extends BasePage {
   readonly pm10Chart: Locator
   readonly pm2_5Chart: Locator
   readonly scroller: Locator
+  readonly siteDropdown: string
   readonly siteForm: Locator
   readonly so2Chart: Locator
   readonly title: Locator
@@ -29,6 +30,7 @@ export class CityPage extends BasePage {
     this.pm10Chart = page.getByTestId('site_measurements_chart_pm10')
     this.pm2_5Chart = page.getByTestId('site_measurements_chart_pm2_5')
     this.scroller = page.locator('.ag-body-horizontal-scroll-viewport')
+    this.siteDropdown = 'svg.css-tj5bde-Svg'
     this.siteForm = page.getByTestId('sites-form')
     this.so2Chart = page.getByTestId('site_measurements_chart_so2')
     this.title = page.locator('title')
@@ -36,6 +38,23 @@ export class CityPage extends BasePage {
   }
   async setBaseTime(baseTime: string) {
     return this.datePicker.fill(baseTime)
+  }
+
+  async svgDropDownClick() {
+    const svgButton = await this.page.$(this.siteDropdown)
+    if (svgButton) {
+      await svgButton.scrollIntoViewIfNeeded()
+      await svgButton.click()
+    } else {
+      throw new Error('SVG button not found')
+    }
+  }
+
+  async dropDownSelect(siteName: string) {
+    await this.svgDropDownClick()
+    const option = this.page.getByRole("option", { name: siteName });
+    await option.scrollIntoViewIfNeeded();
+    await option.click();
   }
 
   async siteRemover(location: string) {

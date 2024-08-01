@@ -14,7 +14,7 @@ test.use({
 })
 
 test.describe('AQI is 3 at 00:00', () => {
-  test.beforeEach(async ({ page, banner, cityPage }) => {
+  test.beforeEach(async ({ page, cityPage }) => {
     const mockedForecastResponse = [
       createForecastAPIResponseData({
         base_time: '2024-07-01T00:00:00Z',
@@ -37,7 +37,7 @@ test.describe('AQI is 3 at 00:00', () => {
     ]
 
     const mockedMeasurementsCityPageResponse = [
-      //Extreme boundary values
+      //Lower bound 00:00
       createMeasurementsCityPageResponseData({
         measurement_date: '2024-06-30T23:29:59Z',
         pm2_5: 800,
@@ -47,16 +47,7 @@ test.describe('AQI is 3 at 00:00', () => {
         o3: 800,
         site_name: 'Tijuca',
       }),
-      createMeasurementsCityPageResponseData({
-        measurement_date: '2024-07-01T00:30:00Z',
-        pm2_5: 800,
-        pm10: 1200,
-        so2: 1250,
-        no2: 1000,
-        o3: 800,
-        site_name: 'Tijuca',
-      }),
-      //AQI 1 values
+
       createMeasurementsCityPageResponseData({
         measurement_date: '2024-07-01T00:00:00Z',
         pm2_5: 10,
@@ -64,6 +55,16 @@ test.describe('AQI is 3 at 00:00', () => {
         so2: 100,
         no2: 40,
         o3: 50,
+        site_name: 'Tijuca',
+      }),
+      // upper bound of 00:00
+      createMeasurementsCityPageResponseData({
+        measurement_date: '2024-07-01T00:30:00Z',
+        pm2_5: 800,
+        pm10: 1200,
+        so2: 1250,
+        no2: 1000,
+        o3: 800,
         site_name: 'Tijuca',
       }),
       createMeasurementsCityPageResponseData({
@@ -158,19 +159,35 @@ test.describe('AQI is 3 at 00:00', () => {
     ])
     await gotoPage(page, '/city/Rio%20de%20Janeiro')
     await cityPage.waitForAllGraphsToBeVisible()
-    await waitForIdleNetwork(page, cityPage.aqiChart)
+    // await waitForIdleNetwork(page, cityPage.aqiChart)
     await cityPage.setBaseTime('01/07/2024 00:00')
-    await banner.confirmDate()
+    // await banner.confirmDate();
   })
 
-  test('PM2.5 creates an AQI 3 plot at 00:00', async ({ cityPage }) => {
+  test('Expect in-situ AQI 3 plot at 00:00 due to PM2.5', async ({
+    cityPage,
+  }) => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.aqiChart)
     await expect(chartShot).toMatchSnapshot('Midnight-AQI-3.png')
   })
 
-  test('AQI 2 is plotted when AQI site 4 is removed', async ({ cityPage }) => {
+  test('Expect in-situ AQI 2 when AQI site 4 is removed due to PM2.5', async ({
+    cityPage,
+  }) => {
     await cityPage.siteRemover('AQI 4 site')
     const chartShot = await cityPage.captureChartScreenshot(cityPage.aqiChart)
     await expect(chartShot).toMatchSnapshot('Midnight-AQI-2.png')
+  })
+
+  test('Expect in-situ AQI at 00:00 to be 3 when a site is removed and reselected', async ({
+    cityPage,
+    page,
+  }) => {
+    await cityPage.siteRemover('AQI 4 site')
+    page.reload()
+    await waitForIdleNetwork(page, cityPage.aqiChart)
+    await cityPage.setBaseTime('01/07/2024 00:00')
+    const chartShot = await cityPage.captureChartScreenshot(cityPage.aqiChart)
+    await expect(chartShot).toMatchSnapshot('Midnight-AQI-3.png')
   })
 })
