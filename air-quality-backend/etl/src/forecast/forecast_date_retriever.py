@@ -22,9 +22,8 @@ def retrieve_dates_requiring_forecast() -> [datetime]:
     potential_dates = [i.to_pydatetime() for i in dates]
 
     stored_dates = get_forecast_dates_between(search_start_date, base_date)
-    diff = list(set(potential_dates) - set(stored_dates))
 
-    return diff
+    return list(set(potential_dates) - set(stored_dates))
 
 
 def align_to_cams_publish_time(forecast_base_time: datetime) -> datetime:
