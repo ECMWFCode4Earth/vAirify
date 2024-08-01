@@ -62,7 +62,6 @@ services:
       - 0.0.0.0
     volumes:
       - ./air-quality-backend/src/:/usr/src/app/src/
-      - data_textures:/app/data_textures
 
   ui:
     container_name: frontend-ui
@@ -79,6 +78,8 @@ services:
     volumes:
       - ./air-quality-ui/:/app/
       - nodemodules:/app/node_modules
+      - data_textures:/app/data_textures
+
       
 volumes:
   database: {}

@@ -36,8 +36,10 @@ export class CityPage extends BasePage {
     this.title = page.locator('title')
     this.toolbarNavigation = page.getByLabel('Toolbar with site navigation')
   }
-  async setBaseTime(baseTime: string) {
-    return this.datePicker.fill(baseTime)
+
+  async captureChartScreenshot(chartElement: Locator) {
+    await waitForIdleNetwork(this.page, chartElement)
+    return await chartElement.screenshot()
   }
 
   async svgDropDownClick() {
@@ -64,9 +66,8 @@ export class CityPage extends BasePage {
     await siteDeselect.click()
   }
 
-  async captureChartScreenshot(chartElement: Locator) {
-    await waitForIdleNetwork(this.page, chartElement)
-    return await chartElement.screenshot()
+  async setBaseTime(baseTime: string) {
+    return this.datePicker.fill(baseTime)
   }
 
   textFinder(textToFind: string) {

@@ -11,11 +11,17 @@ class PollutantDataDto(TypedDict):
     value: float
 
 
+class Coordinates(TypedDict):
+    longitude: float
+    latitude: float
+
+
 class ForecastDto(TypedDict):
     base_time: datetime
     valid_time: datetime
     location_type: AirQualityLocationType
     location_name: str
+    location: Coordinates
     overall_aqi_level: float
     no2: PollutantDataDto
     o3: PollutantDataDto
@@ -28,6 +34,7 @@ class MeasurementDto(TypedDict):
     measurement_date: datetime
     location_type: AirQualityLocationType
     location_name: str
+    location: Coordinates
     api_source: ApiSource
     no2: NotRequired[float]
     o3: NotRequired[float]
@@ -37,6 +44,19 @@ class MeasurementDto(TypedDict):
     entity: NotRequired[str]
     sensor_type: NotRequired[str]
     site_name: str
+
+
+class TextureDto(TypedDict):
+    base_time: datetime
+    variable: str
+    time_start: datetime
+    time_end: datetime
+    chunk: str
+    source: str
+    chunk: str
+    texture_uri: str
+    min_value: float
+    max_value: float
 
 
 T = TypeVar("T")

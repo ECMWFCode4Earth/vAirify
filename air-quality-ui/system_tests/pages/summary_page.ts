@@ -7,8 +7,10 @@ export class SummaryPage extends BasePage {
 
   readonly agCell: Locator
   readonly allCells: Locator
+  readonly grid: Locator
   readonly highlightValuesToggle: Locator
   readonly scroller: Locator
+  readonly timeRange: Locator
   readonly title: Locator
 
   constructor(page: Page) {
@@ -17,61 +19,17 @@ export class SummaryPage extends BasePage {
 
     this.agCell = page.locator('role=gridcell')
     this.allCells = page.locator('[role=gridcell]')
+    this.grid = page.getByTestId('summary-grid')
     this.highlightValuesToggle = page.getByRole('checkbox')
     this.scroller = page.locator('.ag-body-horizontal-scroll-viewport')
+    this.timeRange = page.getByText('Time Range:')
     this.title = page.locator('title')
   }
 
-  async waitForLoad() {
-    await this.page.waitForSelector('.ag-root', { state: 'visible' })
-    await this.page.waitForSelector('.ag-header-cell', {
-      state: 'visible',
-    })
-  }
-
-  async getColumnHeaderAndText(name: string, expectedText: string) {
-    const header = this.page.getByRole('columnheader', { name })
-    await header.waitFor({ state: 'visible' })
-    await expect(header).toHaveText(expectedText)
-  }
-
-  async scrollToRightmostPosition() {
-    await this.scroller.evaluate((element: HTMLElement) => {
-      element.scrollLeft = element.scrollWidth
-    })
-  }
-
-  async checkNumbersHaveOneDecimalOnly(text: string) {
-    const number = parseFloat(text)
-    if (!isNaN(number)) {
-      const decimalPart = text.split('.')[1]
-      if (decimalPart && decimalPart.length > 1) {
-        throw new Error(`Number ${text} has more than one decimal place`)
-      }
-    }
-  }
-
-  async checkCellNumberFormat() {
-    const cells = await this.agCell.all()
-    for (const cell of cells) {
-      const cellText = await cell.textContent()
-      await this.checkNumbersHaveOneDecimalOnly(cellText || '')
-    }
-  }
-
-  async textCellSearch(searchText: string) {
-    const cells = await this.page.locator('.ag-cell').all()
-    let count = 0
-    for (const cell of cells) {
-      const cellText = await cell.innerText()
-      if (cellText.includes(searchText)) {
-        count++
-      }
-    }
-    return count
-  }
-
-  async assertGridAttributes(attribute: string, expectedData: string[][]) {
+  async assertGridAttributes(
+    attribute: string,
+    expectedData: string[][],
+  ): Promise<void> {
     for (let rowIndex = 0; rowIndex < expectedData.length; rowIndex++) {
       const row: string[] = expectedData[rowIndex]
       for (let colIndex = 0; colIndex < row.length; colIndex++) {
@@ -91,7 +49,7 @@ export class SummaryPage extends BasePage {
     }
   }
 
-  async calculateForecastDifference() {
+  async calculateForecastDifference(): Promise<number[]> {
     const rows = await this.page
       .locator('.ag-center-cols-container .ag-row')
       .count()
@@ -115,5 +73,56 @@ export class SummaryPage extends BasePage {
       differences.push(calculation)
     }
     return differences.filter((d) => !isNaN(d))
+  }
+
+  async checkCellNumberFormat(): Promise<void> {
+    const cells = await this.agCell.all()
+    for (const cell of cells) {
+      const cellText = await cell.textContent()
+      await this.checkNumbersHaveOneDecimalOnly(cellText || '')
+    }
+  }
+  async checkNumbersHaveOneDecimalOnly(text: string): Promise<void> {
+    const number = parseFloat(text)
+    if (!isNaN(number)) {
+      const decimalPart = text.split('.')[1]
+      if (decimalPart && decimalPart.length > 1) {
+        throw new Error(`Number ${text} has more than one decimal place`)
+      }
+    }
+  }
+
+  async getColumnHeaderAndText(
+    name: string,
+    expectedText: string,
+  ): Promise<void> {
+    const header = this.page.getByRole('columnheader', { name })
+    await header.waitFor({ state: 'visible' })
+    await expect(header).toHaveText(expectedText)
+  }
+
+  async scrollToRightmostPosition(): Promise<void> {
+    await this.scroller.evaluate((element: HTMLElement) => {
+      element.scrollLeft = element.scrollWidth
+    })
+  }
+
+  async textCellSearch(searchText: string): Promise<number> {
+    const cells = await this.page.locator('.ag-cell').all()
+    let count = 0
+    for (const cell of cells) {
+      const cellText = await cell.innerText()
+      if (cellText.includes(searchText)) {
+        count++
+      }
+    }
+    return count
+  }
+
+  async waitForLoad(): Promise<void> {
+    await this.page.waitForSelector('.ag-root', { state: 'visible' })
+    await this.page.waitForSelector('.ag-header-cell', {
+      state: 'visible',
+    })
   }
 }

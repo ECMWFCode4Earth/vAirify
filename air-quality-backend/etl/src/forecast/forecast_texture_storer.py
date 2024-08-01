@@ -4,6 +4,7 @@ import pandas as pd
 import xarray as xr
 import numpy as np
 from PIL import Image
+from datetime import datetime
 
 
 def _chunk_data_array(
@@ -44,10 +45,10 @@ def _chunk_data_array(
 
         time_start = pd.to_datetime(
             time_vector.data[start_time_step:end_time_step].min(), unit="s"
-        ).strftime("%Y-%m-%d %H:%M:%S")
+        ).isoformat(timespec='milliseconds') + '+00:00'
         time_end = pd.to_datetime(
             time_vector.data[start_time_step:end_time_step].max(), unit="s"
-        ).strftime("%Y-%m-%d %H:%M:%S")
+        ).isoformat(timespec='milliseconds') + '+00:00'
         time_steps_dict[len(chunks) - 1] = {
             "time_start": time_start,
             "time_end": time_end,
@@ -148,15 +149,15 @@ def save_data_textures(
             file_format,
         )
         document = {
-            "forecast_base_time": forecast_date,
+            "forecast_base_time": datetime.strptime(forecast_date, '%Y-%m-%d_%H'),
             "variable": variable_name,
             "source": "cams-production",
             "min_value": min_value,
             "max_value": max_value,
             "units": units,
             "texture_uri": output_file,
-            "time_start": chunk_dict[num_chunk]["time_start"],
-            "time_end": chunk_dict[num_chunk]["time_end"],
+            "time_start": datetime.fromisoformat(chunk_dict[num_chunk]["time_start"]),
+            "time_end": datetime.fromisoformat(chunk_dict[num_chunk]["time_end"]),
             "chunk": f"{num_chunk+1} of {len(chunk_list)}",
         }
         documents.append(document)

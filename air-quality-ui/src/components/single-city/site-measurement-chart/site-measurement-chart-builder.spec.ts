@@ -30,6 +30,10 @@ describe('Site Measurement Chart', () => {
         measurement_date: '2024-01-01T01:00:00Z',
         location_name: 'locationA',
         location_type: 'city',
+        location: {
+          latitude: 10,
+          longitude: 20,
+        },
         api_source: 'source',
         entity: 'entity',
         sensor_type: 'type',
@@ -41,6 +45,10 @@ describe('Site Measurement Chart', () => {
         measurement_date: '2024-01-01T02:00:00Z',
         location_name: 'locationA',
         location_type: 'city',
+        location: {
+          latitude: 10,
+          longitude: 20,
+        },
         api_source: 'source',
         entity: 'entity',
         sensor_type: 'type',
@@ -55,6 +63,7 @@ describe('Site Measurement Chart', () => {
 
   const forecastBaseData = {
     location_name: 'LocationA',
+    coordinates: { longitude: 10, latitude: 20 },
     no2: {
       aqi_level: 2,
       value: 2,

@@ -1,13 +1,13 @@
-import { expect, test } from '../utils/fixtures'
+import { expect, test } from '../../utils/fixtures'
 import {
   gotoPage,
   setupPageWithMockData,
   waitForIdleNetwork,
-} from '../utils/helper_methods'
+} from '../../utils/helper_methods'
 import {
   createForecastAPIResponseData,
   createMeasurementsCityPageResponseData,
-} from '../utils/mocked_api'
+} from '../../utils/mocked_api'
 
 test.use({
   viewport: { width: 1920, height: 1080 },
@@ -98,7 +98,7 @@ test.describe('City page resolution tests', () => {
       await cityPage.waitForAllGraphsToBeVisible()
       for (let i = 0; i < charts.length; i++) {
         await cityPage[charts[i]].scrollIntoViewIfNeeded()
-        expect(cityPage[charts[i]]).toBeInViewport({ ratio: 1 })
+        await expect(cityPage[charts[i]]).toBeInViewport({ ratio: 1 })
       }
     })
   })
@@ -351,10 +351,12 @@ test.describe('City graph snapshots', () => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.no2Chart)
     expect(chartShot).toMatchSnapshot('rio-no2-graph.png')
   })
+
   test('so2 snapshot', async ({ cityPage }) => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.so2Chart)
     expect(chartShot).toMatchSnapshot('rio-so2-graph.png')
   })
+
   // remove station CENTRO
   test('Verify pm2.5 graph updates correctly when sites are removed', async ({
     cityPage,
@@ -363,6 +365,7 @@ test.describe('City graph snapshots', () => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.pm2_5Chart)
     expect(chartShot).toMatchSnapshot('rio-pm2.5-graph-without-centro.png')
   })
+
   test('Verify pm10 graph updates correctly when sites are removed', async ({
     cityPage,
   }) => {
@@ -370,6 +373,7 @@ test.describe('City graph snapshots', () => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.pm10Chart)
     expect(chartShot).toMatchSnapshot('rio-pm10-graph-without-centro.png')
   })
+
   test('Verify o3 graph updates correctly when sites are removed', async ({
     cityPage,
   }) => {
@@ -377,6 +381,7 @@ test.describe('City graph snapshots', () => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.o3Chart)
     expect(chartShot).toMatchSnapshot('rio-o3-graph-without-centro.png')
   })
+
   test('Verify no2 graph updates correctly when sites are removed', async ({
     cityPage,
   }) => {
@@ -384,6 +389,7 @@ test.describe('City graph snapshots', () => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.no2Chart)
     expect(chartShot).toMatchSnapshot('rio-no2-graph-without-centro.png')
   })
+
   test('Verify so2 graph updates correctly when sites are removed', async ({
     cityPage,
   }) => {
@@ -429,6 +435,7 @@ test.describe('Charts are fully visible in 1920x1080 viewport', () => {
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
   })
+
   test('AQI chart element is visible in fullscreen view', async ({
     cityPage,
     page,
@@ -436,6 +443,7 @@ test.describe('Charts are fully visible in 1920x1080 viewport', () => {
     await waitForIdleNetwork(page, cityPage.aqiChart)
     await expect(cityPage.aqiChart).toBeInViewport({ ratio: 1 })
   })
+
   test('pm2.5 chart element is visible in fullscreen view', async ({
     cityPage,
     page,
@@ -444,6 +452,7 @@ test.describe('Charts are fully visible in 1920x1080 viewport', () => {
 
     await expect(cityPage.pm2_5Chart).toBeInViewport({ ratio: 1 })
   })
+
   test('pm10 chart element is visible in fullscreen view', async ({
     cityPage,
     page,
@@ -451,6 +460,7 @@ test.describe('Charts are fully visible in 1920x1080 viewport', () => {
     await waitForIdleNetwork(page, cityPage.pm10Chart)
     await expect(cityPage.pm10Chart).toBeInViewport({ ratio: 1 })
   })
+
   test('o3 chart element is visible in fullscreen view', async ({
     cityPage,
     page,
@@ -458,6 +468,7 @@ test.describe('Charts are fully visible in 1920x1080 viewport', () => {
     await waitForIdleNetwork(page, cityPage.o3Chart)
     await expect(cityPage.o3Chart).toBeInViewport({ ratio: 1 })
   })
+
   test('no2 chart element is visible in fullscreen view', async ({
     cityPage,
     page,
@@ -465,6 +476,7 @@ test.describe('Charts are fully visible in 1920x1080 viewport', () => {
     await waitForIdleNetwork(page, cityPage.no2Chart)
     await expect(cityPage.no2Chart).toBeInViewport({ ratio: 1 })
   })
+
   test('so2 chart element is visible in fullscreen view', async ({
     cityPage,
     page,
@@ -503,6 +515,7 @@ test.describe('Charts are fully visible in 1920x1080 viewport', () => {
       const chartShot = await cityPage.captureChartScreenshot(cityPage.no2Chart)
       expect(chartShot).toMatchSnapshot('rio-no2-no-insitu.png')
     })
+
     test('so2 snapshot without in-situ', async ({ cityPage }) => {
       const chartShot = await cityPage.captureChartScreenshot(cityPage.so2Chart)
       expect(chartShot).toMatchSnapshot('rio-so2-no-insitu.png')

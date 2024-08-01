@@ -49,7 +49,7 @@ export const sortMeasurements = (
     for (const timeOffset in sortedMeasurements) {
       const bucket = sortedMeasurements[timeOffset]
       if (
-        bucket.lowerBound < measurementDataTime &&
+        bucket.lowerBound <= measurementDataTime &&
         bucket.upperBound > measurementDataTime
       ) {
         bucket.measurements.push(measurementsData[i])
