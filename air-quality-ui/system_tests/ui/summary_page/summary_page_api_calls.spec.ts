@@ -137,6 +137,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
       banner,
     }) => {
       await banner.clickOnDay(3)
+      await banner.confirmDate()
       expect(requestArray.length).toEqual(1)
     })
 
@@ -151,6 +152,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
         await encodeDateToURIComponent(systemDate)
 
       await banner.clickOnDay(3)
+      await banner.confirmDate()
       expect(requestArray[0]).toContain(
         `location_type=city&valid_time_from=${expectedValidTimeFrom}&valid_time_to=${systemDateUriEncoded}&base_time=${expectedForecastBaseTime}`,
       )
@@ -179,6 +181,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
       banner,
     }) => {
       await banner.clickOnDay(3)
+      await banner.confirmDate()
       expect(requestArray.length).toEqual(41)
     })
 
@@ -229,6 +232,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
         '2024-07-08T12%3A00%3A00.000Z',
       ]
       await banner.clickOnDay(3)
+      await banner.confirmDate()
       for (const request in requestArray) {
         expect(requestArray[request]).toContain(
           `measurement_base_time=${expectedMeasurementBaseTimeArray[request]}&measurement_time_range=90&location_type=city`,
