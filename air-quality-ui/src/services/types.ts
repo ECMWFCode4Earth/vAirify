@@ -30,7 +30,7 @@ export type ForecastResponseDto = {
   base_time: string
   valid_time: string
   location_type: LocationType
-  coordinates: Coordinates
+  location: Coordinates
   location_name: string
   overall_aqi_level: number
 } & ForecastPollutantDataDto
