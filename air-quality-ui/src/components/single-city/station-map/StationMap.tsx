@@ -4,26 +4,26 @@ import { useEffect, useRef } from 'react'
 import { createMapConfig } from './map-service'
 import classes from './StationMap.module.css'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { ForecastResponseDto } from '../../../services/types'
+import { Coordinates } from '../../../services/types'
 
 interface AverageComparisonChartProps {
-  forecastData: ForecastResponseDto[]
+  mapCenter: Coordinates
   locations: Map<string, { longitude: number; latitude: number }>
 }
 
 export const StationMap = (props: AverageComparisonChartProps) => {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<maplibregl.Map | null>(null)
-  const city_longitude = props.forecastData[0].coordinates.longitude
-  const city_latitude = props.forecastData[0].coordinates.latitude
+  const mapCenterLongitude = props.mapCenter.longitude
+  const mapCenterLatitude = props.mapCenter.latitude
   const zoom = 9
 
   useEffect(() => {
     const mapconfig = new maplibregl.Map(
       createMapConfig(
         mapContainer.current!,
-        city_latitude,
-        city_longitude,
+        mapCenterLatitude,
+        mapCenterLongitude,
         zoom,
       ),
     )
@@ -37,7 +37,7 @@ export const StationMap = (props: AverageComparisonChartProps) => {
     })
 
     map.current = mapconfig
-  }, [city_longitude, city_latitude, zoom, props.locations])
+  }, [mapCenterLongitude, mapCenterLatitude, zoom, props.locations])
 
   return <div ref={mapContainer} data-testid="map" className={classes['map']} />
 }

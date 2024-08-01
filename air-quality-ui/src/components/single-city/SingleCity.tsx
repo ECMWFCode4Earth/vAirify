@@ -221,7 +221,7 @@ export const SingleCity = () => {
                   className={`${classes['site-select']} ${classes['map']}`}
                 >
                   <StationMap
-                    forecastData={forecastData}
+                    mapCenter={forecastData[0].coordinates}
                     locations={siteLocations}
                   ></StationMap>
                 </div>

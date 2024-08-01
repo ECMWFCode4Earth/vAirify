@@ -21,7 +21,7 @@ type SummaryMeasurementPollutantDataDto = {
   [P in PollutantType]?: PollutantAverageDataDto<PollutantDataDto>
 }
 
-type Coordinates = {
+export type Coordinates = {
   longitude: number
   latitude: number
 }

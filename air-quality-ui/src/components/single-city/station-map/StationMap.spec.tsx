@@ -24,21 +24,7 @@ describe('StationMap', () => {
   it('renders', async () => {
     render(
       <StationMap
-        forecastData={[
-          {
-            base_time: '',
-            valid_time: '',
-            overall_aqi_level: 4,
-            location_type: 'city',
-            location_name: 'brazil',
-            o3: { aqi_level: 2, value: 2 },
-            no2: { aqi_level: 1, value: 1 },
-            so2: { aqi_level: 5, value: 5 },
-            pm10: { aqi_level: 3, value: 3 },
-            pm2_5: { aqi_level: 4, value: 4 },
-            coordinates: { latitude: 1, longitude: 2 },
-          },
-        ]}
+        mapCenter={{ latitude: 1, longitude: 2 }}
         locations={new Map()}
       />,
     )
