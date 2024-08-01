@@ -54,9 +54,9 @@ export class CityPage extends BasePage {
 
   async dropDownSelect(siteName: string) {
     await this.svgDropDownClick()
-    const option = this.page.getByRole("option", { name: siteName });
-    await option.scrollIntoViewIfNeeded();
-    await option.click();
+    const option = this.page.getByRole('option', { name: siteName })
+    await option.scrollIntoViewIfNeeded()
+    await option.click()
   }
 
   async siteRemover(location: string) {
