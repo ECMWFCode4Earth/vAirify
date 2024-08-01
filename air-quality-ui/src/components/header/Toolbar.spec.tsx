@@ -1,10 +1,9 @@
 import '@testing-library/jest-dom'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { DateTime, Settings } from 'luxon'
-import React from 'react'
 
+import { ForecastBaseDatePickerProps } from './ForecastBaseDatePicker'
 import { Toolbar } from './Toolbar'
-import { ForecastBaseDatePicker } from './ForecastBaseDatePicker'
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -25,28 +24,30 @@ jest.mock('../../context', () => ({
 }))
 
 jest.mock('./Breadcrumbs', () => ({ Breadcrumbs: () => 'mocked breadcrumbs' }))
+
+const mockForecastBaseDatePicker = jest
+  .fn()
+  .mockReturnValue(<span>mock ForecastBaseDatePicker</span>)
+
+let setIsInvalidDateTime: (val: boolean) => void
 jest.mock('./ForecastBaseDatePicker', () => ({
-  ForecastBaseDatePicker: () => 'mocked ForecastBaseDatePicker',
+  ForecastBaseDatePicker: (props: ForecastBaseDatePickerProps) => {
+    setIsInvalidDateTime = props.setIsInvalidDateTime
+    return mockForecastBaseDatePicker(props)
+  },
 }))
+
 describe('Toolbar component', () => {
   it('renders toolbar', () => {
     render(<Toolbar />)
-
     expect(screen.getByRole('toolbar')).toBeInTheDocument()
-
-    ForecastBaseDatePicker
   })
-  React.useState = jest
-    .fn()
-    .mockReturnValueOnce([
-      DateTime.fromISO('2024-08-01T12:00:00', { zone: 'UTC' }),
-      {},
-    ])
-  test('Invalid date stops button from being used, selected time should not have change', () => {
+  it('Invalid date stops button from being used, selected time should not have change', () => {
     render(<Toolbar />)
-
-    fireEvent.click(screen.getByText('Ok'))
-    expect(mockSetForecastBaseDate).not.toHaveBeenCalled()
+    setIsInvalidDateTime(true)
+    //fireEvent.click(screen.getByText('Ok'))
+    //expect(mockSetForecastBaseDate).not.toHaveBeenCalled()
+    expect(screen.getByRole('button')).toHaveAttribute('disabled')
   })
   //.each<number>([
   //   2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,

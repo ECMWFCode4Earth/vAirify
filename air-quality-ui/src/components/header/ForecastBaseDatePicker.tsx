@@ -4,12 +4,14 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DateTime } from 'luxon'
 
-interface Props {
+export interface ForecastBaseDatePickerProps {
   setSelectedForecastBaseDate: (valueToSet: DateTime<boolean>) => void
   setIsInvalidDateTime: (value: boolean) => void
   forecastBaseDate: DateTime<boolean>
 }
-export const ForecastBaseDatePicker = (props: Props): JSX.Element => {
+export const ForecastBaseDatePicker = (
+  props: ForecastBaseDatePickerProps,
+): JSX.Element => {
   const darkTheme = createTheme({
     palette: {
       mode: 'dark',

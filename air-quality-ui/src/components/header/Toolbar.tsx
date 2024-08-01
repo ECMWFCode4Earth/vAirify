@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import React from 'react'
+import { useState } from 'react'
 
 import { Breadcrumbs } from './Breadcrumbs'
 import { ForecastBaseDatePicker } from './ForecastBaseDatePicker'
@@ -10,9 +10,8 @@ import { VAirifyButton } from '../common/button/VAirifyButton'
 export const Toolbar = () => {
   const { forecastBaseDate, setForecastBaseDate } = useForecastContext()
   const [selectedForecastBaseDate, setSelectedForecastBaseDate] =
-    React.useState<DateTime<boolean>>(forecastBaseDate)
-  const [isInvalidDateTime, setIsInvalidDateTime] =
-    React.useState<boolean>(false)
+    useState<DateTime<boolean>>(forecastBaseDate)
+  const [isInvalidDateTime, setIsInvalidDateTime] = useState<boolean>(false)
 
   return (
     <section
