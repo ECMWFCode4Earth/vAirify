@@ -216,21 +216,24 @@ export const SingleCity = () => {
               Measurement Sites
             </div>
             <div className={classes['section-columns']}>
-              {forecastData[0] && (
-                <div
-                  key="station_map"
-                  data-testid="station_map"
-                  className={`${classes['site-select']} ${classes['map']}`}
-                >
-                  <StationMap
-                    mapCenter={forecastData[0].location}
-                    stations={siteLocations!}
-                    visibleLocations={selectedSites.map((site) => site.label)}
-                    removeSite={deselectSite}
-                    addSite={selectSite}
-                  ></StationMap>
-                </div>
-              )}
+              {forecastData[0] &&
+                Object.keys(siteColors).length > 0 &&
+                Object.keys(siteLocations!).length > 0 && (
+                  <div
+                    key="station_map"
+                    data-testid="station_map"
+                    className={`${classes['site-select']} ${classes['map']}`}
+                  >
+                    <StationMap
+                      mapCenter={forecastData[0].location}
+                      stations={siteLocations!}
+                      visibleLocations={selectedSites.map((site) => site.label)}
+                      stationColors={siteColors}
+                      removeSite={deselectSite}
+                      addSite={selectSite}
+                    ></StationMap>
+                  </div>
+                )}
               <form
                 className={classes['site-select-form']}
                 data-testid="sites-form"

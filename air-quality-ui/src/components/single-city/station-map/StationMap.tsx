@@ -20,6 +20,7 @@ interface AverageComparisonChartProps {
   mapCenter: Coordinates
   stations: Record<string, Station>
   visibleLocations: string[]
+  stationColors: Record<string, string>
   removeSite: (siteName: string) => void
   addSite: (siteName: string) => void
 }
@@ -66,14 +67,14 @@ export const StationMap = (props: AverageComparisonChartProps) => {
 
   useEffect(() => {
     Object.values(stations).forEach((station) => {
-      const marker = new Marker()
+      const marker = new Marker({ color: props.stationColors[station.name] })
         .setLngLat([station.longitude, station.latitude])
         .setPopup(createPopup(station.name))
         .addTo(map.current!)
 
       markers.current?.set(station.name, marker)
     })
-  }, [stations, createPopup])
+  }, [stations, createPopup, props.stationColors])
 
   useEffect(() => {
     const updateMarker = (
@@ -81,10 +82,13 @@ export const StationMap = (props: AverageComparisonChartProps) => {
       markerOptions: MarkerOptions,
       remove: boolean,
     ) => {
-      const mark = markers.current.get(name)!
-      mark.remove()
+      const marker = markers.current.get(name)!
+      if (marker._color === markerOptions.color) {
+        return
+      }
+      marker.remove()
       const newMarker = new Marker(markerOptions)
-        .setLngLat([mark._lngLat.lng, mark._lngLat.lat])
+        .setLngLat([marker._lngLat.lng, marker._lngLat.lat])
         .setPopup(createPopup(name, remove))
 
       newMarker.addTo(map.current!)
@@ -93,12 +97,12 @@ export const StationMap = (props: AverageComparisonChartProps) => {
 
     for (const name of markers.current.keys()) {
       if (props.visibleLocations.includes(name)) {
-        updateMarker(name, {}, true)
+        updateMarker(name, { color: props.stationColors[name] }, true)
       } else {
         updateMarker(name, { color: 'grey', opacity: '0.5' }, false)
       }
     }
-  }, [props.visibleLocations, createPopup])
+  }, [props.visibleLocations, createPopup, props.stationColors])
 
   return <div ref={mapContainer} data-testid="map" className={classes['map']} />
 }
