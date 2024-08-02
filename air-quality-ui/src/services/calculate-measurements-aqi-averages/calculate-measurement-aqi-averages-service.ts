@@ -73,20 +73,52 @@ export const averageAqiValues = (measurementsData: SortMeasurementsType) => {
     if (measurements.length === 0) {
       continue
     }
-    let totalAqi = 0
-    for (let i = 0; i < measurements.length; i++) {
-      const overallAqiLevel = Math.max(
-        getPollutantIndexLevel(measurements[i]['no2'], 'no2'),
-        getPollutantIndexLevel(measurements[i]['o3'], 'o3'),
-        getPollutantIndexLevel(measurements[i]['pm10'], 'pm10'),
-        getPollutantIndexLevel(measurements[i]['pm2_5'], 'pm2_5'),
-        getPollutantIndexLevel(measurements[i]['so2'], 'so2'),
-      )
-      totalAqi = totalAqi + overallAqiLevel
-    }
+
+    let no2_total = 0
+    let no2_num = 0
+    let pm25_total = 0
+    let pm25_num = 0
+    let pm10_total = 0
+    let pm10_num = 0
+    let so2_total = 0
+    let so2_num = 0
+    let o3_total = 0
+    let o3_num = 0
+
+    measurements.forEach((measurement) => {
+      if (measurement['no2'] != undefined && measurement['no2'] != 0) {
+        no2_total += measurement['no2']
+        no2_num++
+      }
+      if (measurement['so2'] != undefined && measurement['so2'] != 0) {
+        so2_total += measurement['so2']
+        so2_num++
+      }
+      if (measurement['o3'] != undefined && measurement['o3'] != 0) {
+        o3_total += measurement['o3']
+        o3_num++
+      }
+      if (measurement['pm2_5'] != undefined && measurement['pm2_5'] != 0) {
+        pm25_total += measurement['pm2_5']
+        pm25_num++
+      }
+      if (measurement['pm10'] != undefined && measurement['pm10'] != 0) {
+        pm10_total += measurement['pm10']
+        pm10_num++
+      }
+    })
+
+    const overallAqiLevel = Math.max(
+      no2_num == 0 ? 0 : getPollutantIndexLevel(no2_total / no2_num, 'no2'),
+      so2_num == 0 ? 0 : getPollutantIndexLevel(so2_total / so2_num, 'so2'),
+      o3_num == 0 ? 0 : getPollutantIndexLevel(o3_total / o3_num, 'o3'),
+      pm25_num == 0 ? 0 : getPollutantIndexLevel(pm25_total / pm25_num, 'pm25'),
+      pm10_num == 0 ? 0 : getPollutantIndexLevel(pm10_total / pm10_num, 'pm10'),
+    )
+
     averageAqiValues.push({
       measurementDate: bucket.time_str,
-      meanAqiValue: Math.round(totalAqi / measurements.length),
+      meanAqiValue: overallAqiLevel,
     })
   }
   return averageAqiValues
