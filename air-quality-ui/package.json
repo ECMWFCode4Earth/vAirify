@@ -23,6 +23,7 @@
     "echarts": "^5.5.0",
     "echarts-for-react": "^3.0.2",
     "jest-each": "^29.7.0",
+    "js-sha1": "^0.7.0",
     "luxon": "^3.4.4",
     "maplibre-gl": "^4.5.0",
     "prettier": "^3.3.2",
