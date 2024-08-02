@@ -1,5 +1,4 @@
-import { Button } from '@mui/material'
-import './VAirifyButton.css'
+import classes from './VAirifyButton.module.css'
 
 interface Props {
   text: string
@@ -8,12 +7,12 @@ interface Props {
 }
 export const VAirifyButton = (props: Props) => {
   return (
-    <Button
+    <button
       onClick={props.onClick}
       disabled={props.isButtonDisabled}
-      className={'vairify-button'}
+      className={classes['vairify-button']}
     >
       {props.text}
-    </Button>
+    </button>
   )
 }
