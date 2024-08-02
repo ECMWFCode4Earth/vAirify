@@ -95,6 +95,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
       banner,
     }) => {
       await banner.clickOnDay(3)
+      await banner.confirmDate()
       expect(requestArray.length).toEqual(1)
     })
 
@@ -106,6 +107,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
       )
 
       await banner.clickOnDay(3)
+      await banner.confirmDate()
       expect(requestArray[0]).toContain(`base_time=${expectedForecastBaseTime}`)
     })
   })
