@@ -165,6 +165,12 @@ export const SingleCity = () => {
     )
   }, [])
 
+  const selectSite = useCallback((siteName: string) => {
+    setSelectedSites((current) =>
+      current.concat({ value: siteName, label: siteName }),
+    )
+  }, [])
+
   if (forecastDataError || measurementDataError) {
     return <>An error occurred</>
   }
@@ -221,6 +227,7 @@ export const SingleCity = () => {
                     stations={siteLocations!}
                     visibleLocations={selectedSites.map((site) => site.label)}
                     removeSite={deselectSite}
+                    addSite={selectSite}
                   ></StationMap>
                 </div>
               )}
