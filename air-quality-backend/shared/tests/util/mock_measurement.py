@@ -37,7 +37,7 @@ def create_mock_measurement_document(overrides) -> InSituMeasurement:
         "api_source": "test api",
         "created_time": datetime(2024, 6, 4, 0, 0, tzinfo=timezone.utc),
         "last_modified_time": datetime(2024, 6, 4, 0, 0, tzinfo=timezone.utc),
-        "location": {"type": "Point", "coordinates": [0, 0]},
+        "location": {"type": "Point", "coordinates": [0, 10]},
         "location_type": "city",
         "metadata": {"entity": "Entity", "sensor_type": "Test Sensor"},
     }

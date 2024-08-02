@@ -264,7 +264,7 @@ def create_mock_forecast_document(overrides) -> Forecast:
         "location_type": "city",
         "last_modified_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
         "created_time": datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-        "location": {"type": "Point", "coordinates": [90, 90]},
+        "location": {"type": "Point", "coordinates": [90, 50]},
         "forecast_range": 0,
         "overall_aqi_level": 1,
         "o3": {"aqi_level": 1, "value": 1.0},

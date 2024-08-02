@@ -1,3 +1,4 @@
+import { sha1 } from 'js-sha1'
 import { DateTime } from 'luxon'
 
 /**
@@ -38,7 +39,7 @@ export const textToColor = async (text: string): Promise<string> => {
   const generateHash = async (text: string): Promise<ArrayBuffer> => {
     const encoder = new TextEncoder()
     const data = encoder.encode(text)
-    return await crypto.subtle.digest('SHA-256', data)
+    return await sha1.arrayBuffer(data)
   }
 
   // Convert the hash to a hexadecimal string

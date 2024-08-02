@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import { useQueries } from '@tanstack/react-query'
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, render, screen, waitFor } from '@testing-library/react'
 import { DateTime } from 'luxon'
 
 import { SingleCity } from './SingleCity'
@@ -22,7 +22,17 @@ jest.mock('../../context', () => ({
   }),
 }))
 
-jest.mock('echarts-for-react', () => () => <div>Mock Chart</div>)
+jest.mock('./average-comparison-chart/AverageComparisonChart', () => ({
+  AverageComparisonChart: () => 'average chart',
+}))
+jest.mock('./site-measurement-chart/SiteMeasurementsChart', () => ({
+  SiteMeasurementsChart: () => 'measurements chart',
+}))
+jest.mock('./station-map/StationMap', () => ({
+  StationMap: () => 'mocked map',
+}))
+
+afterEach(cleanup)
 
 describe('SingleCityComponent', () => {
   it('shows loading spinner when forecast data loading', async () => {
@@ -74,6 +84,26 @@ describe('SingleCityComponent', () => {
         render(<SingleCity />)
       await waitFor(() => {
         expect(screen.getByText('Measurement Sites')).toBeInTheDocument()
+      })
+    })
+    it('shows the map if forecast data', async () => {
+      ;(useQueries as jest.Mock).mockReturnValue([
+        { data: ['one'], isPending: false, isError: false },
+        { data: [], isPending: false, isError: false },
+      ]),
+        render(<SingleCity />)
+      await waitFor(() => {
+        expect(screen.getByText('mocked map')).toBeInTheDocument()
+      })
+    })
+    it('does not show the map if no forecast data', async () => {
+      ;(useQueries as jest.Mock).mockReturnValue([
+        { data: [], isPending: false, isError: false },
+        { data: [], isPending: false, isError: false },
+      ]),
+        render(<SingleCity />)
+      await waitFor(() => {
+        expect(screen.queryByText('mocked map')).not.toBeInTheDocument()
       })
     })
     it('displays pollutant charts when all have values', async () => {

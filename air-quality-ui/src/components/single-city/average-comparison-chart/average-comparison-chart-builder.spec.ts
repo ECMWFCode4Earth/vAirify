@@ -18,6 +18,7 @@ jest.spyOn(Intl.DateTimeFormat.prototype, 'resolvedOptions').mockReturnValue({
 describe('AverageComparisonChart', () => {
   const forecastBaseData = {
     location_name: 'string',
+    location: { longitude: 10, latitude: 20 },
     no2: {
       aqi_level: 2,
       value: 2,

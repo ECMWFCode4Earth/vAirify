@@ -10,6 +10,7 @@ export const mockForecastResponseDto = (
   return {
     base_time: '2024-06-01T00:00:00',
     valid_time: '2024-06-01T00:00:00',
+    location: { longitude: 10, latitude: 20 },
     location_type: 'city',
     location_name: 'Bristol',
     overall_aqi_level: 5,
@@ -29,6 +30,7 @@ export const mockMeasurementResponseDto = (
     measurement_date: '2024-06-01T00:00:00',
     location_type: 'city',
     location_name: 'Bristol',
+    location: { longitude: 10, latitude: 20 },
     api_source: 'test',
     entity: 'entity',
     sensor_type: 'A grade',

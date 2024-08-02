@@ -6,6 +6,7 @@ import Select, { ActionMeta, MultiValue, OnChangeValue } from 'react-select'
 import { AverageComparisonChart } from './average-comparison-chart/AverageComparisonChart'
 import classes from './SingleCity.module.css'
 import { SiteMeasurementsChart } from './site-measurement-chart/SiteMeasurementsChart'
+import { StationMap } from './station-map/StationMap'
 import { useForecastContext } from '../../context'
 import { PollutantType, pollutantTypes } from '../../models'
 import { textToColor } from '../../services/echarts-service'
@@ -91,6 +92,28 @@ export const SingleCity = () => {
     [],
   )
 
+  const siteLocations = useMemo(() => {
+    const result = new Map<string, { longitude: number; latitude: number }>()
+    measurementData
+      ?.filter((measurement) =>
+        selectedSites.find(
+          (site) => site && site.value === getSiteName(measurement),
+        ),
+      )
+      .forEach((measurement) => {
+        const siteName = getSiteName(measurement)
+        const site = result.has(siteName)
+        if (!site) {
+          result.set(siteName, {
+            longitude: measurement.location.longitude,
+            latitude: measurement.location.latitude,
+          })
+        }
+      })
+
+    return result
+  }, [measurementData, selectedSites])
+
   const measurementsByPollutantBySite = useMemo(() => {
     return measurementData
       ?.filter((measurement) =>
@@ -155,7 +178,7 @@ export const SingleCity = () => {
       {(forecastDataPending || measurementDataPending) && <LoadingSpinner />}
       {!forecastDataPending && !measurementDataPending && (
         <>
-          <section className={classes['chart-section']}>
+          <section className={classes['section-columns']}>
             <div
               key="aqi_chart"
               data-testid="aqi_chart"
@@ -187,27 +210,38 @@ export const SingleCity = () => {
               )}
           </section>
           <section className={classes['site-measurements-section']}>
-            <form
-              className={classes['site-select-form']}
-              data-testid="sites-form"
-            >
-              <label
-                className={classes['site-select-label']}
-                htmlFor="sites-select"
+            <div className={classes['site-measurements-title']}>
+              Measurement Sites
+            </div>
+            <div className={classes['section-columns']}>
+              {forecastData[0] && (
+                <div
+                  key="station_map"
+                  data-testid="station_map"
+                  className={`${classes['site-select']} ${classes['map']}`}
+                >
+                  <StationMap
+                    mapCenter={forecastData[0].location}
+                    locations={siteLocations}
+                  ></StationMap>
+                </div>
+              )}
+              <form
+                className={classes['site-select-form']}
+                data-testid="sites-form"
               >
-                Measurement Sites
-              </label>
-              <Select
-                className={classes['site-select']}
-                inputId="sites-select"
-                isClearable={false}
-                isMulti
-                name="sites-select"
-                onChange={onSelectionChange}
-                options={sites}
-                value={selectedSites}
-              />
-            </form>
+                <Select
+                  className={classes['site-select']}
+                  inputId="sites-select"
+                  isClearable={false}
+                  isMulti
+                  name="sites-select"
+                  onChange={onSelectionChange}
+                  options={sites}
+                  value={selectedSites}
+                />
+              </form>
+            </div>
           </section>
         </>
       )}
