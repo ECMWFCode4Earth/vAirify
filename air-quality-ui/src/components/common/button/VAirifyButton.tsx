@@ -1,5 +1,4 @@
-import { Button } from '@mui/base/Button'
-
+import { Button } from '@mui/material'
 import './VAirifyButton.css'
 
 interface Props {
