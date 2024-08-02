@@ -220,6 +220,7 @@ export const SingleCity = () => {
                     mapCenter={forecastData[0].location}
                     stations={siteLocations!}
                     visibleLocations={selectedSites.map((site) => site.label)}
+                    removeSite={deselectSite}
                   ></StationMap>
                 </div>
               )}
