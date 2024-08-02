@@ -90,7 +90,10 @@ test.describe('City page resolution tests', () => {
         'pm10Chart',
         'so2Chart',
       ]
-      page.setViewportSize({ width: resolutionWidth, height: resolutionHeight })
+      page.setViewportSize({
+        width: resolutionWidth,
+        height: resolutionHeight,
+      })
       await gotoPage(page, 'city/Rio%20de%20Janeiro')
       await cityPage.waitForAllGraphsToBeVisible()
       for (let i = 0; i < charts.length; i++) {
@@ -523,7 +526,7 @@ test.describe('Charts are fully visible in 1920x1080 viewport', () => {
 })
 
 test.describe('High value measurements are displayed correctly', () => {
-  test.beforeEach(async ({ page, cityPage }) => {
+  test.beforeEach(async ({ page, cityPage, banner }) => {
     const mockedForecastResponse = [
       createForecastAPIResponseData({
         base_time: '2024-07-01T00:00:00Z',
@@ -559,6 +562,7 @@ test.describe('High value measurements are displayed correctly', () => {
     await gotoPage(page, '/city/Rio%20de%20Janeiro')
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
+    await banner.confirmDate()
   })
 
   test('AQI chart loads', async ({ cityPage }) => {
