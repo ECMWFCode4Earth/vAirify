@@ -300,7 +300,10 @@ def test__in_situ_etl__handles_update_to_existing_pollutant(ensure_forecast_cach
         "metadata": {},
         "last_modified_time": datetime(2024, 2, 22, 12, 0, 0),
         "no2": {
-            "value": 17, "unit": "test", "original_value": 17, "original_unit": "test",
+            "value": 17,
+            "unit": "test",
+            "original_value": 17,
+            "original_unit": "test",
         },
     }
     seed_api_test_data(collection_name, [existing_measurement])
@@ -334,7 +337,10 @@ def test__in_situ_etl__handles_update_for_new_pollutant(ensure_forecast_cache):
         "metadata": {},
         "last_modified_time": datetime(2024, 2, 22, 12, 0, 0),
         "no2": {
-            "value": 17, "unit": "test", "original_value": 17, "original_unit": "test",
+            "value": 17,
+            "unit": "test",
+            "original_value": 17,
+            "original_unit": "test",
         },
     }
     seed_api_test_data(collection_name, [existing_measurement])
@@ -446,14 +452,14 @@ def test__convert_ppm_to_ugm3_and_store__only_no2_so2_o3():
     delete_database_data(collection_name, query)
     berlin_file = f"{open_aq_cache_location}/Berlin_2024062613_2024062713.json"
 
-    berlin_openaq_data= []
+    berlin_openaq_data = []
     overrides = {
         "location": "berlin",
         "date": {"utc": "2024-06-26T13:10:20+00:00"},
         "value": 1000,
         "unit": "ppm",
         "coordinates": {"longitude": 13.41053, "latitude": 52.52437},
-        "parameter": "no2"
+        "parameter": "no2",
     }
 
     berlin_openaq_data.append(create_open_aq_measurement(overrides))
@@ -561,7 +567,7 @@ def create_measurement(
 
 def run_with_data_in_files(files_and_data: dict[str, list[dict]]):
     try:
-        for (filename, data) in files_and_data.items():
+        for filename, data in files_and_data.items():
             with open(filename, "w", encoding="utf-8") as f:
                 json.dump(data, f)
 
