@@ -52,5 +52,37 @@ def get_pollutant_index_level(value: float, pollutant_type: PollutantType) -> in
     return ranges.__len__()
 
 
+def get_pollutant_fractional_index_level(
+    value: float, pollutant_type: PollutantType
+) -> float:
+    ranges = _aqi_ranges_by_pollutant[pollutant_type]
+
+    # value below the first breakpoint
+    if value <= ranges[0][1]:
+        lower_level, lower_max = ranges[0]
+        return 1.0 + lower_level * (value / lower_max)
+
+    # value above the last breakpoint
+    if value > ranges[-1][1]:
+        return 7.0
+
+    # interpolate between breakpoints
+    for i in range(len(ranges) - 1):
+        lower_level, lower_max = ranges[i]
+        upper_level, upper_max = ranges[i + 1]
+
+        if lower_max < value <= upper_max:
+            return (
+                1.0
+                + lower_level
+                + (upper_level - lower_level)
+                * (value - lower_max)
+                / (upper_max - lower_max)
+            )
+
+    # default return value (should not be reached)
+    return 9999.0
+
+
 def get_overall_aqi_level(aqi_values: list[int]) -> int:
     return max(aqi_values)

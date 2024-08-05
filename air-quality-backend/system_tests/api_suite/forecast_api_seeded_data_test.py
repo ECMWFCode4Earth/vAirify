@@ -29,6 +29,7 @@ test_city_1_input_data: dict = create_forecast_database_data_with_overrides(
             2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
         ),
         "name": "Test City 1",
+        "location": create_location_values("point", [2, 3]),
         "no2": create_forecast_api_database_data_pollutant_value(1, 7.79346375328925),
         "o3": create_forecast_api_database_data_pollutant_value(4, 212.70172151472397),
         "overall_aqi_level": 6,
@@ -49,6 +50,7 @@ test_city_2_input_data: dict = create_forecast_database_data_with_overrides(
             2024, 6, 10, 0, 0, 0, tzinfo=datetime.timezone.utc
         ),
         "name": "Test City 2",
+        "location": create_location_values("point", [50, -70]),
         "no2": create_forecast_api_database_data_pollutant_value(6, 350.76859403417895),
         "o3": create_forecast_api_database_data_pollutant_value(5, 261.70172151472397),
         "overall_aqi_level": 6,
@@ -67,6 +69,7 @@ test_city_3_input_data: dict = create_forecast_database_data_with_overrides(
             2024, 6, 11, 0, 0, 0, tzinfo=datetime.timezone.utc
         ),
         "name": "Test City 3",
+        "location": create_location_values("point", [100, 100]),
         "no2": create_forecast_api_database_data_pollutant_value(4, 150.79346375328925),
         "o3": create_forecast_api_database_data_pollutant_value(3, 101.70172151472397),
         "overall_aqi_level": 4,
@@ -82,6 +85,10 @@ test_city_1_expected_response_data: dict = {
     "base_time": format_datetime_as_string(
         test_city_1_input_data["forecast_base_time"], "%Y-%m-%dT%H:%M:%SZ"
     ),
+    "location": {
+        "latitude": test_city_1_input_data["location"]["coordinates"][1],
+        "longitude": test_city_1_input_data["location"]["coordinates"][0],
+    },
     "valid_time": format_datetime_as_string(
         test_city_1_input_data["forecast_valid_time"], "%Y-%m-%dT%H:%M:%SZ"
     ),
@@ -99,6 +106,10 @@ test_city_2_expected_response_data: dict = {
     "base_time": format_datetime_as_string(
         test_city_2_input_data["forecast_base_time"], "%Y-%m-%dT%H:%M:%SZ"
     ),
+    "location": {
+        "latitude": test_city_2_input_data["location"]["coordinates"][1],
+        "longitude": test_city_2_input_data["location"]["coordinates"][0],
+    },
     "valid_time": format_datetime_as_string(
         test_city_2_input_data["forecast_valid_time"], "%Y-%m-%dT%H:%M:%SZ"
     ),

@@ -98,6 +98,21 @@ def get_forecast_data_from_database(
     return list(collection.find(query))
 
 
+def get_forecast_dates_between(
+        forecast_base_search_start: datetime,
+        forecast_base_search_end: datetime,
+) -> List[datetime]:
+    collection = get_collection("forecast_data")
+    query = {
+        "forecast_base_time": {
+            "$gte": forecast_base_search_start,
+            "$lte": forecast_base_search_end
+        }
+    }
+    items = collection.find(query).distinct("forecast_base_time")
+    return [i.replace(tzinfo=None) for i in items]
+
+
 def get_data_textures_from_database(
     forecast_base_time: datetime,
 ) -> List[DataTexture]:

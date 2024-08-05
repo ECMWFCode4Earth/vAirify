@@ -4,6 +4,7 @@ import pytest
 from cerberus import Validator
 import numpy as np
 from unittest.mock import patch
+import xarray as xr
 
 from shared.src.database.locations import AirQualityLocationType
 from etl.src.forecast.forecast_adapter import (
@@ -11,6 +12,7 @@ from etl.src.forecast.forecast_adapter import (
     transform,
     _normalise_data,
     _convert_data,
+    _calc_aqi_2D,
     create_data_textures,
     PollutantType,
 )
@@ -124,6 +126,47 @@ def test__normalise_data(arr, norm_min, norm_max, expected):
     np.testing.assert_allclose(norm_data, expected, rtol=1e-5)
 
 
+@pytest.fixture
+def sample_dataset():
+    # Create a sample xarray.Dataset with test data
+    data = xr.Dataset(
+        {
+            "pm10": (("x", "y"), np.array([[0, 30], [30, 10000]])),
+            "pm2_5": (("x", "y"), np.array([[0, 15], [30, 35]])),
+            "no2": (("x", "y"), np.array([[0, 65], [90, 110]])),
+            "o3": (("x", "y"), np.array([[0, 75], [80, 120]])),
+            "so2": (("x", "y"), np.array([[0, 275], [200, 250]])),
+        },
+        coords={
+            "x": [0, 1],
+            "y": [0, 1],
+        },
+    )
+    return data
+
+
+def test_calc_aqi_2D(sample_dataset):
+    result = _calc_aqi_2D(sample_dataset)
+
+    expected_values = np.array(
+        [
+            [1.0, 3.5],
+            [4.2, 7.0],
+        ]
+    )
+
+    expected_dataarray = xr.DataArray(
+        expected_values,
+        dims=["x", "y"],
+        coords={
+            "x": [0, 1],
+            "y": [0, 1],
+        },
+    )
+
+    xr.testing.assert_allclose(result, expected_dataarray, rtol=1e-5)
+
+
 def test__convert_data():
     rgb_data_array, min_val, max_val, units, num_lon, time = _convert_data(
         gridded_data_single_level, "pm10"
@@ -140,6 +183,12 @@ def test__convert_data():
         gridded_data_single_level, "winds_10m"
     )
     assert rgb_data_array_wind.shape == (11, 121, 3)
+
+    combined_sample_data = xr.merge(
+        [gridded_data_single_level, gridded_data_multi_level]
+    )
+    rgb_data_array_aqi, _, _, _, _, _ = _convert_data(combined_sample_data, "aqi")
+    assert rgb_data_array_aqi.shape == (11, 121, 1)
 
 
 @patch(
@@ -166,13 +215,13 @@ def test_create_data_textures(mock_process_variable):
     )
     db_metadata = create_data_textures(mock_forecast_data)
 
-    assert mock_process_variable.call_count == len(PollutantType) + 1
+    assert mock_process_variable.call_count == len(PollutantType) + 2
 
     expected_num_docs = (
-        len(PollutantType) * len(mock_process_variable.return_value)
-    ) + len(
-        mock_process_variable.return_value
-    )  # One document per pollutant + one for WINDS
+        (len(PollutantType) * len(mock_process_variable.return_value))
+        + len(mock_process_variable.return_value)
+        + len(mock_process_variable.return_value)
+    )  # One document per pollutant + one for AQI + one for WINDS
     assert (
         len(db_metadata) == expected_num_docs
     ), f"Expected {expected_num_docs} documents, got {len(db_metadata)}"

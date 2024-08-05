@@ -4,18 +4,22 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DateTime } from 'luxon'
 
-import { useForecastContext } from '../../context'
-
-export const ForecastBaseDatePicker = (): JSX.Element => {
-  const { forecastBaseDate, setForecastBaseDate } = useForecastContext()
+export interface ForecastBaseDatePickerProps {
+  setSelectedForecastBaseDate: (valueToSet: DateTime<boolean>) => void
+  setIsInvalidDateTime: (value: boolean) => void
+  forecastBaseDate: DateTime<boolean>
+}
+export const ForecastBaseDatePicker = (
+  props: ForecastBaseDatePickerProps,
+): JSX.Element => {
   const darkTheme = createTheme({
     palette: {
       mode: 'dark',
     },
   })
 
-  const IsTimeInvalid = (value: DateTime) => {
-    return value.minute != 0 || value.hour % 12 != 0
+  const isTimeInvalid = (value: DateTime) => {
+    return value > DateTime.utc() || value.minute != 0 || value.hour % 12 != 0
   }
 
   return (
@@ -25,17 +29,14 @@ export const ForecastBaseDatePicker = (): JSX.Element => {
           sx={{ '.MuiFormLabel-root': { color: 'white' } }}
           label="Forecast Base Date"
           disableFuture={true}
-          shouldDisableTime={IsTimeInvalid}
           skipDisabled={true}
           timeSteps={{ minutes: 720 }}
-          value={forecastBaseDate}
+          value={props.forecastBaseDate}
+          shouldDisableTime={isTimeInvalid}
           onChange={(newValue) => {
-            if (
-              newValue != null &&
-              newValue < DateTime.utc() &&
-              !IsTimeInvalid(newValue)
-            ) {
-              setForecastBaseDate(newValue)
+            if (newValue) {
+              props.setIsInvalidDateTime(isTimeInvalid(newValue))
+              props.setSelectedForecastBaseDate(newValue)
             }
           }}
         />
