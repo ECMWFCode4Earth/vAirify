@@ -1,4 +1,6 @@
 import datetime
+import pprint
+
 import pytest
 import requests
 from dotenv import load_dotenv
@@ -93,6 +95,7 @@ test_city_1_site_1_2024_6_21_15_0_0: dict = create_in_situ_database_data_with_ov
             2024, 6, 21, 15, 0, 0, tzinfo=datetime.timezone.utc
         ),
         "name": "Test City 1",
+        "location": create_location_values("point", [-40, 100]),
         "location_name": "Test City 1, Site 1",
     }
 )
@@ -752,16 +755,6 @@ def test__valid_api_source__assert_number_of_responses_is_correct(setup_test):
     ],
 )
 def test__assert_response_keys_and_values_are_correct(setup_test, api_parameters: dict):
-    parameters = {
-        "date_from": date_string_24_6_21_14_0_0,
-        "date_to": date_string_24_6_21_16_0_0,
-        "location_type": location_type,
-        "location_names": [
-            location_names_test_city_1,
-        ],
-        "api_source": api_source_open_aq,
-    }
-
     expected_response: list[dict] = [
         {
             "api_source": test_city_1_site_1_2024_6_21_15_0_0["api_source"],
@@ -770,6 +763,14 @@ def test__assert_response_keys_and_values_are_correct(setup_test, api_parameters
                 "%Y-%m-%dT%H:%M:%SZ",
             ),
             "location_type": test_city_1_site_1_2024_6_21_15_0_0["location_type"],
+            "location": {
+                "latitude": test_city_1_site_1_2024_6_21_15_0_0["location"][
+                    "coordinates"
+                ][1],
+                "longitude": test_city_1_site_1_2024_6_21_15_0_0["location"][
+                    "coordinates"
+                ][0],
+            },
             "location_name": test_city_1_site_1_2024_6_21_15_0_0["name"],
             "no2": test_city_1_site_1_2024_6_21_15_0_0["no2"]["value"],
             "o3": test_city_1_site_1_2024_6_21_15_0_0["o3"]["value"],
@@ -784,8 +785,9 @@ def test__assert_response_keys_and_values_are_correct(setup_test, api_parameters
         }
     ]
 
-    response = requests.request("GET", base_url, params=parameters, timeout=5.0)
+    response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
     response_json = response.json()
+    pprint.pprint(response_json)
     assert response_json == expected_response
 
 
