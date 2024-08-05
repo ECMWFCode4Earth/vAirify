@@ -2,6 +2,7 @@ import each from 'jest-each'
 import { DateTime } from 'luxon'
 
 import {
+  AverageAqiValues,
   SortMeasurementsType,
   averageAqiValues,
   sortMeasurements,
@@ -357,6 +358,16 @@ describe('averageAqiValues function', () => {
     jest
       .spyOn(CalcService, 'getPollutantIndexLevel')
       .mockImplementation(mock_getPollutantIndexLevel)
+  })
+
+  it(`Ignores empty measurement arrays`, () => {
+    const sortedMeasurementData: SortMeasurementsType = {
+      0: mock_time_bucket('2024-07-10T00:00:00.000Z', []),
+    }
+    const expected: AverageAqiValues[] = []
+    const result = averageAqiValues(sortedMeasurementData)
+    expect(result).toStrictEqual(expected)
+    expect(mock_getPollutantIndexLevel).not.toHaveBeenCalled()
   })
 
   it(`Returns AQI of 0 without getting pollutant index for single measurement without pollutants`, () => {
