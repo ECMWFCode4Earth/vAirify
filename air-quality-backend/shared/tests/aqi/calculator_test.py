@@ -3,6 +3,7 @@ from shared.src.aqi.pollutant_type import PollutantType
 from shared.src.aqi.calculator import (
     get_overall_aqi_level,
     get_pollutant_index_level,
+    get_pollutant_fractional_index_level,
 )
 
 
@@ -166,6 +167,46 @@ def test__get_pollutant_index_level(
 ):
     for value in values:
         assert get_pollutant_index_level(value, pollutant_type) == expected
+
+
+@pytest.mark.parametrize(
+    "values, pollutant_type, expected",
+    [
+        (
+            [0.0, 25.0, 49.0, 900.0],
+            PollutantType.OZONE,
+            [1.0, 1.5, 1.98, 7.0],
+        ),
+        (
+            [0.0, 25.0, 49.0, 2000.0],
+            PollutantType.NITROGEN_DIOXIDE,
+            [1.0, 1.625, 2.18, 7.0],
+        ),
+        (
+            [0.0, 25.0, 49.0, 2000.0],
+            PollutantType.SULPHUR_DIOXIDE,
+            [1.0, 1.25, 1.49, 7.0],
+        ),
+        (
+            [0.0, 25.0, 49.0, 2000.0],
+            PollutantType.PARTICULATE_MATTER_10,
+            [1.0, 2.25, 3.9, 7.0],
+        ),
+        (
+            [0.0, 25.0, 49.0, 2000.0],
+            PollutantType.PARTICULATE_MATTER_2_5,
+            [1.0, 4.0, 4.96, 7.0],
+        ),
+    ],
+)
+def test__get_pollutant_fractional_index_level(
+    values: list[float], pollutant_type: PollutantType, expected: list[float]
+):
+    for index, value in enumerate(values):
+        assert (
+            get_pollutant_fractional_index_level(value, pollutant_type)
+            == expected[index]
+        )
 
 
 @pytest.mark.parametrize(

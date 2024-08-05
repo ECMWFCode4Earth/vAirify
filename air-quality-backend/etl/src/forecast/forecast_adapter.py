@@ -21,6 +21,7 @@ VARIABLE_RANGES = {
     "no2": (0, 100.0),
     "so2": (0, 100.0),
     "go3": (0, 500.0),
+    "aqi": (1.0, 7.0),
     WIND_10M: (-50, 50.0),
 }
 
@@ -132,6 +133,37 @@ def _normalise_data(arr: np.ndarray, norm_min: float, norm_max: float) -> np.nda
     return (arr - norm_min) / (norm_max - norm_min)
 
 
+def _calc_aqi_2D(data: xr.Dataset) -> xr.DataArray:
+    """
+    Calculate the overall, fractional AQI from the gridded pollutant concentrations.
+    """
+    pollutant_types = [
+        PollutantType.NITROGEN_DIOXIDE,
+        PollutantType.OZONE,
+        PollutantType.PARTICULATE_MATTER_2_5,
+        PollutantType.PARTICULATE_MATTER_10,
+        PollutantType.SULPHUR_DIOXIDE,
+    ]
+
+    aqi_levels = []
+    for pollutant_type in pollutant_types:
+        pollutant_name = pollutant_type.literal()
+        if pollutant_name in data:
+            aqi_level = xr.apply_ufunc(
+                aqi_calculator.get_pollutant_fractional_index_level,
+                data[pollutant_name],
+                pollutant_type,
+                vectorize=True,
+                dask="parallelized",
+                output_dtypes=[float],
+            )
+            aqi_levels.append(aqi_level)
+
+    aqi = xr.concat(aqi_levels, dim="pollutant").max(dim="pollutant")
+
+    return aqi.round(decimals=1)
+
+
 def _convert_data(
     input_data: xr.Dataset, variable: str
 ) -> Tuple[np.ndarray, float, float, str, int, xr.DataArray]:
@@ -150,6 +182,9 @@ def _convert_data(
     if variable == WIND_10M:
         rgb_data_array = np.zeros((num_lat, num_lon * num_time, 3), dtype=np.uint8)
         units = input_data["u10"].attrs.get("units", "Unknown")
+    elif variable == "aqi":
+        rgb_data_array = np.zeros((num_lat, num_lon * num_time, 1), dtype=np.uint8)
+        units = "fractional overall AQI"
     else:
         rgb_data_array = np.zeros((num_lat, num_lon * num_time, 1), dtype=np.uint8)
         units = input_data[variable].attrs.get("units", "Unknown") + " * 1e-9"
@@ -173,6 +208,12 @@ def _convert_data(
             )
             rgb_data_array[:, start_index:end_index, 1] = np.clip(
                 normalised_data_V * 255, 0, 255
+            )
+        elif variable == "aqi":
+            aqi_data = _calc_aqi_2D(input_data.isel({time_dim: tt}) * 1e9)
+            normalised_data = _normalise_data(aqi_data, min_val, max_val)
+            rgb_data_array[:, start_index:end_index, 0] = np.clip(
+                normalised_data * 255, 0, 255
             )
         else:
             normalised_data = _normalise_data(
@@ -242,6 +283,19 @@ def create_data_textures(forecast_data: ForecastData):
             forecast_date,
         )
         db_metadata.extend(new_documents)
+
+    logging.info("Creating data textures for AQI")
+    combined_data = xr.merge(
+        [forecast_data._single_level_data, forecast_data._multi_level_data]
+    )
+    new_documents = _process_variable(
+        combined_data,
+        "aqi",
+        "aqi",
+        forecast_date,
+    )
+    logging.info(new_documents)
+    db_metadata.extend(new_documents)
 
     logging.info("Creating data textures for WINDS")
     new_documents = _process_variable(
