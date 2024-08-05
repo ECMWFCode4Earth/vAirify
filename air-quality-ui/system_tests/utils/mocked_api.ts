@@ -31,6 +31,7 @@ interface measurementsCityPageAPIresponse {
   measurement_date: string
   location_type: string
   location_name: string
+  location: { longitude: number; latitude: number }
   api_source: string
   no2: number
   o3: number
@@ -48,6 +49,7 @@ export function createMeasurementsCityPageResponseData(
     measurement_date: '2024-07-01T00:00:00Z',
     location_type: 'city',
     location_name: 'Rio de Janeiro',
+    location: { longitude: -22.90642, latitude: -43.18223 },
     api_source: 'OpenAQ',
     no2: defaultCitySnapshotValues.no2,
     o3: defaultCitySnapshotValues.o3,
