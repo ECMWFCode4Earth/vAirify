@@ -54,7 +54,7 @@ export const StationMap = (props: AverageComparisonChartProps) => {
       const root = createRoot(div)
       root.render(
         <StationPopup
-          title={stationName}
+          stationName={stationName}
           removeSite={(id) => removeSite(id)}
           addSite={(id) => addSite(id)}
           remove={remove}
