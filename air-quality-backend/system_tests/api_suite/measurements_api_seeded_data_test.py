@@ -1,6 +1,4 @@
 import datetime
-import pprint
-
 import pytest
 import requests
 from dotenv import load_dotenv
@@ -787,7 +785,6 @@ def test__assert_response_keys_and_values_are_correct(setup_test, api_parameters
 
     response = requests.request("GET", base_url, params=api_parameters, timeout=5.0)
     response_json = response.json()
-    pprint.pprint(response_json)
     assert response_json == expected_response
 
 
