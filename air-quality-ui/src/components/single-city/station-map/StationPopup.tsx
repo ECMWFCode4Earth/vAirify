@@ -1,5 +1,5 @@
 interface StationPopupProps {
-  title: string
+  stationName: string
   remove: boolean
   removeSite: (id: string) => void
   addSite: (id: string) => void
@@ -7,20 +7,26 @@ interface StationPopupProps {
 
 export const StationPopup = (props: StationPopupProps) => {
   const handleRemoveClick = () => {
-    props.removeSite(props.title)
+    props.removeSite(props.stationName)
   }
 
   const handleAddClick = () => {
-    props.addSite(props.title)
+    props.addSite(props.stationName)
   }
 
   return (
     <>
-      <div>
-        <div>{props.title}</div>
-        {props.remove && <button onClick={handleRemoveClick}>Remove</button>}
-        {!props.remove && <button onClick={handleAddClick}>Add</button>}
-      </div>
+      <div data-testid="station-name">{props.stationName}</div>
+      {props.remove && (
+        <button onClick={handleRemoveClick} data-testid="remove">
+          Remove
+        </button>
+      )}
+      {!props.remove && (
+        <button onClick={handleAddClick} data-testid="add">
+          Add
+        </button>
+      )}
     </>
   )
 }
