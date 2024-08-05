@@ -1,4 +1,4 @@
-import getPollutantIndexLevel from './aqi-calculator-service'
+import { getPollutantIndexLevel } from './aqi-calculator-service'
 
 describe('Aqi Calculator', () => {
   it.each([

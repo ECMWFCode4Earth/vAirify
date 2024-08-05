@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 
-import getPollutantIndexLevel from '../aqi-calculator/aqi-calculator-service'
+import { getPollutantIndexLevel } from '../aqi-calculator/aqi-calculator-service'
 import { MeasurementsResponseDto } from '../types'
 
 interface ITimeBucket {
@@ -14,7 +14,7 @@ interface ITimeBucket {
 export type SortMeasurementsType = { [timeOffset: number]: ITimeBucket }
 export type AverageAqiValues = { measurementDate: string; meanAqiValue: number }
 
-const generatePreAveragedDataStructure = (baseTime: DateTime<boolean>) => {
+const generateBuckets = (baseTime: DateTime<boolean>) => {
   const sortedMeasurements: SortMeasurementsType = {}
 
   for (let i = 0; i <= 5 * 24; i++) {
@@ -39,8 +39,7 @@ export const sortMeasurements = (
   measurementsData: MeasurementsResponseDto[],
   baseTime: DateTime<boolean>,
 ) => {
-  const sortedMeasurements: SortMeasurementsType =
-    generatePreAveragedDataStructure(baseTime)
+  const sortedMeasurements: SortMeasurementsType = generateBuckets(baseTime)
   for (let i = 0; i < measurementsData.length; i++) {
     const measurementDataTime = DateTime.fromISO(
       measurementsData[i].measurement_date,
@@ -112,7 +111,9 @@ export const averageAqiValues = (measurementsData: SortMeasurementsType) => {
       no2_num == 0 ? 0 : getPollutantIndexLevel(no2_total / no2_num, 'no2'),
       so2_num == 0 ? 0 : getPollutantIndexLevel(so2_total / so2_num, 'so2'),
       o3_num == 0 ? 0 : getPollutantIndexLevel(o3_total / o3_num, 'o3'),
-      pm25_num == 0 ? 0 : getPollutantIndexLevel(pm25_total / pm25_num, 'pm25'),
+      pm25_num == 0
+        ? 0
+        : getPollutantIndexLevel(pm25_total / pm25_num, 'pm2_5'),
       pm10_num == 0 ? 0 : getPollutantIndexLevel(pm10_total / pm10_num, 'pm10'),
     )
 
