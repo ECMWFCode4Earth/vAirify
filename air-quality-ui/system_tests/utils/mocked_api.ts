@@ -5,6 +5,7 @@ interface forecastAPIResponse {
   valid_time: string
   location_type: string
   location_name: string
+  location: { longitude: number; latitude: number }
   overall_aqi_level: number
   no2: { aqi_level: number; value: number }
   o3: { aqi_level: number; value: number }
@@ -71,6 +72,7 @@ export function createForecastAPIResponseData(
     valid_time: '2024-07-08T00:00:00Z',
     location_type: 'city',
     location_name: 'Los Angeles',
+    location: { longitude: -22.90642, latitude: -43.18223 },
     overall_aqi_level: 3,
     no2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.no2 },
     o3: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 },
