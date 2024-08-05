@@ -80,6 +80,70 @@ import { createForecastAPIResponseData } from '../../utils/mocked_api'
       })
   })
 })
+;[
+  {
+    url: '/city/Rio%20de%20Janeiro',
+    pageType: 'city',
+  },
+  {
+    url: '/city/summary',
+    pageType: 'summary',
+  },
+].forEach(({ url, pageType }) => {
+  test.describe(`Change forecast date with ok button on ${pageType} page`, () => {
+    const httpMethodGet: string = 'GET'
+    const forecastAPIEndpoint = '/forecast'
+    let requestArray: string[]
+
+    test.beforeEach(async ({ page, banner, basePage }) => {
+      const mockSystemDate: Date = new Date('2024-07-26T10:00:00Z')
+
+      await page.clock.setFixedTime(mockSystemDate)
+      await gotoPage(page, url)
+      await banner.calendarIcon.click()
+      requestArray = await basePage.captureNetworkRequestsAsArray(
+        page,
+        httpMethodGet,
+        basePage.baseAPIURL + forecastAPIEndpoint,
+      )
+    })
+    test.describe('when not clicking ok button', () => {
+      test('Verify no updates on date selection', async ({ banner }) => {
+        await banner.clickOnDay(3)
+        expect(requestArray.length).toBe(0)
+      })
+      test('Verify no updates on time selection', async ({ banner }) => {
+        await banner.clickOnTime('12:00')
+        expect(requestArray.length).toBe(0)
+      })
+      test('Verify no updates on date and time selection', async ({
+        banner,
+      }) => {
+        await banner.clickOnDay(3)
+        await banner.clickOnTime('12:00')
+        expect(requestArray.length).toBe(0)
+      })
+    })
+    test.describe('when clicking ok button', () => {
+      test('Verify updates on date selection', async ({ banner }) => {
+        await banner.clickOnDay(3)
+        await banner.confirmDate()
+        expect(requestArray.length).toBeGreaterThan(0)
+      })
+      test('Verify updates on time selection', async ({ banner }) => {
+        await banner.clickOnTime('12:00')
+        await banner.confirmDate()
+        expect(requestArray.length).toBeGreaterThan(0)
+      })
+      test('Verify updates on date and time selection', async ({ banner }) => {
+        await banner.clickOnDay(3)
+        await banner.clickOnTime('12:00')
+        await banner.confirmDate()
+        expect(requestArray.length).toBeGreaterThan(0)
+      })
+    })
+  })
+})
 
 test.describe('Range label', () => {
   test.beforeEach(async ({ page }) => {
