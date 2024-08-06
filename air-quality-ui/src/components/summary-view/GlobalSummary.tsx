@@ -15,6 +15,7 @@ import {
 } from '../../services/types'
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import GlobalSummaryTable from '../summary-grid/table/GlobalSummaryTable'
+import World from '../globe/World' // Import your Three.js scene component
 
 const GlobalSummary = (): JSX.Element => {
   const { forecastDetails } = useForecastContext()
@@ -108,6 +109,7 @@ const GlobalSummary = (): JSX.Element => {
       )}
       {!forecastPending && !summaryPending && (
         <div className={classes['summary-container']}>
+          <World />
           <SummaryViewHeader
             setShowAllColoured={wrapSetShowAllColoured}
             showAllColoured={showAllColoured}
