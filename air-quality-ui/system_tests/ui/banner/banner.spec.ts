@@ -119,42 +119,42 @@ import { createForecastAPIResponseData } from '../../utils/mocked_api'
     test.describe('when not clicking ok button', () => {
       test('Verify no updates on date selection', async ({ banner }) => {
         await banner.clickOnDay(3)
-        expect(forecastRequestArray.length).toBe(0)
-        expect(measurementRequestArray.length).toBe(0)
+        await expect(forecastRequestArray.length).toBe(0)
+        await expect(measurementRequestArray.length).toBe(0)
       })
       test('Verify no updates on time selection', async ({ banner }) => {
         await banner.clickOnTime('12:00')
-        expect(forecastRequestArray.length).toBe(0)
-        expect(measurementRequestArray.length).toBe(0)
+        await expect(forecastRequestArray.length).toBe(0)
+        await expect(measurementRequestArray.length).toBe(0)
       })
       test('Verify no updates on date and time selection', async ({
         banner,
       }) => {
         await banner.clickOnDay(3)
         await banner.clickOnTime('12:00')
-        expect(forecastRequestArray.length).toBe(0)
-        expect(measurementRequestArray.length).toBe(0)
+        await expect(forecastRequestArray.length).toBe(0)
+        await expect(measurementRequestArray.length).toBe(0)
       })
     })
     test.describe('when clicking ok button', () => {
       test('Verify updates on date selection', async ({ banner }) => {
         await banner.clickOnDay(3)
         await banner.confirmDate()
-        expect(forecastRequestArray.length).toBeGreaterThan(0)
-        expect(measurementRequestArray.length).toBeGreaterThan(0)
+        await expect(forecastRequestArray.length).toBeGreaterThan(0)
+        await expect(measurementRequestArray.length).toBeGreaterThan(0)
       })
       test('Verify updates on time selection', async ({ banner }) => {
         await banner.clickOnTime('12:00')
         await banner.confirmDate()
-        expect(forecastRequestArray.length).toBeGreaterThan(0)
-        expect(measurementRequestArray.length).toBeGreaterThan(0)
+        await expect(forecastRequestArray.length).toBeGreaterThan(0)
+        await expect(measurementRequestArray.length).toBeGreaterThan(0)
       })
       test('Verify updates on date and time selection', async ({ banner }) => {
         await banner.clickOnDay(3)
         await banner.clickOnTime('12:00')
         await banner.confirmDate()
-        expect(forecastRequestArray.length).toBeGreaterThan(0)
-        expect(measurementRequestArray.length).toBeGreaterThan(0)
+        await expect(forecastRequestArray.length).toBeGreaterThan(0)
+        await expect(measurementRequestArray.length).toBeGreaterThan(0)
       })
     })
   })
