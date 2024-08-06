@@ -3,3 +3,4 @@ class Routes:
     forecast_api_endpoint = local_base_url + "/forecast"
     measurements_api_endpoint = local_base_url + "/measurements"
     measurements_summary_api_endpoint = measurements_api_endpoint + "/summary"
+    texture_api_endpoint = local_base_url + "/data_textures"
