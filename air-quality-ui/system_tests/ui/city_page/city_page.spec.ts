@@ -724,7 +724,7 @@ const highValuedMeasurementData = [
 ]
 
 test.describe('PM2.5 influences AQI plot', () => {
-  test.beforeEach(async ({ page, cityPage }) => {
+  test.beforeEach(async ({ page, cityPage, banner }) => {
     const mockedForecastResponse = [
       createForecastAPIResponseData({
         base_time: '2024-07-01T00:00:00Z',
@@ -869,16 +869,17 @@ test.describe('PM2.5 influences AQI plot', () => {
     await gotoPage(page, '/city/Rio%20de%20Janeiro')
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
+    await banner.confirmDate()
   })
-
-  test('Expect in-situ AQI 3 plot at 00:00 due to PM2.5', async ({
+  //
+  test('Expect in-situ AQI 3 plot at 00:00 due to multiple stations showing PM2.5', async ({
     cityPage,
   }) => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.aqiChart)
     await expect(chartShot).toMatchSnapshot('Midnight-AQI-3-by-PM2.5.png')
   })
 
-  test('Expect in-situ AQI 2 when AQI site 4 is removed due to PM2.5', async ({
+  test('Expect in-situ AQI at 00:00 to be 2 when AQI site 4 is removed', async ({
     cityPage,
   }) => {
     await cityPage.siteRemover('AQI 4 site')
@@ -886,14 +887,11 @@ test.describe('PM2.5 influences AQI plot', () => {
     await expect(chartShot).toMatchSnapshot('Midnight-AQI-2-by-PM2.5.png')
   })
 
-  test('Expect in-situ AQI at 00:00 to be 3 when a site is removed and reselected', async ({
+  test('Expect in-situ AQI at 00:00 to revert to 3 when AQI site 4 is removed and reselected', async ({
     cityPage,
-    page,
   }) => {
     await cityPage.siteRemover('AQI 4 site')
-    page.reload()
-    await waitForIdleNetwork(page, cityPage.aqiChart)
-    await cityPage.setBaseTime('01/07/2024 00:00')
+    await cityPage.dropDownSelect('AQI 4 site')
     const chartShot = await cityPage.captureChartScreenshot(cityPage.aqiChart)
     await expect(chartShot).toMatchSnapshot('Midnight-AQI-3-by-PM2.5.png')
   })
