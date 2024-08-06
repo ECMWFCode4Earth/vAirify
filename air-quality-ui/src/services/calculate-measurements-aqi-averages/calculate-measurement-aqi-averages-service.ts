@@ -96,7 +96,7 @@ export const averageAqiValues = (measurementsData: SortMeasurementsType) => {
       })
     })
 
-    let overall_aqi = 0
+    const pollutant_aqis: number[] = [0]
     pollutantTypes.forEach((pollutant) => {
       if (pollutant_totals[pollutant].count > 0) {
         const mean_pollutant_value =
@@ -106,9 +106,11 @@ export const averageAqiValues = (measurementsData: SortMeasurementsType) => {
           pollutant,
         )
 
-        overall_aqi = overall_aqi > pollutant_aqi ? overall_aqi : pollutant_aqi
+        pollutant_aqis.push(pollutant_aqi)
       }
     })
+
+    const overall_aqi = Math.max(...pollutant_aqis)
 
     averageAqiValues.push({
       measurementDate: bucket.time_str,
