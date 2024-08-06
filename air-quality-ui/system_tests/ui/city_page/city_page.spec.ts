@@ -321,7 +321,7 @@ test.describe('City graph snapshots', () => {
         mockedAPIResponse: mockedForecastResponse,
       },
       {
-        endpointUrl: '*/**/air-pollutant/measurments*',
+        endpointUrl: '*/**/air-pollutant/measurements*',
         mockedAPIResponse: mockedMeasurementsCityPageResponse,
       },
     ])
