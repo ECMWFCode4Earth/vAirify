@@ -7,7 +7,7 @@ from etl.src.forecast.forecast_date_retriever import retrieve_dates_requiring_fo
 from etl.src.forecast.forecast_orchestrator import process_forecast
 from shared.src.database.locations import get_locations_by_type, AirQualityLocationType
 
-config.fileConfig("./logging.ini")
+config.fileConfig("../logging.ini")
 
 
 def main():
