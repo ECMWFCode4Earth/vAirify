@@ -5,7 +5,7 @@ import {
   MarkerOptions,
   Popup,
 } from 'maplibre-gl'
-import { useCallback, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { createMapConfig } from './map-service'
@@ -23,6 +23,25 @@ interface AverageComparisonChartProps {
   stationColors: Record<string, string>
   removeSite: (siteName: string) => void
   addSite: (siteName: string) => void
+}
+
+const createPopup = (
+  stationName: string,
+  removeSite: (id: string) => void,
+  addSite: (id: string) => void,
+  remove: boolean = true,
+) => {
+  const div = document.createElement('div')
+  const root = createRoot(div)
+  root.render(
+    <StationPopup
+      stationName={stationName}
+      removeSite={(id) => removeSite(id)}
+      addSite={(id) => addSite(id)}
+      remove={remove}
+    />,
+  )
+  return new Popup().setDOMContent(div)
 }
 
 export const StationMap = (props: AverageComparisonChartProps) => {
@@ -48,35 +67,24 @@ export const StationMap = (props: AverageComparisonChartProps) => {
 
   const { stations, removeSite, addSite } = props
 
-  const createPopup = useCallback(
-    (stationName: string, remove: boolean = true) => {
-      const div = document.createElement('div')
-      const root = createRoot(div)
-      root.render(
-        <StationPopup
-          stationName={stationName}
-          removeSite={(id) => removeSite(id)}
-          addSite={(id) => addSite(id)}
-          remove={remove}
-        />,
-      )
-      return new Popup().setDOMContent(div)
-    },
-    [addSite, removeSite],
-  )
-
   useEffect(() => {
     Object.values(stations).forEach((station) => {
       const marker = new Marker({ color: props.stationColors[station.name] })
-        .setLngLat([station.longitude, station.latitude])
-        .setPopup(createPopup(station.name))
-        .addTo(map.current!)
+      marker.setLngLat([station.longitude, station.latitude])
+      marker.setPopup(createPopup(station.name, removeSite, addSite))
+      marker.addTo(map.current!)
 
       markers.current?.set(station.name, marker)
     })
-  }, [stations, createPopup, props.stationColors])
+  }, [stations, props.stationColors, removeSite, addSite])
+
+  const firstLoad = useRef<boolean>(true)
 
   useEffect(() => {
+    if (firstLoad.current) {
+      firstLoad.current = false
+      return
+    }
     const updateMarker = (
       name: string,
       markerOptions: MarkerOptions,
@@ -88,10 +96,11 @@ export const StationMap = (props: AverageComparisonChartProps) => {
       }
       marker.remove()
       const newMarker = new Marker(markerOptions)
-        .setLngLat([marker._lngLat.lng, marker._lngLat.lat])
-        .setPopup(createPopup(name, remove))
+      newMarker.setLngLat([marker.getLngLat().lng, marker.getLngLat().lat])
+      newMarker.setPopup(createPopup(name, removeSite, addSite, remove))
 
       newMarker.addTo(map.current!)
+      map.current
       markers.current?.set(name, newMarker)
     }
 
@@ -102,7 +111,7 @@ export const StationMap = (props: AverageComparisonChartProps) => {
         updateMarker(name, { color: 'grey', opacity: '0.5' }, false)
       }
     }
-  }, [props.visibleLocations, createPopup, props.stationColors])
+  }, [props.visibleLocations, props.stationColors, removeSite, addSite])
 
   return <div ref={mapContainer} data-testid="map" className={classes['map']} />
 }
