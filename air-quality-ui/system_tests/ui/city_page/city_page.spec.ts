@@ -893,12 +893,12 @@ test.describe('In-situ AQI plots', () => {
     await banner.confirmDate()
   })
   //
-  test('Expect in-situ AQI 3 plot at 00:00 due to multiple stations showing PM2.5', async ({
+  test('Expect in-situ AQI 4 plot at 00:00 due to multiple stations showing PM2.5', async ({
     cityPage,
   }) => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.aqiChart)
     await expect(chartShot).toMatchSnapshot(
-      'In-situ-AQI-is-3-at-00:00-due-to-PM2.5.png',
+      'In-situ-AQI-is-4-at-00:00-due-to-PM2.5.png',
     )
   })
 
@@ -912,14 +912,14 @@ test.describe('In-situ AQI plots', () => {
     )
   })
 
-  test('Expect in-situ AQI at 00:00 to revert to 3 when AQI site 4 is removed and reselected', async ({
+  test('Expect in-situ AQI at 00:00 to revert to 4 when AQI site 4 is removed and reselected', async ({
     cityPage,
   }) => {
     await cityPage.siteRemover('AQI 4 site')
     await cityPage.dropDownSelect('AQI 4 site')
     const chartShot = await cityPage.captureChartScreenshot(cityPage.aqiChart)
     await expect(chartShot).toMatchSnapshot(
-      'In-situ-AQI-is-3-at-00:00-due-to-PM2.5.png',
+      'In-situ-AQI-is-4-at-00:00-due-to-PM2.5.png',
     )
   })
 
