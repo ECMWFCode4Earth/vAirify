@@ -75,9 +75,9 @@ describe('StationMap', () => {
     expect(mockAddTo).toHaveBeenCalledTimes(1)
   })
 
-  it('marker updated correctly', async () => {
+  it('marker removed correctly', async () => {
     const visibleLocations = ['stationA']
-    const { container } = render(
+    const { rerender } = render(
       <StationMap
         mapCenter={{ latitude: 1, longitude: 2 }}
         stations={{
@@ -93,7 +93,7 @@ describe('StationMap', () => {
     expect(libre.Marker).toHaveBeenCalledWith({ color: '#123456' })
     expect(mockAddTo).toHaveBeenCalledTimes(1)
 
-    render(
+    rerender(
       <StationMap
         mapCenter={{ latitude: 1, longitude: 2 }}
         stations={{
@@ -104,7 +104,6 @@ describe('StationMap', () => {
         removeSite={() => {}}
         stationColors={{ stationA: '#123456' }}
       />,
-      { container },
     )
     await waitFor(() => {
       expect(mockMarkerRemove).toHaveBeenCalledTimes(1)
@@ -112,6 +111,53 @@ describe('StationMap', () => {
         color: 'grey',
         opacity: '0.5',
       })
+    })
+  })
+
+  it('marker re-added correctly', async () => {
+    const visibleLocations = ['stationA']
+    const { rerender } = render(
+      <StationMap
+        mapCenter={{ latitude: 1, longitude: 2 }}
+        stations={{
+          stationA: { name: 'stationA', latitude: 1, longitude: 2 },
+        }}
+        visibleLocations={visibleLocations}
+        addSite={() => {}}
+        removeSite={() => {}}
+        stationColors={{ stationA: '#123456' }}
+      />,
+    )
+
+    rerender(
+      <StationMap
+        mapCenter={{ latitude: 1, longitude: 2 }}
+        stations={{
+          stationA: { name: 'stationA', latitude: 1, longitude: 2 },
+        }}
+        visibleLocations={[]}
+        addSite={() => {}}
+        removeSite={() => {}}
+        stationColors={{ stationA: '#123456' }}
+      />,
+    )
+
+    rerender(
+      <StationMap
+        mapCenter={{ latitude: 1, longitude: 2 }}
+        stations={{
+          stationA: { name: 'stationA', latitude: 1, longitude: 2 },
+        }}
+        visibleLocations={['StationA']}
+        addSite={() => {}}
+        removeSite={() => {}}
+        stationColors={{ stationA: '#123456' }}
+      />,
+    )
+    await waitFor(() => {
+      expect(mockMarkerRemove).toHaveBeenCalledTimes(2)
+      expect(libre.Marker).toHaveBeenCalledTimes(3)
+      expect(mockAddTo).toHaveBeenCalledTimes(3)
     })
   })
 

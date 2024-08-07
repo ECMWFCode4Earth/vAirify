@@ -94,17 +94,17 @@ export const SingleCity = () => {
 
   const siteLocations = useMemo(() => {
     return measurementData?.reduce<Record<string, Station>>(
-      (acc, measurement) => {
+      (locations, measurement) => {
         const siteName = getSiteName(measurement)
-        const check = acc[siteName]
-        if (!check) {
-          acc[siteName] = {
+        const location = locations[siteName]
+        if (!location) {
+          locations[siteName] = {
             name: siteName,
             longitude: measurement.location.longitude,
             latitude: measurement.location.latitude,
           }
         }
-        return acc
+        return locations
       },
       {},
     )

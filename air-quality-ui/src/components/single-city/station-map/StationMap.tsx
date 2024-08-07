@@ -1,6 +1,6 @@
 import {
   FullscreenControl,
-  Map as MapMap,
+  Map as LibreMap,
   Marker,
   MarkerOptions,
   Popup,
@@ -46,12 +46,17 @@ const createPopup = (
 
 export const StationMap = (props: AverageComparisonChartProps) => {
   const mapContainer = useRef<HTMLDivElement>(null)
-  const map = useRef<MapMap | null>(null)
+  const map = useRef<LibreMap | null>(null)
   const markers = useRef(new Map<string, Marker>())
+  const { stations, removeSite, addSite } = props
 
   useEffect(() => {
+    if (map.current != null) {
+      return
+    }
+
     const zoom = 9
-    const mapconfig = new MapMap(
+    const mapconfig = new LibreMap(
       createMapConfig(
         mapContainer.current!,
         props.mapCenter.latitude,
@@ -63,11 +68,6 @@ export const StationMap = (props: AverageComparisonChartProps) => {
     mapconfig.addControl(new FullscreenControl())
 
     map.current = mapconfig
-  }, [props.mapCenter.latitude, props.mapCenter.longitude])
-
-  const { stations, removeSite, addSite } = props
-
-  useEffect(() => {
     Object.values(stations).forEach((station) => {
       const marker = new Marker({ color: props.stationColors[station.name] })
       marker.setLngLat([station.longitude, station.latitude])
@@ -76,7 +76,14 @@ export const StationMap = (props: AverageComparisonChartProps) => {
 
       markers.current?.set(station.name, marker)
     })
-  }, [stations, props.stationColors, removeSite, addSite])
+  }, [
+    props.mapCenter.latitude,
+    props.mapCenter.longitude,
+    stations,
+    props.stationColors,
+    removeSite,
+    addSite,
+  ])
 
   const firstLoad = useRef<boolean>(true)
 
