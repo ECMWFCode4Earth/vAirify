@@ -1,31 +1,32 @@
-import pytest
+import datetime
+from dotenv import load_dotenv
 
 from etl.scripts.run_forecast_etl import main
 import os
 from unittest import mock
 
-from system_tests.forecast_etl_suite.cams_known_grib_test import data_query
 from system_tests.utils.database_utilities import (
     delete_database_data,
     get_database_data,
 )
 
-
-@pytest.fixture(scope="module")
-def setup_data():
-    # Set up code
-    with mock.patch.dict(os.environ, {
-        "FORECAST_BASE_TIME": "2024-6-4 00",
-        "FORECAST_RETRIEVAL_PERIOD": "0"
-    }):
-        delete_database_data("forecast_data", data_query)
-        main()
-        yield
+load_dotenv()
 
 
-def test__missing_time_london__add_missing_data(
-        setup_data
-):
-    # dict_result = get_database_data("forecast_data", data_query)
-    # print(dict_result)
-    assert 2 == []
+@mock.patch.dict(os.environ, {
+    "FORECAST_BASE_TIME": "2024-6-4 00",
+    "STORE_GRIB_FILES": "True",
+    "FORECAST_RETRIEVAL_PERIOD": "1"
+})
+def test__missing_time_london__add_missing_data():
+    data_query = {"forecast_base_time": {"$lte": datetime.datetime(2024, 6, 4, 00, tzinfo=datetime.timezone.utc),
+                                         "$gte": datetime.datetime(2024, 6, 3, 00, tzinfo=datetime.timezone.utc)}}
+    data_query_to_delete = {"forecast_base_time": datetime.datetime(2024, 6, 3, 12, tzinfo=datetime.timezone.utc)}
+
+    main()
+    delete_database_data("forecast_data", data_query_to_delete)
+    dict_result_after_deletion = get_database_data("forecast_data", data_query)
+    main()
+    dict_result_after_refill = get_database_data("forecast_data", data_query)
+    assert len(dict_result_after_deletion) == 12546
+    assert len(dict_result_after_refill) == 18819
