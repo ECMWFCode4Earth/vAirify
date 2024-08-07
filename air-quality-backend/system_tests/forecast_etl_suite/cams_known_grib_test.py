@@ -21,7 +21,10 @@ data_query = {"forecast_base_time": {"$eq": forecast_base_time}}
 @pytest.fixture(scope="module")
 def setup_data():
     # Set up code
-    with mock.patch.dict(os.environ, {"FORECAST_BASE_TIME": "2024-6-4 00"}):
+    with mock.patch.dict(os.environ, {
+        "FORECAST_BASE_TIME": "2024-6-4 00",
+        "FORECAST_RETRIEVAL_PERIOD": "0"
+    }):
         delete_database_data("forecast_data", data_query)
         main()
         yield
@@ -153,19 +156,20 @@ def test__document_count_matches_expected_for_a_single_city(setup_data):
     # Check 41 forecasts overall for the city
     dict_result = get_database_data("forecast_data", query)
     assert (
-            len(dict_result) == 41
+        len(dict_result) == 41
     ), f"Expected 41 documents for city {rand_city}, but got {len(dict_result)}"
 
     # Check 8 forecasts for the city in a day randomly picked from the forecast
     offset = random.randint(0, 4)
     forecast_date = datetime(2024, 6, 4, tzinfo=timezone.utc) + timedelta(days=offset)
     query["forecast_valid_time"] = {
-        "$gte": forecast_date, "$lt": forecast_date + timedelta(days=1)
+        "$gte": forecast_date,
+        "$lt": forecast_date + timedelta(days=1),
     }
 
     dict_result = get_database_data("forecast_data", query)
     assert (
-            len(dict_result) == 8
+        len(dict_result) == 8
     ), f"Expected 8 documents for {rand_city}, day {offset}, but got {len(dict_result)}"
 
 

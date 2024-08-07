@@ -16,6 +16,7 @@ export class Banner extends BasePage {
   readonly datePickerYearCloseButton: Locator
   readonly futureDay27: Locator
   readonly logo: Locator
+  readonly dateOkButton: Locator
   readonly year2025: Locator
 
   constructor(page: Page) {
@@ -79,5 +80,9 @@ export class Banner extends BasePage {
 
   async setBaseTime(baseTime: string): Promise<void> {
     await this.datePicker.fill(baseTime)
+  }
+
+  async confirmDate() {
+    await this.dateOkButton.click()
   }
 }

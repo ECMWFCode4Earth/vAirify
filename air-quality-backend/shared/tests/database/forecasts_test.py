@@ -8,7 +8,7 @@ from freezegun import freeze_time
 
 from shared.src.database.forecasts import (
     get_forecast_data_from_database,
-    get_data_textures_from_database,
+    get_data_textures_from_database, get_forecast_dates_between,
 )
 from shared.src.database.forecasts import insert_data, delete_data_before
 from shared.tests.util.mock_forecast_data import create_mock_forecast_document
@@ -18,6 +18,15 @@ from shared.tests.util.mock_texture_data import create_mock_texture_document
 @pytest.fixture
 def mock_collection():
     yield mongomock.MongoClient(tz_aware=True).db.collection
+
+
+@pytest.fixture
+def mock_forecast_collection():
+    collection = mongomock.MongoClient(tz_aware=True).db.collection
+    with patch(
+            "shared.src.database.forecasts.get_collection", return_value=collection
+    ):
+        yield collection
 
 
 @freeze_time("2024-05-24")
@@ -48,75 +57,121 @@ def test__insert_new_data(mock_collection):
         }
 
 
-def test__delete_data_before(mock_collection):
-    with patch(
-        "shared.src.database.forecasts.get_collection", return_value=mock_collection
-    ):
-        forecast = {
-            "forecast_base_time": datetime.now(),
-            "location_type": "city",
-            "name": "location1",
-            "source": "API",
-            "overall_aqi_level": 1,
-            "o3": {"value": 123, "aqi_level": 1},
-        }
-        mock_collection.insert_many(
-            [
-                {**forecast, "forecast_valid_time": datetime(2024, 5, 1, 0, 0)},
-                {**forecast, "forecast_valid_time": datetime(2024, 5, 2, 0, 0)},
-                {**forecast, "forecast_valid_time": datetime(2024, 5, 3, 0, 0)},
-            ]
-        )
+def test__delete_data_before(mock_forecast_collection):
+    forecast = {
+        "forecast_base_time": datetime.now(),
+        "location_type": "city",
+        "name": "location1",
+        "source": "API",
+        "overall_aqi_level": 1,
+        "o3": {"value": 123, "aqi_level": 1},
+    }
+    mock_forecast_collection.insert_many(
+        [
+            {**forecast, "forecast_valid_time": datetime(2024, 5, 1, 0, 0)},
+            {**forecast, "forecast_valid_time": datetime(2024, 5, 2, 0, 0)},
+            {**forecast, "forecast_valid_time": datetime(2024, 5, 3, 0, 0)},
+        ]
+    )
 
-        delete_data_before(datetime(2024, 5, 2, 0, 0))
+    delete_data_before(datetime(2024, 5, 2, 0, 0))
 
-        results = list(mock_collection.find({}))
-        assert len(results) == 2
+    results = list(mock_forecast_collection.find({}))
+    assert len(results) == 2
 
 
-def test__get_forecast_from_database__no_location(mock_collection):
-    with patch(
-        "shared.src.database.forecasts.get_collection",
-        return_value=mock_collection,
-    ):
-        mock_collection.insert_many(
-            [
-                create_mock_forecast_document({"name": "ABC"}),
-                create_mock_forecast_document({"name": "DEF"}),
-            ]
-        )
-        result = get_forecast_data_from_database(
-            datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-            datetime(2024, 5, 27, 23, 0, tzinfo=timezone.utc),
-            "city",
-            datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-        )
+def test__get_forecast_from_database__no_location(mock_forecast_collection):
+    mock_forecast_collection.insert_many(
+        [
+            create_mock_forecast_document({"name": "ABC"}),
+            create_mock_forecast_document({"name": "DEF"}),
+        ]
+    )
+    result = get_forecast_data_from_database(
+        datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
+        datetime(2024, 5, 27, 23, 0, tzinfo=timezone.utc),
+        "city",
+        datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
+    )
 
-        assert len(result) == 2
+    assert len(result) == 2
 
 
-def test__get_forecast_from_database__with_location(mock_collection):
-    with patch(
-        "shared.src.database.forecasts.get_collection",
-        return_value=mock_collection,
-    ):
-        mock_collection.insert_many(
-            [
-                create_mock_forecast_document({"name": "Abidjan"}),
-                create_mock_forecast_document({"name": "Not Abidjan"}),
-            ]
-        )
+def test__get_forecast_from_database__with_location(mock_forecast_collection):
+    mock_forecast_collection.insert_many(
+        [
+            create_mock_forecast_document({"name": "Abidjan"}),
+            create_mock_forecast_document({"name": "Not Abidjan"}),
+        ]
+    )
 
-        result = get_forecast_data_from_database(
-            datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-            datetime(2024, 5, 27, 23, 0, tzinfo=timezone.utc),
-            "city",
-            datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
-            "Abidjan",
-        )
+    result = get_forecast_data_from_database(
+        datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
+        datetime(2024, 5, 27, 23, 0, tzinfo=timezone.utc),
+        "city",
+        datetime(2024, 5, 27, 12, 0, tzinfo=timezone.utc),
+        "Abidjan",
+    )
 
-        assert len(result) == 1
-        assert result[0]["name"] == "Abidjan"
+    assert len(result) == 1
+    assert result[0]["name"] == "Abidjan"
+
+
+def test__get_forecast_dates_between__database_empty(mock_forecast_collection):
+    result = get_forecast_dates_between(
+        datetime(2024, 5, 27, 0),
+        datetime(2024, 5, 29, 0))
+
+    assert len(result) == 0
+
+
+def test__get_forecast_dates_between__dates_outside_range(mock_forecast_collection):
+    mock_forecast_collection.insert_many(
+        [
+            create_mock_forecast_document(
+                {
+                    "forecast_base_time": datetime(2024, 5, 26, 23, 59, 59),
+                }
+            ),
+            create_mock_forecast_document(
+                {
+                    "forecast_base_time": datetime(2024, 5, 29, 0, 0, 1),
+                }
+            ),
+        ]
+    )
+    result = get_forecast_dates_between(
+        datetime(2024, 5, 27, 0),
+        datetime(2024, 5, 29, 0))
+
+    assert len(result) == 0
+
+
+def test__get_forecast_dates_between__dates_inside_range(mock_forecast_collection):
+    mock_forecast_collection.insert_many(
+        [
+            create_mock_forecast_document(
+                {
+                    "forecast_base_time": datetime(2024, 5, 27),
+                }
+            ),
+            create_mock_forecast_document(
+                {
+                    "forecast_base_time": datetime(2024, 5, 28, 1, 2, 3),
+                }
+            ),
+            create_mock_forecast_document(
+                {
+                    "forecast_base_time": datetime(2024, 5, 29),
+                }
+            ),
+        ]
+    )
+    result = get_forecast_dates_between(
+        datetime(2024, 5, 27, 0),
+        datetime(2024, 5, 29, 0))
+
+    assert len(result) == 3
 
 
 def test__get_data_textures_from_database__single_match(mock_collection):
