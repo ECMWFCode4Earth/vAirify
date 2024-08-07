@@ -163,3 +163,8 @@ def save_data_textures(
         documents.append(document)
 
     return documents
+
+
+def delete_data_textures_before(archive_date: datetime):
+    # TODO : Write me
+    return
