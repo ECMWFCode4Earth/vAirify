@@ -7,7 +7,7 @@ from unittest.mock import patch
 from shared.src.database.in_situ import (
     find_by_criteria,
     insert_data,
-    delete_data_before,
+    delete_in_situ_data_before,
     get_averaged,
     ApiSource,
 )
@@ -45,7 +45,7 @@ def test__insert_new_data(mock_collection):
         }
 
 
-def test__delete_data_before(mock_collection):
+def test__delete_in_situ_data_before(mock_collection):
     with patch(
         "shared.src.database.in_situ.get_collection", return_value=mock_collection
     ):
@@ -62,7 +62,7 @@ def test__delete_data_before(mock_collection):
             ]
         )
 
-        delete_data_before(datetime(2024, 5, 2, 0, 0))
+        delete_in_situ_data_before(datetime(2024, 5, 2, 0, 0))
 
         results = list(mock_collection.find({}))
         assert len(results) == 2
