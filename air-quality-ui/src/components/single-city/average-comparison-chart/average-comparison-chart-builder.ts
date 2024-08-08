@@ -12,7 +12,7 @@ import {
 
 export const getOptions = (zoomPercent: number): EChartsOption => {
   return {
-    ...baseOptions('AQI', zoomPercent),
+    ...baseOptions('AQI', zoomPercent, ''),
     yAxis: yAxisOptions('AQI', 6),
     tooltip: {
       trigger: 'axis',

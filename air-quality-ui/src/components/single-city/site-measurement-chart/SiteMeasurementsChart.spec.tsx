@@ -18,6 +18,7 @@ describe('AverageComparisonChart', () => {
   it('renders with forecast data and measurement data', async () => {
     render(
       <SiteMeasurementsChart
+        cityName="name"
         forecastData={[]}
         measurementsBySite={{}}
         pollutantType={'pm10'}

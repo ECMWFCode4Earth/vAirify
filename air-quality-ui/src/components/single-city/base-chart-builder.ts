@@ -45,10 +45,12 @@ export const yAxisOptions = (
 export const baseOptions = (
   titleText: string,
   zoomPercent: number,
+  subtext: string,
 ): EChartsOption => {
   return {
     title: {
       text: titleText,
+      subtext,
       left: 'center',
     },
     xAxis: {

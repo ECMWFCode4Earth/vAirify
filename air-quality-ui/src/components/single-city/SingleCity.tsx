@@ -206,6 +206,7 @@ export const SingleCity = () => {
                       onSiteClick={deselectSite}
                       pollutantType={pollutantType as PollutantType}
                       seriesColorsBySite={siteColors}
+                      cityName={locationName}
                     />
                   </div>
                 ),

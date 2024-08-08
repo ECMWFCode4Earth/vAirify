@@ -94,10 +94,11 @@ const createMeasurementSeries = (
 const createChartOptions = (
   chartTitle: string,
   zoomPercent: number,
+  subtext: string,
 ): EChartsOption => {
   return {
-    ...baseOptions(chartTitle, zoomPercent),
-    yAxis: yAxisOptions('µg/m³'),
+    ...baseOptions(chartTitle, zoomPercent, subtext),
+    yAxis: yAxisOptions('Concentration (µg/m³)'),
     tooltip: {
       trigger: 'item',
     },
@@ -109,6 +110,8 @@ export const generateMeasurementChart = (
   zoomPercent: number,
   measurementsBySite: Record<string, MeasurementsResponseDto[]>,
   forecastData: ForecastResponseDto[],
+  subtext: string,
+  city: string,
   seriesColorsBySite?: Record<string, string>,
 ) => {
   const series = createMeasurementSeries(
@@ -118,8 +121,8 @@ export const generateMeasurementChart = (
   )
   const forecast = createForecastSeries(pollutantType, forecastData)
 
-  const chartTile = pollutantTypeDisplay[pollutantType]
-  const options = createChartOptions(chartTile, zoomPercent)
+  const chartTile = `${city} - ${pollutantTypeDisplay[pollutantType]}`
+  const options = createChartOptions(chartTile, zoomPercent, subtext)
 
   return {
     ...options,
