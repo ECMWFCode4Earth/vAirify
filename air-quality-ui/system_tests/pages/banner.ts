@@ -16,6 +16,7 @@ export class Banner extends BasePage {
   readonly datePickerYearCloseButton: Locator
   readonly futureDay27: Locator
   readonly logo: Locator
+  readonly dateOkButton: Locator
   readonly year2025: Locator
 
   constructor(page: Page) {

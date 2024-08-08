@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 
-import getPollutantIndexLevel from '../aqi-calculator/aqi-calculator-service'
+import { pollutantTypes } from '../../models'
+import { getPollutantIndexLevel } from '../aqi-calculator/aqi-calculator-service'
 import { MeasurementsResponseDto } from '../types'
 
 interface ITimeBucket {
@@ -14,7 +15,7 @@ interface ITimeBucket {
 export type SortMeasurementsType = { [timeOffset: number]: ITimeBucket }
 export type AverageAqiValues = { measurementDate: string; meanAqiValue: number }
 
-const generatePreAveragedDataStructure = (baseTime: DateTime<boolean>) => {
+const generateBuckets = (baseTime: DateTime<boolean>) => {
   const sortedMeasurements: SortMeasurementsType = {}
 
   for (let i = 0; i <= 5 * 24; i++) {
@@ -39,8 +40,7 @@ export const sortMeasurements = (
   measurementsData: MeasurementsResponseDto[],
   baseTime: DateTime<boolean>,
 ) => {
-  const sortedMeasurements: SortMeasurementsType =
-    generatePreAveragedDataStructure(baseTime)
+  const sortedMeasurements: SortMeasurementsType = generateBuckets(baseTime)
   for (let i = 0; i < measurementsData.length; i++) {
     const measurementDataTime = DateTime.fromISO(
       measurementsData[i].measurement_date,
@@ -73,20 +73,48 @@ export const averageAqiValues = (measurementsData: SortMeasurementsType) => {
     if (measurements.length === 0) {
       continue
     }
-    let totalAqi = 0
-    for (let i = 0; i < measurements.length; i++) {
-      const overallAqiLevel = Math.max(
-        getPollutantIndexLevel(measurements[i]['no2'], 'no2'),
-        getPollutantIndexLevel(measurements[i]['o3'], 'o3'),
-        getPollutantIndexLevel(measurements[i]['pm10'], 'pm10'),
-        getPollutantIndexLevel(measurements[i]['pm2_5'], 'pm2_5'),
-        getPollutantIndexLevel(measurements[i]['so2'], 'so2'),
-      )
-      totalAqi = totalAqi + overallAqiLevel
+
+    interface pollutant_total {
+      sum: number
+      count: number
     }
+    const pollutant_totals: Record<string, pollutant_total> = {}
+
+    pollutantTypes.forEach((pollutant) => {
+      pollutant_totals[pollutant] = { sum: 0, count: 0 }
+    })
+
+    measurements.forEach((measurement) => {
+      pollutantTypes.forEach((pollutant) => {
+        if (
+          measurement[pollutant] != undefined &&
+          measurement[pollutant] != 0
+        ) {
+          pollutant_totals[pollutant].sum += measurement[pollutant]
+          pollutant_totals[pollutant].count++
+        }
+      })
+    })
+
+    const pollutant_aqis: number[] = [0]
+    pollutantTypes.forEach((pollutant) => {
+      if (pollutant_totals[pollutant].count > 0) {
+        const mean_pollutant_value =
+          pollutant_totals[pollutant].sum / pollutant_totals[pollutant].count
+        const pollutant_aqi = getPollutantIndexLevel(
+          mean_pollutant_value,
+          pollutant,
+        )
+
+        pollutant_aqis.push(pollutant_aqi)
+      }
+    })
+
+    const overall_aqi = Math.max(...pollutant_aqis)
+
     averageAqiValues.push({
       measurementDate: bucket.time_str,
-      meanAqiValue: Math.round(totalAqi / measurements.length),
+      meanAqiValue: overall_aqi,
     })
   }
   return averageAqiValues

@@ -9,10 +9,10 @@ export const aqiRangesByPollutant: AqiRangesByPollutantType = {
   pm2_5: [10, 20, 25, 50, 75, 800],
 }
 
-export default function getPollutantIndexLevel(
+export const getPollutantIndexLevel = (
   value: number | undefined,
   pollutantType: string,
-) {
+) => {
   if (value === undefined) {
     return 0
   }
