@@ -16,6 +16,7 @@ import {
 } from '../../../services/types'
 
 interface AverageComparisonChartProps {
+  cityName: string
   forecastData?: ForecastResponseDto[]
   measurementsData?: MeasurementsResponseDto[]
   forecastBaseTime: DateTime<boolean>
@@ -47,6 +48,7 @@ export const AverageComparisonChart = (
     <ReactECharts
       className={classes['chart']}
       option={getForecastOptions(
+        props.cityName,
         zoomPercent,
         props.forecastData,
         measurementsAveragedData,

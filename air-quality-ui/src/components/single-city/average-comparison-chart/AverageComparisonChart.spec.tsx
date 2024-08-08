@@ -22,6 +22,7 @@ describe('AverageComparisonChart', () => {
   it('renders with no data', async () => {
     render(
       <AverageComparisonChart
+        cityName="city-name"
         forecastBaseTime={DateTime.fromISO('2024-05-25T09:00:00.00+00:00')}
         measurementsData={undefined}
         forecastData={undefined}
@@ -34,6 +35,7 @@ describe('AverageComparisonChart', () => {
   it('renders with forecast data and measurement data', async () => {
     render(
       <AverageComparisonChart
+        cityName="city-name"
         forecastData={[mockForecastResponseDto()]}
         measurementsData={[mockMeasurementResponseDto()]}
         forecastBaseTime={DateTime.fromISO('2024-05-25T09:00:00.00+00:00')}
