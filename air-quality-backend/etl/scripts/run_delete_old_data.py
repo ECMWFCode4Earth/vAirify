@@ -15,15 +15,15 @@ config.fileConfig("./logging.ini")
 def main():
     load_dotenv()
 
-    archive_limit_weeks = int(os.getenv("ARCHIVE_LIMIT_WEEKS", 0))
+    archive_limit_weeks = int(os.getenv("DELETE_LIMIT_WEEKS", 0))
 
     if archive_limit_weeks <= 0:
-        logging.warning('Archiving has not received a valid limit so will not run')
+        logging.warning('Deletion has not received a valid limit so will not run')
         return
 
     initial_valid_date = datetime.utcnow() - timedelta(weeks=archive_limit_weeks)
 
-    logging.info(f"Archiving data earlier than {initial_valid_date}")
+    logging.info(f"Deleting data earlier than {initial_valid_date}")
     delete_forecast_data_before(initial_valid_date)
     delete_in_situ_data_before(initial_valid_date)
     delete_data_texture_data_before(initial_valid_date)
