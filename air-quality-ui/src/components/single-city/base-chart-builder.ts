@@ -62,5 +62,14 @@ export const baseOptions = (
       end: zoomPercent,
     },
     animation: false,
+    toolbox: {
+      feature: {
+        saveAsImage: {
+          pixelRatio: 3,
+          excludeComponents: ['dataZoom', 'toolbox'],
+        },
+      },
+      right: '10%',
+    },
   }
 }
