@@ -81,8 +81,4 @@ export class Banner extends BasePage {
   async setBaseTime(baseTime: string): Promise<void> {
     await this.datePicker.fill(baseTime)
   }
-
-  async confirmDate() {
-    await this.dateOkButton.click()
-  }
 }
