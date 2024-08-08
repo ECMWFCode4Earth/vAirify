@@ -16,6 +16,7 @@ export class CityPage extends BasePage {
   readonly siteDropdown: Locator
   readonly siteForm: Locator
   readonly so2Chart: Locator
+  readonly stationMap: Locator
   readonly title: Locator
   readonly toolbarNavigation: Locator
 
@@ -33,6 +34,7 @@ export class CityPage extends BasePage {
     this.siteDropdown = page.getByTestId('sites-form').locator('svg').nth(3)
     this.siteForm = page.getByTestId('sites-form')
     this.so2Chart = page.getByTestId('site_measurements_chart_so2')
+    this.stationMap = page.getByTestId('station_map')
     this.title = page.locator('title')
     this.toolbarNavigation = page.getByLabel('Toolbar with site navigation')
   }
@@ -81,5 +83,9 @@ export class CityPage extends BasePage {
     await this.o3Chart.waitFor({ state: 'visible' })
     await this.no2Chart.waitFor({ state: 'visible' })
     await this.so2Chart.waitFor({ state: 'visible' })
+  }
+
+  async waitForStationMapToBeVisible() {
+    await this.stationMap.waitFor({ state: 'visible' })
   }
 }
