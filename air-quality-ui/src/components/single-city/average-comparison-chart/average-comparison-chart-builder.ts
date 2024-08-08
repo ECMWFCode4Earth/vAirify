@@ -12,10 +12,11 @@ import {
 
 export const getOptions = (
   cityName: string,
+  subtext: string,
   zoomPercent: number,
 ): EChartsOption => {
   return {
-    ...baseOptions(`${cityName} - AQI`, zoomPercent, ''),
+    ...baseOptions(`${cityName} - AQI`, zoomPercent, subtext),
     yAxis: yAxisOptions('AQI', 6),
     tooltip: {
       trigger: 'axis',
@@ -51,13 +52,14 @@ const generateMeasurementLine = (
 
 export const getForecastOptions = (
   cityName: string,
+  subtext: string,
   zoomPercent: number,
   forecastData?: ForecastResponseDto[],
   measurementsAveragedData?: AverageAqiValues[] | undefined,
 ) => {
   const forecastPlot = generateForecastLine(forecastData)
   const measurementPlot = generateMeasurementLine(measurementsAveragedData)
-  const options = getOptions(cityName, zoomPercent)
+  const options = getOptions(cityName, subtext, zoomPercent)
 
   return {
     ...options,

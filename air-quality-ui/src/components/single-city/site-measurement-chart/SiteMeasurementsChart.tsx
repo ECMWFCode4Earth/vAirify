@@ -1,11 +1,14 @@
 import ReactECharts from 'echarts-for-react'
-import { DateTime } from 'luxon'
 import { useCallback, useRef } from 'react'
 
 import { generateMeasurementChart } from './site-measurement-chart-builder'
 import classes from './SiteMeasurementsChart.module.css'
 import { useForecastContext } from '../../../context'
 import { PollutantType } from '../../../models'
+import {
+  formatDateRange,
+  updateChartSubtext,
+} from '../../../services/echarts-service'
 import { getInSituPercentage } from '../../../services/forecast-time-service'
 import {
   ForecastResponseDto,
@@ -62,22 +65,9 @@ export const SiteMeasurementsChart = ({
     maxInSituDate,
   )
 
-  const setSubtitle = (start: DateTime, end: DateTime) => {
-    return `${start.toLocaleString(DateTime.DATETIME_SHORT)} to ${end.toLocaleString(DateTime.DATETIME_SHORT)}`
-  }
-
   const zoomEventHandler = useCallback(() => {
-    const instance = chartRef.current!.getEchartsInstance().getOption()
-    const dateRange = {
-      start: DateTime.fromMillis(instance.dataZoom![0].startValue as number),
-      end: DateTime.fromMillis(instance.dataZoom![0].endValue as number),
-    }
-
-    chartRef.current?.getEchartsInstance().setOption({
-      title: {
-        subtext: setSubtitle(dateRange.start, dateRange.end),
-      },
-    })
+    const instance = chartRef.current?.getEchartsInstance()
+    updateChartSubtext(instance!)
   }, [])
 
   return (
@@ -95,7 +85,7 @@ export const SiteMeasurementsChart = ({
           zoomPercent,
           measurementsBySite,
           forecastData,
-          setSubtitle(forecastBaseDate, maxInSituDate),
+          formatDateRange(forecastBaseDate, maxInSituDate),
           cityName,
           seriesColorsBySite,
         )}

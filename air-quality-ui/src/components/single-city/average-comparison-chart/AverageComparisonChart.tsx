@@ -1,6 +1,6 @@
 import ReactECharts from 'echarts-for-react'
 import { DateTime } from 'luxon'
-import { useMemo } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 
 import { getForecastOptions } from './average-comparison-chart-builder'
 import classes from './AverageComparisonChart.module.css'
@@ -9,6 +9,10 @@ import {
   averageAqiValues,
   sortMeasurements,
 } from '../../../services/calculate-measurements-aqi-averages/calculate-measurement-aqi-averages-service'
+import {
+  formatDateRange,
+  updateChartSubtext,
+} from '../../../services/echarts-service'
 import { getInSituPercentage } from '../../../services/forecast-time-service'
 import {
   ForecastResponseDto,
@@ -25,6 +29,7 @@ interface AverageComparisonChartProps {
 export const AverageComparisonChart = (
   props: AverageComparisonChartProps,
 ): JSX.Element => {
+  const chartRef = useRef<ReactECharts>(null)
   const { forecastBaseDate, maxForecastDate, maxInSituDate } =
     useForecastContext()
 
@@ -44,11 +49,19 @@ export const AverageComparisonChart = (
     maxInSituDate,
   )
 
+  const zoomEventHandler = useCallback(() => {
+    const instance = chartRef.current?.getEchartsInstance()
+    updateChartSubtext(instance!)
+  }, [])
+
   return (
     <ReactECharts
+      ref={chartRef}
       className={classes['chart']}
+      onEvents={{ dataZoom: zoomEventHandler }}
       option={getForecastOptions(
         props.cityName,
+        formatDateRange(forecastBaseDate, maxInSituDate),
         zoomPercent,
         props.forecastData,
         measurementsAveragedData,

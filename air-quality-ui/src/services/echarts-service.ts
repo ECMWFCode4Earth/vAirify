@@ -1,3 +1,4 @@
+import { EChartsType } from 'echarts'
 import { sha1 } from 'js-sha1'
 import { DateTime } from 'luxon'
 
@@ -62,4 +63,22 @@ export const xAxisFormat = (timestamp: number, index: number) => {
     return date.toFormat('dd/MM')
   }
   return date.toFormat('HH:mm')
+}
+
+export const formatDateRange = (start: DateTime, end: DateTime) => {
+  return `${start.toLocaleString(DateTime.DATETIME_SHORT)} to ${end.toLocaleString(DateTime.DATETIME_SHORT)}`
+}
+
+export const updateChartSubtext = (chart: EChartsType) => {
+  const options = chart.getOption()
+  const dateRange = {
+    start: DateTime.fromMillis(options.dataZoom![0].startValue as number),
+    end: DateTime.fromMillis(options.dataZoom![0].endValue as number),
+  }
+
+  chart.setOption({
+    title: {
+      subtext: formatDateRange(dateRange.start, dateRange.end),
+    },
+  })
 }
