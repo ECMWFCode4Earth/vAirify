@@ -30,8 +30,9 @@ def setup_data():
         yield
 
 
-def epic_test(setup_data):
+def test_epic_test(setup_data):
     dict_result = get_database_data("data_textures", data_query)
-    assert (len(dict_result) == 21), f"Expected 21 documents for one forecast_base_time"
+    expected_doc_count = 7 * 3
+    assert (len(dict_result) == expected_doc_count), f"Expected {expected_doc_count} documents for one forecast_base_time"
 
 
