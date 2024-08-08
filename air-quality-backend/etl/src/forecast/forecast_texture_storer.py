@@ -190,5 +190,8 @@ def delete_data_textures_before(archive_date: datetime):
 
     # delete the folders
     for folder_to_delete in folders_to_delete:
-        logging.info(f"Archiving folder '{folder_to_delete}'")
+        logging.info(f"Deleting folder '{folder_to_delete}'")
         shutil.rmtree(folder_to_delete)
+
+    logging.info(f"Deleted {len(folders_to_delete)} data texture folders "
+                 f"from {data_textures_folder}")
