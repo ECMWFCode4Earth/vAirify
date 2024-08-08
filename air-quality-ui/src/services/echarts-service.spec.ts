@@ -1,6 +1,13 @@
+import { EChartsType } from 'echarts'
 import { DateTime } from 'luxon'
 
-import { convertToLocalTime, textToColor, xAxisFormat } from './echarts-service'
+import {
+  convertToLocalTime,
+  formatDateRange,
+  textToColor,
+  updateChartSubtext,
+  xAxisFormat,
+} from './echarts-service'
 
 const originalDateResolvedOptions = new Intl.DateTimeFormat().resolvedOptions()
 jest.spyOn(Intl.DateTimeFormat.prototype, 'resolvedOptions').mockReturnValue({
@@ -53,6 +60,37 @@ describe('ECharts Service', () => {
       const location = 'testLocation'
       const result = await textToColor(location)
       expect(result).toMatch(/#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/)
+    })
+  })
+  describe('dateFormat', () => {
+    it('should format the dates correctly', () => {
+      const start = DateTime.fromISO('2024-01-30T09:00')
+      const end = DateTime.fromISO('2024-02-01T13:00')
+
+      const result = formatDateRange(start, end)
+      expect(result).toBe('30/01/2024 09:00 to 01/02/2024 13:00')
+    })
+  })
+
+  describe('chart subtext', () => {
+    it('updates the chart subtext with correct string', () => {
+      const start = DateTime.fromISO('2020-01-24T09:00')
+      const end = DateTime.fromISO('2020-03-19T14:00')
+      const expectedDateString = formatDateRange(start, end)
+      const mockSetOption = jest.fn()
+      const mockEchart = {
+        setOption: mockSetOption,
+        getOption: jest.fn(() => ({
+          dataZoom: [
+            { startValue: start.toMillis(), endValue: end.toMillis() },
+          ],
+        })),
+      }
+
+      updateChartSubtext(mockEchart as unknown as EChartsType)
+      expect(mockSetOption).toHaveBeenCalledWith({
+        title: { subtext: expectedDateString },
+      })
     })
   })
 })

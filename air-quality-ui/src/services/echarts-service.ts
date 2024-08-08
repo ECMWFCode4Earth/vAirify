@@ -65,8 +65,12 @@ export const xAxisFormat = (timestamp: number, index: number) => {
   return date.toFormat('HH:mm')
 }
 
+const formatDate = (date: DateTime) => {
+  return date.toFormat('dd/MM/yyyy HH:mm')
+}
+
 export const formatDateRange = (start: DateTime, end: DateTime) => {
-  return `${start.toLocaleString(DateTime.DATETIME_SHORT)} to ${end.toLocaleString(DateTime.DATETIME_SHORT)}`
+  return `${formatDate(start)} to ${formatDate(end)}`
 }
 
 export const updateChartSubtext = (chart: EChartsType) => {
