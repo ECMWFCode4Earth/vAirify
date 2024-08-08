@@ -146,6 +146,9 @@ import { createForecastAPIResponseData } from '../../utils/mocked_api'
       test('Verify updates on time selection', async ({ banner }) => {
         await banner.clickOnTime('12:00')
         await banner.confirmDate()
+        await banner.calendarIcon.click()
+        await banner.clickOnTime('00:00')
+        await banner.confirmDate()
         await expect(forecastRequestArray.length).toBeGreaterThan(0)
         await expect(measurementRequestArray.length).toBeGreaterThan(0)
       })
