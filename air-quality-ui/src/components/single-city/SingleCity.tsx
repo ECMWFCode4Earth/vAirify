@@ -6,7 +6,7 @@ import Select, { ActionMeta, MultiValue, OnChangeValue } from 'react-select'
 import { AverageComparisonChart } from './average-comparison-chart/AverageComparisonChart'
 import classes from './SingleCity.module.css'
 import { SiteMeasurementsChart } from './site-measurement-chart/SiteMeasurementsChart'
-import { StationMap } from './station-map/StationMap'
+import { Station, StationMap } from './station-map/StationMap'
 import { useForecastContext } from '../../context'
 import { PollutantType, pollutantTypes } from '../../models'
 import { textToColor } from '../../services/echarts-service'
@@ -93,26 +93,22 @@ export const SingleCity = () => {
   )
 
   const siteLocations = useMemo(() => {
-    const result = new Map<string, { longitude: number; latitude: number }>()
-    measurementData
-      ?.filter((measurement) =>
-        selectedSites.find(
-          (site) => site && site.value === getSiteName(measurement),
-        ),
-      )
-      .forEach((measurement) => {
+    return measurementData?.reduce<Record<string, Station>>(
+      (locations, measurement) => {
         const siteName = getSiteName(measurement)
-        const site = result.has(siteName)
-        if (!site) {
-          result.set(siteName, {
+        const location = locations[siteName]
+        if (!location) {
+          locations[siteName] = {
+            name: siteName,
             longitude: measurement.location.longitude,
             latitude: measurement.location.latitude,
-          })
+          }
         }
-      })
-
-    return result
-  }, [measurementData, selectedSites])
+        return locations
+      },
+      {},
+    )
+  }, [measurementData])
 
   const measurementsByPollutantBySite = useMemo(() => {
     return measurementData
@@ -169,6 +165,12 @@ export const SingleCity = () => {
     )
   }, [])
 
+  const selectSite = useCallback((siteName: string) => {
+    setSelectedSites((current) =>
+      current.concat({ value: siteName, label: siteName }),
+    )
+  }, [])
+
   if (forecastDataError || measurementDataError) {
     return <>An error occurred</>
   }
@@ -214,18 +216,24 @@ export const SingleCity = () => {
               Measurement Sites
             </div>
             <div className={classes['section-columns']}>
-              {forecastData[0] && (
-                <div
-                  key="station_map"
-                  data-testid="station_map"
-                  className={`${classes['site-select']} ${classes['map']}`}
-                >
-                  <StationMap
-                    mapCenter={forecastData[0].location}
-                    locations={siteLocations}
-                  ></StationMap>
-                </div>
-              )}
+              {forecastData[0] &&
+                Object.keys(siteColors).length > 0 &&
+                Object.keys(siteLocations!).length > 0 && (
+                  <div
+                    key="station_map"
+                    data-testid="station_map"
+                    className={`${classes['site-select']} ${classes['map']}`}
+                  >
+                    <StationMap
+                      mapCenter={forecastData[0].location}
+                      stations={siteLocations!}
+                      visibleLocations={selectedSites.map((site) => site.label)}
+                      stationColors={siteColors}
+                      removeSite={deselectSite}
+                      addSite={selectSite}
+                    ></StationMap>
+                  </div>
+                )}
               <form
                 className={classes['site-select-form']}
                 data-testid="sites-form"

@@ -89,7 +89,13 @@ describe('SingleCityComponent', () => {
     it('shows the map if forecast data', async () => {
       ;(useQueries as jest.Mock).mockReturnValue([
         { data: ['one'], isPending: false, isError: false },
-        { data: [], isPending: false, isError: false },
+        {
+          data: [
+            { site_name: 'Banana', location: { latitude: 1, longitude: 2 } },
+          ],
+          isPending: false,
+          isError: false,
+        },
       ]),
         render(<SingleCity />)
       await waitFor(() => {
