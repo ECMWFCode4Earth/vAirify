@@ -67,7 +67,7 @@ def insert_data(data):
     upsert_data(collection_name, ["measurement_date", "name", "location_name"], data)
 
 
-def delete_data_before(measurement_date: datetime):
+def delete_in_situ_data_before(measurement_date: datetime):
     result = get_collection(collection_name).delete_many(
         {"measurement_date": {"$lt": measurement_date}}
     )

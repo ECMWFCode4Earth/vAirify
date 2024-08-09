@@ -70,9 +70,9 @@ def insert_textures(textures):
     )
 
 
-def delete_data_before(forecast_valid_time: datetime):
+def delete_forecast_data_before(forecast_base_time: datetime):
     result = get_collection("forecast_data").delete_many(
-        {"forecast_valid_time": {"$lt": forecast_valid_time}}
+        {"forecast_base_time": {"$lt": forecast_base_time}}
     )
     logging.info(f"Deleted {result.deleted_count} documents from forecast_data")
 
@@ -122,3 +122,10 @@ def get_data_textures_from_database(
     }
 
     return list(collection.find(query))
+
+
+def delete_data_texture_data_before(forecast_base_time: datetime):
+    result = get_collection("data_textures").delete_many(
+        {"forecast_base_time": {"$lt": forecast_base_time}}
+    )
+    logging.info(f"Deleted {result.deleted_count} documents from data_textures")

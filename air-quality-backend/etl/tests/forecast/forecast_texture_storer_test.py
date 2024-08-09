@@ -9,7 +9,7 @@ from etl.src.forecast.forecast_texture_storer import (
     _chunk_data_array,
     _create_output_directory,
     _write_texture_to_disk,
-    save_data_textures,
+    save_data_textures, delete_data_textures_before,
 )
 from shared.tests.util.mock_forecast_data import default_time
 
@@ -179,3 +179,76 @@ def test__save_data_textures(
             mock_chunk_data_array.return_value[1][i]["time_end"])
         assert doc["time_end"] == time_end_datetime
         assert doc["chunk"] == f"{i+1} of 3"
+
+
+@patch("etl.src.forecast.forecast_texture_storer.os")
+def test__delete_data_textures_before__app_folder_used_if_exists(mock_os):
+    archive_before = datetime(2024, 8, 8)
+
+    mock_os.path.exists.return_value = True
+    mock_os.listdir.return_value = []
+
+    delete_data_textures_before(archive_before)
+
+    mock_os.path.exists.assert_called_with("/app/data_textures/")
+    mock_os.listdir.assert_called_with("/app/data_textures/")
+
+
+@patch("etl.src.forecast.forecast_texture_storer.os")
+def test__delete_data_textures_before__cwd_used_if_no_app_folder(mock_os):
+    archive_before = datetime(2024, 8, 8)
+
+    mock_os.path.exists.return_value = False
+    mock_os.listdir.return_value = []
+    mock_os.getcwd.return_value = "test_folder"
+
+    delete_data_textures_before(archive_before)
+
+    mock_os.path.exists.assert_called_with("/app/data_textures/")
+    mock_os.listdir.assert_called_with("test_folder/data_textures/")
+
+
+@patch("etl.src.forecast.forecast_texture_storer.os")
+@patch("etl.src.forecast.forecast_texture_storer.shutil")
+def test__delete_data_textures_before__no_folders_to_archive(mock_shutil, mock_os):
+    archive_before = datetime(2024, 7, 31)
+
+    mock_os.path.exists.return_value = False
+    mock_os.listdir.return_value = [
+        "2024-07-31_00",
+        "2024-07-31_12",
+        "2024-08-01_00",
+        "2024-08-01_12",
+    ]
+    mock_os.getcwd.return_value = "test_folder"
+
+    delete_data_textures_before(archive_before)
+
+    mock_os.listdir.assert_called_with("test_folder/data_textures/")
+    mock_shutil.rmtree.assert_not_called()
+
+
+@patch("etl.src.forecast.forecast_texture_storer.os")
+@patch("etl.src.forecast.forecast_texture_storer.shutil")
+def test__delete_data_textures_before__with_folders_to_archive(mock_shutil, mock_os):
+    archive_before = datetime(2024, 7, 31)
+
+    mock_os.path.exists.return_value = False
+    mock_os.listdir.return_value = [
+        "2024-07-01_00",
+        "2024-07-01_12",
+        "2024-07-30_00",
+        "2024-07-30_12",
+        "2024-07-31_00",
+        "2024-07-31_12",
+    ]
+    mock_os.getcwd.return_value = "test_folder"
+
+    delete_data_textures_before(archive_before)
+
+    mock_os.listdir.assert_called_with("test_folder/data_textures/")
+
+    mock_shutil.rmtree.assert_any_call("test_folder/data_textures/2024-07-01_00")
+    mock_shutil.rmtree.assert_any_call("test_folder/data_textures/2024-07-01_12")
+    mock_shutil.rmtree.assert_any_call("test_folder/data_textures/2024-07-30_00")
+    mock_shutil.rmtree.assert_any_call("test_folder/data_textures/2024-07-30_12")

@@ -1,3 +1,5 @@
+import logging
+import shutil
 from typing import List, Dict, Tuple
 import os
 import pandas as pd
@@ -163,3 +165,33 @@ def save_data_textures(
         documents.append(document)
 
     return documents
+
+
+def delete_data_textures_before(archive_date: datetime):
+    date_folder_format = "%Y-%m-%d_%H"
+
+    # Get the list of dated folders in the data textures folder, and convert to dates
+    if os.path.exists("/app/data_textures/"):
+        data_textures_folder = "/app/data_textures/"
+    else:
+        data_textures_folder = f"{os.getcwd()}/data_textures/"
+
+    dated_folders = os.listdir(data_textures_folder)
+    all_stored_dates = [
+        datetime.strptime(folder, date_folder_format) for folder in dated_folders
+    ]
+
+    # retrieve the dates to delete, and turn them back into folders
+    dates_to_delete = [date for date in all_stored_dates if date < archive_date]
+    folders_to_delete = [
+        data_textures_folder + date.strftime(date_folder_format)
+        for date in dates_to_delete
+    ]
+
+    # delete the folders
+    for folder_to_delete in folders_to_delete:
+        logging.info(f"Deleting folder '{folder_to_delete}'")
+        shutil.rmtree(folder_to_delete)
+
+    logging.info(f"Deleted {len(folders_to_delete)} data texture folders "
+                 f"from {data_textures_folder}")
