@@ -115,27 +115,61 @@ describe('Site Measurement Chart', () => {
       ['pm2_5', 'PM2.5'],
     ])(
       `shows the correct pollutant`,
-      async (title: PollutantType, expected: string) => {
+      async (pollutant: PollutantType, expected: string) => {
         const result = generateMeasurementChart(
-          title,
+          pollutant,
           zoomPercent,
           measurementsBySite,
           forecastData,
+          'this is the date',
+          'the city name',
         )
-        expect((result.title as TitleComponentOption).text).toBe(expected)
+        expect((result.title as TitleComponentOption).text).toContain(expected)
       },
     )
+
+    it('shows the city name', () => {
+      const result = generateMeasurementChart(
+        'pm10',
+        zoomPercent,
+        measurementsBySite,
+        forecastData,
+        'this is the date',
+        'the city name',
+      )
+      expect((result.title as TitleComponentOption).text).toContain(
+        'the city name',
+      )
+    })
+
+    it('shows the subtext', () => {
+      const result = generateMeasurementChart(
+        'pm10',
+        zoomPercent,
+        measurementsBySite,
+        forecastData,
+        'this is the date',
+        'the city name',
+      )
+      expect((result.title as TitleComponentOption).subtext).toBe(
+        'this is the date',
+      )
+    })
   })
 
   describe('yAxis', () => {
-    it('label is AQI', async () => {
+    it('label is concentration', async () => {
       const result = generateMeasurementChart(
         pollutantType,
         zoomPercent,
         measurementsBySite,
         forecastData,
+        'this is the date',
+        'the city name',
       )
-      expect((result.yAxis as YAXisComponentOption).name).toBe('µg/m³')
+      expect((result.yAxis as YAXisComponentOption).name).toBe(
+        'Concentration (µg/m³)',
+      )
     })
 
     it('label is in middle of axis', async () => {
@@ -144,6 +178,8 @@ describe('Site Measurement Chart', () => {
         zoomPercent,
         measurementsBySite,
         forecastData,
+        'this is the date',
+        'the city name',
       )
       expect((result.yAxis as YAXisComponentOption).nameLocation).toBe('middle')
     })
@@ -154,6 +190,8 @@ describe('Site Measurement Chart', () => {
         zoomPercent,
         measurementsBySite,
         forecastData,
+        'this is the date',
+        'the city name',
       )
       expect((result.yAxis as YAXisComponentOption).type).toBe('value')
     })
@@ -166,6 +204,8 @@ describe('Site Measurement Chart', () => {
         zoomPercent,
         measurementsBySite,
         forecastData,
+        'this is the date',
+        'the city name',
       )
       expect((result.dataZoom as DataZoomComponentOption).end).toBe(zoomPercent)
     })
@@ -197,6 +237,8 @@ describe('Site Measurement Chart', () => {
           zoomPercent,
           measurementsBySite,
           forecastData,
+          'this is the date',
+          'the city name',
           seriesColorsBySite,
         )
 
@@ -225,6 +267,8 @@ describe('Site Measurement Chart', () => {
           zoomPercent,
           measurementsBySite,
           forecastData,
+          'this is the date',
+          'the city name',
           seriesColorsBySite,
         )
 
@@ -243,6 +287,8 @@ describe('Site Measurement Chart', () => {
         zoomPercent,
         measurementsBySite,
         forecastData,
+        'this is the date',
+        'the city name',
         seriesColorsBySite,
       )
       expect(result.series.find((x) => x.name === 'Background')?.z).toBe(-1)
@@ -254,6 +300,8 @@ describe('Site Measurement Chart', () => {
         zoomPercent,
         measurementsBySite,
         forecastData,
+        'this is the date',
+        'the city name',
         seriesColorsBySite,
       )
       expect(result.series.find((x) => x.name === 'Background')?.silent).toBe(
@@ -270,6 +318,8 @@ describe('Site Measurement Chart', () => {
           zoomPercent,
           measurementsBySite,
           forecastData,
+          'this is the date',
+          'the city name',
           seriesColorsBySite,
         )
         expect(result.series.find((x) => x.name === 'Forecast')?.type).toBe(
@@ -283,6 +333,8 @@ describe('Site Measurement Chart', () => {
           zoomPercent,
           measurementsBySite,
           forecastData,
+          'this is the date',
+          'the city name',
           seriesColorsBySite,
         )
         expect(result.series.find((x) => x.name === 'Forecast')?.color).toBe(
@@ -296,6 +348,8 @@ describe('Site Measurement Chart', () => {
           zoomPercent,
           measurementsBySite,
           forecastData,
+          'this is the date',
+          'the city name',
           seriesColorsBySite,
         )
         expect(
@@ -310,6 +364,8 @@ describe('Site Measurement Chart', () => {
           zoomPercent,
           measurementsBySite,
           forecastData,
+          'this is the date',
+          'the city name',
           seriesColorsBySite,
         )
         const data = (
@@ -330,6 +386,8 @@ describe('Site Measurement Chart', () => {
           zoomPercent,
           measurementsBySite,
           forecastData,
+          'this is the date',
+          'the city name',
           seriesColorsBySite,
         )
         expect(result.series.find((x) => x.name === 'locationA')?.type).toBe(
@@ -343,6 +401,8 @@ describe('Site Measurement Chart', () => {
           zoomPercent,
           measurementsBySite,
           forecastData,
+          'this is the date',
+          'the city name',
           seriesColorsBySite,
         )
         expect(
@@ -360,6 +420,8 @@ describe('Site Measurement Chart', () => {
           zoomPercent,
           measurementsBySite,
           forecastData,
+          'this is the date',
+          'the city name',
           seriesColorsBySite,
         )
         expect(result.series.find((x) => x.name === 'locationA')?.color).toBe(
@@ -373,6 +435,8 @@ describe('Site Measurement Chart', () => {
           zoomPercent,
           measurementsBySite,
           forecastData,
+          'this is the date',
+          'the city name',
           seriesColorsBySite,
         )
         expect(
@@ -390,6 +454,8 @@ describe('Site Measurement Chart', () => {
           zoomPercent,
           measurementsBySite,
           forecastData,
+          'this is the date',
+          'the city name',
           seriesColorsBySite,
         )
         const data = (

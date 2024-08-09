@@ -74,15 +74,21 @@ describe('AverageComparisonChart', () => {
   describe('title', () => {
     it('says AQI', async () => {
       const result = getForecastOptions(
+        'city-name',
+        'some dates',
         zoomPercent,
         testForecastData,
         testMeasurementData,
       )
-      expect((result.title as TitleComponentOption).text).toBe('AQI')
+      expect((result.title as TitleComponentOption).text).toBe(
+        'city-name - AQI',
+      )
     })
 
     it('is in the center', async () => {
       const result = getForecastOptions(
+        'city-name',
+        'some dates',
         zoomPercent,
         testForecastData,
         testMeasurementData,
@@ -94,6 +100,8 @@ describe('AverageComparisonChart', () => {
   describe('yAxis', () => {
     it('label is AQI', async () => {
       const result = getForecastOptions(
+        'city-name',
+        'some dates',
         zoomPercent,
         testForecastData,
         testMeasurementData,
@@ -103,6 +111,8 @@ describe('AverageComparisonChart', () => {
 
     it('label is in middle of axis', async () => {
       const result = getForecastOptions(
+        'city-name',
+        'some dates',
         zoomPercent,
         testForecastData,
         testMeasurementData,
@@ -112,6 +122,8 @@ describe('AverageComparisonChart', () => {
 
     it('type is value', async () => {
       const result = getForecastOptions(
+        'city-name',
+        'some dates',
         zoomPercent,
         testForecastData,
         testMeasurementData,
@@ -123,6 +135,8 @@ describe('AverageComparisonChart', () => {
   describe('zoom', () => {
     it('is visible', async () => {
       const result = getForecastOptions(
+        'city-name',
+        'some dates',
         zoomPercent,
         testForecastData,
         testMeasurementData,
@@ -133,6 +147,8 @@ describe('AverageComparisonChart', () => {
 
     it('zoom bar is zoomed', async () => {
       const result = getForecastOptions(
+        'city-name',
+        'some dates',
         zoomPercent,
         testForecastData,
         testMeasurementData,
@@ -146,6 +162,8 @@ describe('AverageComparisonChart', () => {
     describe('Forecast data', () => {
       it('type is line', async () => {
         const result = getForecastOptions(
+          'city-name',
+          'some dates',
           zoomPercent,
           testForecastData,
           testMeasurementData,
@@ -157,6 +175,8 @@ describe('AverageComparisonChart', () => {
 
       it('has the correct number of data points', async () => {
         const result = getForecastOptions(
+          'city-name',
+          'some dates',
           zoomPercent,
           testForecastData,
           testMeasurementData,
@@ -168,6 +188,8 @@ describe('AverageComparisonChart', () => {
 
       it('has mapped the forecast data correctly', async () => {
         const result = getForecastOptions(
+          'city-name',
+          'some dates',
           zoomPercent,
           testForecastData,
           testMeasurementData,
@@ -182,6 +204,8 @@ describe('AverageComparisonChart', () => {
     describe('Measurement data', () => {
       it('type is line', async () => {
         const result = getForecastOptions(
+          'city-name',
+          'some dates',
           zoomPercent,
           testForecastData,
           testMeasurementData,
@@ -193,6 +217,8 @@ describe('AverageComparisonChart', () => {
 
       it('line has correct width', async () => {
         const result = getForecastOptions(
+          'city-name',
+          'some dates',
           zoomPercent,
           testForecastData,
           testMeasurementData,
@@ -208,6 +234,8 @@ describe('AverageComparisonChart', () => {
 
       it('has the correct number of datapoints', async () => {
         const result = getForecastOptions(
+          'city-name',
+          'some dates',
           zoomPercent,
           testForecastData,
           testMeasurementData,
@@ -219,6 +247,8 @@ describe('AverageComparisonChart', () => {
 
       it('to map measurement data correctly', async () => {
         const result = getForecastOptions(
+          'city-name',
+          'some dates',
           zoomPercent,
           testForecastData,
           testMeasurementData,

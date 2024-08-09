@@ -187,6 +187,7 @@ export const SingleCity = () => {
               className={classes['chart']}
             >
               <AverageComparisonChart
+                cityName={locationName}
                 forecastData={forecastData}
                 measurementsData={measurements}
                 forecastBaseTime={forecastBaseDate}
@@ -206,6 +207,7 @@ export const SingleCity = () => {
                       onSiteClick={deselectSite}
                       pollutantType={pollutantType as PollutantType}
                       seriesColorsBySite={siteColors}
+                      cityName={locationName}
                     />
                   </div>
                 ),
