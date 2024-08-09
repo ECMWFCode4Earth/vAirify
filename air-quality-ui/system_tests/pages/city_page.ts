@@ -70,7 +70,6 @@ export class CityPage extends BasePage {
 
   async mapStationPopupButtonClick(buttonName: string) {
     await this.stationMap.getByTestId(buttonName).click()
-    // await this.stationMap.locator('div.maplibregl-popup-content button')
   }
 
   async setBaseTime(baseTime: string) {
