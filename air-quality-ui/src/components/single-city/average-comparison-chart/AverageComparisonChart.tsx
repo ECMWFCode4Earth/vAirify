@@ -10,7 +10,7 @@ import {
   sortMeasurements,
 } from '../../../services/calculate-measurements-aqi-averages/calculate-measurement-aqi-averages-service'
 import {
-  formatDateRange,
+  createSubtext,
   updateChartSubtext,
 } from '../../../services/echarts-service'
 import { getInSituPercentage } from '../../../services/forecast-time-service'
@@ -51,8 +51,8 @@ export const AverageComparisonChart = (
 
   const zoomEventHandler = useCallback(() => {
     const instance = chartRef.current?.getEchartsInstance()
-    updateChartSubtext(instance!)
-  }, [])
+    updateChartSubtext(instance!, forecastBaseDate)
+  }, [forecastBaseDate])
 
   return (
     <ReactECharts
@@ -61,7 +61,7 @@ export const AverageComparisonChart = (
       onEvents={{ dataZoom: zoomEventHandler }}
       option={getForecastOptions(
         props.cityName,
-        formatDateRange(forecastBaseDate, maxInSituDate),
+        createSubtext(forecastBaseDate, forecastBaseDate, maxInSituDate),
         zoomPercent,
         props.forecastData,
         measurementsAveragedData,

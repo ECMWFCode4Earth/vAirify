@@ -6,7 +6,7 @@ import classes from './SiteMeasurementsChart.module.css'
 import { useForecastContext } from '../../../context'
 import { PollutantType } from '../../../models'
 import {
-  formatDateRange,
+  createSubtext,
   updateChartSubtext,
 } from '../../../services/echarts-service'
 import { getInSituPercentage } from '../../../services/forecast-time-service'
@@ -67,8 +67,8 @@ export const SiteMeasurementsChart = ({
 
   const zoomEventHandler = useCallback(() => {
     const instance = chartRef.current?.getEchartsInstance()
-    updateChartSubtext(instance!)
-  }, [])
+    updateChartSubtext(instance!, forecastBaseDate)
+  }, [forecastBaseDate])
 
   return (
     <>
@@ -85,7 +85,7 @@ export const SiteMeasurementsChart = ({
           zoomPercent,
           measurementsBySite,
           forecastData,
-          formatDateRange(forecastBaseDate, maxInSituDate),
+          createSubtext(forecastBaseDate, forecastBaseDate, maxInSituDate),
           cityName,
           seriesColorsBySite,
         )}

@@ -73,7 +73,18 @@ export const formatDateRange = (start: DateTime, end: DateTime) => {
   return `${formatDate(start)} to ${formatDate(end)}`
 }
 
-export const updateChartSubtext = (chart: EChartsType) => {
+export const createSubtext = (
+  forecast: DateTime,
+  start: DateTime,
+  end: DateTime,
+) => {
+  return `Forecast: ${formatDate(forecast)} \n Range: ${formatDateRange(start, end)}`
+}
+
+export const updateChartSubtext = (
+  chart: EChartsType,
+  forecastTime: DateTime,
+) => {
   const options = chart.getOption()
   const dateRange = {
     start: DateTime.fromMillis(options.dataZoom![0].startValue as number),
@@ -82,7 +93,7 @@ export const updateChartSubtext = (chart: EChartsType) => {
 
   chart.setOption({
     title: {
-      subtext: formatDateRange(dateRange.start, dateRange.end),
+      subtext: createSubtext(forecastTime, dateRange.start, dateRange.end),
     },
   })
 }

@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 
 import {
   convertToLocalTime,
+  createSubtext,
   formatDateRange,
   textToColor,
   updateChartSubtext,
@@ -72,11 +73,25 @@ describe('ECharts Service', () => {
     })
   })
 
+  describe('create subtext', () => {
+    it('create correct string', () => {
+      const start = DateTime.fromISO('2020-01-24T09:00')
+      const end = DateTime.fromISO('2020-03-19T14:00')
+      const forecast = DateTime.fromISO('2021-12-23T12:00')
+      const result = createSubtext(forecast, start, end)
+
+      expect(result).toBe(
+        'Forecast: 23/12/2021 12:00 \n Range: 24/01/2020 09:00 to 19/03/2020 14:00',
+      )
+    })
+  })
+
   describe('chart subtext', () => {
     it('updates the chart subtext with correct string', () => {
       const start = DateTime.fromISO('2020-01-24T09:00')
       const end = DateTime.fromISO('2020-03-19T14:00')
-      const expectedDateString = formatDateRange(start, end)
+      const forecast = DateTime.fromISO('2021-12-23T12:00')
+      const expectedDateString = createSubtext(forecast, start, end)
       const mockSetOption = jest.fn()
       const mockEchart = {
         setOption: mockSetOption,
@@ -87,7 +102,7 @@ describe('ECharts Service', () => {
         })),
       }
 
-      updateChartSubtext(mockEchart as unknown as EChartsType)
+      updateChartSubtext(mockEchart as unknown as EChartsType, forecast)
       expect(mockSetOption).toHaveBeenCalledWith({
         title: { subtext: expectedDateString },
       })
