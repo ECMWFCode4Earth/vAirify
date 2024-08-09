@@ -64,6 +64,15 @@ export class CityPage extends BasePage {
     await siteDeselect.click()
   }
 
+  async mapStationClick(position: number) {
+    await this.stationMap.locator('div.maplibregl-marker').nth(position).click()
+  }
+
+  async mapStationPopupButtonClick(buttonName: string) {
+    await this.stationMap.getByTestId(buttonName).click()
+    // await this.stationMap.locator('div.maplibregl-popup-content button')
+  }
+
   async setBaseTime(baseTime: string) {
     return this.datePicker.fill(baseTime)
   }
