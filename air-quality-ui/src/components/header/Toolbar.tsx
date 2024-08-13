@@ -1,9 +1,12 @@
 import { DateTime } from 'luxon'
-import { useEffect, useState } from 'react'
-import Select from 'react-select'
+import { useState } from 'react'
 
 import { Breadcrumbs } from './Breadcrumbs'
 import { ForecastBaseDatePicker } from './ForecastBaseDatePicker'
+import {
+  ForecastWindowOption,
+  ForecastWindowSelector,
+} from './ForecastWindowSelector'
 import classes from './Toolbar.module.css'
 import { useForecastContext } from '../../context'
 import { VAirifyButton } from '../common/button/VAirifyButton'
@@ -21,23 +24,6 @@ export const Toolbar = () => {
     useState<ForecastWindowOption>({ value: 1, label: '1' })
   const [isInvalidDateTime, setIsInvalidDateTime] = useState<boolean>(false)
 
-  interface ForecastWindowOption {
-    value: number
-    label: string
-  }
-
-  const forecastWindowOptions = [
-    { value: 1, label: '1' },
-    { value: 2, label: '2' },
-    { value: 3, label: '3' },
-    { value: 4, label: '4' },
-    { value: 5, label: '5' },
-  ]
-  useEffect(() => {
-    setMaxForecastDate(selectedForecastWindow.value)
-    setMaxInSituDate(selectedForecastWindow.value)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [forecastBaseDate])
   return (
     <section
       role="toolbar"
@@ -55,20 +41,9 @@ export const Toolbar = () => {
         />
       </div>
       <div className={classes['forecast-window-main-div']}>
-        <label className={classes['forecast-window-label']}>
-          Forecast Window
-        </label>
-        <Select
-          className={classes['forecast-window-select']}
-          inputId="forecast-window-select"
-          name="forecast-window-select"
-          onChange={(value) => {
-            if (value) {
-              setSelectedForecastWindow(value)
-            }
-          }}
-          options={forecastWindowOptions}
-          value={selectedForecastWindow}
+        <ForecastWindowSelector
+          setSelectedForecastWindowState={setSelectedForecastWindow}
+          selectedForecastWindow={selectedForecastWindow}
         />
       </div>
       <div className={classes['forecast-base-date-picker-button-div']}>

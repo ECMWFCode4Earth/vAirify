@@ -1,5 +1,11 @@
 import { DateTime } from 'luxon'
-import { createContext, useContext, useState } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 
 import {
   getLatestBaseForecastTime,
@@ -43,25 +49,46 @@ export const ForecastContextProvider = (props: any) => {
     ),
   )
 
+  const [forecastWindow, setForecastWindowState] = useState(1)
+  const [inSituWindow, setInSituWindowState] = useState(1)
+
   const setForecastBaseDate: ForecastContextType['setForecastBaseDate'] = (
     value,
   ) => {
     setForecastBaseDateState(value)
   }
-  const setMaxForecastDate: ForecastContextType['setMaxForecastDate'] = (
-    value,
-  ) => {
-    setMaxForecastDateState(forecastBaseDate.plus({ days: value }))
-  }
 
-  const setMaxInSituDate: ForecastContextType['setMaxInSituDate'] = (value) => {
-    setMaxInSituDateState(
-      DateTime.min(
-        getNearestValidForecastTime(DateTime.utc()),
-        forecastBaseDate.plus({ days: value }),
-      ),
+  const setMaxForecastDate: ForecastContextType['setMaxForecastDate'] =
+    useCallback(
+      (value: number) => {
+        setForecastWindowState(value)
+        setMaxForecastDateState(forecastBaseDate.plus({ days: value }))
+      },
+      [forecastBaseDate],
     )
-  }
+  const setMaxInSituDate: ForecastContextType['setMaxInSituDate'] = useCallback(
+    (value: number) => {
+      setInSituWindowState(value)
+      setMaxInSituDateState(
+        DateTime.min(
+          getNearestValidForecastTime(DateTime.utc()),
+          forecastBaseDate.plus({ days: value }),
+        ),
+      )
+    },
+    [forecastBaseDate],
+  )
+
+  useEffect(() => {
+    setMaxForecastDate(forecastWindow)
+    setMaxInSituDate(inSituWindow)
+  }, [
+    forecastBaseDate,
+    forecastWindow,
+    inSituWindow,
+    setMaxForecastDate,
+    setMaxInSituDate,
+  ])
 
   return (
     <ForecastContext.Provider

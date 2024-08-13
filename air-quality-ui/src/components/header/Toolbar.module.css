@@ -30,7 +30,3 @@
   text-overflow: ellipsis;
   max-width: calc(133% - 32px);
 }
-.forecast-window-select{
-    width: 6.6rem;
-    color: black;
-}
