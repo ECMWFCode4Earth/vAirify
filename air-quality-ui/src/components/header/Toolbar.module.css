@@ -14,3 +14,19 @@
 .forecast-base-date-picker-div{
     margin-left: auto;
 }
+.forecast-window-main-div{
+    padding-left: 1rem;
+    padding-bottom: 1rem;
+}
+.forecast-window-label{
+  font-family: "Roboto","Helvetica","Arial",sans-serif;
+  font-weight: 400;
+  font-size: 0.8rem;
+  line-height: 1.4375em;
+  letter-spacing: 0.00938em;
+  transform-origin: top left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(133% - 32px);
+}

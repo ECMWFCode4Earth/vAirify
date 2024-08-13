@@ -42,7 +42,12 @@ export const SingleCity = () => {
   ] = useQueries({
     queries: [
       {
-        queryKey: [forecastBaseDate, locationName],
+        queryKey: [
+          forecastBaseDate,
+          locationName,
+          maxInSituDate,
+          maxForecastDate,
+        ],
         queryFn: () =>
           getForecastData(
             forecastBaseDate,
@@ -52,7 +57,13 @@ export const SingleCity = () => {
           ),
       },
       {
-        queryKey: ['measurements', locationName, forecastBaseDate],
+        queryKey: [
+          'measurements',
+          locationName,
+          forecastBaseDate,
+          maxInSituDate,
+          maxForecastDate,
+        ],
         queryFn: () =>
           getMeasurements(forecastBaseDate, maxInSituDate, 'city', [
             locationName,
