@@ -41,16 +41,14 @@ export class Banner extends BasePage {
     this.windowDropdown = page.locator('svg').nth(1)
   }
 
-
-  async forecastWindowDropdownClick(){
+  async forecastWindowDropdownClick() {
     await this.windowDropdown.click()
   }
 
-  async forecastWindowDropdownSelect(option: string){
-   const optionSelect = await this.page.getByRole('option', { name: option})
-   await optionSelect.click()
+  async forecastWindowDropdownSelect(option: string) {
+    const optionSelect = await this.page.getByRole('option', { name: option })
+    await optionSelect.click()
   }
-  
 
   async clickOnDay(day: number): Promise<void> {
     let row: number
