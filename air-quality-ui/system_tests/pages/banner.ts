@@ -16,7 +16,7 @@ export class Banner extends BasePage {
   readonly datePickerYearCloseButton: Locator
   readonly futureDay27: Locator
   readonly logo: Locator
-  readonly dateOkButton: Locator
+  readonly windowDropdown: Locator
   readonly year2025: Locator
 
   constructor(page: Page) {
@@ -38,6 +38,16 @@ export class Banner extends BasePage {
     )
     this.logo = page.getByAltText('vAirify')
     this.year2025 = page.locator('//div //button').filter({ hasText: /^2025$/ })
+    this.windowDropdown = page.locator('svg').nth(1)
+  }
+
+  async forecastWindowDropdownClick() {
+    await this.windowDropdown.click()
+  }
+
+  async forecastWindowDropdownSelect(option: string) {
+    const optionSelect = await this.page.getByRole('option', { name: option })
+    await optionSelect.click()
   }
 
   async clickOnDay(day: number): Promise<void> {
