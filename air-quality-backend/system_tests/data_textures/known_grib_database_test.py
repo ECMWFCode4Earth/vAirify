@@ -1,7 +1,7 @@
 import copy
 from datetime import timezone, datetime, timedelta
 import pprint
-
+from PIL import Image, ImageChops
 import pytest
 from dotenv import load_dotenv
 
@@ -87,7 +87,7 @@ def setup_data():
         ),
     ],
 )
-def test__each_variable_has_3_chunks(
+def test__that_each_variable_has_correct_key_values(
     variable,
     forecast_base_date,
     setup_data,
@@ -114,10 +114,74 @@ def test__each_variable_has_3_chunks(
         ), f"Expected max_value: {expected_max_value}, but got: {result['max_value']}"
 
 
-def test__epic_test(setup_data):
+def test__that_21_documents_are_fetched(setup_data):
     dict_result = get_database_data("data_textures", data_query)
     pprint.pprint(dict_result)
     expected_doc_count = 7 * 3
     assert (
         len(dict_result) == expected_doc_count
     ), f"Expected {expected_doc_count} documents for one forecast_base_time"
+
+
+REFERENCE_DIR = os.path.join(os.path.dirname(__file__), "2024-06-04_00_comparisons")
+GENERATED_DIR = os.path.join(os.path.dirname(__file__), "2024-06-04_00")
+DIFF_DIR = os.path.join(os.path.dirname(__file__), "diff_image_store")
+
+os.makedirs(DIFF_DIR, exist_ok=True)
+
+
+def image_difference(image1, image2):
+    diff = ImageChops.difference(image1, image2)
+    if diff.getbbox():
+        return diff, False
+    return None, True
+
+
+@pytest.mark.parametrize(
+    "image_name",
+    [
+        "aqi_2024-06-04_00_CAMS_global.chunk_1_of_3.webp",
+        "aqi_2024-06-04_00_CAMS_global.chunk_2_of_3.webp",
+        "aqi_2024-06-04_00_CAMS_global.chunk_3_of_3.webp",
+        "no2_2024-06-04_00_CAMS_global.chunk_1_of_3.webp",
+        "no2_2024-06-04_00_CAMS_global.chunk_2_of_3.webp",
+        "no2_2024-06-04_00_CAMS_global.chunk_3_of_3.webp",
+        "o3_2024-06-04_00_CAMS_global.chunk_1_of_3.webp",
+        "o3_2024-06-04_00_CAMS_global.chunk_2_of_3.webp",
+        "o3_2024-06-04_00_CAMS_global.chunk_3_of_3.webp",
+        "pm2_5_2024-06-04_00_CAMS_global.chunk_1_of_3.webp",
+        "pm2_5_2024-06-04_00_CAMS_global.chunk_2_of_3.webp",
+        "pm2_5_2024-06-04_00_CAMS_global.chunk_3_of_3.webp",
+        "pm10_2024-06-04_00_CAMS_global.chunk_1_of_3.webp",
+        "pm10_2024-06-04_00_CAMS_global.chunk_2_of_3.webp",
+        "pm10_2024-06-04_00_CAMS_global.chunk_3_of_3.webp",
+        "so2_2024-06-04_00_CAMS_global.chunk_1_of_3.webp",
+        "so2_2024-06-04_00_CAMS_global.chunk_2_of_3.webp",
+        "so2_2024-06-04_00_CAMS_global.chunk_3_of_3.webp",
+        "winds_10m_2024-06-04_00_CAMS_global.chunk_1_of_3.webp",
+        "winds_10m_2024-06-04_00_CAMS_global.chunk_2_of_3.webp",
+        "winds_10m_2024-06-04_00_CAMS_global.chunk_3_of_3.webp",
+    ],
+)
+def test__that_rendered_bitmaps_are_consistent(setup_data, image_name):
+    reference_image_path = os.path.join(REFERENCE_DIR, image_name)
+    generated_image_path = os.path.join(GENERATED_DIR, image_name)
+
+    assert os.path.exists(
+        reference_image_path
+    ), f"Reference image {image_name} not found."
+    assert os.path.exists(
+        generated_image_path
+    ), f"Generated image {image_name} not found."
+
+    reference_image = Image.open(reference_image_path)
+    generated_image = Image.open(generated_image_path)
+
+    diff_image, are_identical = image_difference(reference_image, generated_image)
+
+    if not are_identical:
+        diff_image_path = os.path.join(DIFF_DIR, f"diff_{image_name}")
+        diff_image.save(diff_image_path)
+        pytest.fail(
+            f"Images {image_name} do not match. Difference image saved at {diff_image_path}"
+        )
