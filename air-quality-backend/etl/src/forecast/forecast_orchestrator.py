@@ -21,6 +21,5 @@ def process_forecast(cities: list[AirQualityLocation], base_date: datetime):
 
     logging.info(f"Creating forecast data textures for base date {base_date_str}")
     textures = create_data_textures(extracted_forecast_data)
-
     logging.info(f"Persisting forecast data textures for base date {base_date_str}")
     insert_textures(textures)

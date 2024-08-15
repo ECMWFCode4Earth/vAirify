@@ -6,9 +6,11 @@ from logging import config
 
 from dotenv import load_dotenv
 
+from etl.src.in_situ.openaq_date_retriever import retrieve_past_dates_requiring_in_situ_data
+from etl.src.in_situ.openaq_orchestrator import retrieve_openaq_in_situ_data
 from shared.src.database.in_situ import insert_data
 from shared.src.database.locations import get_locations_by_type, AirQualityLocationType
-from etl.src.in_situ.openaq_orchestrator import retrieve_openaq_in_situ_data
+
 
 config.fileConfig("./logging.ini")
 
@@ -25,14 +27,16 @@ def main():
         cities = [city for city in cities if city["name"] in open_aq_cities.split(",")]
     logging.info(f"Finding data for {cities.__len__()} cities")
 
-    hours_to_query = 24
-    end_date = datetime.utcnow()
+    logging.info("Generating Required in situ dates")
+    base_dates = retrieve_past_dates_requiring_in_situ_data()
+    print("Function END: " + str(base_dates))
 
-    logging.info("Retrieving Open AQ in situ data")
-    open_aq_data = retrieve_openaq_in_situ_data(cities, end_date, hours_to_query)
-
-    logging.info("Persisting open AQ in situ data")
-    insert_data(open_aq_data)
+    logging.info("Retrieving Missing Open AQ in situ data")
+    for date in base_dates:
+        open_aq_data = retrieve_openaq_in_situ_data(cities, date, 1)
+        insert_data(open_aq_data)
+    logging.info("Retrieving Today's Open AQ in situ data")
+    retrieve_openaq_in_situ_data(cities, datetime.utcnow(), 24)
 
 
 if __name__ == "__main__":
