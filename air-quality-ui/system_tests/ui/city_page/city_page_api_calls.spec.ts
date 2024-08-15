@@ -1,5 +1,14 @@
 import { expect, test } from '../../utils/fixtures'
-import { encodeDateToURIComponent, gotoPage } from '../../utils/helper_methods'
+import {
+  encodeDateToURIComponent,
+  gotoPage,
+  setupPageWithMockData,
+  waitForIdleNetwork,
+} from '../../utils/helper_methods'
+import {
+  createForecastAPIResponseData,
+  createMeasurementsCityPageResponseData,
+} from '../../utils/mocked_api'
 
 const systemDate: Date = new Date('2024-07-18T14:00:00Z')
 const forecastAPIEndpoint = '/forecast'
@@ -110,5 +119,83 @@ test.describe('API calls on changing forecast base time in UI', () => {
       await banner.confirmDate()
       expect(requestArray[0]).toContain(`base_time=${expectedForecastBaseTime}`)
     })
+  })
+})
+
+test.describe('Forecast window', () => {
+  test.beforeEach(async ({ page, cityPage, banner }) => {
+    const mockedForecastResponse = [
+      createForecastAPIResponseData({
+        base_time: '2024-07-01T00:00:00Z',
+        valid_time: '2024-07-01T00:00:00Z',
+        location_name: 'Rio de Janeiro',
+        overall_aqi_level: 1,
+      }),
+      createForecastAPIResponseData({
+        base_time: '2024-07-02T00:00:00Z',
+        valid_time: '2024-07-01T03:00:00Z',
+        location_name: 'Rio de Janeiro',
+        overall_aqi_level: 2,
+      }),
+      createForecastAPIResponseData({
+        base_time: '2024-07-03T00:00:00Z',
+        valid_time: '2024-07-01T06:00:00Z',
+        location_name: 'Rio de Janeiro',
+        overall_aqi_level: 3,
+      }),
+      createForecastAPIResponseData({
+        base_time: '2024-07-04T00:00:00Z',
+        valid_time: '2024-07-01T06:00:00Z',
+        location_name: 'Rio de Janeiro',
+        overall_aqi_level: 4,
+      }),
+      createForecastAPIResponseData({
+        base_time: '2024-07-05T00:00:00Z',
+        valid_time: '2024-07-01T06:00:00Z',
+        location_name: 'Rio de Janeiro',
+        overall_aqi_level: 5,
+      }),
+    ]
+
+    const mockedMeasurementsCityPageResponse = [
+      createMeasurementsCityPageResponseData({
+        measurement_date: '2024-07-01T00:00:00Z',
+      }),
+      createMeasurementsCityPageResponseData({
+        measurement_date: '2024-07-02T00:00:00Z',
+      }),
+      createMeasurementsCityPageResponseData({
+        measurement_date: '2024-07-03T00:00:00Z',
+      }),
+      createMeasurementsCityPageResponseData({
+        measurement_date: '2024-07-04T00:00:00Z',
+      }),
+      createMeasurementsCityPageResponseData({
+        measurement_date: '2024-07-05T00:00:00Z',
+      }),
+    ]
+
+    await setupPageWithMockData(page, [
+      {
+        endpointUrl: '*/**/air-pollutant/forecast*',
+        mockedAPIResponse: mockedForecastResponse,
+      },
+      {
+        endpointUrl: '*/**/air-pollutant/measurements*',
+        mockedAPIResponse: mockedMeasurementsCityPageResponse,
+      },
+    ])
+    await gotoPage(page, '/city/Rio%20de%20Janeiro')
+    await cityPage.waitForAllGraphsToBeVisible()
+    await cityPage.setBaseTime('01/07/2024 00:00')
+  })
+
+  test('Forecast window 2 requests 2 days worth of data', async ({
+    banner,
+    page,
+  }) => {
+    await banner.forecastWindowDropdownClick()
+    await banner.forecastWindowDropdownSelect('2')
+    await banner.confirmDate()
   })
 })

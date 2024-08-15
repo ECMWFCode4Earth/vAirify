@@ -42,6 +42,7 @@ export class Banner extends BasePage {
   }
 
   async forecastWindowDropdownClick() {
+    await this.windowDropdown.waitFor({ state: 'visible' })
     await this.windowDropdown.click()
   }
 
