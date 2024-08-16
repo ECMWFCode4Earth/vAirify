@@ -249,7 +249,6 @@ test.describe('Forecast window test', () => {
       banner,
       page,
       cityPage,
-      summaryPage,
     }) => {
       await verifyForecastAndMeasurements(
         banner,

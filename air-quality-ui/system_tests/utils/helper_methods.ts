@@ -1,6 +1,9 @@
 import { type Locator, type Page } from '@playwright/test'
 import { expect } from '@playwright/test'
 
+import { Banner } from '../pages/banner'
+import { CityPage } from '../pages/city_page'
+
 export async function encodeDateToURIComponent(date: Date): Promise<string> {
   return encodeURIComponent(date.toISOString())
 }
@@ -76,9 +79,9 @@ export async function waitForIdleNetwork(
 }
 
 export async function verifyForecastAndMeasurements(
-  banner: any,
-  page: any,
-  cityPage: any,
+  banner: Banner,
+  page: Page,
+  cityPage: CityPage,
   forecastRequestArray: string[],
   measurementsRequestArray: string[],
   window: number,
