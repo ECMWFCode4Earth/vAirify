@@ -33,7 +33,7 @@ const GlobalSummary = (): JSX.Element => {
     isPending: forecastPending,
     isError: forecastDataError,
   } = useQuery({
-    queryKey: [forecastBaseDate],
+    queryKey: [forecastBaseDate, maxInSituDate],
     queryFn: () =>
       getForecastData(forecastBaseDate, DateTime.now(), forecastBaseDate).then(
         (forecastData) =>
@@ -61,7 +61,7 @@ const GlobalSummary = (): JSX.Element => {
     isError: summaryDataError,
   } = useQueries({
     queries: forecastValidTimeRange.map((validTime) => ({
-      queryKey: ['summary', validTime.toMillis()],
+      queryKey: ['summary', validTime.toMillis(), maxInSituDate],
       queryFn: () => getMeasurementSummary(validTime),
     })),
     combine: (results) => {
