@@ -12,6 +12,7 @@ import {
 
 const systemDate: Date = new Date('2024-07-18T14:00:00Z')
 const forecastAPIEndpoint = '/forecast'
+const measurementsAPIEndpoint = '/measurements'
 const httpMethodGet: string = 'GET'
 
 test.describe('API calls on page load', () => {
@@ -123,7 +124,9 @@ test.describe('API calls on changing forecast base time in UI', () => {
 })
 
 test.describe('Forecast window', () => {
-  test.beforeEach(async ({ page, cityPage, banner }) => {
+  let forecastRequestArray: string[]
+  let measurementsRequestArray: string[]
+  test.beforeEach(async ({ page, cityPage, basePage, banner, summaryPage }) => {
     const mockedForecastResponse = [
       createForecastAPIResponseData({
         base_time: '2024-07-01T00:00:00Z',
@@ -155,6 +158,12 @@ test.describe('Forecast window', () => {
         location_name: 'Rio de Janeiro',
         overall_aqi_level: 5,
       }),
+      createForecastAPIResponseData({
+        base_time: '2024-07-06T00:00:00Z',
+        valid_time: '2024-07-01T06:00:00Z',
+        location_name: 'Rio de Janeiro',
+        overall_aqi_level: 5,
+      }),
     ]
 
     const mockedMeasurementsCityPageResponse = [
@@ -173,6 +182,9 @@ test.describe('Forecast window', () => {
       createMeasurementsCityPageResponseData({
         measurement_date: '2024-07-05T00:00:00Z',
       }),
+      createMeasurementsCityPageResponseData({
+        measurement_date: '2024-07-06T00:00:00Z',
+      }),
     ]
 
     await setupPageWithMockData(page, [
@@ -188,14 +200,163 @@ test.describe('Forecast window', () => {
     await gotoPage(page, '/city/Rio%20de%20Janeiro')
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
+
+    forecastRequestArray = await summaryPage.captureNetworkRequestsAsArray(
+      page,
+      httpMethodGet,
+      basePage.baseAPIURL + forecastAPIEndpoint,
+    )
+    measurementsRequestArray = await summaryPage.captureNetworkRequestsAsArray(
+      page,
+      httpMethodGet,
+      basePage.baseAPIURL + measurementsAPIEndpoint,
+    )
+    await banner.forecastWindowDropdownClick()
   })
 
+  test('Forecast window 1 requests 1 day worth of data', async ({
+    banner,
+    page,
+    cityPage,
+  }) => {
+    const expectedValidTimeFrom: string = await encodeDateToURIComponent(
+      new Date(`2024-07-01T00:00:00Z`),
+    )
+    const expectedValidTimeTo: string = await encodeDateToURIComponent(
+      new Date(`2024-07-02T00:00:00Z`),
+    )
+
+    await banner.forecastWindowDropdownSelect('1')
+    await banner.confirmDate()
+    await waitForIdleNetwork(page, cityPage.aqiChart)
+
+    await expect(forecastRequestArray[1]).toContain(
+      `valid_time_from=${expectedValidTimeFrom}`,
+    )
+    await expect(forecastRequestArray[1]).toContain(
+      `valid_time_to=${expectedValidTimeTo}`,
+    )
+    await expect(measurementsRequestArray[1]).toContain(
+      `date_from=${expectedValidTimeFrom}`,
+    )
+    await expect(measurementsRequestArray[1]).toContain(
+      `date_to=${expectedValidTimeTo}`,
+    )
+  })
   test('Forecast window 2 requests 2 days worth of data', async ({
     banner,
     page,
+    cityPage,
   }) => {
-    await banner.forecastWindowDropdownClick()
+    const expectedValidTimeFrom: string = await encodeDateToURIComponent(
+      new Date(`2024-07-01T00:00:00Z`),
+    )
+    const expectedValidTimeTo: string = await encodeDateToURIComponent(
+      new Date(`2024-07-03T00:00:00Z`),
+    )
+
     await banner.forecastWindowDropdownSelect('2')
     await banner.confirmDate()
+    await waitForIdleNetwork(page, cityPage.aqiChart)
+
+    await expect(forecastRequestArray[1]).toContain(
+      `valid_time_from=${expectedValidTimeFrom}`,
+    )
+    await expect(forecastRequestArray[1]).toContain(
+      `valid_time_to=${expectedValidTimeTo}`,
+    )
+    await expect(measurementsRequestArray[1]).toContain(
+      `date_from=${expectedValidTimeFrom}`,
+    )
+    await expect(measurementsRequestArray[1]).toContain(
+      `date_to=${expectedValidTimeTo}`,
+    )
+  })
+  test('Forecast window 3 requests 3 days worth of data', async ({
+    banner,
+    page,
+    cityPage,
+  }) => {
+    const expectedValidTimeFrom: string = await encodeDateToURIComponent(
+      new Date(`2024-07-01T00:00:00Z`),
+    )
+    const expectedValidTimeTo: string = await encodeDateToURIComponent(
+      new Date(`2024-07-04T00:00:00Z`),
+    )
+
+    await banner.forecastWindowDropdownSelect('3')
+    await banner.confirmDate()
+    await waitForIdleNetwork(page, cityPage.aqiChart)
+
+    await expect(forecastRequestArray[1]).toContain(
+      `valid_time_from=${expectedValidTimeFrom}`,
+    )
+    await expect(forecastRequestArray[1]).toContain(
+      `valid_time_to=${expectedValidTimeTo}`,
+    )
+    await expect(measurementsRequestArray[1]).toContain(
+      `date_from=${expectedValidTimeFrom}`,
+    )
+    await expect(measurementsRequestArray[1]).toContain(
+      `date_to=${expectedValidTimeTo}`,
+    )
+  })
+  test('Forecast window 4 requests 4 days worth of data', async ({
+    banner,
+    page,
+    cityPage,
+  }) => {
+    const expectedValidTimeFrom: string = await encodeDateToURIComponent(
+      new Date(`2024-07-01T00:00:00Z`),
+    )
+    const expectedValidTimeTo: string = await encodeDateToURIComponent(
+      new Date(`2024-07-05T00:00:00Z`),
+    )
+
+    await banner.forecastWindowDropdownSelect('4')
+    await banner.confirmDate()
+    await waitForIdleNetwork(page, cityPage.aqiChart)
+
+    await expect(forecastRequestArray[1]).toContain(
+      `valid_time_from=${expectedValidTimeFrom}`,
+    )
+    await expect(forecastRequestArray[1]).toContain(
+      `valid_time_to=${expectedValidTimeTo}`,
+    )
+    await expect(measurementsRequestArray[1]).toContain(
+      `date_from=${expectedValidTimeFrom}`,
+    )
+    await expect(measurementsRequestArray[1]).toContain(
+      `date_to=${expectedValidTimeTo}`,
+    )
+  })
+  test('Forecast window 5 requests 5 days worth of data', async ({
+    banner,
+    page,
+    cityPage,
+  }) => {
+    const expectedValidTimeFrom: string = await encodeDateToURIComponent(
+      new Date(`2024-07-01T00:00:00Z`),
+    )
+    const expectedValidTimeTo: string = await encodeDateToURIComponent(
+      new Date(`2024-07-06T00:00:00Z`),
+    )
+
+    await banner.forecastWindowDropdownSelect('5')
+    await banner.confirmDate()
+    await waitForIdleNetwork(page, cityPage.aqiChart)
+
+    await expect(forecastRequestArray[1]).toContain(
+      `valid_time_from=${expectedValidTimeFrom}`,
+    )
+    await expect(forecastRequestArray[1]).toContain(
+      `valid_time_to=${expectedValidTimeTo}`,
+    )
+    await expect(measurementsRequestArray[1]).toContain(
+      `date_from=${expectedValidTimeFrom}`,
+    )
+    await expect(measurementsRequestArray[1]).toContain(
+      `date_to=${expectedValidTimeTo}`,
+    )
   })
 })
