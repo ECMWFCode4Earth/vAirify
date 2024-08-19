@@ -402,6 +402,24 @@ test.describe('City graph snapshots', () => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.so2Chart)
     expect(chartShot).toMatchSnapshot('rio-so2-graph-without-centro.png')
   })
+  test.describe('Graphs can be downloaded as PNGs', () => {
+    test('Verify AQI graph can be downloaded as a PNG', async ({
+      page,
+      cityPage,
+    }) => {
+      const downloadPromise = page.waitForEvent('download')
+      await cityPage.aqiChart.click({
+        position: {
+          x: 531,
+          y: 13,
+        },
+      })
+      const download = await downloadPromise
+      await download.saveAs(
+        './system_tests/ui/city_page/' + download.suggestedFilename(),
+      )
+    })
+  })
 })
 
 test.use({
