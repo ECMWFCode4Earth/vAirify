@@ -18,7 +18,7 @@ def retrieve_dates_requiring_forecast() -> [datetime]:
     forecast_retrieval_period_env = int(os.getenv("FORECAST_RETRIEVAL_PERIOD", 7))
     search_start_date = base_date - timedelta(days=forecast_retrieval_period_env)
 
-    dates = pd.date_range(search_start_date, base_date, freq="24h")
+    dates = pd.date_range(search_start_date, base_date, freq="12h")
     potential_dates = [i.to_pydatetime() for i in dates]
 
     stored_dates = get_forecast_dates_between(search_start_date, base_date)

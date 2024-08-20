@@ -18,7 +18,7 @@ def main():
 
     base_dates = retrieve_dates_requiring_forecast()
     logging.info(f"Finding data for {len(base_dates)} dates")
-    print(base_dates)
+
     for base_date in base_dates:
         process_forecast(cities, base_date)
 
