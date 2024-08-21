@@ -1,27 +1,20 @@
 Feature: Summary table tests
 
-Background:
-    Given the user navigates to the summary page
-    And the forecast window is set to "1"
+Scenario: Changing the forecast base time on the summary page
+    Given the user navigates to the "summary page"
+    When they change the forecast base time to "date" "time"
+    And they look at the entry in the table for "London"
+    Then the table data should be based on the data for "date" "time", with forecast window "1"
 
-Scenario: Default table data
-    When they look at the entry in the table for "London"
-    Then table data should be based on the data for "today", with forecast window "1"
-
-Scenario: Changing the forecast base time
-    When they change the forecast base time to "date" "time" for "London"
-    Then table data should be based on the data for "date" "time", with forecast window "1"
-
-Scenario: Changing the forecast window
+Scenario: Changing the forecast window on the summary page
+    Given the user navigates to the "summary page"
+    And they change the forecast base time to "date" "time"
     When they change the forecast window to "3"
-    And they change the forecast base time to "date" "time" for "London"
-    Then table data should be based on the data for "date" "time", with forecast window "3"
+    Then the table data should be based on the data for "date" "time", with forecast window "3"
 
-Scenario: Default table AQI colours
-    When they look at the entry in the table for "London"
-    Then table data should be coloured to represent the AQI levels of the values
-
-Scenario: Toggle 'Highlight all AQI values' button to off position
-    When they look at the entry in the table for "London"
-    And they turn "off" highlighting all AQI values
-    Then table data should be coloured to represent the AQI levels of the values
+Scenario: Changing the forecast base time and window on the summary page is reflected in the city page
+    Given the user navigates to the "summary page"
+    And they change the forecast base time to "date" "time"
+    And they change the forecast window to "3"
+    When the user navigates to the city page for "London"
+    Then the AQI graph data should be based on the data for "London" on "date" "time", with forecast window "3"
