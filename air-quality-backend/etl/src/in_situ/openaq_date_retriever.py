@@ -10,10 +10,10 @@ def dates_without_measurements(
         dates_from_db: list[datetime],
         potential_dates: list[datetime]):
     date_without_measurement = []
-    for hour in range(0, 23):
-        for potential_date in potential_dates:
+    for potential_date in potential_dates:
+        for hour in range(0, 23):
             if date_without_measurement.__contains__(potential_date):
-                continue
+                break
 
             start_date = potential_date - timedelta(hours=hour + 1)
             end_date = potential_date - timedelta(hours=hour)
@@ -30,6 +30,13 @@ def dates_without_measurements(
     return date_without_measurement
 
 
+#
+# Function to retrieve dates requiring in-situ data.
+# This always retrieves the current date and time
+# It also looks back at all 24 hour periods within the in situ retrieval period
+# (default 7 days). In any given 24-hour period if there are any hour slots that do not
+# have any data at all, that period is returned.
+#
 def retrieve_dates_requiring_in_situ_data() -> [datetime]:
     in_situ_retrieval_period = int(os.getenv("IN_SITU_RETRIEVAL_PERIOD", 7))
 
