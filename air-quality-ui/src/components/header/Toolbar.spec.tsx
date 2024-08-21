@@ -8,9 +8,9 @@ import {
   ForecastWindowSelectorProps,
 } from './ForecastWindowSelector'
 import { Toolbar } from './Toolbar'
-import { SetForcastDetailsType } from '../../context'
+import { SetForecastDetailsType } from '../../context'
 
-const mockSetDetails: (val: SetForcastDetailsType) => void = jest.fn()
+const mockSetDetails: (val: SetForecastDetailsType) => void = jest.fn()
 
 const dateNow = DateTime.fromISO('2024-06-01T12:00:00', { zone: 'UTC' })
 Settings.now = () => dateNow.toMillis()
@@ -25,7 +25,7 @@ jest.mock('../../context', () => ({
         zone: 'utc',
       }),
     },
-    setDetails: (x: SetForcastDetailsType) => mockSetDetails(x),
+    setDetails: (x: SetForecastDetailsType) => mockSetDetails(x),
   }),
 }))
 

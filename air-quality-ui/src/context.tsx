@@ -19,13 +19,13 @@ type ForecastWindowDetails = {
   forecastWindow: number
 }
 
-export type SetForcastDetailsType = {
+export type SetForecastDetailsType = {
   forecastBaseDate: DateTime
   forecastWindow: number
 }
 
 type ForecastDetailsContext = {
-  setDetails: (newDetails: SetForcastDetailsType) => void
+  setDetails: (newDetails: SetForecastDetailsType) => void
   forecastDetails: ForecastWindowDetails
 }
 
@@ -54,7 +54,7 @@ export const ForecastContextProvider = (props: any) => {
   const [forecastDetails, setForecastDetails] =
     useState<ForecastWindowDetails>(defaultValue)
 
-  const setDetails = useCallback((response: SetForcastDetailsType) => {
+  const setDetails = useCallback((response: SetForecastDetailsType) => {
     setForecastDetails({
       maxForecastDate: response.forecastBaseDate.plus({
         days: response.forecastWindow,
