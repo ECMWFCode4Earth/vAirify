@@ -26,8 +26,9 @@ def main():
 
     in_situ_dates = retrieve_dates_requiring_in_situ_data()
 
-    logging.info(f"Finding data for {in_situ_dates.__len__()} 24-hour periods")
     for date in in_situ_dates:
+        logging.info(f"Finding in-situ data for the 24 hour period before {date}")
+
         open_aq_data = retrieve_openaq_in_situ_data(cities, date, 24)
         insert_data(open_aq_data)
 
