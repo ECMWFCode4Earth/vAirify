@@ -31,7 +31,7 @@ def test__retrieve_dates_requiring_in_situ_data__no_extra_dates_required(
 def test__retrieve_dates_requiring_in_situ_data__one_extra_date_without_gap(
         patch_db_get):
     patch_db_get.return_value = [
-        datetime(2024, 8, 6, 12, 34, 56) - timedelta(hours=i+1) for i in range(23)]
+        datetime(2024, 8, 6, 12, 34, 56) - timedelta(hours=i + 1) for i in range(23)]
 
     result = retrieve_dates_requiring_in_situ_data()
 
@@ -49,7 +49,7 @@ def test__retrieve_dates_requiring_in_situ_data__one_extra_date_without_gap(
 def test__retrieve_dates_requiring_in_situ_data__one_extra_date_with_gaps(
         patch_db_get):
     patch_db_get.return_value = [
-        datetime(2024, 8, 6, 12, 34, 56) - timedelta(hours=i+1) for i in range(20)]
+        datetime(2024, 8, 6, 12, 34, 56) - timedelta(hours=i + 1) for i in range(20)]
 
     result = retrieve_dates_requiring_in_situ_data()
 
@@ -68,7 +68,7 @@ def test__retrieve_dates_requiring_in_situ_data__one_extra_date_with_gaps(
 def test__retrieve_dates_requiring_in_situ_data__two_extra_dates_one_with_gap(
         patch_db_get):
     patch_db_get.return_value = [
-        datetime(2024, 8, 6, 12, 34, 56) - timedelta(hours=i+1) for i in range(30)]
+        datetime(2024, 8, 6, 12, 34, 56) - timedelta(hours=i + 1) for i in range(30)]
 
     result = retrieve_dates_requiring_in_situ_data()
 
