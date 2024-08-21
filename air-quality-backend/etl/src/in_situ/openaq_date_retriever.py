@@ -6,35 +6,51 @@ import pandas as pd
 from shared.src.database.in_situ import get_in_situ_dates_between
 
 
-# Function to ensure each hour in a given day has at least one measurement
-def ensure_one_measurement_per_hour(dates_from_db: list[datetime], potential_dates: list[datetime]):
-    no_data_for_hours = []
-    for potential_date in potential_dates:
-        for date_from_db in dates_from_db:
-            end_date = potential_date + timedelta(hours=1)
-            if date_from_db >= potential_date and date_from_db < end_date:
-                break
-        no_data_for_hours.append(potential_date)
-    return no_data_for_hours
+def dates_without_measurements(
+        dates_from_db: list[datetime],
+        potential_dates: list[datetime]):
+    date_without_measurement = []
+    for hour in range(0, 23):
+        for potential_date in potential_dates:
+            if date_without_measurement.__contains__(potential_date):
+                continue
+
+            start_date = potential_date - timedelta(hours=hour + 1)
+            end_date = potential_date - timedelta(hours=hour)
+
+            found = False
+            for date_from_db in dates_from_db:
+                if start_date <= date_from_db < end_date:
+                    found = True
+                    break
+
+            if not found:
+                date_without_measurement.append(potential_date)
+
+    return date_without_measurement
 
 
-def retrieve_past_dates_requiring_in_situ_data() -> [datetime]:
-    base_date = datetime(datetime.utcnow().date().year, datetime.utcnow().date().month, datetime.utcnow().date().day - 1
-                         , 0)
+def retrieve_dates_requiring_in_situ_data() -> [datetime]:
+    in_situ_retrieval_period = int(os.getenv("IN_SITU_RETRIEVAL_PERIOD", 7))
 
-    base_date_env = os.environ.get("FORECAST_BASE_TIME")
-    if base_date_env is not None:
-        date_format = "%Y-%m-%d %H"
-        base_date = datetime.strptime(base_date_env, date_format)
+    cur_date = datetime.utcnow()
+    search_end_date = cur_date - timedelta(days=1)
+    search_start_date = cur_date - timedelta(days=in_situ_retrieval_period)
 
-    forecast_retrieval_period_env = int(os.getenv("FORECAST_RETRIEVAL_PERIOD", 7))
-    search_start_date = base_date - timedelta(days=forecast_retrieval_period_env)
+    if search_end_date <= search_start_date:
+        return [cur_date]
 
-    dates = pd.date_range(search_start_date, base_date, freq="1h")
+    dates = pd.date_range(search_start_date,
+                          search_end_date,
+                          inclusive="right",
+                          freq="24h")
     potential_dates = [i.to_pydatetime() for i in dates]
 
-    dates_from_db = get_in_situ_dates_between(search_start_date, base_date)
-    print("dates_from_db: " + str(dates_from_db))
-    one_measurement_per_hour_list = ensure_one_measurement_per_hour(dates_from_db, potential_dates)
-    print("one_measurement_per_hour_list: " + str(one_measurement_per_hour_list))
-    return one_measurement_per_hour_list
+    dates_from_db = get_in_situ_dates_between(search_start_date, search_end_date)
+    dates_requiring_in_situ_data = dates_without_measurements(
+        dates_from_db,
+        potential_dates)
+
+    dates_requiring_in_situ_data.append(cur_date)
+
+    return dates_requiring_in_situ_data
