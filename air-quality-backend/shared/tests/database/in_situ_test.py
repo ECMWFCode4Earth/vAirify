@@ -9,7 +9,7 @@ from shared.src.database.in_situ import (
     insert_data,
     delete_in_situ_data_before,
     get_averaged,
-    ApiSource,
+    ApiSource, get_in_situ_dates_between,
 )
 from shared.src.database.locations import AirQualityLocationType
 from shared.tests.util.mock_measurement import create_mock_measurement_document
@@ -17,14 +17,19 @@ from shared.tests.util.mock_measurement import create_mock_measurement_document
 
 @pytest.fixture
 def mock_collection():
-    yield mongomock.MongoClient().db.collection
+    collection = mongomock.MongoClient().db.collection
+    with patch(
+            "shared.src.database.in_situ.get_collection", return_value=collection
+    ):
+        yield collection
 
 
 @freeze_time("2024-05-24")
-def test__insert_new_data(mock_collection):
+def test__insert_new_data():
+    test_mock_collection = mongomock.MongoClient().db.collection
     with patch(
-        "shared.src.database.mongo_db_operations.get_collection",
-        return_value=mock_collection,
+            "shared.src.database.mongo_db_operations.get_collection",
+            return_value=test_mock_collection,
     ):
         date = datetime.now()
         in_situ_1 = {
@@ -35,7 +40,7 @@ def test__insert_new_data(mock_collection):
         }
         insert_data([in_situ_1])
 
-        results = list(mock_collection.find({}))
+        results = list(test_mock_collection.find({}))
         assert len(results) == 1
         del results[0]["_id"]
         assert results[0] == {
@@ -46,26 +51,23 @@ def test__insert_new_data(mock_collection):
 
 
 def test__delete_in_situ_data_before(mock_collection):
-    with patch(
-        "shared.src.database.in_situ.get_collection", return_value=mock_collection
-    ):
-        in_situ = {
-            "name": "location1",
-            "location_name": "API",
-            "o3": 123,
-        }
-        mock_collection.insert_many(
-            [
-                {**in_situ, "measurement_date": datetime(2024, 5, 1, 0, 0)},
-                {**in_situ, "measurement_date": datetime(2024, 5, 2, 0, 0)},
-                {**in_situ, "measurement_date": datetime(2024, 5, 3, 0, 0)},
-            ]
-        )
+    in_situ = {
+        "name": "location1",
+        "location_name": "API",
+        "o3": 123,
+    }
+    mock_collection.insert_many(
+        [
+            {**in_situ, "measurement_date": datetime(2024, 5, 1, 0, 0)},
+            {**in_situ, "measurement_date": datetime(2024, 5, 2, 0, 0)},
+            {**in_situ, "measurement_date": datetime(2024, 5, 3, 0, 0)},
+        ]
+    )
 
-        delete_in_situ_data_before(datetime(2024, 5, 2, 0, 0))
+    delete_in_situ_data_before(datetime(2024, 5, 2, 0, 0))
 
-        results = list(mock_collection.find({}))
-        assert len(results) == 2
+    results = list(mock_collection.find({}))
+    assert len(results) == 2
 
 
 @pytest.mark.parametrize(
@@ -126,117 +128,173 @@ def test__delete_in_situ_data_before(mock_collection):
     ],
 )
 def test__find_by_criteria(params, expected_names, mock_collection):
-    with patch(
-        "shared.src.database.in_situ.get_collection", return_value=mock_collection
-    ):
-        in_situ = {
-            "o3": 123,
-            "location_type": "city",
-            "location_name": "test",
-            "api_source": "OpenAQ",
-        }
-        mock_collection.insert_many(
-            [
-                {
-                    **in_situ,
-                    "measurement_date": datetime(2024, 5, 1, 5, 0),
-                    "name": "London",
-                },
-                {
-                    **in_situ,
-                    "measurement_date": datetime(2024, 5, 1, 11, 0),
-                    "name": "Paris",
-                },
-            ]
-        )
+    in_situ = {
+        "o3": 123,
+        "location_type": "city",
+        "location_name": "test",
+        "api_source": "OpenAQ",
+    }
+    mock_collection.insert_many(
+        [
+            {
+                **in_situ,
+                "measurement_date": datetime(2024, 5, 1, 5, 0),
+                "name": "London",
+            },
+            {
+                **in_situ,
+                "measurement_date": datetime(2024, 5, 1, 11, 0),
+                "name": "Paris",
+            },
+        ]
+    )
 
-        response = find_by_criteria(**params)
+    response = find_by_criteria(**params)
 
-        assert list(map(lambda x: x["name"], response)) == expected_names
+    assert list(map(lambda x: x["name"], response)) == expected_names
 
 
 def test__get_averaged(mock_collection):
-    with patch(
-        "shared.src.database.in_situ.get_collection", return_value=mock_collection
-    ):
-        documents = [
+    documents = [
+        create_mock_measurement_document(
+            {
+                "name": "city 1",
+                "measurement_date": datetime(2024, 6, 5, 1, 30),
+                "o3": {"value": 1.0},
+                "no2": {"value": 1.0},
+                "so2": {"value": 1.0},
+                "pm10": {"value": 1.0},
+                "pm2_5": {"value": 1.0},
+            }
+        ),
+        # Only one pollutant measurement
+        create_mock_measurement_document(
+            {
+                "name": "city 1",
+                "measurement_date": datetime(2024, 6, 5, 4, 30),
+                "o3": {"value": 3.0},
+            }
+        ),
+        # Only one pollutant measurement
+        create_mock_measurement_document(
+            {
+                "name": "city 1",
+                "measurement_date": datetime(2024, 6, 5, 3, 0),
+                "o3": {"value": 5.0},
+            }
+        ),
+        # Before date range
+        create_mock_measurement_document(
+            {
+                "name": "city 1",
+                "measurement_date": datetime(2024, 6, 5, 1, 29),
+                "o3": {"value": 100.0},
+            }
+        ),
+        # After date range
+        create_mock_measurement_document(
+            {
+                "name": "city 1",
+                "measurement_date": datetime(2024, 6, 5, 4, 31),
+                "o3": {"value": 100.0},
+            }
+        ),
+        # Second city, pollutants missing
+        create_mock_measurement_document(
+            {
+                "name": "city 2",
+                "measurement_date": datetime(2024, 6, 5, 1, 30),
+                "pm10": {"value": 5.0},
+                "pm2_5": {"value": 5.0},
+            }
+        ),
+    ]
+    mock_collection.insert_many(documents)
+
+    results = get_averaged(
+        datetime(2024, 6, 5, 3, 0), 90, AirQualityLocationType.CITY
+    )
+    assert results == [
+        {
+            "measurement_base_time": datetime(2024, 6, 5, 3, 0),
+            "location_type": "city",
+            "name": "city 1",
+            "no2": {"mean": 1.0},
+            "o3": {"mean": 3.0},
+            "pm2_5": {"mean": 1.0},
+            "pm10": {"mean": 1.0},
+            "so2": {"mean": 1.0},
+        },
+        {
+            "measurement_base_time": datetime(2024, 6, 5, 3, 0),
+            "location_type": "city",
+            "name": "city 2",
+            "no2": {"mean": None},
+            "o3": {"mean": None},
+            "pm2_5": {"mean": 5.0},
+            "pm10": {"mean": 5.0},
+            "so2": {"mean": None},
+        },
+    ]
+
+
+def test__get_in_situ_dates_between__database_empty(mock_collection):
+    result = get_in_situ_dates_between(
+        datetime(2024, 5, 27, 0),
+        datetime(2024, 5, 29, 0))
+
+    assert len(result) == 0
+
+
+def test__get_in_situ_dates_between__dates_outside_range(mock_collection):
+    mock_collection.insert_many(
+        [
             create_mock_measurement_document(
                 {
                     "name": "city 1",
-                    "measurement_date": datetime(2024, 6, 5, 1, 30),
-                    "o3": {"value": 1.0},
-                    "no2": {"value": 1.0},
-                    "so2": {"value": 1.0},
-                    "pm10": {"value": 1.0},
-                    "pm2_5": {"value": 1.0},
+                    "measurement_date": datetime(2024, 5, 26, 23, 59, 59),
                 }
             ),
-            # Only one pollutant measurement
-            create_mock_measurement_document(
-                {
-                    "name": "city 1",
-                    "measurement_date": datetime(2024, 6, 5, 4, 30),
-                    "o3": {"value": 3.0},
-                }
-            ),
-            # Only one pollutant measurement
-            create_mock_measurement_document(
-                {
-                    "name": "city 1",
-                    "measurement_date": datetime(2024, 6, 5, 3, 0),
-                    "o3": {"value": 5.0},
-                }
-            ),
-            # Before date range
-            create_mock_measurement_document(
-                {
-                    "name": "city 1",
-                    "measurement_date": datetime(2024, 6, 5, 1, 29),
-                    "o3": {"value": 100.0},
-                }
-            ),
-            # After date range
-            create_mock_measurement_document(
-                {
-                    "name": "city 1",
-                    "measurement_date": datetime(2024, 6, 5, 4, 31),
-                    "o3": {"value": 100.0},
-                }
-            ),
-            # Second city, pollutants missing
             create_mock_measurement_document(
                 {
                     "name": "city 2",
-                    "measurement_date": datetime(2024, 6, 5, 1, 30),
-                    "pm10": {"value": 5.0},
-                    "pm2_5": {"value": 5.0},
+                    "measurement_date": datetime(2024, 5, 29, 0, 0, 1),
                 }
             ),
         ]
-        mock_collection.insert_many(documents)
+    )
+    result = get_in_situ_dates_between(
+        datetime(2024, 5, 27, 0),
+        datetime(2024, 5, 29, 0))
 
-        results = get_averaged(
-            datetime(2024, 6, 5, 3, 0), 90, AirQualityLocationType.CITY
-        )
-        assert results == [
-            {
-                "measurement_base_time": datetime(2024, 6, 5, 3, 0),
-                "location_type": "city",
-                "name": "city 1",
-                "no2": {"mean": 1.0},
-                "o3": {"mean": 3.0},
-                "pm2_5": {"mean": 1.0},
-                "pm10": {"mean": 1.0},
-                "so2": {"mean": 1.0},
-            },
-            {
-                "measurement_base_time": datetime(2024, 6, 5, 3, 0),
-                "location_type": "city",
-                "name": "city 2",
-                "no2": {"mean": None},
-                "o3": {"mean": None},
-                "pm2_5": {"mean": 5.0},
-                "pm10": {"mean": 5.0},
-                "so2": {"mean": None},
-            },
+    assert len(result) == 0
+
+
+def test__get_in_situ_dates_between__dates_inside_range(mock_collection):
+    mock_collection.insert_many(
+        [
+            create_mock_measurement_document(
+                {
+                    "name": "city 1",
+                    "measurement_date": datetime(2024, 5, 27),
+                }
+            ),
+            create_mock_measurement_document(
+                {
+                    "name": "city 2",
+                    "measurement_date": datetime(2024, 5, 28, 1, 2, 3),
+                }
+            ),
+            create_mock_measurement_document(
+                {
+                    "name": "city 3",
+                    "measurement_date": datetime(2024, 5, 29),
+                }
+            ),
         ]
+    )
+    result = get_in_situ_dates_between(
+        datetime(2024, 5, 27, 0),
+        datetime(2024, 5, 29, 0))
+
+    assert len(result) == 3
