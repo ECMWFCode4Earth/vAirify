@@ -1,4 +1,4 @@
-Feature: Summary table tests
+Feature: Summary table. A user should be able to set the data in the summary table according to the parameters 'forecast base time' and 'forecast window'
 
 Scenario: Changing the forecast base time on the summary page
     Given the user navigates to the "summary page"
