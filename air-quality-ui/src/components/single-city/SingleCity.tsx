@@ -25,8 +25,8 @@ const getSiteName = (measurement: MeasurementsResponseDto): string => {
 }
 
 export const SingleCity = () => {
-  const { forecastBaseDate, maxInSituDate, maxForecastDate } =
-    useForecastContext()
+  const { forecastDetails } = useForecastContext()
+
   const { name: locationName = '' } = useParams()
   const [
     {
@@ -43,16 +43,16 @@ export const SingleCity = () => {
     queries: [
       {
         queryKey: [
-          forecastBaseDate,
+          forecastDetails.forecastBaseDate,
           locationName,
-          maxInSituDate,
-          maxForecastDate,
+          forecastDetails.maxMeasurementDate,
+          forecastDetails.maxForecastDate,
         ],
         queryFn: () =>
           getForecastData(
-            forecastBaseDate,
-            maxForecastDate,
-            forecastBaseDate,
+            forecastDetails.forecastBaseDate,
+            forecastDetails.maxForecastDate,
+            forecastDetails.forecastBaseDate,
             locationName,
           ),
       },
@@ -60,14 +60,17 @@ export const SingleCity = () => {
         queryKey: [
           'measurements',
           locationName,
-          forecastBaseDate,
-          maxInSituDate,
-          maxForecastDate,
+          forecastDetails.forecastBaseDate,
+          forecastDetails.maxMeasurementDate,
+          forecastDetails.maxForecastDate,
         ],
         queryFn: () =>
-          getMeasurements(forecastBaseDate, maxInSituDate, 'city', [
-            locationName,
-          ]),
+          getMeasurements(
+            forecastDetails.forecastBaseDate,
+            forecastDetails.maxMeasurementDate,
+            'city',
+            [locationName],
+          ),
       },
     ],
   })
@@ -201,7 +204,7 @@ export const SingleCity = () => {
                 cityName={locationName}
                 forecastData={forecastData}
                 measurementsData={measurements}
-                forecastBaseTime={forecastBaseDate}
+                forecastBaseTime={forecastDetails.forecastBaseDate}
               />
             </div>
             {measurementsByPollutantBySite &&

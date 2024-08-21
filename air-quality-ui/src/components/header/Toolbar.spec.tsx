@@ -8,21 +8,24 @@ import {
   ForecastWindowSelectorProps,
 } from './ForecastWindowSelector'
 import { Toolbar } from './Toolbar'
+import { SetForecastDetailsType } from '../../context'
 
-const mockSetForecastBaseDate: (val: DateTime) => void = jest.fn()
-const mockSetMaxForecastDate: (val: number) => void = jest.fn()
-const mockSetMaxInSituDate: (val: number) => void = jest.fn()
+const mockSetDetails: (val: SetForecastDetailsType) => void = jest.fn()
 
 const dateNow = DateTime.fromISO('2024-06-01T12:00:00', { zone: 'UTC' })
 Settings.now = () => dateNow.toMillis()
 
 jest.mock('../../context', () => ({
   useForecastContext: jest.fn().mockReturnValue({
-    forecastBaseDate: DateTime.fromISO('2024-06-01T12:00:00', { zone: 'UTC' }),
-    maxInSituDate: DateTime.fromISO('2024-06-10T09:00:00', { zone: 'utc' }),
-    setForecastBaseDate: (x: DateTime) => mockSetForecastBaseDate(x),
-    setMaxForecastDate: (x: number) => mockSetMaxForecastDate(x),
-    setMaxInSituDate: (x: number) => mockSetMaxInSituDate(x),
+    forecastDetails: {
+      forecastBaseDate: DateTime.fromISO('2024-06-01T12:00:00', {
+        zone: 'UTC',
+      }),
+      maxMeasurementDate: DateTime.fromISO('2024-06-10T09:00:00', {
+        zone: 'utc',
+      }),
+    },
+    setDetails: (x: SetForecastDetailsType) => mockSetDetails(x),
   }),
 }))
 
@@ -58,6 +61,9 @@ jest.mock('./ForecastWindowSelector', () => ({
 }))
 
 describe('Toolbar component', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
   it('renders toolbar', () => {
     render(<Toolbar />)
     expect(screen.getByRole('toolbar')).toBeInTheDocument()
@@ -85,9 +91,12 @@ describe('Toolbar component', () => {
     })
     fireEvent.click(screen.getByText('Ok'))
     await waitFor(() => {
-      expect(mockSetForecastBaseDate).toHaveBeenCalledWith(
-        DateTime.fromISO('2024-06-10T09:00:00', { zone: 'utc' }),
-      )
+      expect(mockSetDetails).toHaveBeenCalledWith({
+        forecastBaseDate: DateTime.fromISO('2024-06-10T09:00:00', {
+          zone: 'utc',
+        }),
+        forecastWindow: 1,
+      })
     })
   })
   it('Setting invalid date and clicking button does not update context', async () => {
@@ -102,7 +111,7 @@ describe('Toolbar component', () => {
     })
     fireEvent.click(screen.getByText('Ok'))
     await waitFor(() => {
-      expect(mockSetForecastBaseDate).not.toHaveBeenCalledWith(
+      expect(mockSetDetails).not.toHaveBeenCalledWith(
         DateTime.fromISO('2024-08-10T09:00:00', { zone: 'utc' }),
       )
     })
@@ -130,7 +139,7 @@ describe('Toolbar component', () => {
       expected: 5,
     },
   ].forEach(({ testData, expected }) => {
-    it(`When forecast window selector is changed to ${testData}, when the ok button is clicked, selectedForecastWindow is ${expected}`, async () => {
+    it(`When forecast window selector is changed to ${testData.label}, when the ok button is clicked, selectedForecastWindow is ${expected}`, async () => {
       render(<Toolbar />)
       const beforeSetting = selectedForecastWindow
       await waitFor(() => {
@@ -140,8 +149,14 @@ describe('Toolbar component', () => {
       await waitFor(() => {
         expect(beforeSetting).toStrictEqual({ value: 1, label: '1' })
       })
+      const expects = {
+        forecastBaseDate: DateTime.fromISO('2024-06-01T12:00:00', {
+          zone: 'utc',
+        }),
+        forecastWindow: expected,
+      }
       await waitFor(() => {
-        expect(mockSetMaxForecastDate).toHaveBeenCalledWith(expected)
+        expect(mockSetDetails).toHaveBeenCalledWith(expects)
       })
     })
   })
