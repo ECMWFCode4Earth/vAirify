@@ -10,6 +10,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "jest",
+    "test:cucumber": "cucumber-js",
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --json --coverage --testLocationInResults --outputFile=report.json"
   },
