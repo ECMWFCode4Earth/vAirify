@@ -175,7 +175,7 @@ test.describe('Range label', () => {
     summaryPage,
   }) => {
     await expect(summaryPage.timeRange).toContainText(
-      'Time Range: 25 Jul 00:00 - 26 Jul 09:00 UTC',
+      'Time Range: 25 Jul 00:00 - 26 Jul 00:00 UTC',
     )
   })
 
@@ -186,7 +186,7 @@ test.describe('Range label', () => {
     await banner.setBaseTime('20/07/2024 00:00')
     await banner.confirmDate()
     await expect(summaryPage.timeRange).toContainText(
-      'Time Range: 20 Jul 00:00 - 25 Jul 00:00 UTC',
+      'Time Range: 20 Jul 00:00 - 21 Jul 00:00 UTC',
     )
   })
 })
