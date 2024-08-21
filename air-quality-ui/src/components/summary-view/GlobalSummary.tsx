@@ -18,7 +18,7 @@ import { LoadingSpinner } from '../common/LoadingSpinner'
 import GlobalSummaryTable from '../summary-grid/table/GlobalSummaryTable'
 
 const GlobalSummary = (): JSX.Element => {
-  const { forecastBaseDate, maxInSituDate } = useForecastContext()
+  const { forecastDetails } = useForecastContext()
   const [showAllColoured, setShowAllColoured] = useState<boolean>(true)
 
   const wrapSetShowAllColoured = useCallback(
@@ -33,27 +33,36 @@ const GlobalSummary = (): JSX.Element => {
     isPending: forecastPending,
     isError: forecastDataError,
   } = useQuery({
-    queryKey: [forecastBaseDate, maxInSituDate],
+    queryKey: [
+      forecastDetails.forecastBaseDate,
+      forecastDetails.maxMeasurementDate,
+    ],
     queryFn: () =>
-      getForecastData(forecastBaseDate, DateTime.now(), forecastBaseDate).then(
-        (forecastData) =>
-          forecastData.reduce<Record<string, ForecastResponseDto[]>>(
-            (acc, reading) => {
-              const location = reading.location_name
-              if (!acc[location]) {
-                acc[location] = []
-              }
-              acc[location].push(reading)
-              return acc
-            },
-            {},
-          ),
+      getForecastData(
+        forecastDetails.forecastBaseDate,
+        DateTime.now(),
+        forecastDetails.forecastBaseDate,
+      ).then((forecastData) =>
+        forecastData.reduce<Record<string, ForecastResponseDto[]>>(
+          (acc, reading) => {
+            const location = reading.location_name
+            if (!acc[location]) {
+              acc[location] = []
+            }
+            acc[location].push(reading)
+            return acc
+          },
+          {},
+        ),
       ),
   })
 
   const forecastValidTimeRange = useMemo(() => {
-    return getValidForecastTimesBetween(forecastBaseDate, maxInSituDate)
-  }, [forecastBaseDate, maxInSituDate])
+    return getValidForecastTimesBetween(
+      forecastDetails.forecastBaseDate,
+      forecastDetails.maxMeasurementDate,
+    )
+  }, [forecastDetails])
 
   const {
     data: summarizedMeasurementData,
@@ -61,7 +70,11 @@ const GlobalSummary = (): JSX.Element => {
     isError: summaryDataError,
   } = useQueries({
     queries: forecastValidTimeRange.map((validTime) => ({
-      queryKey: ['summary', validTime.toMillis(), maxInSituDate],
+      queryKey: [
+        'summary',
+        validTime.toMillis(),
+        forecastDetails.maxMeasurementDate,
+      ],
       queryFn: () => getMeasurementSummary(validTime),
     })),
     combine: (results) => {

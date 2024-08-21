@@ -12,9 +12,11 @@ jest.mock('echarts-for-react', () => () => <div>Mock Chart</div>)
 
 jest.mock('../../../context', () => ({
   useForecastContext: jest.fn().mockReturnValue({
-    forecastBaseDate: DateTime.now(),
-    maxInSituDate: DateTime.now(),
-    maxForecastDate: DateTime.now(),
+    forecastDetails: {
+      forecastBaseDate: DateTime.now(),
+      maxMeasurementDate: DateTime.now(),
+      maxForecastDate: DateTime.now(),
+    },
   }),
 }))
 

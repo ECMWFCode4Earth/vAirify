@@ -12,14 +12,11 @@ import { useForecastContext } from '../../context'
 import { VAirifyButton } from '../common/button/VAirifyButton'
 
 export const Toolbar = () => {
-  const {
-    forecastBaseDate,
-    setForecastBaseDate,
-    setMaxForecastDate,
-    setMaxInSituDate,
-  } = useForecastContext()
-  const [selectedForecastBaseDate, setSelectedForecastBaseDate] =
-    useState<DateTime<boolean>>(forecastBaseDate)
+  const { forecastDetails, setDetails } = useForecastContext()
+
+  const [selectedForecastBaseDate, setSelectedForecastBaseDate] = useState<
+    DateTime<boolean>
+  >(forecastDetails.forecastBaseDate)
   const [selectedForecastWindow, setSelectedForecastWindow] =
     useState<ForecastWindowOption>({ value: 1, label: '1' })
   const [isInvalidDateTime, setIsInvalidDateTime] = useState<boolean>(false)
@@ -37,7 +34,7 @@ export const Toolbar = () => {
         <ForecastBaseDatePicker
           setSelectedForecastBaseDate={setSelectedForecastBaseDate}
           setIsInvalidDateTime={setIsInvalidDateTime}
-          forecastBaseDate={forecastBaseDate}
+          forecastBaseDate={forecastDetails.forecastBaseDate}
         />
       </div>
       <div className={classes['forecast-window-main-div']}>
@@ -50,10 +47,11 @@ export const Toolbar = () => {
         <VAirifyButton
           onClick={() => {
             if (selectedForecastBaseDate) {
-              setForecastBaseDate(selectedForecastBaseDate)
+              setDetails({
+                forecastBaseDate: selectedForecastBaseDate,
+                forecastWindow: selectedForecastWindow.value,
+              })
             }
-            setMaxForecastDate(selectedForecastWindow.value)
-            setMaxInSituDate(selectedForecastWindow.value)
           }}
           text={'Ok'}
           isButtonDisabled={isInvalidDateTime}

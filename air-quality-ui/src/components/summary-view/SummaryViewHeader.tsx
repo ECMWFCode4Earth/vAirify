@@ -12,14 +12,14 @@ export const SummaryViewHeader = ({
   showAllColoured,
   setShowAllColoured,
 }: SummaryViewHeaderProps): JSX.Element => {
-  const { forecastBaseDate, maxInSituDate } = useForecastContext()
+  const { forecastDetails } = useForecastContext()
 
   return (
     <div className={classes['table-header']}>
       <div className={classes['table-date']}>
-        Time Range: {forecastBaseDate.toFormat('dd MMM HH:mm')}
+        Time Range: {forecastDetails.forecastBaseDate.toFormat('dd MMM HH:mm')}
         {' - '}
-        {maxInSituDate.toFormat('dd MMM HH:mm ZZZZ')}
+        {forecastDetails.maxMeasurementDate.toFormat('dd MMM HH:mm ZZZZ')}
       </div>
       <div className={`ag-theme-quartz ${classes['table-switch-container']}`}>
         <label className={`ag-theme-quartz ${classes['table-switch-label']}`}>
