@@ -9,11 +9,13 @@ export class Banner extends BasePage {
   readonly updateDateButton: Locator
   readonly datePicker: Locator
   readonly datePickerNextMonthButton: Locator
+  readonly datePickerPreviousMonthButton: Locator
   readonly datePickerTimeOptions: Locator
   readonly datePickerTimeOption0000: Locator
   readonly datePickerTimeOption1200: Locator
   readonly datePickerYearOpenButton: Locator
   readonly datePickerYearCloseButton: Locator
+  readonly datePickerDateText: Locator
   readonly dateUpdateButton: Locator
   readonly futureDay27: Locator
   readonly logo: Locator
@@ -28,11 +30,15 @@ export class Banner extends BasePage {
     this.updateDateButton = page.getByRole('button', { name: 'Update' })
     this.datePicker = page.getByRole('textbox', { name: 'Forecast Base Date' })
     this.datePickerNextMonthButton = page.getByLabel('Next month')
+    this.datePickerPreviousMonthButton = page.getByTestId('ArrowLeftIcon')
     this.datePickerTimeOptions = page.locator('ul > [role="option"]')
     this.datePickerTimeOption0000 = page.getByRole('option', { name: '00:00' })
     this.datePickerTimeOption1200 = page.getByRole('option', { name: '12:00' })
     this.datePickerYearOpenButton = page.getByLabel(
       'calendar view is open, switch',
+    )
+    this.datePickerDateText = page.locator(
+      '//div[contains(@class, "MuiPickersCalendarHeader-root")]',
     )
     this.dateUpdateButton = page.getByRole('button', { name: 'Update' })
     this.futureDay27 = page.locator(
@@ -101,5 +107,16 @@ export class Banner extends BasePage {
 
   async setBaseTime(baseTime: string): Promise<void> {
     await this.datePicker.fill(baseTime)
+  }
+
+  async findSpecificMonthAndYear(month: string, year: string) {
+    let bannerText: string | null = await this.datePickerDateText.innerText()
+
+    while (!bannerText?.includes(`${month} ${year}`)) {
+      this.datePickerPreviousMonthButton.click()
+      this.datePickerDateText.waitFor({ state: 'visible' })
+      console.log(bannerText)
+      bannerText = await this.datePickerDateText.textContent()
+    }
   }
 }
