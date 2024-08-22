@@ -4,6 +4,6 @@
     "format-options": { "snippetInterface": "synchronous" },
     "parallel": 2,
     "paths": ["./system_tests/e2e/features/*.feature"],
-    "require": ["./system_tests/e2e/step_definitions/*.ts"]
+    "import": ["./system_tests/e2e/step_definitions/*.js"]
   }
 }

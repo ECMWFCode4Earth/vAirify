@@ -12,22 +12,19 @@ Given('the user navigates to the summary page', async function () {
 
 When(
   'they change the forecast base time to {string} {string}',
-  function (date: string, time: string) {
+  function (date, time) {
     console.log(date)
     console.log(time)
   },
 )
 
-When(
-  'they look at the entry in the table for {string}',
-  function (city: string) {
-    console.log(city)
-  },
-)
+When('they look at the entry in the table for {string}', function (city) {
+  console.log(city)
+})
 
 Then(
   'the table data should be based on the data for {string} {string}, with forecast window {int}',
-  function (date: string, time: string, forecast_window: number) {
+  function (date, time, forecast_window) {
     console.log(date)
     console.log(time)
     console.log(forecast_window)
