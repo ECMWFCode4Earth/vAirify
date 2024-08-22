@@ -1,4 +1,4 @@
-import Select from 'react-select'
+import Select, { StylesConfig } from 'react-select'
 
 import classes from './ForecastWindowSelector.module.css'
 
@@ -20,6 +20,27 @@ export interface ForecastWindowSelectorProps {
   selectedForecastWindow: ForecastWindowOption
 }
 
+const selectStyling: StylesConfig = {
+  control: (baseStyles, state) => ({
+    ...baseStyles,
+    background: 'black',
+    height: '100%',
+    borderColor: state.isFocused ? 'white' : '#444',
+  }),
+  singleValue: (baseStyles) => ({
+    ...baseStyles,
+    color: 'white',
+  }),
+  input: (baseStyles) => ({
+    ...baseStyles,
+    color: 'white',
+  }),
+  menu: (baseStyles) => ({
+    ...baseStyles,
+    color: 'black',
+  }),
+}
+
 export const ForecastWindowSelector = (props: ForecastWindowSelectorProps) => {
   return (
     <div>
@@ -33,11 +54,12 @@ export const ForecastWindowSelector = (props: ForecastWindowSelectorProps) => {
         data-testid="forecast-window-select"
         onChange={(value) => {
           if (value) {
-            props.setSelectedForecastWindowState(value)
+            props.setSelectedForecastWindowState(value as ForecastWindowOption)
           }
         }}
         options={forecastWindowOptions}
         value={props.selectedForecastWindow}
+        styles={selectStyling}
       />
     </div>
   )

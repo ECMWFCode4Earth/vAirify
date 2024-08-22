@@ -30,32 +30,34 @@ export const Toolbar = () => {
       <div>
         <Breadcrumbs />
       </div>
-      <div className={classes['forecast-base-date-picker-div']}>
-        <ForecastBaseDatePicker
-          setSelectedForecastBaseDate={setSelectedForecastBaseDate}
-          setIsInvalidDateTime={setIsInvalidDateTime}
-          forecastBaseDate={forecastDetails.forecastBaseDate}
-        />
-      </div>
-      <div className={classes['forecast-window-main-div']}>
-        <ForecastWindowSelector
-          setSelectedForecastWindowState={setSelectedForecastWindow}
-          selectedForecastWindow={selectedForecastWindow}
-        />
-      </div>
-      <div className={classes['forecast-base-date-picker-button-div']}>
-        <VAirifyButton
-          onClick={() => {
-            if (selectedForecastBaseDate) {
-              setDetails({
-                forecastBaseDate: selectedForecastBaseDate,
-                forecastWindow: selectedForecastWindow.value,
-              })
-            }
-          }}
-          text={'Ok'}
-          isButtonDisabled={isInvalidDateTime}
-        />
+      <div className={classes['controls']}>
+        <div className={classes['forecast-base-date-picker-div']}>
+          <ForecastBaseDatePicker
+            setSelectedForecastBaseDate={setSelectedForecastBaseDate}
+            setIsInvalidDateTime={setIsInvalidDateTime}
+            forecastBaseDate={forecastDetails.forecastBaseDate}
+          />
+        </div>
+        <div className={classes['forecast-window-main-div']}>
+          <ForecastWindowSelector
+            setSelectedForecastWindowState={setSelectedForecastWindow}
+            selectedForecastWindow={selectedForecastWindow}
+          />
+        </div>
+        <div className={classes['forecast-base-date-picker-button-div']}>
+          <VAirifyButton
+            onClick={() => {
+              if (selectedForecastBaseDate) {
+                setDetails({
+                  forecastBaseDate: selectedForecastBaseDate,
+                  forecastWindow: selectedForecastWindow.value,
+                })
+              }
+            }}
+            text={'Ok'}
+            isButtonDisabled={isInvalidDateTime}
+          />
+        </div>
       </div>
     </section>
   )

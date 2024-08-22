@@ -1,4 +1,25 @@
 .forecast-window-select{
-    width: 6.6rem;
-    color: black;
+    width: 100%;
+    z-index: 1000;
+    height: 3.5rem
+}
+
+
+.forecast-window-label{
+  font-family: "Roboto","Helvetica","Arial",sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.4375em;
+  letter-spacing: 0.00938em;
+  transform-origin: top left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(133% - 32px);
+  position: absolute;
+  z-index: 1001;
+  top: -0.5rem;
+  left: 0.5rem;
+  background-color: black;
+  padding: 0 0.3rem;
 }
