@@ -213,15 +213,14 @@ test.describe('Forecast Window', () => {
     )
     await banner.forecastWindowDropdownClick()
   })
-  test.describe('Forecast array', () => {
-    const testCases = [
-      { window: '1', days: 1, toDate: '2024-07-02T00:00:00Z' },
-      { window: '2', days: 2, toDate: '2024-07-03T00:00:00Z' },
-      { window: '3', days: 3, toDate: '2024-07-04T00:00:00Z' },
-      { window: '4', days: 4, toDate: '2024-07-05T00:00:00Z' },
-      { window: '5', days: 5, toDate: '2024-07-06T00:00:00Z' },
-    ]
-
+  const testCases = [
+    { window: '1', days: 1, toDate: '2024-07-02T00:00:00Z' },
+    { window: '2', days: 2, toDate: '2024-07-03T00:00:00Z' },
+    { window: '3', days: 3, toDate: '2024-07-04T00:00:00Z' },
+    { window: '4', days: 4, toDate: '2024-07-05T00:00:00Z' },
+    { window: '5', days: 5, toDate: '2024-07-06T00:00:00Z' },
+  ]
+  test.describe('Forecast API array', () => {
     for (const { window, days, toDate } of testCases) {
       test(`Forecast window ${window} requests ${days} day(s) worth of data`, async ({
         banner,
@@ -246,7 +245,28 @@ test.describe('Forecast Window', () => {
     }
   })
 
-  test.describe('Measurements array', () => {
-    console.log('Measuremnts will be here')
+  test.describe('Measurements API array', () => {
+    for (const { window, days, toDate } of testCases) {
+      test(`Forecast window ${window} requests ${days} day(s) worth of data`, async ({
+        banner,
+        page,
+        cityPage,
+      }) => {
+        const expectedValidTimeFrom = await encodeDateToURIComponent(
+          new Date('2024-07-01T00:00:00Z'),
+        )
+        const expectedValidTimeTo = await encodeDateToURIComponent(
+          new Date(toDate),
+        )
+
+        await banner.forecastWindowDropdownSelect(window)
+        await banner.confirmDate()
+        await waitForIdleNetwork(page, cityPage.aqiChart)
+
+        await expect(measurementsRequestArray[0]).toContain(
+          `date_from=${expectedValidTimeFrom}&date_to=${expectedValidTimeTo}`,
+        )
+      })
+    }
   })
 })
