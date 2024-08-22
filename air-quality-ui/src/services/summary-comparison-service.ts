@@ -68,7 +68,7 @@ const reduceComparisonData = (
   const reducedComparisonData = { ...currentComparison }
 
   if (
-    !reducedComparisonData.aqiDifference ||
+    reducedComparisonData.aqiDifference == undefined ||
     reducedComparisonData.aqiDifference < aqiDifference ||
     (reducedComparisonData.aqiDifference == aqiDifference &&
       reducedComparisonData.forecastData.aqiLevel <
