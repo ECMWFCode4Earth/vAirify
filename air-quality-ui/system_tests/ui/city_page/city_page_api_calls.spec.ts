@@ -2,13 +2,8 @@ import { expect, test } from '../../utils/fixtures'
 import {
   encodeDateToURIComponent,
   gotoPage,
-  setupPageWithMockData,
   waitForIdleNetwork,
 } from '../../utils/helper_methods'
-import {
-  createForecastAPIResponseData,
-  createMeasurementsCityPageResponseData,
-} from '../../utils/mocked_api'
 
 const systemDate: Date = new Date('2024-07-18T14:00:00Z')
 const forecastAPIEndpoint = '/forecast'
@@ -105,7 +100,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
       banner,
     }) => {
       await banner.clickOnDay(3)
-      await banner.confirmDate()
+      await banner.clickOK()
       expect(requestArray.length).toEqual(1)
     })
 
@@ -117,86 +112,16 @@ test.describe('API calls on changing forecast base time in UI', () => {
       )
 
       await banner.clickOnDay(3)
-      await banner.confirmDate()
+      await banner.clickOK()
       expect(requestArray[0]).toContain(`base_time=${expectedForecastBaseTime}`)
     })
   })
 })
 
-test.describe('Forecast Window', () => {
+test.describe('Forecast window for city page', () => {
   let forecastRequestArray: string[]
   let measurementsRequestArray: string[]
   test.beforeEach(async ({ page, cityPage, basePage, banner, summaryPage }) => {
-    const mockedForecastResponse = [
-      createForecastAPIResponseData({
-        base_time: '2024-07-01T00:00:00Z',
-        valid_time: '2024-07-01T00:00:00Z',
-        location_name: 'Rio de Janeiro',
-        overall_aqi_level: 1,
-      }),
-      createForecastAPIResponseData({
-        base_time: '2024-07-02T00:00:00Z',
-        valid_time: '2024-07-01T03:00:00Z',
-        location_name: 'Rio de Janeiro',
-        overall_aqi_level: 2,
-      }),
-      createForecastAPIResponseData({
-        base_time: '2024-07-03T00:00:00Z',
-        valid_time: '2024-07-01T06:00:00Z',
-        location_name: 'Rio de Janeiro',
-        overall_aqi_level: 3,
-      }),
-      createForecastAPIResponseData({
-        base_time: '2024-07-04T00:00:00Z',
-        valid_time: '2024-07-01T06:00:00Z',
-        location_name: 'Rio de Janeiro',
-        overall_aqi_level: 4,
-      }),
-      createForecastAPIResponseData({
-        base_time: '2024-07-05T00:00:00Z',
-        valid_time: '2024-07-01T06:00:00Z',
-        location_name: 'Rio de Janeiro',
-        overall_aqi_level: 5,
-      }),
-      createForecastAPIResponseData({
-        base_time: '2024-07-06T00:00:00Z',
-        valid_time: '2024-07-01T06:00:00Z',
-        location_name: 'Rio de Janeiro',
-        overall_aqi_level: 5,
-      }),
-    ]
-
-    const mockedMeasurementsCityPageResponse = [
-      createMeasurementsCityPageResponseData({
-        measurement_date: '2024-07-01T00:00:00Z',
-      }),
-      createMeasurementsCityPageResponseData({
-        measurement_date: '2024-07-02T00:00:00Z',
-      }),
-      createMeasurementsCityPageResponseData({
-        measurement_date: '2024-07-03T00:00:00Z',
-      }),
-      createMeasurementsCityPageResponseData({
-        measurement_date: '2024-07-04T00:00:00Z',
-      }),
-      createMeasurementsCityPageResponseData({
-        measurement_date: '2024-07-05T00:00:00Z',
-      }),
-      createMeasurementsCityPageResponseData({
-        measurement_date: '2024-07-06T00:00:00Z',
-      }),
-    ]
-
-    await setupPageWithMockData(page, [
-      {
-        endpointUrl: '*/**/air-pollutant/forecast*',
-        mockedAPIResponse: mockedForecastResponse,
-      },
-      {
-        endpointUrl: '*/**/air-pollutant/measurements*',
-        mockedAPIResponse: mockedMeasurementsCityPageResponse,
-      },
-    ])
     await gotoPage(page, '/city/Rio%20de%20Janeiro')
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
@@ -214,15 +139,15 @@ test.describe('Forecast Window', () => {
     await banner.forecastWindowDropdownClick()
   })
   const testCases = [
-    { window: '1', days: 1, toDate: '2024-07-02T00:00:00Z' },
-    { window: '2', days: 2, toDate: '2024-07-03T00:00:00Z' },
-    { window: '3', days: 3, toDate: '2024-07-04T00:00:00Z' },
-    { window: '4', days: 4, toDate: '2024-07-05T00:00:00Z' },
-    { window: '5', days: 5, toDate: '2024-07-06T00:00:00Z' },
+    { windowOption: '1', days: 1, toDate: '2024-07-02T00:00:00Z' },
+    { windowOption: '2', days: 2, toDate: '2024-07-03T00:00:00Z' },
+    { windowOption: '3', days: 3, toDate: '2024-07-04T00:00:00Z' },
+    { windowOption: '4', days: 4, toDate: '2024-07-05T00:00:00Z' },
+    { windowOption: '5', days: 5, toDate: '2024-07-06T00:00:00Z' },
   ]
   test.describe('Forecast API array', () => {
-    for (const { window, days, toDate } of testCases) {
-      test(`Forecast window ${window} requests ${days} day(s) worth of data`, async ({
+    for (const { windowOption, days, toDate } of testCases) {
+      test(`Forecast window ${windowOption} requests ${days} day(s) worth of data`, async ({
         banner,
         page,
         cityPage,
@@ -234,8 +159,8 @@ test.describe('Forecast Window', () => {
           new Date(toDate),
         )
 
-        await banner.forecastWindowDropdownSelect(window)
-        await banner.confirmDate()
+        await banner.forecastWindowDropdownSelect(windowOption)
+        await banner.clickOK()
         await waitForIdleNetwork(page, cityPage.aqiChart)
 
         await expect(forecastRequestArray[0]).toContain(
@@ -246,8 +171,8 @@ test.describe('Forecast Window', () => {
   })
 
   test.describe('Measurements API array', () => {
-    for (const { window, days, toDate } of testCases) {
-      test(`Forecast window ${window} requests ${days} day(s) worth of data`, async ({
+    for (const { windowOption, days, toDate } of testCases) {
+      test(`Forecast window ${windowOption} requests ${days} day(s) worth of data`, async ({
         banner,
         page,
         cityPage,
@@ -259,8 +184,8 @@ test.describe('Forecast Window', () => {
           new Date(toDate),
         )
 
-        await banner.forecastWindowDropdownSelect(window)
-        await banner.confirmDate()
+        await banner.forecastWindowDropdownSelect(windowOption)
+        await banner.clickOK()
         await waitForIdleNetwork(page, cityPage.aqiChart)
 
         await expect(measurementsRequestArray[0]).toContain(

@@ -85,7 +85,7 @@ export class Banner extends BasePage {
     }
   }
 
-  async confirmDate() {
+  async clickOK() {
     await this.dateOkButton.click()
   }
 
