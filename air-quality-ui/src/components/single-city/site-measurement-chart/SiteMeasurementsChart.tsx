@@ -34,8 +34,7 @@ export const SiteMeasurementsChart = ({
 }: SiteMeasurementsChartProps): JSX.Element => {
   const chartRef = useRef<ReactECharts>(null)
 
-  const { forecastBaseDate, maxForecastDate, maxInSituDate } =
-    useForecastContext()
+  const { forecastDetails } = useForecastContext()
 
   const eChartEventHandler = useCallback(
     ({
@@ -60,15 +59,15 @@ export const SiteMeasurementsChart = ({
   )
 
   const zoomPercent = getInSituPercentage(
-    forecastBaseDate,
-    maxForecastDate,
-    maxInSituDate,
+    forecastDetails.forecastBaseDate,
+    forecastDetails.maxForecastDate,
+    forecastDetails.maxMeasurementDate,
   )
 
   const zoomEventHandler = useCallback(() => {
     const instance = chartRef.current?.getEchartsInstance()
-    updateChartSubtext(instance!, forecastBaseDate)
-  }, [forecastBaseDate])
+    updateChartSubtext(instance!, forecastDetails.forecastBaseDate)
+  }, [forecastDetails])
 
   return (
     <>
@@ -85,7 +84,11 @@ export const SiteMeasurementsChart = ({
           zoomPercent,
           measurementsBySite,
           forecastData,
-          createSubtext(forecastBaseDate, forecastBaseDate, maxInSituDate),
+          createSubtext(
+            forecastDetails.forecastBaseDate,
+            forecastDetails.forecastBaseDate,
+            forecastDetails.maxMeasurementDate,
+          ),
           cityName,
           seriesColorsBySite,
         )}

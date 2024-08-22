@@ -213,11 +213,11 @@ describe('Site Measurement Chart', () => {
 
   describe('background colors', () => {
     const aqiRangesByPollutant: { [key: string]: number[] } = {
-      o3: [0, 50, 100, 130, 240, 380, 800],
-      no2: [0, 40, 90, 120, 230, 340, 1000],
-      so2: [0, 100, 200, 350, 500, 750, 1250],
-      pm10: [0, 20, 40, 50, 100, 150, 1200],
-      pm2_5: [0, 10, 20, 25, 50, 75, 800],
+      o3: [0, 50, 100, 130, 240, 380, Number.MAX_SAFE_INTEGER],
+      no2: [0, 40, 90, 120, 230, 340, Number.MAX_SAFE_INTEGER],
+      so2: [0, 100, 200, 350, 500, 750, Number.MAX_SAFE_INTEGER],
+      pm10: [0, 20, 40, 50, 100, 150, Number.MAX_SAFE_INTEGER],
+      pm2_5: [0, 10, 20, 25, 50, 75, Number.MAX_SAFE_INTEGER],
     }
 
     const colours: { [key: string]: string } = {

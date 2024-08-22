@@ -30,7 +30,7 @@ const createBackgroundAqiZones = (pollutant: PollutantType): SeriesOption => {
         getAqiBand(ranges[1], ranges[2], '#f0e641'),
         getAqiBand(ranges[2], ranges[3], '#ff505080'),
         getAqiBand(ranges[3], ranges[4], '#960032'),
-        getAqiBand(ranges[4], ranges[5], '#7d2181'),
+        getAqiBand(ranges[4], Number.MAX_SAFE_INTEGER, '#7d2181'),
       ],
     },
     silent: true,

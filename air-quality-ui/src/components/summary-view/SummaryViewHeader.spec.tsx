@@ -6,8 +6,14 @@ import { SummaryViewHeader } from './SummaryViewHeader'
 
 jest.mock('../../context', () => ({
   useForecastContext: jest.fn().mockReturnValue({
-    forecastBaseDate: DateTime.fromISO('2024-06-01T03:00:00', { zone: 'utc' }),
-    maxInSituDate: DateTime.fromISO('2024-06-10T09:00:00', { zone: 'utc' }),
+    forecastDetails: {
+      forecastBaseDate: DateTime.fromISO('2024-06-01T03:00:00', {
+        zone: 'utc',
+      }),
+      maxMeasurementDate: DateTime.fromISO('2024-06-10T09:00:00', {
+        zone: 'utc',
+      }),
+    },
   }),
 }))
 

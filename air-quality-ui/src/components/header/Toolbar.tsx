@@ -12,14 +12,11 @@ import { useForecastContext } from '../../context'
 import { VAirifyButton } from '../common/button/VAirifyButton'
 
 export const Toolbar = () => {
-  const {
-    forecastBaseDate,
-    setForecastBaseDate,
-    setMaxForecastDate,
-    setMaxInSituDate,
-  } = useForecastContext()
-  const [selectedForecastBaseDate, setSelectedForecastBaseDate] =
-    useState<DateTime<boolean>>(forecastBaseDate)
+  const { forecastDetails, setDetails } = useForecastContext()
+
+  const [selectedForecastBaseDate, setSelectedForecastBaseDate] = useState<
+    DateTime<boolean>
+  >(forecastDetails.forecastBaseDate)
   const [selectedForecastWindow, setSelectedForecastWindow] =
     useState<ForecastWindowOption>({ value: 1, label: '1' })
   const [isInvalidDateTime, setIsInvalidDateTime] = useState<boolean>(false)
@@ -33,31 +30,34 @@ export const Toolbar = () => {
       <div>
         <Breadcrumbs />
       </div>
-      <div className={classes['forecast-base-date-picker-div']}>
-        <ForecastBaseDatePicker
-          setSelectedForecastBaseDate={setSelectedForecastBaseDate}
-          setIsInvalidDateTime={setIsInvalidDateTime}
-          forecastBaseDate={forecastBaseDate}
-        />
-      </div>
-      <div className={classes['forecast-window-main-div']}>
-        <ForecastWindowSelector
-          setSelectedForecastWindowState={setSelectedForecastWindow}
-          selectedForecastWindow={selectedForecastWindow}
-        />
-      </div>
-      <div className={classes['forecast-base-date-picker-button-div']}>
-        <VAirifyButton
-          onClick={() => {
-            if (selectedForecastBaseDate) {
-              setForecastBaseDate(selectedForecastBaseDate)
-            }
-            setMaxForecastDate(selectedForecastWindow.value)
-            setMaxInSituDate(selectedForecastWindow.value)
-          }}
-          text={'Ok'}
-          isButtonDisabled={isInvalidDateTime}
-        />
+      <div className={classes['controls']}>
+        <div className={classes['forecast-base-date-picker-div']}>
+          <ForecastBaseDatePicker
+            setSelectedForecastBaseDate={setSelectedForecastBaseDate}
+            setIsInvalidDateTime={setIsInvalidDateTime}
+            forecastBaseDate={forecastDetails.forecastBaseDate}
+          />
+        </div>
+        <div className={classes['forecast-window-main-div']}>
+          <ForecastWindowSelector
+            setSelectedForecastWindowState={setSelectedForecastWindow}
+            selectedForecastWindow={selectedForecastWindow}
+          />
+        </div>
+        <div className={classes['forecast-base-date-picker-button-div']}>
+          <VAirifyButton
+            onClick={() => {
+              if (selectedForecastBaseDate) {
+                setDetails({
+                  forecastBaseDate: selectedForecastBaseDate,
+                  forecastWindow: selectedForecastWindow.value,
+                })
+              }
+            }}
+            text={'Ok'}
+            isButtonDisabled={isInvalidDateTime}
+          />
+        </div>
       </div>
     </section>
   )

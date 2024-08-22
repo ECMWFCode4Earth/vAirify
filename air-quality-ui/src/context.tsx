@@ -3,7 +3,7 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
+  useMemo,
   useState,
 } from 'react'
 
@@ -12,95 +12,71 @@ import {
   getNearestValidForecastTime,
 } from './services/forecast-time-service'
 
-type ForecastContextType = {
+type ForecastWindowDetails = {
   forecastBaseDate: DateTime
   maxForecastDate: DateTime
-  maxInSituDate: DateTime
-  setForecastBaseDate: (arg: DateTime) => void
-  setMaxForecastDate: (arg: number) => void
-  setMaxInSituDate: (arg: number) => void
+  maxMeasurementDate: DateTime
+  forecastWindow: number
 }
 
-const ForecastContext = createContext<ForecastContextType | undefined>(
-  undefined,
-)
+export type SetForecastDetailsType = {
+  forecastBaseDate: DateTime
+  forecastWindow: number
+}
+
+type ForecastDetailsContext = {
+  setDetails: (newDetails: SetForecastDetailsType) => void
+  forecastDetails: ForecastWindowDetails
+}
+
+const defaultForecastBaseDate = getLatestBaseForecastTime()
+
+const defaultValue: ForecastWindowDetails = {
+  forecastBaseDate: defaultForecastBaseDate.minus({ hours: 24 }),
+  maxForecastDate: defaultForecastBaseDate,
+  maxMeasurementDate: DateTime.min(
+    getNearestValidForecastTime(DateTime.utc()),
+    defaultForecastBaseDate,
+  ),
+  forecastWindow: 1,
+}
+
+const ForecastContext = createContext<ForecastDetailsContext>({
+  setDetails: () => {},
+  forecastDetails: defaultValue,
+})
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const useForecastContext = () =>
-  useContext(ForecastContext) as ForecastContextType
+export const useForecastContext = () => useContext(ForecastContext)
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const ForecastContextProvider = (props: any) => {
-  const defaultValue = getLatestBaseForecastTime().minus({ hours: 24 })
+  const [forecastDetails, setForecastDetails] =
+    useState<ForecastWindowDetails>(defaultValue)
 
-  const [forecastBaseDate, setForecastBaseDateState] =
-    useState<ForecastContextType['forecastBaseDate']>(defaultValue)
+  const setDetails = useCallback((response: SetForecastDetailsType) => {
+    setForecastDetails({
+      maxForecastDate: response.forecastBaseDate.plus({
+        days: response.forecastWindow,
+      }),
+      maxMeasurementDate: DateTime.min(
+        getNearestValidForecastTime(DateTime.utc()),
+        response.forecastBaseDate.plus({ days: response.forecastWindow }),
+      ),
+      ...response,
+    })
+  }, [])
 
-  const [maxForecastDate, setMaxForecastDateState] = useState<
-    ForecastContextType['maxForecastDate']
-  >(forecastBaseDate.plus({ days: 1 }))
-
-  const [maxInSituDate, setMaxInSituDateState] = useState<
-    ForecastContextType['maxInSituDate']
-  >(
-    DateTime.min(
-      getNearestValidForecastTime(DateTime.utc()),
-      forecastBaseDate.plus({ days: 1 }),
-    ),
+  const contextValue = useMemo(
+    () => ({
+      setDetails,
+      forecastDetails,
+    }),
+    [setDetails, forecastDetails],
   )
-
-  const [forecastWindow, setForecastWindowState] = useState(1)
-  const [inSituWindow, setInSituWindowState] = useState(1)
-
-  const setForecastBaseDate: ForecastContextType['setForecastBaseDate'] = (
-    value,
-  ) => {
-    setForecastBaseDateState(value)
-  }
-
-  const setMaxForecastDate: ForecastContextType['setMaxForecastDate'] =
-    useCallback(
-      (value: number) => {
-        setForecastWindowState(value)
-        setMaxForecastDateState(forecastBaseDate.plus({ days: value }))
-      },
-      [forecastBaseDate],
-    )
-  const setMaxInSituDate: ForecastContextType['setMaxInSituDate'] = useCallback(
-    (value: number) => {
-      setInSituWindowState(value)
-      setMaxInSituDateState(
-        DateTime.min(
-          getNearestValidForecastTime(DateTime.utc()),
-          forecastBaseDate.plus({ days: value }),
-        ),
-      )
-    },
-    [forecastBaseDate],
-  )
-
-  useEffect(() => {
-    setMaxForecastDate(forecastWindow)
-    setMaxInSituDate(inSituWindow)
-  }, [
-    forecastBaseDate,
-    forecastWindow,
-    inSituWindow,
-    setMaxForecastDate,
-    setMaxInSituDate,
-  ])
 
   return (
-    <ForecastContext.Provider
-      value={{
-        forecastBaseDate,
-        maxForecastDate,
-        maxInSituDate,
-        setForecastBaseDate,
-        setMaxInSituDate,
-        setMaxForecastDate,
-      }}
-    >
+    <ForecastContext.Provider value={contextValue}>
       {props.children}
     </ForecastContext.Provider>
   )

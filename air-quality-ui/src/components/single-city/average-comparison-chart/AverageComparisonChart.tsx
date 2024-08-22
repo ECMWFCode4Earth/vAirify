@@ -30,8 +30,8 @@ export const AverageComparisonChart = (
   props: AverageComparisonChartProps,
 ): JSX.Element => {
   const chartRef = useRef<ReactECharts>(null)
-  const { forecastBaseDate, maxForecastDate, maxInSituDate } =
-    useForecastContext()
+
+  const { forecastDetails } = useForecastContext()
 
   const measurementsAveragedData = useMemo(() => {
     if (props.measurementsData) {
@@ -44,15 +44,15 @@ export const AverageComparisonChart = (
   }, [props.measurementsData, props.forecastBaseTime])
 
   const zoomPercent = getInSituPercentage(
-    forecastBaseDate,
-    maxForecastDate,
-    maxInSituDate,
+    forecastDetails.forecastBaseDate,
+    forecastDetails.maxForecastDate,
+    forecastDetails.maxMeasurementDate,
   )
 
   const zoomEventHandler = useCallback(() => {
     const instance = chartRef.current?.getEchartsInstance()
-    updateChartSubtext(instance!, forecastBaseDate)
-  }, [forecastBaseDate])
+    updateChartSubtext(instance!, forecastDetails.forecastBaseDate)
+  }, [forecastDetails])
 
   return (
     <ReactECharts
@@ -61,7 +61,11 @@ export const AverageComparisonChart = (
       onEvents={{ dataZoom: zoomEventHandler }}
       option={getForecastOptions(
         props.cityName,
-        createSubtext(forecastBaseDate, forecastBaseDate, maxInSituDate),
+        createSubtext(
+          forecastDetails.forecastBaseDate,
+          forecastDetails.forecastBaseDate,
+          forecastDetails.maxMeasurementDate,
+        ),
         zoomPercent,
         props.forecastData,
         measurementsAveragedData,

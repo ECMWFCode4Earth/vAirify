@@ -225,6 +225,46 @@ describe('Summary Comparison Service createComparisonData', () => {
       value: 6,
     })
   })
+  it('should produce comparisons defaulting to earliest when forecast is exact', () => {
+    const forecastData = {
+      London: [
+        mockForecastResponseDto({
+          valid_time: '2024-06-01T00:00:00Z',
+          overall_aqi_level: 4,
+          no2: { aqi_level: 4, value: 4 },
+        }),
+        mockForecastResponseDto({
+          valid_time: '2024-06-01T03:00:00Z',
+          overall_aqi_level: 4,
+          no2: { aqi_level: 4, value: 4 },
+        }),
+      ],
+    }
+    const measurements = {
+      London: [
+        mockMeasurementSummaryResponseDto({
+          measurement_base_time: '2024-06-01T00:00:00Z',
+          no2: { mean: { aqi_level: 4, value: 4 } },
+        }),
+        mockMeasurementSummaryResponseDto({
+          measurement_base_time: '2024-06-01T03:00:00Z',
+          no2: { mean: { aqi_level: 4, value: 4 } },
+        }),
+      ],
+    }
+    const comparisons = createComparisonData(forecastData, measurements)
+    expect(comparisons.length).toEqual(1)
+
+    expect(comparisons[0]['no2'].forecastData).toEqual({
+      validTime: '2024-06-01T00:00:00Z',
+      aqiLevel: 4,
+      value: 4,
+    })
+    expect(comparisons[0]['no2'].measurementData).toEqual({
+      aqiLevel: 4,
+      value: 4,
+    })
+  })
 })
 
 describe('Summary Comparison Service createSummaryRow', () => {
