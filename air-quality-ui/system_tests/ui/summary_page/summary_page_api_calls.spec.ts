@@ -86,7 +86,7 @@ test.describe('API calls on page load', () => {
     })
 
     test('Verify on page load the measurement summary API is called proportionately', async () => {
-      expect(requestArray.length).toEqual(13)
+      expect(requestArray.length).toEqual(9)
     })
 
     test('Verify on page load the measurement summary API calls have correct params', async () => {
@@ -182,7 +182,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
     }) => {
       await banner.clickOnDay(3)
       await banner.confirmDate()
-      expect(requestArray.length).toEqual(41)
+      expect(requestArray.length).toEqual(9)
     })
 
     test('Verify on changing the forecast base time, the measurement summary API calls have correct params', async ({

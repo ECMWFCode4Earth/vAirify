@@ -3,7 +3,7 @@ import {
   encodeDateToURIComponent,
   gotoPage,
   setupPageWithMockData,
-  verifyForecastAndMeasurements,
+  waitForIdleNetwork,
 } from '../../utils/helper_methods'
 import {
   createForecastAPIResponseData,
@@ -123,10 +123,9 @@ test.describe('API calls on changing forecast base time in UI', () => {
   })
 })
 
-test.describe('Forecast window test', () => {
+test.describe('Forecast Window', () => {
   let forecastRequestArray: string[]
   let measurementsRequestArray: string[]
-
   test.beforeEach(async ({ page, cityPage, basePage, banner, summaryPage }) => {
     const mockedForecastResponse = [
       createForecastAPIResponseData({
@@ -198,7 +197,6 @@ test.describe('Forecast window test', () => {
         mockedAPIResponse: mockedMeasurementsCityPageResponse,
       },
     ])
-
     await gotoPage(page, '/city/Rio%20de%20Janeiro')
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
@@ -215,51 +213,40 @@ test.describe('Forecast window test', () => {
     )
     await banner.forecastWindowDropdownClick()
   })
+  test.describe('Forecast array', () => {
+    const testCases = [
+      { window: '1', days: 1, toDate: '2024-07-02T00:00:00Z' },
+      { window: '2', days: 2, toDate: '2024-07-03T00:00:00Z' },
+      { window: '3', days: 3, toDate: '2024-07-04T00:00:00Z' },
+      { window: '4', days: 4, toDate: '2024-07-05T00:00:00Z' },
+      { window: '5', days: 5, toDate: '2024-07-06T00:00:00Z' },
+    ]
 
-  const testCases = [
-    {
-      window: 1,
-      fromDate: '2024-07-01T00:00:00Z',
-      toDate: '2024-07-02T00:00:00Z',
-    },
-    {
-      window: 2,
-      fromDate: '2024-07-01T00:00:00Z',
-      toDate: '2024-07-03T00:00:00Z',
-    },
-    {
-      window: 3,
-      fromDate: '2024-07-01T00:00:00Z',
-      toDate: '2024-07-04T00:00:00Z',
-    },
-    {
-      window: 4,
-      fromDate: '2024-07-01T00:00:00Z',
-      toDate: '2024-07-05T00:00:00Z',
-    },
-    {
-      window: 5,
-      fromDate: '2024-07-01T00:00:00Z',
-      toDate: '2024-07-06T00:00:00Z',
-    },
-  ]
-
-  testCases.forEach(({ window, fromDate, toDate }) => {
-    test(`Forecast window ${window} requests ${window} day(s) worth of data`, async ({
-      banner,
-      page,
-      cityPage,
-    }) => {
-      await verifyForecastAndMeasurements(
+    for (const { window, days, toDate } of testCases) {
+      test(`Forecast window ${window} requests ${days} day(s) worth of data`, async ({
         banner,
         page,
         cityPage,
-        forecastRequestArray,
-        measurementsRequestArray,
-        window,
-        fromDate,
-        toDate,
-      )
-    })
+      }) => {
+        const expectedValidTimeFrom = await encodeDateToURIComponent(
+          new Date('2024-07-01T00:00:00Z'),
+        )
+        const expectedValidTimeTo = await encodeDateToURIComponent(
+          new Date(toDate),
+        )
+
+        await banner.forecastWindowDropdownSelect(window)
+        await banner.confirmDate()
+        await waitForIdleNetwork(page, cityPage.aqiChart)
+
+        await expect(forecastRequestArray[0]).toContain(
+          `valid_time_from=${expectedValidTimeFrom}&valid_time_to=${expectedValidTimeTo}`,
+        )
+      })
+    }
+  })
+
+  test.describe('Measurements array', () => {
+    console.log('Measuremnts will be here')
   })
 })

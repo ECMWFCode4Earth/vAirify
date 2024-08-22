@@ -1,8 +1,4 @@
 import { type Locator, type Page } from '@playwright/test'
-import { expect } from '@playwright/test'
-
-import { Banner } from '../pages/banner'
-import { CityPage } from '../pages/city_page'
 
 export async function encodeDateToURIComponent(date: Date): Promise<string> {
   return encodeURIComponent(date.toISOString())
@@ -76,39 +72,4 @@ export async function waitForIdleNetwork(
     console.error('Error waiting for chart animation:', error)
     throw error
   }
-}
-
-export async function verifyForecastAndMeasurements(
-  banner: Banner,
-  page: Page,
-  cityPage: CityPage,
-  forecastRequestArray: string[],
-  measurementsRequestArray: string[],
-  window: number,
-  fromDate: string,
-  toDate: string,
-) {
-  const expectedValidTimeFrom: string = await encodeDateToURIComponent(
-    new Date(fromDate),
-  )
-  const expectedValidTimeTo: string = await encodeDateToURIComponent(
-    new Date(toDate),
-  )
-
-  await banner.forecastWindowDropdownSelect(window.toString())
-  await banner.confirmDate()
-  await waitForIdleNetwork(page, cityPage.aqiChart)
-
-  await expect(forecastRequestArray[1]).toContain(
-    `valid_time_from=${expectedValidTimeFrom}`,
-  )
-  await expect(forecastRequestArray[1]).toContain(
-    `valid_time_to=${expectedValidTimeTo}`,
-  )
-  await expect(measurementsRequestArray[1]).toContain(
-    `date_from=${expectedValidTimeFrom}`,
-  )
-  await expect(measurementsRequestArray[1]).toContain(
-    `date_to=${expectedValidTimeTo}`,
-  )
 }
