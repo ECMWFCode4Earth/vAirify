@@ -32,7 +32,7 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'local - chromium',
+      name: 'local_chromium',
       testIgnore: /.*e2e.spec.ts/,
       use: {
         baseURL: 'http://localhost:5173',
@@ -40,7 +40,7 @@ export default defineConfig({
       },
     },
     {
-      name: 'local - firefox',
+      name: 'local_firefox',
       testIgnore: /.*e2e.spec.ts/,
       use: {
         baseURL: 'http://localhost:5173',
@@ -48,7 +48,7 @@ export default defineConfig({
       },
     },
     {
-      name: 'local - webkit',
+      name: 'local_webkit',
       testIgnore: /.*e2e.spec.ts/,
       use: {
         baseURL: 'http://localhost:5173',
@@ -56,7 +56,7 @@ export default defineConfig({
       },
     },
     {
-      name: 'prod - chromium',
+      name: 'prod_chromium',
       testMatch: /.*e2e.spec.ts/,
       use: {
         baseURL: 'http://64.225.143.231/city/summary',
@@ -64,7 +64,7 @@ export default defineConfig({
       },
     },
     {
-      name: 'prod - firefox',
+      name: 'prod_firefox',
       testMatch: /.*e2e.spec.ts/,
       use: {
         baseURL: 'http://64.225.143.231/city/summary',
@@ -72,7 +72,7 @@ export default defineConfig({
       },
     },
     {
-      name: 'prod - webkit',
+      name: 'prod_webkit',
       testMatch: /.*e2e.spec.ts/,
       use: {
         baseURL: 'http://64.225.143.231/city/summary',
