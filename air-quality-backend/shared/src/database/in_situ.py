@@ -143,3 +143,18 @@ def get_averaged(
         ]
     )
     return list(results)
+
+
+def get_in_situ_dates_between(
+        in_situ_base_search_start: datetime,
+        in_situ_base_search_end: datetime,
+) -> List[datetime]:
+    collection = get_collection(collection_name)
+    query = {
+        "measurement_date": {
+            "$gte": in_situ_base_search_start,
+            "$lte": in_situ_base_search_end
+        }
+    }
+    items = collection.find(query).distinct("measurement_date")
+    return [i.replace(tzinfo=None) for i in items]
