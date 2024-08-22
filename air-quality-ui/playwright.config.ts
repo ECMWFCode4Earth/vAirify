@@ -32,20 +32,52 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
+      name: 'local - chromium',
+      testIgnore: /.*e2e.spec.ts/,
       use: {
+        baseURL: 'http://localhost:5173',
         ...devices['Desktop Chrome'],
       },
     },
-
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      name: 'local - firefox',
+      testIgnore: /.*e2e.spec.ts/,
+      use: {
+        baseURL: 'http://localhost:5173',
+        ...devices['Desktop Firefox'],
+      },
     },
-
     {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      name: 'local - webkit',
+      testIgnore: /.*e2e.spec.ts/,
+      use: {
+        baseURL: 'http://localhost:5173',
+        ...devices['Desktop Safari'],
+      },
+    },
+    {
+      name: 'prod - chromium',
+      testMatch: /.*e2e.spec.ts/,
+      use: {
+        baseURL: 'http://64.225.143.231/city/summary',
+        ...devices['Desktop Chrome'],
+      },
+    },
+    {
+      name: 'prod - firefox',
+      testMatch: /.*e2e.spec.ts/,
+      use: {
+        baseURL: 'http://64.225.143.231/city/summary',
+        ...devices['Desktop Firefox'],
+      },
+    },
+    {
+      name: 'prod - webkit',
+      testMatch: /.*e2e.spec.ts/,
+      use: {
+        baseURL: 'http://64.225.143.231/city/summary',
+        ...devices['Desktop Safari'],
+      },
     },
 
     /* Test against mobile viewports. */
