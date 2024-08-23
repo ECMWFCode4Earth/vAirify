@@ -9,7 +9,7 @@ import { SiteMeasurementsChart } from './site-measurement-chart/SiteMeasurements
 import { Station, StationMap } from './station-map/StationMap'
 import { useForecastContext } from '../../context'
 import { PollutantType, pollutantTypes } from '../../models'
-import { textToColor } from '../../services/echarts-service'
+import { indexToColor } from '../../services/echarts-service'
 import { getForecastData } from '../../services/forecast-data-service'
 import { getMeasurements } from '../../services/measurement-data-service'
 import { MeasurementsResponseDto } from '../../services/types'
@@ -163,10 +163,12 @@ export const SingleCity = () => {
   const [siteColors, setSiteColors] = useState<Record<string, string>>({})
   useEffect(() => {
     const updateColors = async () => {
+      let index = 0
       const colorsBySite: Record<string, string> = {}
       for (const { value } of sites) {
-        const color = await textToColor(value)
+        const color = await indexToColor(index)
         colorsBySite[value] = color
+        index++
       }
       setSiteColors(colorsBySite)
     }

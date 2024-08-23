@@ -1,5 +1,4 @@
 import { EChartsType } from 'echarts'
-import { sha1 } from 'js-sha1'
 import { DateTime } from 'luxon'
 
 /**
@@ -31,30 +30,24 @@ export const convertToLocalTime = (date: string): string | null => {
 }
 
 /**
- * Creates a colorCode for an input string. The colour will always be the same for the string
- * @param text
+ * Retrieves a color for an input numeric index.
+ * @param number
  * @returns
  */
-export const textToColor = async (text: string): Promise<string> => {
-  // Create a SHA-256 hash of the input text
-  const generateHash = async (text: string): Promise<ArrayBuffer> => {
-    const encoder = new TextEncoder()
-    const data = encoder.encode(text)
-    return await sha1.arrayBuffer(data)
-  }
-
-  // Convert the hash to a hexadecimal string
-  const hashToHex = (hash: ArrayBuffer): string => {
-    return Array.from(new Uint8Array(hash))
-      .map((byte) => byte.toString(16).padStart(2, '0'))
-      .join('')
-  }
-
-  // Main function to generate the color
-  return generateHash(text).then((hash) => {
-    // Use the first 6 characters of the hash to form the color code
-    return `#${hashToHex(hash).slice(0, 6)}`
-  })
+export const indexToColor = async (index: number): Promise<string> => {
+  const colours = [
+    '#FF0000', // Red
+    '#0088FF', // Blue
+    '#00FF00', // Green
+    '#FF8800', // Orange
+    '#80530d', // Brown
+    '#777777', // Grey
+    '#8800FF', // Purple
+    '#FFFF00', // Yellow
+    '#0000FF', // Navy
+    '#FF00FF', // Pink,
+  ]
+  return colours[index % colours.length]
 }
 
 export const xAxisFormat = (timestamp: number, index: number) => {
