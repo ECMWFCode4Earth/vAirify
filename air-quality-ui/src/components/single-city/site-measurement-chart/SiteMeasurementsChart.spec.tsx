@@ -16,8 +16,12 @@ jest.mock('../../../context', () => ({
   }),
 }))
 
+jest.mock('../../common/LoadingSpinner', () => ({
+  LoadingSpinner: () => 'Mocked loading spinner',
+}))
+
 describe('AverageComparisonChart', () => {
-  it('renders with forecast data and measurement data', async () => {
+  it('renders with loading spinner if no colours set', async () => {
     render(
       <SiteMeasurementsChart
         cityName="name"
@@ -25,6 +29,21 @@ describe('AverageComparisonChart', () => {
         measurementsBySite={{}}
         pollutantType={'pm10'}
         onSiteClick={() => {}}
+      />,
+    )
+    await waitFor(() => {
+      expect(screen.getByText('Mocked loading spinner')).toBeInTheDocument()
+    })
+  })
+  it('renders with echarts if colours set', async () => {
+    render(
+      <SiteMeasurementsChart
+        cityName="name"
+        forecastData={[]}
+        measurementsBySite={{}}
+        pollutantType={'pm10'}
+        onSiteClick={() => {}}
+        seriesColorsBySite={{ Station1: 'Red' }}
       />,
     )
     await waitFor(() => {
