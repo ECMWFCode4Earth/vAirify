@@ -44,9 +44,7 @@ const selectStyling: StylesConfig = {
 export const ForecastWindowSelector = (props: ForecastWindowSelectorProps) => {
   return (
     <div>
-      <label className={classes['forecast-window-label']}>
-        Forecast Window
-      </label>
+      <label className={classes['forecast-window-label']}>Forecast Days</label>
       <Select
         className={classes['forecast-window-select']}
         inputId="forecast-window-select"
