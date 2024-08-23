@@ -37,14 +37,14 @@ export const convertToLocalTime = (date: string): string | null => {
 export const indexToColor = async (index: number): Promise<string> => {
   const colours = [
     '#FF0000', // Red
-    '#0088FF', // Blue
-    '#00FF00', // Green
-    '#FF8800', // Orange
+    '#0000FF', // Navy
+    '#039000', // Green
     '#80530d', // Brown
     '#777777', // Grey
+    '#FF8800', // Orange
     '#8800FF', // Purple
-    '#FFFF00', // Yellow
-    '#0000FF', // Navy
+    '#BBBB00', // Yellow
+    '#0088FF', // Blue
     '#FF00FF', // Pink,
   ]
   return colours[index % colours.length]
