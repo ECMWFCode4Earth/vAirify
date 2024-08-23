@@ -569,33 +569,33 @@ test.describe('High value measurements are displayed correctly', () => {
     await banner.confirmDate()
   })
 
-  test('AQI chart loads', async ({ cityPage }) => {
+  test('High AQI chart loads', async ({ cityPage }) => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.aqiChart)
     expect(chartShot).toMatchSnapshot('rio-high-aqi-graph.png')
   })
 
-  test('pm2.5 snapshot', async ({ cityPage }) => {
+  test('High pm2.5 snapshot', async ({ cityPage }) => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.pm2_5Chart)
     expect(chartShot).toMatchSnapshot('rio-high-pm2_5-graph.png')
   })
 
-  test('pm10 snapshot', async ({ cityPage }) => {
+  test('High pm10 snapshot', async ({ cityPage }) => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.pm10Chart)
     expect(chartShot).toMatchSnapshot('rio-high-pm10-graph.png')
   })
 
-  test('o3 snapshot', async ({ cityPage, page }) => {
+  test('High o3 snapshot', async ({ cityPage, page }) => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.o3Chart)
     expect(chartShot).toMatchSnapshot('rio-high-o3-graph.png')
     await page.pause()
   })
 
-  test('no2 snapshot', async ({ cityPage }) => {
+  test('High no2 snapshot', async ({ cityPage }) => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.no2Chart)
     expect(chartShot).toMatchSnapshot('rio-high-no2-graph.png')
   })
 
-  test('so2 snapshot', async ({ cityPage }) => {
+  test('High so2 snapshot', async ({ cityPage }) => {
     const chartShot = await cityPage.captureChartScreenshot(cityPage.so2Chart)
     expect(chartShot).toMatchSnapshot('rio-high-so2-graph.png')
   })
@@ -606,7 +606,7 @@ const highValuedMeasurementData = [
     measurement_date: '2024-07-01T00:00:00Z',
     no2: 990,
     o3: 700,
-    so2: 1250,
+    so2: 2000,
     pm2_5: 850,
     pm10: 1175,
   }),
