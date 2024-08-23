@@ -54,7 +54,7 @@ export const Toolbar = () => {
                 })
               }
             }}
-            text={'Ok'}
+            text={'Update'}
             isButtonDisabled={isInvalidDateTime}
           />
         </div>
