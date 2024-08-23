@@ -25,7 +25,7 @@ const selectStyling: StylesConfig = {
     ...baseStyles,
     background: 'black',
     height: '100%',
-    borderColor: state.isFocused ? 'white' : '#444',
+    borderColor: state.isFocused ? 'white' : '#3b3b3b',
   }),
   singleValue: (baseStyles) => ({
     ...baseStyles,
@@ -35,9 +35,25 @@ const selectStyling: StylesConfig = {
     ...baseStyles,
     color: 'white',
   }),
+  dropdownIndicator: (baseStyles) => ({
+    ...baseStyles,
+    cursor: 'pointer',
+  }),
+  option: (baseStyles, state) => ({
+    ...baseStyles,
+    cursor: 'pointer',
+    color: state.isSelected ? '#2f2f2f' : 'white',
+    backgroundColor: state.isSelected
+      ? state.isFocused
+        ? '#62a5f4'
+        : '#9ecaf8'
+      : state.isFocused
+        ? '#373b3e'
+        : baseStyles.backgroundColor,
+  }),
   menu: (baseStyles) => ({
     ...baseStyles,
-    color: 'black',
+    backgroundColor: '#2f2f2f',
   }),
 }
 
