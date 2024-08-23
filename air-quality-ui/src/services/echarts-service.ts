@@ -34,7 +34,7 @@ export const convertToLocalTime = (date: string): string | null => {
  * @param number
  * @returns
  */
-export const indexToColor = async (index: number): Promise<string> => {
+export const indexToColor = (index: number): string => {
   const colours = [
     '#FF0000', // Red
     '#0000FF', // Navy

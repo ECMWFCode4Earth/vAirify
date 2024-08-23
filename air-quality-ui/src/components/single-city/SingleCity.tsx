@@ -163,13 +163,11 @@ export const SingleCity = () => {
   const [siteColors, setSiteColors] = useState<Record<string, string>>({})
   useEffect(() => {
     const updateColors = async () => {
-      let index = 0
       const colorsBySite: Record<string, string> = {}
-      for (const { value } of sites) {
-        const color = await indexToColor(index)
-        colorsBySite[value] = color
-        index++
-      }
+      sites.forEach((value, index) => {
+        const color = indexToColor(index)
+        colorsBySite[value.label] = color
+      })
       setSiteColors(colorsBySite)
     }
     updateColors()
