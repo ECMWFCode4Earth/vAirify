@@ -31,7 +31,7 @@ export enum CaseAQI2 {
 export enum CaseAQI3 {
   aqiLevel = 3,
   no2 = 100.5,
-  o3 = 100,
+  o3 = 101,
   pm2_5 = 22.5,
   pm10 = 45.5,
   so2 = 300.5,
@@ -43,7 +43,7 @@ export enum CaseAQI4 {
   o3 = 135,
   pm2_5 = 26,
   pm10 = 99,
-  so2 = 205,
+  so2 = 400,
 }
 
 export enum CaseAQI5 {
@@ -52,7 +52,7 @@ export enum CaseAQI5 {
   o3 = 370,
   pm2_5 = 60,
   pm10 = 120,
-  so2 = 510,
+  so2 = 600,
 }
 
 export enum CaseAQI6 {
