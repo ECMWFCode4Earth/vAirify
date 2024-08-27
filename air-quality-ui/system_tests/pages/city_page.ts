@@ -19,6 +19,7 @@ export class CityPage extends BasePage {
   readonly stationMap: Locator
   readonly title: Locator
   readonly toolbarNavigation: Locator
+  readonly loadingSpinner: Locator
 
   constructor(page: Page) {
     super(page)
@@ -37,11 +38,16 @@ export class CityPage extends BasePage {
     this.stationMap = page.getByTestId('station_map')
     this.title = page.locator('title')
     this.toolbarNavigation = page.getByLabel('Toolbar with site navigation')
+    this.loadingSpinner = page.getByTestId('loading-spinner')
   }
 
   async captureChartScreenshot(chartElement: Locator) {
     await waitForIdleNetwork(this.page, chartElement)
     return await chartElement.screenshot()
+  }
+
+  async waitForSpinnerHidden() {
+    await this.loadingSpinner.waitFor({ state: 'hidden' })
   }
 
   async svgDropDownClick() {
