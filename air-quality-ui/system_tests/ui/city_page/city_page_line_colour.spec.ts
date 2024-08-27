@@ -206,7 +206,7 @@ test.beforeEach(async ({ cityPage, page }) => {
     createMeasurementsCityPageResponseData({
       location_name: locationLondon,
       site_name: testSite8,
-      measurement_date: '2024-08-27T00:00:00Z',
+      measurement_date: date0000,
       no2: CaseAQI6.no2,
       o3: CaseAQI6.o3,
       so2: CaseAQI6.so2,
