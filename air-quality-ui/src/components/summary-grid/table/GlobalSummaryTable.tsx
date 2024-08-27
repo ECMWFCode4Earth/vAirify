@@ -32,6 +32,9 @@ export interface GlobalSummaryTableProps {
 }
 
 const maxWidth = 115
+const forecastWidth = 85
+const measurementWidth = 85
+const diffWidth = 60
 
 function insertEmptyValueDash(value: number | undefined): string {
   if (value === undefined) {
@@ -61,7 +64,7 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         field: 'forecast.aqiLevel',
         headerName: 'Forecast',
         headerClass: 'cell-header-format',
-        maxWidth: maxWidth,
+        maxWidth: forecastWidth,
         cellClass: 'cell-format',
         cellClassRules: aqiCellRules(),
         valueFormatter: (params: ValueFormatterParams) =>
@@ -71,7 +74,7 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         field: 'measurements.aqiLevel',
         headerName: 'Measured',
         headerClass: 'cell-header-format',
-        maxWidth: maxWidth,
+        maxWidth: measurementWidth,
         cellClass: 'cell-format',
         cellClassRules: aqiCellRules(),
         valueFormatter: (params: ValueFormatterParams) =>
@@ -82,7 +85,7 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         headerName: 'Diff',
         headerClass: 'cell-header-format',
         sort: 'desc',
-        maxWidth: maxWidth,
+        maxWidth: diffWidth,
         cellClass: 'cell-format',
         valueFormatter: (params: ValueFormatterParams): string => {
           if (!params.data.measurements) {
@@ -104,7 +107,7 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         headerClass: 'cell-header-format',
         cellClass: 'cell-format',
         cellClassRules: pollutantCellRules(showAllColoured, type),
-        maxWidth: maxWidth,
+        maxWidth: forecastWidth,
         valueFormatter: (params: ValueFormatterParams) =>
           insertEmptyValueDash(params.value),
       },
@@ -114,7 +117,7 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         headerClass: 'cell-header-format',
         cellClass: 'cell-format',
         cellClassRules: pollutantCellRules(showAllColoured, type),
-        maxWidth: maxWidth,
+        maxWidth: measurementWidth,
         valueFormatter: (params: ValueFormatterParams) =>
           insertEmptyValueDash(params.value),
       },
