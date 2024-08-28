@@ -13,7 +13,7 @@ import {
   CaseAQI6,
 } from '../../utils/test_enums'
 
-test.beforeEach(async ({ page, cityPage }) => {
+test.beforeEach(async ({ page, cityPage, banner }) => {
   const mockedForecastResponse = [
     //AQI 3
     createForecastAPIResponseData({
@@ -286,6 +286,8 @@ test.beforeEach(async ({ page, cityPage }) => {
   ])
   await gotoPage(page, '/city/London')
   await cityPage.waitForAllGraphsToBeVisible()
+  await banner.setBaseTime('26/08/2024 00:00')
+  await banner.confirmDate()
 })
 
 test(`With greater than 10 stations, the pm10 chart uses the correct line colours`, async ({
