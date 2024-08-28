@@ -440,7 +440,6 @@ test.describe('Charts are fully visible in 1920x1080 viewport', () => {
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
     await banner.confirmDate()
-    await cityPage.waitForSpinnerHidden()
   })
 
   test('AQI chart element is visible in fullscreen view', async ({
