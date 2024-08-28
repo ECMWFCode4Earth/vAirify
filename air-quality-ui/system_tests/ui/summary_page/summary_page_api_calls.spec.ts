@@ -179,24 +179,54 @@ test.describe('API calls on changing forecast base time in UI', () => {
         httpMethodGet,
         basePage.baseAPIURL + measurementSummaryAPIEndpoint,
       )
+      await banner.clickOnDay(3)
     })
 
     test(`Verify on changing the forecast base time, the measurement summary API is called proportionately`, async ({
       banner,
     }) => {
-      await banner.clickOnDay(3)
       await banner.windowUpdateClick()
       expect(requestArray.length).toEqual(9)
     })
 
-    test('When forecast window is 2 then summary calls are 15', async ({
-      banner,
-    }) => {
-      await banner.clickOnDay(3)
-      await banner.forecastWindowDropdownClick()
-      await banner. forecastWindowDropdownSelect('2')
-      await banner.windowUpdateClick()
-      expect(requestArray.length).toEqual(9)
+    test.describe('Forecast window selections', () => {
+      test('When forecast window is 2 then summary calls are 15', async ({
+        banner,
+      }) => {
+        await banner.forecastWindowDropdownClick()
+        await banner.forecastWindowDropdownSelect('2')
+        await banner.windowUpdateClick()
+        expect(requestArray.length).toEqual(17)
+      })
+
+      test('When forecast window is 3 then summary calls are 25', async ({
+        banner,
+        page,
+      }) => {
+        await banner.forecastWindowDropdownClick()
+        await banner.forecastWindowDropdownSelect('3')
+        await banner.windowUpdateClick()
+        await page.waitForTimeout(10000)
+        expect(requestArray.length).toEqual(25)
+      })
+
+      test('When forecast window is 4 then summary calls are 33', async ({
+        banner,
+      }) => {
+        await banner.forecastWindowDropdownClick()
+        await banner.forecastWindowDropdownSelect('4')
+        await banner.windowUpdateClick()
+        expect(requestArray.length).toEqual(33)
+      })
+
+      test('When forecast window is 5 then summary calls are 41', async ({
+        banner,
+      }) => {
+        await banner.forecastWindowDropdownClick()
+        await banner.forecastWindowDropdownSelect('5')
+        await banner.windowUpdateClick()
+        expect(requestArray.length).toEqual(41)
+      })
     })
 
     test('Verify on changing the forecast base time, the measurement summary API calls have correct params', async ({

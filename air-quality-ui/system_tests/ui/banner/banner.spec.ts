@@ -189,6 +189,58 @@ test.describe('Range label', () => {
       'Time Range: 20 Jul 00:00 - 21 Jul 00:00 UTC',
     )
   })
+
+  test('On forecast window 2 expect 48 hour time range', async ({
+    summaryPage,
+    banner,
+  }) => {
+    await banner.setBaseTime('20/07/2024 00:00')
+    await banner.forecastWindowDropdownClick()
+    await banner.forecastWindowDropdownSelect('2')
+    await banner.windowUpdateClick()
+    await expect(summaryPage.timeRange).toContainText(
+      'Time Range: 20 Jul 00:00 - 22 Jul 00:00 UTC',
+    )
+  })
+
+  test('On forecast window 3 expect 72 hour time range', async ({
+    summaryPage,
+    banner,
+  }) => {
+    await banner.setBaseTime('20/07/2024 00:00')
+    await banner.forecastWindowDropdownClick()
+    await banner.forecastWindowDropdownSelect('3')
+    await banner.windowUpdateClick()
+    await expect(summaryPage.timeRange).toContainText(
+      'Time Range: 20 Jul 00:00 - 23 Jul 00:00 UTC',
+    )
+  })
+
+  test('On forecast window 4 expect 96 hour time range', async ({
+    summaryPage,
+    banner,
+  }) => {
+    await banner.setBaseTime('20/07/2024 00:00')
+    await banner.forecastWindowDropdownClick()
+    await banner.forecastWindowDropdownSelect('4')
+    await banner.windowUpdateClick()
+    await expect(summaryPage.timeRange).toContainText(
+      'Time Range: 20 Jul 00:00 - 24 Jul 00:00 UTC',
+    )
+  })
+
+  test('On forecast window 5 expect 120 hour time range', async ({
+    summaryPage,
+    banner,
+  }) => {
+    await banner.setBaseTime('20/07/2024 00:00')
+    await banner.forecastWindowDropdownClick()
+    await banner.forecastWindowDropdownSelect('5')
+    await banner.windowUpdateClick()
+    await expect(summaryPage.timeRange).toContainText(
+      'Time Range: 20 Jul 00:00 - 25 Jul 00:00 UTC',
+    )
+  })
 })
 
 test('Verify breadcrumb text is correct on each page', async ({

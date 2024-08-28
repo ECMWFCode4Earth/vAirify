@@ -6,7 +6,7 @@ export class Banner extends BasePage {
   readonly page: Page
 
   readonly calendarIcon: Locator
-  
+
   readonly datePicker: Locator
   readonly datePickerNextMonthButton: Locator
   readonly datePickerTimeOptions: Locator
@@ -48,7 +48,10 @@ export class Banner extends BasePage {
   }
 
   async forecastWindowDropdownSelect(option: string) {
-    const optionSelect = await this.page.getByRole('option', { name: option })
+    const optionSelect = await this.page.getByRole('option', {
+      name: option,
+      exact: true,
+    })
     await optionSelect.click()
   }
 
