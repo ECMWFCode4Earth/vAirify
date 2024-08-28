@@ -6,7 +6,7 @@ export class Banner extends BasePage {
   readonly page: Page
 
   readonly calendarIcon: Locator
-  readonly updateDateButton: Locator
+  readonly dateOkButton: Locator
   readonly datePicker: Locator
   readonly datePickerNextMonthButton: Locator
   readonly datePickerPreviousMonthButton: Locator
@@ -19,6 +19,7 @@ export class Banner extends BasePage {
   readonly dateUpdateButton: Locator
   readonly futureDay27: Locator
   readonly logo: Locator
+  readonly updateDateButton: Locator
   readonly windowDropdown: Locator
   readonly year2025: Locator
 
@@ -27,7 +28,7 @@ export class Banner extends BasePage {
     this.page = page
 
     this.calendarIcon = page.getByTestId('CalendarIcon')
-    this.updateDateButton = page.getByRole('button', { name: 'Update' })
+    this.dateOkButton = page.getByRole('button', { name: 'Ok' })
     this.datePicker = page.getByRole('textbox', { name: 'Forecast Base Date' })
     this.datePickerNextMonthButton = page.getByLabel('Next month')
     this.datePickerPreviousMonthButton = page.getByTestId('ArrowLeftIcon')
@@ -45,6 +46,7 @@ export class Banner extends BasePage {
       '//div[@aria-rowindex="4"] //button[@aria-colindex="6"]',
     )
     this.logo = page.getByAltText('vAirify')
+    this.updateDateButton = page.getByRole('button', { name: 'Update' })
     this.year2025 = page.locator('//div //button').filter({ hasText: /^2025$/ })
     this.windowDropdown = page.locator('svg').nth(1)
   }

@@ -17,7 +17,7 @@ test('Changing the forecast base time on the summary page sets the correct data'
   // await banner.dateOkButton.click()
 
   await banner.setBaseTime('21/08/2024 12:00')
-  await banner.dateOkButton.click()
+  await banner.confirmDate()
   await summaryPage.waitForLoad()
 
   await summaryPage.filterByCity('Atlanta')
