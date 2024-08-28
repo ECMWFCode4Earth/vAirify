@@ -7,11 +7,8 @@ test('Changing the forecast base time on the summary page sets the correct data'
   banner,
   summaryPage,
 }) => {
-  // Given the user navigates to the summary page
   await gotoPage(page, 'summary')
   await summaryPage.waitForLoad()
-
-  // When they change the forecast base time to "21/08/2024" "12:00"
 
   // await banner.calendarIcon.click()
   // await banner.findSpecificMonthAndYear('July', '2024'07)
@@ -23,10 +20,8 @@ test('Changing the forecast base time on the summary page sets the correct data'
   await banner.dateOkButton.click()
   await summaryPage.waitForLoad()
 
-  // And they look at the entry in the table for "Atlanta"
   await summaryPage.filterByCity('Atlanta')
 
-  // Then the table data should be based on the data for "date" "time", with forecast window "1
   const expectedTableContents: string[][] = [
     [
       // AQI Level
