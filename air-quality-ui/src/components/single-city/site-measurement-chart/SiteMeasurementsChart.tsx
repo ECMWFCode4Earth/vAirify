@@ -72,33 +72,31 @@ export const SiteMeasurementsChart = ({
 
   return (
     <>
-      {(seriesColorsBySite == undefined ||
-        Object.keys(seriesColorsBySite).length <= 0) && <LoadingSpinner />}
-      {seriesColorsBySite != undefined &&
-        Object.keys(seriesColorsBySite).length > 0 && (
-          <ReactECharts
-            ref={chartRef}
-            className={classes['chart']}
-            onEvents={{
-              click: eChartEventHandler,
-              dataZoom: zoomEventHandler,
-            }}
-            notMerge
-            option={generateMeasurementChart(
-              pollutantType,
-              zoomPercent,
-              measurementsBySite,
-              forecastData,
-              createSubtext(
-                forecastDetails.forecastBaseDate,
-                forecastDetails.forecastBaseDate,
-                forecastDetails.maxMeasurementDate,
-              ),
-              cityName,
-              seriesColorsBySite,
-            )}
-          />
-        )}
+      {!seriesColorsBySite && <LoadingSpinner />}
+      {seriesColorsBySite && (
+        <ReactECharts
+          ref={chartRef}
+          className={classes['chart']}
+          onEvents={{
+            click: eChartEventHandler,
+            dataZoom: zoomEventHandler,
+          }}
+          notMerge
+          option={generateMeasurementChart(
+            pollutantType,
+            zoomPercent,
+            measurementsBySite,
+            forecastData,
+            createSubtext(
+              forecastDetails.forecastBaseDate,
+              forecastDetails.forecastBaseDate,
+              forecastDetails.maxMeasurementDate,
+            ),
+            cityName,
+            seriesColorsBySite,
+          )}
+        />
+      )}
     </>
   )
 }

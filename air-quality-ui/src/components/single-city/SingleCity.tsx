@@ -75,21 +75,25 @@ export const SingleCity = () => {
     ],
   })
 
-  const [sites, setSites] = useState<MultiValue<SiteOption>>([])
+  const [sites, setSites] = useState<MultiValue<SiteOption> | undefined>(
+    undefined,
+  )
   const [selectedSites, setSelectedSites] = useState<MultiValue<SiteOption>>([])
-  useEffect(() => {
-    const sites = Array.from(
-      measurementData
-        ?.map((measurement) => getSiteName(measurement))
-        .reduce((sites, name) => sites.add(name), new Set<string>()) ?? [],
-    ).map((name) => ({
-      value: name,
-      label: name,
-    }))
 
-    setSites(sites)
-    setSelectedSites(sites)
-  }, [measurementData])
+  useEffect(() => {
+    if (!measurementDataPending) {
+      const sites = Array.from(
+        measurementData
+          ?.map((measurement) => getSiteName(measurement))
+          .reduce((sites, name) => sites.add(name), new Set<string>()) ?? [],
+      ).map((name) => ({
+        value: name,
+        label: name,
+      }))
+      setSites(sites)
+      setSelectedSites(sites)
+    }
+  }, [measurementData, measurementDataPending])
 
   const onSelectionChange = useCallback(
     (
@@ -160,9 +164,11 @@ export const SingleCity = () => {
     )
   }, [measurementData, selectedSites])
 
-  const [siteColors, setSiteColors] = useState<Record<string, string>>({})
+  const [siteColors, setSiteColors] = useState<
+    Record<string, string> | undefined
+  >(undefined)
   useEffect(() => {
-    const updateColors = async () => {
+    if (sites) {
       const colorsBySite: Record<string, string> = {}
       sites.forEach((value, index) => {
         const color = indexToColor(index)
@@ -170,7 +176,6 @@ export const SingleCity = () => {
       })
       setSiteColors(colorsBySite)
     }
-    updateColors()
   }, [sites])
 
   const deselectSite = useCallback((siteName: string) => {
@@ -232,24 +237,22 @@ export const SingleCity = () => {
               Measurement Sites
             </div>
             <div className={classes['section-columns']}>
-              {forecastData[0] &&
-                Object.keys(siteColors).length > 0 &&
-                Object.keys(siteLocations!).length > 0 && (
-                  <div
-                    key="station_map"
-                    data-testid="station_map"
-                    className={`${classes['site-select']} ${classes['map']}`}
-                  >
-                    <StationMap
-                      mapCenter={forecastData[0].location}
-                      stations={siteLocations!}
-                      visibleLocations={selectedSites.map((site) => site.label)}
-                      stationColors={siteColors}
-                      removeSite={deselectSite}
-                      addSite={selectSite}
-                    ></StationMap>
-                  </div>
-                )}
+              {forecastData[0] && siteColors && (
+                <div
+                  key="station_map"
+                  data-testid="station_map"
+                  className={`${classes['site-select']} ${classes['map']}`}
+                >
+                  <StationMap
+                    mapCenter={forecastData[0].location}
+                    stations={siteLocations!}
+                    visibleLocations={selectedSites.map((site) => site.label)}
+                    stationColors={siteColors}
+                    removeSite={deselectSite}
+                    addSite={selectSite}
+                  ></StationMap>
+                </div>
+              )}
               <form
                 className={classes['site-select-form']}
                 data-testid="sites-form"
