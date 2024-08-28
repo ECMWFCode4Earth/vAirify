@@ -15,7 +15,6 @@
     text-decoration: none;
 
     &:hover {
-        border-bottom: solid 2px white;
         font-weight: bold;
     }
 }
