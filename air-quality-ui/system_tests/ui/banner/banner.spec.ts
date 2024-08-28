@@ -139,23 +139,23 @@ import { createForecastAPIResponseData } from '../../utils/mocked_api'
     test.describe('when clicking ok button', () => {
       test('Verify updates on date selection', async ({ banner }) => {
         await banner.clickOnDay(3)
-        await banner.confirmDate()
+        await banner.windowUpdateClick()
         await expect(forecastRequestArray.length).toBeGreaterThan(0)
         await expect(measurementRequestArray.length).toBeGreaterThan(0)
       })
       test('Verify updates on time selection', async ({ banner }) => {
         await banner.clickOnTime('12:00')
-        await banner.confirmDate()
+        await banner.windowUpdateClick()
         await banner.calendarIcon.click()
         await banner.clickOnTime('00:00')
-        await banner.confirmDate()
+        await banner.windowUpdateClick()
         await expect(forecastRequestArray.length).toBeGreaterThan(0)
         await expect(measurementRequestArray.length).toBeGreaterThan(0)
       })
       test('Verify updates on date and time selection', async ({ banner }) => {
         await banner.clickOnDay(3)
         await banner.clickOnTime('12:00')
-        await banner.confirmDate()
+        await banner.windowUpdateClick()
         await expect(forecastRequestArray.length).toBeGreaterThan(0)
         await expect(measurementRequestArray.length).toBeGreaterThan(0)
       })
@@ -184,7 +184,7 @@ test.describe('Range label', () => {
     banner,
   }) => {
     await banner.setBaseTime('20/07/2024 00:00')
-    await banner.confirmDate()
+    await banner.windowUpdateClick()
     await expect(summaryPage.timeRange).toContainText(
       'Time Range: 20 Jul 00:00 - 21 Jul 00:00 UTC',
     )

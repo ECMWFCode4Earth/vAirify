@@ -141,7 +141,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
       banner,
     }) => {
       await banner.clickOnDay(3)
-      await banner.clickOK()
+      await banner.windowUpdateClick()
       expect(requestArray.length).toEqual(1)
     })
 
@@ -156,7 +156,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
         await encodeDateToURIComponent(systemDate)
 
       await banner.clickOnDay(3)
-      await banner.clickOK()
+      await banner.windowUpdateClick()
       expect(requestArray[0]).toContain(
         `location_type=city&valid_time_from=${expectedValidTimeFrom}&valid_time_to=${systemDateUriEncoded}&base_time=${expectedForecastBaseTime}`,
       )
@@ -185,7 +185,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
       banner,
     }) => {
       await banner.clickOnDay(3)
-      await banner.clickOK()
+      await banner.windowUpdateClick()
       expect(requestArray.length).toEqual(9)
     })
 
@@ -193,8 +193,9 @@ test.describe('API calls on changing forecast base time in UI', () => {
       banner,
     }) => {
       await banner.clickOnDay(3)
-
-      await banner.clickOK()
+      await banner.forecastWindowDropdownClick()
+      await banner. forecastWindowDropdownSelect('2')
+      await banner.windowUpdateClick()
       expect(requestArray.length).toEqual(9)
     })
 
@@ -245,7 +246,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
         '2024-07-08T12%3A00%3A00.000Z',
       ]
       await banner.clickOnDay(3)
-      await banner.clickOK()
+      await banner.windowUpdateClick()
       for (const request in requestArray) {
         expect(requestArray[request]).toContain(
           `measurement_base_time=${expectedMeasurementBaseTimeArray[request]}&measurement_time_range=90&location_type=city`,
@@ -291,7 +292,7 @@ test.describe('Forecast window for summary page', () => {
         )
 
         await banner.forecastWindowDropdownSelect(windowOption)
-        await banner.clickOK()
+        await banner.windowUpdateClick()
         await waitForIdleNetwork(page, cityPage.aqiChart)
 
         await expect(forecastRequestArray[0]).toContain(

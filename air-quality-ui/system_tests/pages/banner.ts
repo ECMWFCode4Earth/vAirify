@@ -6,7 +6,7 @@ export class Banner extends BasePage {
   readonly page: Page
 
   readonly calendarIcon: Locator
-  readonly dateOkButton: Locator
+  
   readonly datePicker: Locator
   readonly datePickerNextMonthButton: Locator
   readonly datePickerTimeOptions: Locator
@@ -14,6 +14,7 @@ export class Banner extends BasePage {
   readonly datePickerTimeOption1200: Locator
   readonly datePickerYearOpenButton: Locator
   readonly datePickerYearCloseButton: Locator
+  readonly dateUpdateButton: Locator
   readonly futureDay27: Locator
   readonly logo: Locator
   readonly windowDropdown: Locator
@@ -24,7 +25,6 @@ export class Banner extends BasePage {
     this.page = page
 
     this.calendarIcon = page.getByTestId('CalendarIcon')
-    this.dateOkButton = page.getByRole('button', { name: 'Ok' })
     this.datePicker = page.getByRole('textbox', { name: 'Forecast Base Date' })
     this.datePickerNextMonthButton = page.getByLabel('Next month')
     this.datePickerTimeOptions = page.locator('ul > [role="option"]')
@@ -33,6 +33,7 @@ export class Banner extends BasePage {
     this.datePickerYearOpenButton = page.getByLabel(
       'calendar view is open, switch',
     )
+    this.dateUpdateButton = page.getByRole('button', { name: 'Update' })
     this.futureDay27 = page.locator(
       '//div[@aria-rowindex="4"] //button[@aria-colindex="6"]',
     )
@@ -85,8 +86,8 @@ export class Banner extends BasePage {
     }
   }
 
-  async clickOK() {
-    await this.dateOkButton.click()
+  async windowUpdateClick() {
+    await this.dateUpdateButton.click()
   }
 
   async setBaseTime(baseTime: string): Promise<void> {
