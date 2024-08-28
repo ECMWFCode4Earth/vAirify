@@ -27,6 +27,8 @@ def gribbing():
     print(f"Original Value at ({target_lat}, {target_lon}): {tracked_value}")
 
     # Normalize the data for bitmap conversion using greyscale 0-255
+    # pm10 is 0 - 1000 replace min and max accordingly
+    # clip values to 255 using np.clip
     normalized_data = 255 * (data - np.min(data)) / (np.max(data) - np.min(data))
     normalized_data = normalized_data.astype(np.uint8)
 
