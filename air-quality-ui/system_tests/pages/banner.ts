@@ -6,7 +6,7 @@ export class Banner extends BasePage {
   readonly page: Page
 
   readonly calendarIcon: Locator
-  readonly dateOkButton: Locator
+  readonly updateDateButton: Locator
   readonly datePicker: Locator
   readonly datePickerNextMonthButton: Locator
   readonly datePickerTimeOptions: Locator
@@ -24,7 +24,7 @@ export class Banner extends BasePage {
     this.page = page
 
     this.calendarIcon = page.getByTestId('CalendarIcon')
-    this.dateOkButton = page.getByRole('button', { name: 'Ok' })
+    this.updateDateButton = page.getByRole('button', { name: 'Update' })
     this.datePicker = page.getByRole('textbox', { name: 'Forecast Base Date' })
     this.datePickerNextMonthButton = page.getByLabel('Next month')
     this.datePickerTimeOptions = page.locator('ul > [role="option"]')
@@ -85,7 +85,7 @@ export class Banner extends BasePage {
   }
 
   async confirmDate() {
-    await this.dateOkButton.click()
+    await this.updateDateButton.click()
   }
 
   async setBaseTime(baseTime: string): Promise<void> {
