@@ -352,10 +352,10 @@ describe('Site Measurement Chart', () => {
           'the city name',
           seriesColorsBySite,
         )
-        expect(
-          (result.series.find((x) => x.name === 'Forecast') as LineSeriesOption)
-            .lineStyle?.type,
-        ).toBe('dashed')
+        const lineOptions = result.series.find(
+          (x) => x.name === 'Forecast',
+        ) as LineSeriesOption
+        expect(lineOptions.lineStyle?.type).toBe('dashed')
       })
 
       it('to map measurement data correctly', async () => {
@@ -368,9 +368,10 @@ describe('Site Measurement Chart', () => {
           'the city name',
           seriesColorsBySite,
         )
-        const data = (
-          result.series.find((x) => x.name === 'Forecast') as LineSeriesOption
-        ).data
+        const lineOptions = result.series.find(
+          (x) => x.name === 'Forecast',
+        ) as LineSeriesOption
+        const data = lineOptions.data
         expect(data).toHaveLength(2)
         expect(data).toEqual([
           ['2024-01-01T00:00:00.000Z', '2.0'],
@@ -405,13 +406,26 @@ describe('Site Measurement Chart', () => {
           'the city name',
           seriesColorsBySite,
         )
-        expect(
-          (
-            result.series.find(
-              (x) => x.name === 'locationA',
-            ) as LineSeriesOption
-          ).lineStyle?.width,
-        ).toBe(1)
+        const lineOptions = result.series.find(
+          (x) => x.name === 'locationA',
+        ) as LineSeriesOption
+        expect(lineOptions.lineStyle?.width).toBe(2)
+      })
+
+      it('symbol size should be correct', async () => {
+        const result = generateMeasurementChart(
+          pollutantType,
+          zoomPercent,
+          measurementsBySite,
+          forecastData,
+          'this is the date',
+          'the city name',
+          seriesColorsBySite,
+        )
+        const lineOptions = result.series.find(
+          (x) => x.name === 'locationA',
+        ) as LineSeriesOption
+        expect(lineOptions.symbolSize).toBe(2)
       })
 
       it('line should be blue', async () => {
@@ -439,13 +453,11 @@ describe('Site Measurement Chart', () => {
           'the city name',
           seriesColorsBySite,
         )
-        expect(
-          (
-            result.series.find(
-              (x) => x.name === 'locationA',
-            ) as LineSeriesOption
-          ).lineStyle?.type,
-        ).toBe('solid')
+        const lineOptions = result.series.find(
+          (x) => x.name === 'locationA',
+        ) as LineSeriesOption
+
+        expect(lineOptions.lineStyle?.type).toBe('solid')
       })
 
       it('to map measurement data correctly', async () => {
@@ -458,9 +470,10 @@ describe('Site Measurement Chart', () => {
           'the city name',
           seriesColorsBySite,
         )
-        const data = (
-          result.series.find((x) => x.name === 'locationA') as LineSeriesOption
-        ).data
+        const lineOptions = result.series.find(
+          (x) => x.name === 'locationA',
+        ) as LineSeriesOption
+        const data = lineOptions.data
         expect(data).toHaveLength(2)
         expect(data).toEqual([
           ['2024-01-01T01:00:00.000Z', '12.0'],

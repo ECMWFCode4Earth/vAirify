@@ -14,6 +14,7 @@ import {
   ForecastResponseDto,
   MeasurementsResponseDto,
 } from '../../../services/types'
+import { LoadingSpinner } from '../../common/LoadingSpinner'
 
 interface SiteMeasurementsChartProps {
   cityName: string
@@ -71,28 +72,31 @@ export const SiteMeasurementsChart = ({
 
   return (
     <>
-      <ReactECharts
-        ref={chartRef}
-        className={classes['chart']}
-        onEvents={{
-          click: eChartEventHandler,
-          dataZoom: zoomEventHandler,
-        }}
-        notMerge
-        option={generateMeasurementChart(
-          pollutantType,
-          zoomPercent,
-          measurementsBySite,
-          forecastData,
-          createSubtext(
-            forecastDetails.forecastBaseDate,
-            forecastDetails.forecastBaseDate,
-            forecastDetails.maxMeasurementDate,
-          ),
-          cityName,
-          seriesColorsBySite,
-        )}
-      />
+      {!seriesColorsBySite && <LoadingSpinner />}
+      {seriesColorsBySite && (
+        <ReactECharts
+          ref={chartRef}
+          className={classes['chart']}
+          onEvents={{
+            click: eChartEventHandler,
+            dataZoom: zoomEventHandler,
+          }}
+          notMerge
+          option={generateMeasurementChart(
+            pollutantType,
+            zoomPercent,
+            measurementsBySite,
+            forecastData,
+            createSubtext(
+              forecastDetails.forecastBaseDate,
+              forecastDetails.forecastBaseDate,
+              forecastDetails.maxMeasurementDate,
+            ),
+            cityName,
+            seriesColorsBySite,
+          )}
+        />
+      )}
     </>
   )
 }

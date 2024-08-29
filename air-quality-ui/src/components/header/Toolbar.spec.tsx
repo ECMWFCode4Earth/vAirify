@@ -89,7 +89,7 @@ describe('Toolbar component', () => {
         DateTime.fromISO('2024-06-10T09:00:00', { zone: 'utc' }),
       )
     })
-    fireEvent.click(screen.getByText('Ok'))
+    fireEvent.click(screen.getByText('Update'))
     await waitFor(() => {
       expect(mockSetDetails).toHaveBeenCalledWith({
         forecastBaseDate: DateTime.fromISO('2024-06-10T09:00:00', {
@@ -109,7 +109,7 @@ describe('Toolbar component', () => {
     await waitFor(() => {
       setIsInvalidDateTime(true)
     })
-    fireEvent.click(screen.getByText('Ok'))
+    fireEvent.click(screen.getByText('Update'))
     await waitFor(() => {
       expect(mockSetDetails).not.toHaveBeenCalledWith(
         DateTime.fromISO('2024-08-10T09:00:00', { zone: 'utc' }),
@@ -145,7 +145,7 @@ describe('Toolbar component', () => {
       await waitFor(() => {
         setSelectedForecastWindow(testData)
       })
-      fireEvent.click(screen.getByText('Ok'))
+      fireEvent.click(screen.getByText('Update'))
       await waitFor(() => {
         expect(beforeSetting).toStrictEqual({ value: 1, label: '1' })
       })

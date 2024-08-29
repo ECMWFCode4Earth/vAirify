@@ -12,7 +12,7 @@ describe('ForecastWindowSelector component', () => {
       />,
     )
     await waitFor(() => {
-      expect(screen.getByText('Forecast Window')).toBeInTheDocument()
+      expect(screen.getByText('Forecast Days')).toBeInTheDocument()
     })
   })
   it('Select box is present', async () => {

@@ -16,7 +16,7 @@ export const forecastLine = (): LineSeriesOption => {
 }
 
 export const measurementLine = (
-  width: number | undefined = 1,
+  width: number | undefined = 2,
 ): LineSeriesOption => {
   return {
     lineStyle: {
@@ -24,6 +24,7 @@ export const measurementLine = (
       type: 'solid',
       opacity: 0.5,
     },
+    symbolSize: width,
     z: 1,
     symbol: 'roundRect',
   }

@@ -5,7 +5,7 @@ import {
   convertToLocalTime,
   createSubtext,
   formatDateRange,
-  textToColor,
+  indexToColor,
   updateChartSubtext,
   xAxisFormat,
 } from './echarts-service'
@@ -45,22 +45,32 @@ describe('ECharts Service', () => {
       expect(result).toEqual('14/06')
     })
   })
-  describe('textToColor', () => {
-    it('should produce the same unique color for a string', async () => {
-      const location = 'testLocation'
-      const firstResult = await textToColor(location)
-      const secondResult = await textToColor(location)
+  describe('indexToColor', () => {
+    it('should produce the same color for an index', async () => {
+      const index = 5
+      const firstResult = await indexToColor(index)
+      const secondResult = await indexToColor(index)
       expect(firstResult).toEqual(secondResult)
     })
-    it('should produce a different color for different strings', async () => {
-      const firstResult = await textToColor('testLocation')
-      const secondResult = await textToColor('testLocation2')
+    it('should produce a different color for different low indicies', async () => {
+      const firstResult = await indexToColor(1)
+      const secondResult = await indexToColor(7)
       expect(firstResult).not.toEqual(secondResult)
     })
     it('should produce a color in hex format', async () => {
-      const location = 'testLocation'
-      const result = await textToColor(location)
+      const index = 5
+      const result = await indexToColor(index)
       expect(result).toMatch(/#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/)
+    })
+    it('should produce a color when index is high', async () => {
+      const index = 500
+      const result = await indexToColor(index)
+      expect(result).toMatch(/#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/)
+    })
+    it('should wrap the list and generate the same colour if index is high enough', async () => {
+      const firstResult = await indexToColor(0)
+      const secondResult = await indexToColor(10)
+      expect(firstResult).toEqual(secondResult)
     })
   })
   describe('dateFormat', () => {

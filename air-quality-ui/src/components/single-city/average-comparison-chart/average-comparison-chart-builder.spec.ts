@@ -223,13 +223,12 @@ describe('AverageComparisonChart', () => {
           testForecastData,
           testMeasurementData,
         )
-        expect(
-          (
-            result.series.find(
-              (x) => x.name === 'Measurement',
-            ) as LineSeriesOption
-          ).lineStyle?.width,
-        ).toBe(5)
+        const lineOptions = result.series.find(
+          (x) => x.name === 'Measurement',
+        ) as LineSeriesOption
+
+        expect(lineOptions.lineStyle?.width).toBe(5)
+        expect(lineOptions.symbolSize).toBe(5)
       })
 
       it('has the correct number of datapoints', async () => {

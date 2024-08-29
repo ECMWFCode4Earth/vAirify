@@ -35,10 +35,12 @@ cache_london_env_vars = {
     "OPEN_AQ_CITIES": "London",
     "OPEN_AQ_CACHE": open_aq_cache_location,
     "STORE_GRIB_FILES": "True",
+    "IN_SITU_RETRIEVAL_PERIOD": "1"
 }
 
 
-@mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London"})
+@mock.patch.dict(
+    os.environ, {"OPEN_AQ_CITIES": "London", "IN_SITU_RETRIEVAL_PERIOD": "1"})
 def test__in_situ_etl__calling_actual_api_returns_values_and_stores():
     query = {"name": "London"}
     delete_database_data(collection_name, query)
@@ -259,6 +261,7 @@ def test__in_situ_etl__does_not_store_9999_pollutant_readings(ensure_forecast_ca
         "OPEN_AQ_CITIES": "London,Melbourne",
         "OPEN_AQ_CACHE": open_aq_cache_location,
         "STORE_GRIB_FILES": "True",
+        "IN_SITU_RETRIEVAL_PERIOD": "1",
     },
 )
 def test__in_situ_etl__handles_multiple_cities(ensure_forecast_cache):
@@ -378,7 +381,14 @@ def test__in_situ_etl__invalid_data_raises_error_and_does_not_store(
 
 
 @mock.patch("urllib3.connectionpool.HTTPConnectionPool._get_conn")
-@mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London", "STORE_GRIB_FILES": "True"})
+@mock.patch.dict(
+    os.environ,
+    {
+        "OPEN_AQ_CITIES": "London",
+        "STORE_GRIB_FILES": "True",
+        "IN_SITU_RETRIEVAL_PERIOD": "1",
+    }
+)
 def test__in_situ_etl__timeouts_retry_twice_then_stop(
     mock_get_conn, caplog, ensure_forecast_cache
 ):
@@ -397,7 +407,14 @@ def test__in_situ_etl__timeouts_retry_twice_then_stop(
 
 
 @mock.patch("urllib3.connectionpool.HTTPConnectionPool._get_conn")
-@mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London", "STORE_GRIB_FILES": "True"})
+@mock.patch.dict(
+    os.environ,
+    {
+        "OPEN_AQ_CITIES": "London",
+        "STORE_GRIB_FILES": "True",
+        "IN_SITU_RETRIEVAL_PERIOD": "1",
+    }
+)
 def test__in_situ_etl__internal_error_fails_without_retry(
     mock_get_conn, caplog, ensure_forecast_cache
 ):
@@ -416,7 +433,14 @@ def test__in_situ_etl__internal_error_fails_without_retry(
 
 
 @mock.patch("urllib3.connectionpool.HTTPConnectionPool._get_conn")
-@mock.patch.dict(os.environ, {"OPEN_AQ_CITIES": "London", "STORE_GRIB_FILES": "True"})
+@mock.patch.dict(
+    os.environ,
+    {
+        "OPEN_AQ_CITIES": "London",
+        "STORE_GRIB_FILES": "True",
+        "IN_SITU_RETRIEVAL_PERIOD": "1",
+    }
+)
 def test__in_situ_etl__timeout_followed_by_success_returns_correctly(
     mock_get_conn, caplog, ensure_forecast_cache
 ):
@@ -442,7 +466,11 @@ def test__in_situ_etl__timeout_followed_by_success_returns_correctly(
 
 @mock.patch.dict(
     os.environ,
-    {"OPEN_AQ_CITIES": "Berlin", "OPEN_AQ_CACHE": open_aq_cache_location},
+    {
+        "OPEN_AQ_CITIES": "Berlin",
+        "OPEN_AQ_CACHE": open_aq_cache_location,
+        "IN_SITU_RETRIEVAL_PERIOD": "1",
+    }
 )
 @freeze_time("2024-06-27T13:00:00")
 def test__convert_ppm_to_ugm3_and_store__only_no2_so2_o3():
