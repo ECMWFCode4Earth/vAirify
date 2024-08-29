@@ -183,50 +183,22 @@ test.describe('API calls on changing forecast base time in UI', () => {
     })
 
     test.describe('Forecast window selections', () => {
-      test(`When forecast window is 1 then summary calls are 9`, async ({
-        banner,
-      }) => {
-        await banner.clickUpdateButton()
-        expect(requestArray.length).toEqual(9)
-      })
+      const testCases = [
+        { windowOption: '1', requestCount: 9 },
+        { windowOption: '2', requestCount: 17 },
+        { windowOption: '3', requestCount: 25 },
+        { windowOption: '4', requestCount: 33 },
+        { windowOption: '5', requestCount: 41 },
+      ]
 
-      test('When forecast window is 2 then summary calls are 15', async ({
-        banner,
-      }) => {
-        await banner.forecastWindowDropdownClick()
-        await banner.forecastWindowDropdownSelect('2')
-        await banner.clickUpdateButton()
-        expect(requestArray.length).toEqual(17)
-      })
-
-      test('When forecast window is 3 then summary calls are 25', async ({
-        banner,
-        page,
-      }) => {
-        await banner.forecastWindowDropdownClick()
-        await banner.forecastWindowDropdownSelect('3')
-        await banner.clickUpdateButton()
-        await page.waitForTimeout(10000)
-        expect(requestArray.length).toEqual(25)
-      })
-
-      test('When forecast window is 4 then summary calls are 33', async ({
-        banner,
-      }) => {
-        await banner.forecastWindowDropdownClick()
-        await banner.forecastWindowDropdownSelect('4')
-        await banner.clickUpdateButton()
-        expect(requestArray.length).toEqual(33)
-      })
-
-      test('When forecast window is 5 then summary calls are 41', async ({
-        banner,
-      }) => {
-        await banner.forecastWindowDropdownClick()
-        await banner.forecastWindowDropdownSelect('5')
-        await banner.clickUpdateButton()
-        expect(requestArray.length).toEqual(41)
-      })
+      for (const { windowOption, requestCount } of testCases)
+        test(`When forecast window is ${windowOption} then ${requestCount} requests should be made `, async ({
+          banner,
+        }) => {
+          await banner.setForecastWindow(windowOption)
+          await banner.clickUpdateButton()
+          await expect(requestArray.length).toEqual(requestCount)
+        })
     })
 
     test('Verify on changing the forecast base time, the measurement summary API calls have correct params', async ({
