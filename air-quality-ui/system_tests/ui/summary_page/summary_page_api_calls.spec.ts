@@ -141,7 +141,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
       banner,
     }) => {
       await banner.clickOnDay(3)
-      await banner.windowUpdateClick()
+      await banner.clickUpdateButton()
       expect(requestArray.length).toEqual(1)
     })
 
@@ -156,7 +156,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
         await encodeDateToURIComponent(systemDate)
 
       await banner.clickOnDay(3)
-      await banner.windowUpdateClick()
+      await banner.clickUpdateButton()
       expect(requestArray[0]).toContain(
         `location_type=city&valid_time_from=${expectedValidTimeFrom}&valid_time_to=${systemDateUriEncoded}&base_time=${expectedForecastBaseTime}`,
       )
@@ -182,20 +182,20 @@ test.describe('API calls on changing forecast base time in UI', () => {
       await banner.clickOnDay(3)
     })
 
-    test(`Verify on changing the forecast base time, the measurement summary API is called proportionately`, async ({
-      banner,
-    }) => {
-      await banner.windowUpdateClick()
-      expect(requestArray.length).toEqual(9)
-    })
-
     test.describe('Forecast window selections', () => {
+      test(`When forecast window is 1 then summary calls are 9`, async ({
+        banner,
+      }) => {
+        await banner.clickUpdateButton()
+        expect(requestArray.length).toEqual(9)
+      })
+
       test('When forecast window is 2 then summary calls are 15', async ({
         banner,
       }) => {
         await banner.forecastWindowDropdownClick()
         await banner.forecastWindowDropdownSelect('2')
-        await banner.windowUpdateClick()
+        await banner.clickUpdateButton()
         expect(requestArray.length).toEqual(17)
       })
 
@@ -205,7 +205,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
       }) => {
         await banner.forecastWindowDropdownClick()
         await banner.forecastWindowDropdownSelect('3')
-        await banner.windowUpdateClick()
+        await banner.clickUpdateButton()
         await page.waitForTimeout(10000)
         expect(requestArray.length).toEqual(25)
       })
@@ -215,7 +215,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
       }) => {
         await banner.forecastWindowDropdownClick()
         await banner.forecastWindowDropdownSelect('4')
-        await banner.windowUpdateClick()
+        await banner.clickUpdateButton()
         expect(requestArray.length).toEqual(33)
       })
 
@@ -224,7 +224,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
       }) => {
         await banner.forecastWindowDropdownClick()
         await banner.forecastWindowDropdownSelect('5')
-        await banner.windowUpdateClick()
+        await banner.clickUpdateButton()
         expect(requestArray.length).toEqual(41)
       })
     })
@@ -276,7 +276,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
         '2024-07-08T12%3A00%3A00.000Z',
       ]
       await banner.clickOnDay(3)
-      await banner.windowUpdateClick()
+      await banner.clickUpdateButton()
       for (const request in requestArray) {
         expect(requestArray[request]).toContain(
           `measurement_base_time=${expectedMeasurementBaseTimeArray[request]}&measurement_time_range=90&location_type=city`,
@@ -322,7 +322,7 @@ test.describe('Forecast window for summary page', () => {
         )
 
         await banner.forecastWindowDropdownSelect(windowOption)
-        await banner.windowUpdateClick()
+        await banner.clickUpdateButton()
         await waitForIdleNetwork(page, cityPage.aqiChart)
 
         await expect(forecastRequestArray[0]).toContain(

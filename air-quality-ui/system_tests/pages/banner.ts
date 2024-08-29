@@ -55,6 +55,11 @@ export class Banner extends BasePage {
     await optionSelect.click()
   }
 
+  async setForecastWindow(option: string) {
+    await this.forecastWindowDropdownClick()
+    await this.forecastWindowDropdownSelect(option)
+  }
+
   async clickOnDay(day: number): Promise<void> {
     let row: number
     let column: number
@@ -89,7 +94,7 @@ export class Banner extends BasePage {
     }
   }
 
-  async windowUpdateClick() {
+  async clickUpdateButton() {
     await this.dateUpdateButton.click()
   }
 

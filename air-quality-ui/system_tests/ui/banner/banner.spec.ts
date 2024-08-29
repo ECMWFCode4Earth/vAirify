@@ -139,23 +139,23 @@ import { createForecastAPIResponseData } from '../../utils/mocked_api'
     test.describe('when clicking ok button', () => {
       test('Verify updates on date selection', async ({ banner }) => {
         await banner.clickOnDay(3)
-        await banner.windowUpdateClick()
+        await banner.clickUpdateButton()
         await expect(forecastRequestArray.length).toBeGreaterThan(0)
         await expect(measurementRequestArray.length).toBeGreaterThan(0)
       })
       test('Verify updates on time selection', async ({ banner }) => {
         await banner.clickOnTime('12:00')
-        await banner.windowUpdateClick()
+        await banner.clickUpdateButton()
         await banner.calendarIcon.click()
         await banner.clickOnTime('00:00')
-        await banner.windowUpdateClick()
+        await banner.clickUpdateButton()
         await expect(forecastRequestArray.length).toBeGreaterThan(0)
         await expect(measurementRequestArray.length).toBeGreaterThan(0)
       })
       test('Verify updates on date and time selection', async ({ banner }) => {
         await banner.clickOnDay(3)
         await banner.clickOnTime('12:00')
-        await banner.windowUpdateClick()
+        await banner.clickUpdateButton()
         await expect(forecastRequestArray.length).toBeGreaterThan(0)
         await expect(measurementRequestArray.length).toBeGreaterThan(0)
       })
@@ -184,7 +184,7 @@ test.describe('Range label', () => {
     banner,
   }) => {
     await banner.setBaseTime('20/07/2024 00:00')
-    await banner.windowUpdateClick()
+    await banner.clickUpdateButton()
     await expect(summaryPage.timeRange).toContainText(
       'Time Range: 20 Jul 00:00 - 21 Jul 00:00 UTC',
     )
@@ -197,7 +197,7 @@ test.describe('Range label', () => {
     await banner.setBaseTime('20/07/2024 00:00')
     await banner.forecastWindowDropdownClick()
     await banner.forecastWindowDropdownSelect('2')
-    await banner.windowUpdateClick()
+    await banner.clickUpdateButton()
     await expect(summaryPage.timeRange).toContainText(
       'Time Range: 20 Jul 00:00 - 22 Jul 00:00 UTC',
     )
@@ -210,7 +210,7 @@ test.describe('Range label', () => {
     await banner.setBaseTime('20/07/2024 00:00')
     await banner.forecastWindowDropdownClick()
     await banner.forecastWindowDropdownSelect('3')
-    await banner.windowUpdateClick()
+    await banner.clickUpdateButton()
     await expect(summaryPage.timeRange).toContainText(
       'Time Range: 20 Jul 00:00 - 23 Jul 00:00 UTC',
     )
@@ -223,7 +223,7 @@ test.describe('Range label', () => {
     await banner.setBaseTime('20/07/2024 00:00')
     await banner.forecastWindowDropdownClick()
     await banner.forecastWindowDropdownSelect('4')
-    await banner.windowUpdateClick()
+    await banner.clickUpdateButton()
     await expect(summaryPage.timeRange).toContainText(
       'Time Range: 20 Jul 00:00 - 24 Jul 00:00 UTC',
     )
@@ -236,7 +236,7 @@ test.describe('Range label', () => {
     await banner.setBaseTime('20/07/2024 00:00')
     await banner.forecastWindowDropdownClick()
     await banner.forecastWindowDropdownSelect('5')
-    await banner.windowUpdateClick()
+    await banner.clickUpdateButton()
     await expect(summaryPage.timeRange).toContainText(
       'Time Range: 20 Jul 00:00 - 25 Jul 00:00 UTC',
     )
