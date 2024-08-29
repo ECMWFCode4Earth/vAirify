@@ -427,36 +427,57 @@ test.describe("Verifying a full row is correct", () => {
     await summaryPage.assertGridAttributes("values", expectedTableContents);
   });
 
-  test("Verify table shows pollutant data for the timestamp that has the largest deviation - diff 0 - forecast AQI 3, measurement AQI 3", async ({
+  test('Verify table shows pollutant data for the earliest timestamp when max diff is shared - forecast AQI 4, measurement AQI 3', async ({
     summaryPage,
     page,
   }) => {
     const forecastLondonValidTimeArray: object[] = [
-      createForecastResponseWithValidTimeAndAQI("2024-07-08T03:00:00Z", 3),
-      // AQI 3 default forecast
+      // AQI 4 default forecast
       createForecastAPIResponseData({
-        base_time: "2024-07-08T00:00:00Z",
-        valid_time: "2024-07-08T12:00:00Z",
-        overall_aqi_level: CaseAQI3.aqiLevel,
-        no2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.no2 },
-        o3: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 },
-        pm2_5: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
-        pm10: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm10 },
-        so2: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 },
+        base_time: '2024-07-08T00:00:00Z',
+        valid_time: '2024-07-08T03:00:00Z',
+        overall_aqi_level: CaseAQI4.aqiLevel,
+        no2: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.no2 },
+        o3: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.o3 },
+        pm2_5: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm2_5 },
+        pm10: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm10 },
+        so2: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.so2 },
+      }),
+      createForecastAPIResponseData({
+        base_time: '2024-07-08T00:00:00Z',
+        valid_time: '2024-07-08T12:00:00Z',
+        overall_aqi_level: CaseAQI4.aqiLevel,
+        no2: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.no2 },
+        o3: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.o3 },
+        pm2_5: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm2_5 },
+        pm10: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.pm10 },
+        so2: { aqi_level: CaseAQI4.aqiLevel, value: CaseAQI4.so2 },
       }),
     ];
 
     const measurementsLondonArray: object[] = [
-      createMeasurementSumResponseWithTimeAndAQI("2024-07-08T03:00:00Z", 3),
-      // AQI 3 mesurements (higher)
+      createMeasurementSummaryAPIResponseData({
+        measurement_base_time: '2024-07-08T03:00:00Z',
+        overall_aqi_level: { mean: CaseAQI3.aqiLevel },
+        no2: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.no2 } },
+        o3: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 } },
+        pm2_5: {
+          mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
+        },
+        pm10: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm10 } },
+        so2: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 } },
+      }),
+      // AQI 3 mesurements
       createMeasurementSummaryAPIResponseData({
         measurement_base_time: "2024-07-08T12:00:00Z",
         overall_aqi_level: { mean: CaseAQI3.aqiLevel },
-        no2: { mean: { aqi_level: CaseAQI3.aqiLevel, value: 119 } },
-        o3: { mean: { aqi_level: CaseAQI3.aqiLevel, value: 129 } },
-        pm2_5: { mean: { aqi_level: CaseAQI3.aqiLevel, value: 24 } },
-        pm10: { mean: { aqi_level: CaseAQI3.aqiLevel, value: 49 } },
-        so2: { mean: { aqi_level: CaseAQI3.aqiLevel, value: 349 } },
+        no2: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.no2 } },
+        o3: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.o3 } },
+        pm2_5: {
+          mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm2_5 },
+        },
+        pm10: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.pm10 } },
+        so2: { mean: { aqi_level: CaseAQI3.aqiLevel, value: CaseAQI3.so2 } },
       }),
     ];
 
@@ -475,29 +496,29 @@ test.describe("Verifying a full row is correct", () => {
     const expectedTableContents: string[][] = [
       [
         // AQI Level
-        CaseAQI3.aqiLevel.toString(), // Forecast
+        CaseAQI4.aqiLevel.toString(), // Forecast
         CaseAQI3.aqiLevel.toString(), // Measured
-        "0", // Diff
+        '+1', // Diff
         // pm2.5
-        CaseAQI3.pm2_5.toString(), // Forecast
-        "24", //Measured
-        "08 Jul 12:00", //Time
+        CaseAQI4.pm2_5.toString(), // Forecast
+        CaseAQI3.pm2_5.toString(), //Measured
+        '08 Jul 03:00', //Time
         // pm10
-        CaseAQI3.pm10.toString(), // Forecast
-        "49", // Measured
-        "08 Jul 12:00", //Time
+        CaseAQI4.pm10.toString(), // Forecast
+        CaseAQI3.pm10.toString(), //Measured
+        '08 Jul 03:00', //Time
         // no2
-        CaseAQI3.no2.toString(), // Forecast
-        "119", // Measured
-        "08 Jul 12:00", //Time
+        CaseAQI4.no2.toString(), // Forecast
+        CaseAQI3.no2.toString(), //Measured
+        '08 Jul 03:00', //Time
         // o3
-        CaseAQI3.o3.toString(), // Forecast
-        "129", // Measured
-        "08 Jul 12:00", //Time
+        CaseAQI4.o3.toString(), // Forecast
+        CaseAQI3.o3.toString(), //Measured
+        '08 Jul 03:00', //Time
         // so2
-        CaseAQI3.so2.toString(), // Forecast
-        "349", // Measured
-        "08 Jul 12:00", //Time
+        CaseAQI4.so2.toString(), // Forecast
+        CaseAQI3.so2.toString(), //Measured
+        '08 Jul 03:00', //Time
       ],
     ];
     await summaryPage.waitForLoad();

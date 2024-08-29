@@ -317,4 +317,77 @@ test.describe('Colour testing', () => {
     await summaryPage.waitForLoad()
     await summaryPage.assertGridAttributes('colours', expectedTableContents)
   })
+
+  test('Pollutant values above AQI 6 are coloured black', async ({
+    summaryPage,
+    page,
+  }) => {
+    const mockedForecastResponse = [
+      createForecastAPIResponseData({
+        valid_time: '2024-07-08T03:00:00Z',
+        no2: { aqi_level: CaseAQI6.aqiLevel, value: 2000 },
+        o3: { aqi_level: CaseAQI6.aqiLevel, value: 2000 },
+        pm2_5: { aqi_level: CaseAQI6.aqiLevel, value: 2000 },
+        pm10: { aqi_level: CaseAQI6.aqiLevel, value: 2000 },
+        so2: { aqi_level: CaseAQI6.aqiLevel, value: 2000 },
+      }),
+    ]
+    const mockedMeasurementSummaryResponse = [
+      createMeasurementSummaryAPIResponseData({
+        measurement_base_time: '2024-07-08T03:00:00Z',
+        no2: { mean: { aqi_level: CaseAQI6.aqiLevel, value: 2000 } },
+        o3: { mean: { aqi_level: CaseAQI6.aqiLevel, value: 2000 } },
+        pm2_5: {
+          mean: { aqi_level: CaseAQI6.aqiLevel, value: 2000 },
+        },
+        pm10: {
+          mean: { aqi_level: CaseAQI6.aqiLevel, value: 2000 },
+        },
+        so2: { mean: { aqi_level: CaseAQI6.aqiLevel, value: 2000 } },
+      }),
+    ]
+
+    await setupPageWithMockData(page, [
+      {
+        endpointUrl: '*/**/air-pollutant/forecast*',
+        mockedAPIResponse: mockedForecastResponse,
+      },
+      {
+        endpointUrl: '*/**/air-pollutant/measurements/summary*',
+        mockedAPIResponse: mockedMeasurementSummaryResponse,
+      },
+    ])
+    await gotoPage(page, '/city/summary')
+
+    const expectedTableColours: string[][] = [
+      [
+        // AQI Level
+        Colours.aqi6, // Forecast
+        Colours.aqi6, // Measured
+        Colours.notColoured, // Diff
+        // pm2.5
+        Colours.cellError, // Forecast
+        Colours.cellError, // Measured
+        Colours.notColoured, // Time
+        // pm10
+        Colours.cellError, // Forecast
+        Colours.cellError, // Measured
+        Colours.notColoured, // Time
+        // no2
+        Colours.cellError, // Forecast
+        Colours.cellError, // Measured
+        Colours.notColoured, // Time
+        // o3
+        Colours.cellError, // Forecast
+        Colours.cellError, // Measured
+        Colours.notColoured, // Time
+        // so2
+        Colours.cellError, // Forecast
+        Colours.cellError, // Measured
+        Colours.notColoured, // Time
+      ],
+    ]
+    await summaryPage.waitForLoad()
+    await summaryPage.assertGridAttributes('colours', expectedTableColours)
+  })
 })

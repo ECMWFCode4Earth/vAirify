@@ -8,6 +8,7 @@ export enum Colours {
   aqiNa = 'rgb(235, 235, 235)',
   notColoured = 'rgba(0, 0, 0, 0)',
   noData = 'rgb(111, 111, 111)',
+  cellError = 'rgb(0, 0, 0)',
 }
 
 export enum CaseAQI1 {

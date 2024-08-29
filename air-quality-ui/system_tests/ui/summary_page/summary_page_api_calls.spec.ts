@@ -90,6 +90,7 @@ test.describe('API calls on page load', () => {
 
     test('Verify on page load the measurement summary API is called proportionately', async () => {
       expect(requestArray.length).toEqual(9)
+      expect(requestArray.length).toEqual(9)
     })
 
     test('Verify on page load the measurement summary API calls have correct params', async () => {
