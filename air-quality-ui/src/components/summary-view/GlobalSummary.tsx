@@ -1,7 +1,6 @@
 import { useQueries, useQuery } from '@tanstack/react-query'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-import { DateTime } from 'luxon'
 import { useCallback, useMemo, useState } from 'react'
 
 import classes from './GlobalSummary.module.css'
@@ -35,12 +34,12 @@ const GlobalSummary = (): JSX.Element => {
   } = useQuery({
     queryKey: [
       forecastDetails.forecastBaseDate,
-      forecastDetails.maxMeasurementDate,
+      forecastDetails.maxForecastDate,
     ],
     queryFn: () =>
       getForecastData(
         forecastDetails.forecastBaseDate,
-        DateTime.now(),
+        forecastDetails.maxForecastDate,
         forecastDetails.forecastBaseDate,
       ).then((forecastData) =>
         forecastData.reduce<Record<string, ForecastResponseDto[]>>(
