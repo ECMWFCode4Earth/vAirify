@@ -51,7 +51,6 @@ test.describe('API calls on page load', () => {
             expectedRequestForecastBaseTime
           const mockDateTimeNowUriEncoded: string =
             await encodeDateToURIComponent(mockSystemDate)
-
           expect(requestArray[0]).toContain(
             `location_type=city&valid_time_from=${expectedRequestValidTimeFrom}&valid_time_to=${mockDateTimeNowUriEncoded}&base_time=${expectedRequestForecastBaseTime}`,
           )
@@ -261,16 +260,14 @@ test.describe('API calls on changing forecast base time in UI', () => {
 test.describe('Forecast window for summary page', () => {
   let forecastRequestArray: string[]
   test.beforeEach(async ({ page, cityPage, basePage, banner, summaryPage }) => {
-    await gotoPage(page, '/city/Rio%20de%20Janeiro')
-    await cityPage.waitForAllGraphsToBeVisible()
-    await cityPage.setBaseTime('01/07/2024 00:00')
+    await gotoPage(page, 'city/summary')
+    await banner.setBaseTime('01/07/2024 00:00')
 
     forecastRequestArray = await summaryPage.captureNetworkRequestsAsArray(
       page,
       httpMethodGet,
       basePage.baseAPIURL + forecastAPIEndpoint,
     )
-    await banner.forecastWindowDropdownClick()
   })
   const testCases = [
     { windowOption: '1', days: 1, toDate: '2024-07-02T00:00:00Z' },
@@ -283,8 +280,6 @@ test.describe('Forecast window for summary page', () => {
     for (const { windowOption, days, toDate } of testCases) {
       test(`Forecast window ${windowOption} requests ${days} day(s) worth of data`, async ({
         banner,
-        page,
-        cityPage,
       }) => {
         const expectedValidTimeFrom = await encodeDateToURIComponent(
           new Date('2024-07-01T00:00:00Z'),
@@ -293,10 +288,8 @@ test.describe('Forecast window for summary page', () => {
           new Date(toDate),
         )
 
-        await banner.forecastWindowDropdownSelect(windowOption)
+        await banner.setForecastWindow(windowOption)
         await banner.clickUpdateButton()
-        await waitForIdleNetwork(page, cityPage.aqiChart)
-
         await expect(forecastRequestArray[0]).toContain(
           `valid_time_from=${expectedValidTimeFrom}&valid_time_to=${expectedValidTimeTo}`,
         )

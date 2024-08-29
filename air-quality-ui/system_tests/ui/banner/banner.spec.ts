@@ -193,7 +193,7 @@ test.describe('Range label', () => {
       labelExpectation: 'Time Range: 20 Jul 00:00 - 25 Jul 00:00 UTC',
     },
   ]
-  test('On load, label accurately displays forecast range on summary page', async ({
+  test('On load, label accurately displays default forecast range of 1 ', async ({
     summaryPage,
   }) => {
     await expect(summaryPage.timeRange).toContainText(

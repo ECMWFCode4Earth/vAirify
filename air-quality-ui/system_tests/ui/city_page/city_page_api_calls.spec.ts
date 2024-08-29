@@ -52,6 +52,8 @@ test.describe('API calls on page load', () => {
           expect(requestArray[0]).toContain(
             `base_time=${expectedRequestForecastBaseTime}`,
           )
+          expect(requestArray[0]).toContain(`location_type=city`)
+          expect(requestArray[0]).toContain(`location_name=Rio+de+Janeiro`)
         })
       })
     })
@@ -139,15 +141,15 @@ test.describe('Forecast window for city page', () => {
     await banner.forecastWindowDropdownClick()
   })
   const testCases = [
-    { windowOption: '1', days: 1, toDate: '2024-07-02T00:00:00Z' },
-    { windowOption: '2', days: 2, toDate: '2024-07-03T00:00:00Z' },
-    { windowOption: '3', days: 3, toDate: '2024-07-04T00:00:00Z' },
-    { windowOption: '4', days: 4, toDate: '2024-07-05T00:00:00Z' },
-    { windowOption: '5', days: 5, toDate: '2024-07-06T00:00:00Z' },
+    { windowOption: '1', toDate: '2024-07-02T00:00:00Z' },
+    { windowOption: '2', toDate: '2024-07-03T00:00:00Z' },
+    { windowOption: '3', toDate: '2024-07-04T00:00:00Z' },
+    { windowOption: '4', toDate: '2024-07-05T00:00:00Z' },
+    { windowOption: '5', toDate: '2024-07-06T00:00:00Z' },
   ]
   test.describe('Forecast API array', () => {
-    for (const { windowOption, days, toDate } of testCases) {
-      test(`Forecast window ${windowOption} requests ${days} day(s) worth of data`, async ({
+    for (const { windowOption, toDate } of testCases) {
+      test(`Forecast window ${windowOption} has correct request parameters`, async ({
         banner,
         page,
         cityPage,
@@ -164,15 +166,15 @@ test.describe('Forecast window for city page', () => {
         await waitForIdleNetwork(page, cityPage.aqiChart)
 
         await expect(forecastRequestArray[0]).toContain(
-          `valid_time_from=${expectedValidTimeFrom}&valid_time_to=${expectedValidTimeTo}`,
+          `location_type=city&valid_time_from=${expectedValidTimeFrom}&valid_time_to=${expectedValidTimeTo}&base_time=2024-07-01T00%3A00%3A00.000Z&location_name=Rio+de+Janeiro`,
         )
       })
     }
   })
-
+  // &location_name=Rio+de+Janeiro&base_time=2024-07-01T00%3A00%3A00.000Z
   test.describe('Measurements API array', () => {
-    for (const { windowOption, days, toDate } of testCases) {
-      test(`Forecast window ${windowOption} requests ${days} day(s) worth of data`, async ({
+    for (const { windowOption, toDate } of testCases) {
+      test(`Forecast window ${windowOption} has correct request parameters`, async ({
         banner,
         page,
         cityPage,
@@ -189,7 +191,7 @@ test.describe('Forecast window for city page', () => {
         await waitForIdleNetwork(page, cityPage.aqiChart)
 
         await expect(measurementsRequestArray[0]).toContain(
-          `date_from=${expectedValidTimeFrom}&date_to=${expectedValidTimeTo}`,
+          `date_from=${expectedValidTimeFrom}&date_to=${expectedValidTimeTo}&location_type=city&location_names=Rio+de+Janeiro`,
         )
       })
     }
