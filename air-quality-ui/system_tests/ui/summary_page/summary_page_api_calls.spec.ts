@@ -287,8 +287,9 @@ test.describe('Forecast window for summary page', () => {
 
         await banner.setForecastWindow(windowOption)
         await banner.clickUpdateButton()
+        console.log(forecastRequestArray[0])
         await expect(forecastRequestArray[0]).toContain(
-          `valid_time_from=${expectedValidTimeFrom}&valid_time_to=${expectedValidTimeTo}`,
+          `location_type=city&valid_time_from=${expectedValidTimeFrom}&valid_time_to=${expectedValidTimeTo}&base_time=2024-07-01T00%3A00%3A00.000Z`,
         )
       })
     }
