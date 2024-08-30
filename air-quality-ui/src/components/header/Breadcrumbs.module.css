@@ -10,12 +10,16 @@
     padding: 0 8px 0 8px;
 }
 
+.breadcrumb:first-child {
+    width: 2.5em;
+    text-align: center;
+}
+
 .breadcrumb-link {
     color: white;
     text-decoration: none;
 
     &:hover {
-        border-bottom: solid 2px white;
         font-weight: bold;
     }
 }
