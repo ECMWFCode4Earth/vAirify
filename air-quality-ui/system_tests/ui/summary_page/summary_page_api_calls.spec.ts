@@ -13,49 +13,54 @@ test.describe('API calls on page load', () => {
         {
           dateTime: '2024-07-03T10:00:00Z',
           expectedRequestForecastBaseTime: '2024-07-02T00%3A00%3A00.000Z',
-          expectedValidTimeTo:'2024-07-03T00%3A00%3A00.000Z'
+          expectedValidTimeTo: '2024-07-03T00%3A00%3A00.000Z',
         },
         {
           dateTime: '2024-07-03T09:59:00Z',
           expectedRequestForecastBaseTime: '2024-07-01T12%3A00%3A00.000Z',
-          expectedValidTimeTo:'2024-07-02T12%3A00%3A00.000Z'
+          expectedValidTimeTo: '2024-07-02T12%3A00%3A00.000Z',
         },
         {
           dateTime: '2024-07-03T21:59:00Z',
           expectedRequestForecastBaseTime: '2024-07-02T00%3A00%3A00.000Z',
-          expectedValidTimeTo:'2024-07-03T00%3A00%3A00.000Z'
+          expectedValidTimeTo: '2024-07-03T00%3A00%3A00.000Z',
         },
         {
           dateTime: '2024-07-03T22:00:00Z',
           expectedRequestForecastBaseTime: '2024-07-02T12%3A00%3A00.000Z',
-          expectedValidTimeTo:'2024-07-03T12%3A00%3A00.000Z'
+          expectedValidTimeTo: '2024-07-03T12%3A00%3A00.000Z',
         },
-      ].forEach(({ dateTime, expectedRequestForecastBaseTime, expectedValidTimeTo }) => {
-        test(`System time ${dateTime}, assert forecast request params are correct`, async ({
-          page,
-          summaryPage,
-          basePage,
+      ].forEach(
+        ({
+          dateTime,
+          expectedRequestForecastBaseTime,
+          expectedValidTimeTo,
         }) => {
-          const mockSystemDate: Date = new Date(dateTime)
-          await page.clock.setFixedTime(mockSystemDate)
+          test(`System time ${dateTime}, assert forecast request params are correct`, async ({
+            page,
+            summaryPage,
+            basePage,
+          }) => {
+            const mockSystemDate: Date = new Date(dateTime)
+            await page.clock.setFixedTime(mockSystemDate)
 
-          const requestArray: string[] =
-            await summaryPage.captureNetworkRequestsAsArray(
-              page,
-              httpMethodGet,
-              basePage.baseAPIURL + forecastAPIEndpoint,
+            const requestArray: string[] =
+              await summaryPage.captureNetworkRequestsAsArray(
+                page,
+                httpMethodGet,
+                basePage.baseAPIURL + forecastAPIEndpoint,
+              )
+            await gotoPage(page, 'city/summary')
+            await summaryPage.waitForLoad()
+            const expectedRequestValidTimeFrom: string =
+              expectedRequestForecastBaseTime
+            const expectedRequestValidTimeTo: string = expectedValidTimeTo
+            expect(requestArray[0]).toContain(
+              `location_type=city&valid_time_from=${expectedRequestValidTimeFrom}&valid_time_to=${expectedRequestValidTimeTo}&base_time=${expectedRequestForecastBaseTime}`,
             )
-          await gotoPage(page, 'city/summary')
-          await summaryPage.waitForLoad()
-          const expectedRequestValidTimeFrom: string =
-            expectedRequestForecastBaseTime
-          const expectedRequestValidTimeTo: string =
-            expectedValidTimeTo
-          expect(requestArray[0]).toContain(
-            `location_type=city&valid_time_from=${expectedRequestValidTimeFrom}&valid_time_to=${expectedRequestValidTimeTo}&base_time=${expectedRequestForecastBaseTime}`,
-          )
-        })
-      })
+          })
+        },
+      )
     })
     test('Verify on page load the forecast API is called once', async ({
       summaryPage,
@@ -153,8 +158,8 @@ test.describe('API calls on changing forecast base time in UI', () => {
       )
       const expectedValidTimeFrom: string = expectedForecastBaseTime
       const expectedValidTimeTo = await encodeDateToURIComponent(
-          new Date('2024-07-04T12:00:00Z'),
-        )
+        new Date('2024-07-04T12:00:00Z'),
+      )
       await banner.clickOnDay(3)
       await banner.clickUpdateButton()
       expect(requestArray[0]).toContain(
@@ -291,7 +296,6 @@ test.describe('Forecast window for summary page', () => {
 
         await banner.setForecastWindow(windowOption)
         await banner.clickUpdateButton()
-        console.log(forecastRequestArray[0])
         await expect(forecastRequestArray[0]).toContain(
           `location_type=city&valid_time_from=${expectedValidTimeFrom}&valid_time_to=${expectedValidTimeTo}&base_time=2024-07-01T00%3A00%3A00.000Z`,
         )
