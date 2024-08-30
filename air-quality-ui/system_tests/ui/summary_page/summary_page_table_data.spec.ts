@@ -1050,7 +1050,7 @@ test('Verify changing date in date picker triggers change of data displayed', as
   ])
 
   await banner.setBaseTime('25/06/2024 00:00')
-  await banner.confirmDate()
+  await banner.clickUpdateButton()
   await summaryPage.waitForLoad()
   await summaryPage.assertGridAttributes('values', newExpectedTableContents)
 })

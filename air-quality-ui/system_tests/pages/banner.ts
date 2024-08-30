@@ -14,6 +14,7 @@ export class Banner extends BasePage {
   readonly datePickerTimeOption1200: Locator
   readonly datePickerYearOpenButton: Locator
   readonly datePickerYearCloseButton: Locator
+  readonly dateUpdateButton: Locator
   readonly futureDay27: Locator
   readonly logo: Locator
   readonly windowDropdown: Locator
@@ -33,6 +34,7 @@ export class Banner extends BasePage {
     this.datePickerYearOpenButton = page.getByLabel(
       'calendar view is open, switch',
     )
+    this.dateUpdateButton = page.getByRole('button', { name: 'Update' })
     this.futureDay27 = page.locator(
       '//div[@aria-rowindex="4"] //button[@aria-colindex="6"]',
     )
@@ -42,12 +44,21 @@ export class Banner extends BasePage {
   }
 
   async forecastWindowDropdownClick() {
+    await this.windowDropdown.waitFor({ state: 'visible' })
     await this.windowDropdown.click()
   }
 
   async forecastWindowDropdownSelect(option: string) {
-    const optionSelect = await this.page.getByRole('option', { name: option })
-    await optionSelect.click()
+    const windowOptionSelect = this.page.getByRole('option', {
+      name: option,
+      exact: true,
+    })
+    await windowOptionSelect.click()
+  }
+
+  async setForecastWindow(option: string) {
+    await this.forecastWindowDropdownClick()
+    await this.forecastWindowDropdownSelect(option)
   }
 
   async clickOnDay(day: number): Promise<void> {
@@ -84,8 +95,8 @@ export class Banner extends BasePage {
     }
   }
 
-  async confirmDate() {
-    await this.updateDateButton.click()
+  async clickUpdateButton() {
+    await this.dateUpdateButton.click()
   }
 
   async setBaseTime(baseTime: string): Promise<void> {

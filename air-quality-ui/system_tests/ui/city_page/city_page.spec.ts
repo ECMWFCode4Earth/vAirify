@@ -328,7 +328,7 @@ test.describe('City graph snapshots', () => {
     await gotoPage(page, '/city/Rio%20de%20Janeiro')
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
-    await banner.confirmDate()
+    await banner.clickUpdateButton()
   })
 
   test('AQI snapshot', async ({ cityPage }) => {
@@ -439,7 +439,7 @@ test.describe('Charts are fully visible in 1920x1080 viewport', () => {
 
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
-    await banner.confirmDate()
+    await banner.clickUpdateButton()
   })
 
   test('AQI chart element is visible in fullscreen view', async ({
@@ -566,7 +566,7 @@ test.describe('High value measurements are displayed correctly', () => {
     await gotoPage(page, '/city/Rio%20de%20Janeiro')
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
-    await banner.confirmDate()
+    await banner.clickUpdateButton()
   })
 
   test('High AQI chart loads', async ({ cityPage }) => {
@@ -890,7 +890,7 @@ test.describe('In-situ AQI plots', () => {
     await gotoPage(page, '/city/Rio%20de%20Janeiro')
     await cityPage.waitForAllGraphsToBeVisible()
     await cityPage.setBaseTime('01/07/2024 00:00')
-    await banner.confirmDate()
+    await banner.clickUpdateButton()
   })
   //
   test('Expect in-situ AQI 4 plot at 00:00 due to multiple stations showing PM2.5', async ({

@@ -139,23 +139,23 @@ import { createForecastAPIResponseData } from '../../utils/mocked_api'
     test.describe('when clicking ok button', () => {
       test('Verify updates on date selection', async ({ banner }) => {
         await banner.clickOnDay(3)
-        await banner.confirmDate()
+        await banner.clickUpdateButton()
         await expect(forecastRequestArray.length).toBeGreaterThan(0)
         await expect(measurementRequestArray.length).toBeGreaterThan(0)
       })
       test('Verify updates on time selection', async ({ banner }) => {
         await banner.clickOnTime('12:00')
-        await banner.confirmDate()
+        await banner.clickUpdateButton()
         await banner.calendarIcon.click()
         await banner.clickOnTime('00:00')
-        await banner.confirmDate()
+        await banner.clickUpdateButton()
         await expect(forecastRequestArray.length).toBeGreaterThan(0)
         await expect(measurementRequestArray.length).toBeGreaterThan(0)
       })
       test('Verify updates on date and time selection', async ({ banner }) => {
         await banner.clickOnDay(3)
         await banner.clickOnTime('12:00')
-        await banner.confirmDate()
+        await banner.clickUpdateButton()
         await expect(forecastRequestArray.length).toBeGreaterThan(0)
         await expect(measurementRequestArray.length).toBeGreaterThan(0)
       })
@@ -171,24 +171,45 @@ test.describe('Range label', () => {
     await gotoPage(page, '/city/summary')
   })
 
-  test('On load, label accurately displays forecast range on summary page', async ({
+  const testCases = [
+    {
+      windowOption: '1',
+      labelExpectation: 'Time Range: 20 Jul 00:00 - 21 Jul 00:00 UTC',
+    },
+    {
+      windowOption: '2',
+      labelExpectation: 'Time Range: 20 Jul 00:00 - 22 Jul 00:00 UTC',
+    },
+    {
+      windowOption: '3',
+      labelExpectation: 'Time Range: 20 Jul 00:00 - 23 Jul 00:00 UTC',
+    },
+    {
+      windowOption: '4',
+      labelExpectation: 'Time Range: 20 Jul 00:00 - 24 Jul 00:00 UTC',
+    },
+    {
+      windowOption: '5',
+      labelExpectation: 'Time Range: 20 Jul 00:00 - 25 Jul 00:00 UTC',
+    },
+  ]
+  test('On load, label accurately displays default forecast range of 1 ', async ({
     summaryPage,
   }) => {
     await expect(summaryPage.timeRange).toContainText(
       'Time Range: 25 Jul 00:00 - 26 Jul 00:00 UTC',
     )
   })
-
-  test('On changing to historic forecast base time (T-6), label accurately displays forecast range on summary page', async ({
-    summaryPage,
-    banner,
-  }) => {
-    await banner.setBaseTime('20/07/2024 00:00')
-    await banner.confirmDate()
-    await expect(summaryPage.timeRange).toContainText(
-      'Time Range: 20 Jul 00:00 - 21 Jul 00:00 UTC',
-    )
-  })
+  for (const { windowOption, labelExpectation } of testCases)
+    test(`When forecast window is ${windowOption} then expect time range label to read ${labelExpectation}`, async ({
+      banner,
+      summaryPage,
+    }) => {
+      await banner.setBaseTime('20/07/2024 00:00')
+      await banner.setForecastWindow(windowOption)
+      await banner.clickUpdateButton()
+      await expect(summaryPage.timeRange).toContainText(labelExpectation)
+    })
 })
 
 test('Verify breadcrumb text is correct on each page', async ({
