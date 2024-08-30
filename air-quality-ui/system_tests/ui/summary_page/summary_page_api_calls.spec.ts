@@ -13,20 +13,24 @@ test.describe('API calls on page load', () => {
         {
           dateTime: '2024-07-03T10:00:00Z',
           expectedRequestForecastBaseTime: '2024-07-02T00%3A00%3A00.000Z',
+          expectedValidTimeTo:'2024-07-03T00%3A00%3A00.000Z'
         },
         {
           dateTime: '2024-07-03T09:59:00Z',
           expectedRequestForecastBaseTime: '2024-07-01T12%3A00%3A00.000Z',
+          expectedValidTimeTo:'2024-07-02T12%3A00%3A00.000Z'
         },
         {
           dateTime: '2024-07-03T21:59:00Z',
           expectedRequestForecastBaseTime: '2024-07-02T00%3A00%3A00.000Z',
+          expectedValidTimeTo:'2024-07-03T00%3A00%3A00.000Z'
         },
         {
           dateTime: '2024-07-03T22:00:00Z',
           expectedRequestForecastBaseTime: '2024-07-02T12%3A00%3A00.000Z',
+          expectedValidTimeTo:'2024-07-03T12%3A00%3A00.000Z'
         },
-      ].forEach(({ dateTime, expectedRequestForecastBaseTime }) => {
+      ].forEach(({ dateTime, expectedRequestForecastBaseTime, expectedValidTimeTo }) => {
         test(`System time ${dateTime}, assert forecast request params are correct`, async ({
           page,
           summaryPage,
@@ -45,10 +49,10 @@ test.describe('API calls on page load', () => {
           await summaryPage.waitForLoad()
           const expectedRequestValidTimeFrom: string =
             expectedRequestForecastBaseTime
-          const mockDateTimeNowUriEncoded: string =
-            await encodeDateToURIComponent(mockSystemDate)
+          const expectedRequestValidTimeTo: string =
+            expectedValidTimeTo
           expect(requestArray[0]).toContain(
-            `location_type=city&valid_time_from=${expectedRequestValidTimeFrom}&valid_time_to=${mockDateTimeNowUriEncoded}&base_time=${expectedRequestForecastBaseTime}`,
+            `location_type=city&valid_time_from=${expectedRequestValidTimeFrom}&valid_time_to=${expectedRequestValidTimeTo}&base_time=${expectedRequestForecastBaseTime}`,
           )
         })
       })
@@ -148,13 +152,13 @@ test.describe('API calls on changing forecast base time in UI', () => {
         new Date(`2024-07-03T12:00:00Z`),
       )
       const expectedValidTimeFrom: string = expectedForecastBaseTime
-      const systemDateUriEncoded: string =
-        await encodeDateToURIComponent(systemDate)
-
+      const expectedValidTimeTo = await encodeDateToURIComponent(
+          new Date('2024-07-04T12:00:00Z'),
+        )
       await banner.clickOnDay(3)
       await banner.clickUpdateButton()
       expect(requestArray[0]).toContain(
-        `location_type=city&valid_time_from=${expectedValidTimeFrom}&valid_time_to=${systemDateUriEncoded}&base_time=${expectedForecastBaseTime}`,
+        `location_type=city&valid_time_from=${expectedValidTimeFrom}&valid_time_to=${expectedValidTimeTo}&base_time=${expectedForecastBaseTime}`,
       )
     })
   })
