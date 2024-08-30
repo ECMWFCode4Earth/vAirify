@@ -6,7 +6,6 @@ export class Banner extends BasePage {
   readonly page: Page
 
   readonly calendarIcon: Locator
-  readonly dateOkButton: Locator
   readonly datePicker: Locator
   readonly datePickerNextMonthButton: Locator
   readonly datePickerPreviousMonthButton: Locator
@@ -28,7 +27,6 @@ export class Banner extends BasePage {
     this.page = page
 
     this.calendarIcon = page.getByTestId('CalendarIcon')
-    this.dateOkButton = page.getByRole('button', { name: 'Ok' })
     this.datePicker = page.getByRole('textbox', { name: 'Forecast Base Date' })
     this.datePickerNextMonthButton = page.getByLabel('Next month')
     this.datePickerPreviousMonthButton = page.getByTestId('ArrowLeftIcon')
