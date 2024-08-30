@@ -98,12 +98,17 @@ export class SummaryPage extends BasePage {
     }
   }
 
-  async filterByCity(cityName: string) {
+  async filterByCity(cityName: string, page: Page) {
     await this.locationFilterIcon.click()
     await this.locationFilterTextBox.click()
     await this.locationFilterTextBox.fill(cityName)
     await this.grid.click()
     await this.waitForLoad()
+    // awaiting a div to be hidden that matches another locator needed when asserting the grid
+    await page
+      .locator('.ag-center-cols-container > div:nth-child(23) > div')
+      .first()
+      .waitFor({ state: 'hidden' })
   }
 
   async getColumnHeaderAndText(

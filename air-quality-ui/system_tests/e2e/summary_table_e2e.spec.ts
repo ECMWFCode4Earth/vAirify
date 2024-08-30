@@ -2,26 +2,23 @@ import { test } from '../utils/fixtures'
 import { gotoPage } from '../utils/helper_methods'
 import { CaseAQI2, CaseAQI4 } from '../utils/test_enums'
 
+test.beforeEach(async ({ page, summaryPage, banner }) => {
+  // Navigate to the deployed UI and prepare the date with 21/08/2024 12:00
+  await gotoPage(page, 'summary')
+  await summaryPage.waitForLoad()
+  await banner.setBaseTime('21/08/2024 12:00')
+})
 test('Changing the forecast base time on the summary page sets the correct data', async ({
   page,
   banner,
   summaryPage,
 }) => {
-  await gotoPage(page, 'summary')
+  // Set date and filter by city 'Atlanta'
+  await banner.clickUpdateButton()
   await summaryPage.waitForLoad()
+  await summaryPage.filterByCity('Atlanta', page)
 
-  // await banner.calendarIcon.click()
-  // await banner.findSpecificMonthAndYear('July', '2024'07)
-  // await banner.clickOnDay(3)
-  // await banner.datePickerTimeOption1200.click()
-  // await banner.dateOkButton.click()
-
-  await banner.setBaseTime('21/08/2024 12:00')
-  await banner.confirmDate()
-  await summaryPage.waitForLoad()
-
-  await summaryPage.filterByCity('Atlanta')
-
+  //Compare the UI summary table data for Atlanta with expected verified data from the database
   const expectedTableContents: string[][] = [
     [
       // AQI Level
@@ -50,6 +47,5 @@ test('Changing the forecast base time on the summary page sets the correct data'
       '21 Aug 12:00', // Time
     ],
   ]
-  await summaryPage.waitForLoad()
   await summaryPage.assertGridAttributes('values', expectedTableContents)
 })
