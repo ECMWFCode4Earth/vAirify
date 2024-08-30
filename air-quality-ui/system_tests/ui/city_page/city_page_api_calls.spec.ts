@@ -171,7 +171,6 @@ test.describe('Forecast window for city page', () => {
       })
     }
   })
-  // &location_name=Rio+de+Janeiro&base_time=2024-07-01T00%3A00%3A00.000Z
   test.describe('Measurements API array', () => {
     for (const { windowOption, toDate } of testCases) {
       test(`Forecast window ${windowOption} has correct request parameters`, async ({

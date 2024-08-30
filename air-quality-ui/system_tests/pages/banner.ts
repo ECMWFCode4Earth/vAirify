@@ -17,6 +17,7 @@ export class Banner extends BasePage {
   readonly dateUpdateButton: Locator
   readonly futureDay27: Locator
   readonly logo: Locator
+  private windowOptionSelect: Locator
   readonly windowDropdown: Locator
   readonly year2025: Locator
 
@@ -39,6 +40,10 @@ export class Banner extends BasePage {
       '//div[@aria-rowindex="4"] //button[@aria-colindex="6"]',
     )
     this.logo = page.getByAltText('vAirify')
+    this.windowOptionSelect = this.page.getByRole('option', {
+      name: '1',
+      exact: true,
+    })
     this.year2025 = page.locator('//div //button').filter({ hasText: /^2025$/ })
     this.windowDropdown = page.locator('svg').nth(1)
   }
@@ -49,11 +54,11 @@ export class Banner extends BasePage {
   }
 
   async forecastWindowDropdownSelect(option: string) {
-    const optionSelect = await this.page.getByRole('option', {
+    this.windowOptionSelect = this.page.getByRole('option', {
       name: option,
       exact: true,
     })
-    await optionSelect.click()
+    await this.windowOptionSelect.click()
   }
 
   async setForecastWindow(option: string) {
