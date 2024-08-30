@@ -1,9 +1,5 @@
 import { expect, test } from '../../utils/fixtures'
-import {
-  encodeDateToURIComponent,
-  gotoPage,
-  waitForIdleNetwork,
-} from '../../utils/helper_methods'
+import { encodeDateToURIComponent, gotoPage } from '../../utils/helper_methods'
 
 const systemDate: Date = new Date('2024-07-18T14:00:00Z')
 const forecastAPIEndpoint = '/forecast'
@@ -260,7 +256,7 @@ test.describe('API calls on changing forecast base time in UI', () => {
 
 test.describe('Forecast window for summary page', () => {
   let forecastRequestArray: string[]
-  test.beforeEach(async ({ page, cityPage, basePage, banner, summaryPage }) => {
+  test.beforeEach(async ({ page, basePage, banner, summaryPage }) => {
     await gotoPage(page, 'city/summary')
     await banner.setBaseTime('01/07/2024 00:00')
 
