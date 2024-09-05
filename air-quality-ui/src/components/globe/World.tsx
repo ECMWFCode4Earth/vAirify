@@ -1,6 +1,6 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
-import { useRef, useEffect, memo } from "react"
+import { useRef } from "react"
 
 import { SurfaceLayer, SurfaceLayerRef } from "./SurfaceLayer"
 
@@ -17,10 +17,6 @@ const World = (): JSX.Element => {
         >
         <ambientLight />
         <directionalLight position={[0, 5, 0]} />
-        {/* <mesh>
-          <boxGeometry args={[3, 3, 3]} />
-          <meshStandardMaterial color={'orange'} />
-        </mesh> */}
         <SurfaceLayer ref={surface_layer_ref} />
         <OrbitControls />
       </Canvas>

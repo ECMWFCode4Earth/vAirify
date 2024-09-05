@@ -15,11 +15,14 @@ import {
   const loader = new THREE.TextureLoader();
   const cmap = loader.load('/all_colormaps.png');
   const lsm = loader.load('/NaturalEarthCoastline2.jpg');
+  const height = loader.load('/gebco_08_rev_elev_2k_HQ.jpg');
+
   cmap.minFilter = THREE.NearestFilter;
   cmap.magFilter = THREE.NearestFilter;
   lsm.minFilter = THREE.NearestFilter;
   lsm.magFilter = THREE.NearestFilter;
-
+  height.minFilter = THREE.NearestFilter;
+  height.magFilter = THREE.NearestFilter;
 
   const geometry = new THREE.PlaneGeometry(4, 2, 64 * 4, 32 * 4);
   
@@ -98,7 +101,7 @@ import {
           thisDataMax: { value: new Float32Array(1) },
           nextDataMin: { value: null },
           nextDataMax: { value: null },
-          referenceHeightTexture: { value: null },
+          referenceHeightTexture: { value: height },
           referenceDataMin: { value: null },
           referenceDataMax: { value: null },
           referenceDataHeightFlag: { value: false },
@@ -108,7 +111,7 @@ import {
         },
       }));
   
-      const imageUrl = 'http://localhost:5173/data_textures/2024-08-04_00/aqi_2024-08-04_00_CAMS_global.chunk_1_of_3.webp';
+      const imageUrl = 'http://localhost:5173/data_textures/2024-08-29_00/aqi_2024-08-29_00_CAMS_global.chunk_1_of_3.webp';
   
       const fullImageCanvasRef = useRef<HTMLCanvasElement | null>(null);
   
@@ -146,7 +149,7 @@ import {
   
       useEffect(() => {
         const interval = setInterval(() => {
-          elapsedTimeRef.current += 0.03;
+          elapsedTimeRef.current += 0.015;
   
           if (elapsedTimeRef.current >= 1) {
             if (windowIndexRef.current >= 14.) {
@@ -162,6 +165,7 @@ import {
           const weight = currentTime % 1; // Value between 0 and 1
           if (materialRef.current) {
             materialRef.current.uniforms.uFrameWeight.value = weight;
+            // materialRef.current.uniforms.uFrameWeight.value = 0.0;
             materialRef.current.uniforms.uFrameWeight.needsUpdate = true;
           }
         }, 1);
