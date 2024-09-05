@@ -10,7 +10,7 @@ uniform float thisDataMin[12];
 uniform float thisDataMax[12];
 
 uniform sampler2D dataTexture; // Heightmap texture
-
+uniform sampler2D referenceHeightTexture;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // varying for fragment shader
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,20 +55,19 @@ void main()	{
 
     float thisFrameData = remap( 
         texture2D(
-            dataTexture, 
+            referenceHeightTexture, 
             uv
             ).r, 
         0.0, 
         1.0, 
-        thisDataMin[0], 
-        thisDataMax[0]);
+        0.0, 
+        8000.0);
 
     float dataRemapped = userRemap(thisFrameData);
 
-        
 
     // Sample the heightmap texture
-    // float height = texture2D(dataTexture, uv).r - 0.5;
+    // float height = texture2D(referenceHeightTexture, uv).r - 0.5;
     // float height = dataRemapped - 0.5;
     float height = 0.0;
 
