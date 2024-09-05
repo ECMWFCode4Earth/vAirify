@@ -1,178 +1,212 @@
 import {
-    forwardRef,
-    useImperativeHandle,
-    useRef,
-    memo,
-    useEffect,
-    useCallback,
-  } from "react";
-  import * as THREE from "three";
-  import vertexShader from "./shaders/surfaceVert.glsl";
-  import fragmentShader from "./shaders/surfaceFrag.glsl";
-  
-  type PlaneType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
-  
-  const loader = new THREE.TextureLoader();
-  const cmap = loader.load('/all_colormaps.png');
-  const lsm = loader.load('/NaturalEarthCoastline2.jpg');
-  const height = loader.load('/gebco_08_rev_elev_2k_HQ.jpg');
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  memo,
+  useEffect,
+  useCallback,
+} from "react";
+import * as THREE from "three";
+import vertexShader from "./shaders/surfaceVert.glsl";
+import fragmentShader from "./shaders/surfaceFrag.glsl";
+import { useForecastContext } from '../../context';
 
-  cmap.minFilter = THREE.NearestFilter;
-  cmap.magFilter = THREE.NearestFilter;
-  lsm.minFilter = THREE.NearestFilter;
-  lsm.magFilter = THREE.NearestFilter;
-  height.minFilter = THREE.NearestFilter;
-  height.magFilter = THREE.NearestFilter;
+type PlaneType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
 
-  const geometry = new THREE.PlaneGeometry(4, 2, 64 * 4, 32 * 4);
-  
-  const createCanvasTextureFromFullImage = async (imageUrl: string): Promise<HTMLCanvasElement> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = 'Anonymous'; // Handle cross-origin issues
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-  
+type SurfaceLayerProps = {
+  forecastData: Record<string, ForecastResponseDto[]>;
+  summarizedMeasurementData: Record<string, MeasurementSummaryResponseDto[]>;
+  isTimeRunning: boolean; // New prop to control the time updates
+};
+
+export type SurfaceLayerRef = {
+  type: React.RefObject<PlaneType>;
+  tick: (weight: number, uSphereWrapAmount: number) => void;
+};
+
+// Preload textures globally so they are not reloaded during re-renders
+const loader = new THREE.TextureLoader();
+const cmap = loader.load('/all_colormaps.png');
+const lsm = loader.load('/NaturalEarthCoastline2.jpg');
+const height = loader.load('/gebco_08_rev_elev_2k_HQ.jpg');
+
+cmap.minFilter = THREE.NearestFilter;
+cmap.magFilter = THREE.NearestFilter;
+lsm.minFilter = THREE.NearestFilter;
+lsm.magFilter = THREE.NearestFilter;
+height.minFilter = THREE.NearestFilter;
+height.magFilter = THREE.NearestFilter;
+
+const geometry = new THREE.PlaneGeometry(4, 2, 64 * 4, 32 * 4);
+
+const createCanvasTextureFromMultipleImages = async (imageUrls: string[]): Promise<HTMLCanvasElement> => {
+  return new Promise((resolve, reject) => {
+    const images: HTMLImageElement[] = [];
+    let imagesLoaded = 0;
+
+    // Helper function to handle image loading
+    const onLoadImage = () => {
+      imagesLoaded++;
+      if (imagesLoaded === imageUrls.length) {
+        // All images are loaded, now concatenate them
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+
         if (context) {
-          canvas.width = img.width;
-          canvas.height = img.height;
-          context.drawImage(img, 0, 0);
-  
+          const singleImageWidth = images[0].width;
+          const singleImageHeight = images[0].height;
+
+          // Set the canvas width and height to accommodate all images horizontally
+          canvas.width = singleImageWidth * imageUrls.length;
+          canvas.height = singleImageHeight;
+
+          // Draw each image side by side
+          images.forEach((img, index) => {
+            context.drawImage(img, index * singleImageWidth, 0);
+          });
+
           resolve(canvas);
         } else {
-          reject(new Error('Failed to get canvas context'));
+          reject(new Error("Failed to get canvas context"));
         }
-      };
-      img.onerror = (error) => reject(error);
-      img.src = imageUrl;
-    });
-  };
-  
-  const createCanvasTextureFromCanvas = (canvas: HTMLCanvasElement, index: number): THREE.CanvasTexture => {
-    const context = canvas.getContext('2d');
-    if (context) {
-      const textureCanvas = document.createElement('canvas');
-      const textureContext = textureCanvas.getContext('2d');
-  
-      textureCanvas.width = 900; // Width of the texture canvas
-      textureCanvas.height = 450; // Height of the texture canvas
-      textureContext.drawImage(canvas, index * 900, 0, 900, 450, 0, 0, 900, 450);
-  
-      const texture = new THREE.CanvasTexture(textureCanvas);
-      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    //   texture.minFilter = THREE.NearestFilter;
-    //   texture.magFilter = THREE.NearestFilter;
-      texture.minFilter = THREE.LinearFilter;
-      texture.magFilter = THREE.LinearFilter;
+      }
+    };
 
-      return texture;
-    } else {
-      throw new Error('Failed to get texture canvas context');
-    }
-  };
-  
-  export type SurfaceLayerRef = {
-    type: RefObject<PlaneType>,
-    tick: (weight: number, uSphereWrapAmount: number) => void,
-  };
-  
-  const SurfaceLayer = memo(
-    forwardRef<SurfaceLayerRef, {}>(({}, ref) => {
-      console.log('creating SurfaceLayer component');
+    // Load all images
+    imageUrls.forEach((url) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.onload = onLoadImage;
+      img.onerror = (error) => reject(error);
+      img.src = url;
+      images.push(img);
+    });
+  });
+};
+
+const createCanvasTextureFromCanvas = (canvas: HTMLCanvasElement, index: number): THREE.CanvasTexture => {
+  const context = canvas.getContext("2d");
+  if (context) {
+    const textureCanvas = document.createElement("canvas");
+    const textureContext = textureCanvas.getContext("2d");
+
+    textureCanvas.width = 900; // Width of the texture canvas
+    textureCanvas.height = 450; // Height of the texture canvas
+    textureContext.drawImage(canvas, index * 900, 0, 900, 450, 0, 0, 900, 450);
+
+    const texture = new THREE.CanvasTexture(textureCanvas);
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+
+    return texture;
+  } else {
+    throw new Error("Failed to get texture canvas context");
+  }
+};
+
+const SurfaceLayer = memo(
+  forwardRef<SurfaceLayerRef, SurfaceLayerProps>(
+    ({ forecastData, summarizedMeasurementData, isTimeRunning }, ref) => { // Receive isTimeRunning as a prop
       const surface_layer_ref = useRef<PlaneType>(null);
-  
-      const materialRef = useRef(new THREE.ShaderMaterial({
-        vertexShader: vertexShader,
-        fragmentShader: fragmentShader,
-        wireframe: false,
-        transparent: true,
-        side: THREE.DoubleSide,
-        uniforms: {
-          uFrameWeight: { value: 0 },
-          uSphereWrapAmount: { value: 0.0 },
-          uHeightDisplacement: { value: 0.2 },
-          uLayerHeight: { value: 0.0 },
-          uLayerOpacity: { value: 0.0 },
-          thisDataTexture: { value: null },
-          nextDataTexture: { value: null },
-          textureTimesteps: { value: null },
-          thisDataMin: { value: new Float32Array(1) },
-          thisDataMax: { value: new Float32Array(1) },
-          nextDataMin: { value: null },
-          nextDataMax: { value: null },
-          referenceHeightTexture: { value: height },
-          referenceDataMin: { value: null },
-          referenceDataMax: { value: null },
-          referenceDataHeightFlag: { value: false },
-          colorMap: { value: cmap },
-          colorMapIndex: { value: 0.0 },
-          lsmTexture: { value: lsm },
-        },
-      }));
-  
-      const imageUrl = 'http://localhost:5173/data_textures/2024-08-29_00/aqi_2024-08-29_00_CAMS_global.chunk_1_of_3.webp';
-  
+      const materialRef = useRef(
+        new THREE.ShaderMaterial({
+          vertexShader: vertexShader,
+          fragmentShader: fragmentShader,
+          wireframe: false,
+          transparent: true,
+          side: THREE.DoubleSide,
+          uniforms: {
+            uFrameWeight: { value: 0 },
+            uSphereWrapAmount: { value: 0.0 },
+            uHeightDisplacement: { value: 0.2 },
+            uLayerHeight: { value: 0.0 },
+            uLayerOpacity: { value: 0.0 },
+            thisDataTexture: { value: null },
+            nextDataTexture: { value: null },
+            textureTimesteps: { value: null },
+            thisDataMin: { value: new Float32Array(1) },
+            thisDataMax: { value: new Float32Array(1) },
+            nextDataMin: { value: null },
+            nextDataMax: { value: null },
+            referenceHeightTexture: { value: height },
+            referenceDataMin: { value: null },
+            referenceDataMax: { value: null },
+            referenceDataHeightFlag: { value: false },
+            colorMap: { value: cmap },
+            colorMapIndex: { value: 0.0 },
+            lsmTexture: { value: lsm },
+          },
+        })
+      );
+
       const fullImageCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  
+      const windowIndexRef = useRef(0);
+      const elapsedTimeRef = useRef(0);
+
+      const { forecastDetails } = useForecastContext();
+      const forecastBaseDate = forecastDetails.forecastBaseDate.toFormat('yyyy-MM-dd_HH');
+      // const imageUrl = `http://localhost:5173/data_textures/${forecastBaseDate}/aqi_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`;
+
+      const imageUrls = [
+        `http://localhost:5173/data_textures/${forecastBaseDate}/aqi_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`,
+        `http://localhost:5173/data_textures/${forecastBaseDate}/aqi_${forecastBaseDate}_CAMS_global.chunk_2_of_3.webp`,
+        `http://localhost:5173/data_textures/${forecastBaseDate}/aqi_${forecastBaseDate}_CAMS_global.chunk_3_of_3.webp`,
+      ];
+
       const fetchAndUpdateTextures = useCallback(async () => {
         try {
           if (!fullImageCanvasRef.current) {
-            // Load the full image and draw it to a single canvas
-            const fullCanvas = await createCanvasTextureFromFullImage(imageUrl);
+            const fullCanvas = await createCanvasTextureFromMultipleImages(imageUrls);
             fullImageCanvasRef.current = fullCanvas;
           }
-  
+
           const canvas = fullImageCanvasRef.current;
           if (canvas) {
-            const thisCanvasTexture = createCanvasTextureFromCanvas(canvas, windowIndexRef.current);
-            const nextCanvasTexture = createCanvasTextureFromCanvas(canvas, windowIndexRef.current + 1);
-  
+            const thisCanvasTexture = createCanvasTextureFromCanvas(
+              canvas,
+              windowIndexRef.current
+            );
+            const nextCanvasTexture = createCanvasTextureFromCanvas(
+              canvas,
+              windowIndexRef.current + 1
+            );
+
             if (materialRef.current) {
               materialRef.current.uniforms.thisDataTexture.value = thisCanvasTexture;
               materialRef.current.uniforms.nextDataTexture.value = nextCanvasTexture;
-              materialRef.current.uniforms.thisDataTexture.needsUpdate = true;
-              materialRef.current.uniforms.nextDataTexture.needsUpdate = true;
             }
           }
         } catch (error) {
-          console.error('Error processing image:', error);
+          console.error("Error processing image:", error);
         }
-      }, [imageUrl]);
-  
-      const windowIndexRef = useRef(0);
-      const elapsedTimeRef = useRef(0);
-  
+      }, [imageUrls]);
+
+      fetchAndUpdateTextures()
+
       useEffect(() => {
-        fetchAndUpdateTextures();
-      }, [fetchAndUpdateTextures]);
-  
-      useEffect(() => {
+        if (!isTimeRunning) return; // If time is paused, stop the update loop
+
         const interval = setInterval(() => {
-          elapsedTimeRef.current += 0.015;
-  
+          elapsedTimeRef.current += 0.05;
+
           if (elapsedTimeRef.current >= 1) {
-            if (windowIndexRef.current >= 14.) {
-              windowIndexRef.current = 0; // Reset windowIndex
-            } else {
-              windowIndexRef.current += 1;
-            }
-            elapsedTimeRef.current = 0; // Reset elapsedTime
-            fetchAndUpdateTextures(); // Update textures when the window index changes
+            windowIndexRef.current = (windowIndexRef.current + 1) % 40; // Loop through a max of 15 windows
+            elapsedTimeRef.current = 0; // Reset elapsed time
+            fetchAndUpdateTextures(); // Fetch and update textures on each new frame
           }
-  
+
           const currentTime = elapsedTimeRef.current;
           const weight = currentTime % 1; // Value between 0 and 1
           if (materialRef.current) {
             materialRef.current.uniforms.uFrameWeight.value = weight;
-            // materialRef.current.uniforms.uFrameWeight.value = 0.0;
-            materialRef.current.uniforms.uFrameWeight.needsUpdate = true;
           }
-        }, 1);
-  
-        return () => clearInterval(interval); // Cleanup on component unmount
-      }, [fetchAndUpdateTextures]);
-  
+        }, 1000 / 60); // Run updates at roughly 60 frames per second
+
+        return () => clearInterval(interval); // Cleanup interval on component unmount
+      }, [fetchAndUpdateTextures, isTimeRunning]); // Add isTimeRunning as a dependency
+
+      // Handle the tick function to externally control weight and sphere wrapping
       const tick = (weight: number, uSphereWrapAmount: number) => {
         if (materialRef.current) {
           materialRef.current.uniforms.uFrameWeight.value = weight % 1;
@@ -180,12 +214,12 @@ import {
           materialRef.current.uniforms.uLayerOpacity.value = 1.0;
         }
       };
-  
+
       useImperativeHandle(ref, () => ({
         type: surface_layer_ref,
         tick,
       }));
-  
+
       return (
         <mesh
           ref={surface_layer_ref}
@@ -194,7 +228,8 @@ import {
           renderOrder={1}
         />
       );
-    })
-  );
-  
-  export { SurfaceLayer };
+    }
+  )
+);
+
+export { SurfaceLayer };

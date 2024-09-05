@@ -64,6 +64,7 @@ const GlobalSummary = (): JSX.Element => {
     )
   }, [forecastDetails])
 
+
   const {
     data: summarizedMeasurementData,
     isPending: summaryPending,
@@ -109,7 +110,10 @@ const GlobalSummary = (): JSX.Element => {
       )}
       {!forecastPending && !summaryPending && (
         <div className={classes['summary-container']}>
-          <World />
+          <World
+            forecastData={forecastData}
+            summarizedMeasurementData={summarizedMeasurementData}
+          />
           <SummaryViewHeader
             setShowAllColoured={wrapSetShowAllColoured}
             showAllColoured={showAllColoured}
