@@ -214,12 +214,10 @@ const SurfaceLayer = memo(
           materialRef.current.uniforms.uLayerOpacity.value = 1.0;
         }
       };
-
       useImperativeHandle(ref, () => ({
         type: surface_layer_ref,
         tick,
       }));
-
       return (
         <mesh
           ref={surface_layer_ref}
