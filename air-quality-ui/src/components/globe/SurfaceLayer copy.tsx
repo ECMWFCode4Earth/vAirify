@@ -4,13 +4,12 @@ import {
   useRef,
   memo,
   useCallback,
-  useEffect, // Import useEffect
 } from "react";
 import * as THREE from "three";
 import vertexShader from "./shaders/surfaceVert.glsl";
 import fragmentShader from "./shaders/surfaceFrag.glsl";
-import { useForecastContext } from "../../context";
-import { gsap } from "gsap";
+import { useForecastContext } from '../../context';
+import { gsap } from 'gsap';
 
 type PlaneType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
 
@@ -22,19 +21,18 @@ type SurfaceLayerProps = {
   selectedVariable: string; // Add this prop
 };
 
+
 export type SurfaceLayerRef = {
   type: React.RefObject<PlaneType>;
   tick: (weight: number, uSphereWrapAmount: number) => void;
   changeProjection: (globeState: boolean) => void;
-  changeFilter: (filterState: boolean) => void;
-  changeTimeInterpolation: (timeInterpolationState: boolean) => void;
 };
 
 // Preload textures globally so they are not reloaded during re-renders
 const loader = new THREE.TextureLoader();
-const cmap = loader.load("/all_colormaps.png");
-const lsm = loader.load("/NaturalEarthCoastline2.jpg");
-const height = loader.load("/gebco_08_rev_elev_2k_HQ.jpg");
+const cmap = loader.load('/all_colormaps.png');
+const lsm = loader.load('/NaturalEarthCoastline2.jpg');
+const height = loader.load('/gebco_08_rev_elev_2k_HQ.jpg');
 
 cmap.minFilter = THREE.NearestFilter;
 cmap.magFilter = THREE.NearestFilter;
@@ -45,9 +43,7 @@ height.magFilter = THREE.NearestFilter;
 
 const geometry = new THREE.PlaneGeometry(4, 2, 64 * 4, 32 * 4);
 
-const createCanvasTextureFromMultipleImages = async (
-  imageUrls: string[]
-): Promise<HTMLCanvasElement> => {
+const createCanvasTextureFromMultipleImages = async (imageUrls: string[]): Promise<HTMLCanvasElement> => {
   return new Promise((resolve, reject) => {
     const images: HTMLImageElement[] = [];
     let imagesLoaded = 0;
@@ -56,14 +52,19 @@ const createCanvasTextureFromMultipleImages = async (
     const onLoadImage = () => {
       imagesLoaded++;
       if (imagesLoaded === imageUrls.length) {
+        // All images are loaded, now concatenate them
         const canvas = document.createElement("canvas");
         const context = canvas.getContext("2d");
 
         if (context) {
           const singleImageWidth = images[0].width;
           const singleImageHeight = images[0].height;
+
+          // Set the canvas width and height to accommodate all images horizontally
           canvas.width = singleImageWidth * imageUrls.length;
           canvas.height = singleImageHeight;
+
+          // Draw each image side by side
           images.forEach((img, index) => {
             context.drawImage(img, index * singleImageWidth, 0);
           });
@@ -87,29 +88,15 @@ const createCanvasTextureFromMultipleImages = async (
   });
 };
 
-const createCanvasTextureFromCanvas = (
-  canvas: HTMLCanvasElement,
-  index: number,
-  filter: string
-): THREE.CanvasTexture => {
+const createCanvasTextureFromCanvas = (canvas: HTMLCanvasElement, index: number, filter: string): THREE.CanvasTexture => {
   const context = canvas.getContext("2d");
   if (context) {
     const textureCanvas = document.createElement("canvas");
     const textureContext = textureCanvas.getContext("2d");
 
-    textureCanvas.width = 900;
-    textureCanvas.height = 450;
-    textureContext.drawImage(
-      canvas,
-      index * 900,
-      0,
-      900,
-      450,
-      0,
-      0,
-      900,
-      450
-    );
+    textureCanvas.width = 900; // Width of the texture canvas
+    textureCanvas.height = 450; // Height of the texture canvas
+    textureContext.drawImage(canvas, index * 900, 0, 900, 450, 0, 0, 900, 450);
 
     const texture = new THREE.CanvasTexture(textureCanvas);
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -129,16 +116,7 @@ const createCanvasTextureFromCanvas = (
 
 const SurfaceLayer = memo(
   forwardRef<SurfaceLayerRef, SurfaceLayerProps>(
-    (
-      {
-        forecastData,
-        summarizedMeasurementData,
-        isFilterNearest,
-        isTimeInterpolation,
-        selectedVariable,
-      },
-      ref
-    ) => {
+    ({ forecastData, summarizedMeasurementData, isFilterNearest, isTimeInterpolation, selectedVariable }, ref) => { // Receive isTimeRunning as a prop
       const surface_layer_ref = useRef<PlaneType>(null);
       const materialRef = useRef(
         new THREE.ShaderMaterial({
@@ -169,81 +147,67 @@ const SurfaceLayer = memo(
             colorMap: { value: cmap },
             colorMapIndex: { value: 0.0 },
             lsmTexture: { value: lsm },
-            uVariableIndex: { value: variableIndex },
           },
         })
       );
-
-      var variableIndex;
-      if (selectedVariable === "aqi") {
-        variableIndex = 1;
-      } else if (selectedVariable === "pm10") {
-        variableIndex = 2;
-      }
-
-      materialRef.current.uniforms.uVariableIndex.value = variableIndex;
 
       const fullImageCanvasRef = useRef<HTMLCanvasElement | null>(null);
       const windowIndexRef = useRef(0);
 
       const { forecastDetails } = useForecastContext();
-      const forecastBaseDate = forecastDetails.forecastBaseDate.toFormat(
-        "yyyy-MM-dd_HH"
-      );
+      const forecastBaseDate = forecastDetails.forecastBaseDate.toFormat('yyyy-MM-dd_HH');
+      // const imageUrl = `http://localhost:5173/data_textures/${forecastBaseDate}/aqi_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`;
 
-      // Generate image URLs based on the selected variable
       const imageUrls = [
         `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`,
         `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_2_of_3.webp`,
         `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_3_of_3.webp`,
       ];
 
-      const fetchAndUpdateTextures = useCallback(
-        async (filter: string) => {
-          try {
-            const fullCanvas =
-              fullImageCanvasRef.current ||
-              (await createCanvasTextureFromMultipleImages(imageUrls));
-            fullImageCanvasRef.current = fullCanvas;
+      console.log(imageUrls)
 
+      const fetchAndUpdateTextures = useCallback(async (filter: string) => {
+        try {
+          if (!fullImageCanvasRef.current) {
+            const fullCanvas = await createCanvasTextureFromMultipleImages(imageUrls);
+            fullImageCanvasRef.current = fullCanvas;
+          }
+
+          const canvas = fullImageCanvasRef.current;
+          if (canvas) {
             const thisCanvasTexture = createCanvasTextureFromCanvas(
-              fullCanvas,
+              canvas,
               windowIndexRef.current,
               filter
             );
             const nextCanvasTexture = createCanvasTextureFromCanvas(
-              fullCanvas,
+              canvas,
               windowIndexRef.current + 1,
               filter
             );
 
             if (materialRef.current) {
-              materialRef.current.uniforms.thisDataTexture.value =
-                thisCanvasTexture;
-              materialRef.current.uniforms.nextDataTexture.value =
-                nextCanvasTexture;
+              materialRef.current.uniforms.thisDataTexture.value = thisCanvasTexture;
+              materialRef.current.uniforms.nextDataTexture.value = nextCanvasTexture;
             }
-          } catch (error) {
-            console.error("Error processing image:", error);
           }
-        },
-        [imageUrls]
-      );
-
-      // Effect to fetch new textures when `selectedVariable` changes
-      useEffect(() => {
-        // Reset canvas and reload textures
-        fullImageCanvasRef.current = null;
-        if (isFilterNearest) {
-          fetchAndUpdateTextures("nearest");
-        } else {
-          fetchAndUpdateTextures("linear");
+        } catch (error) {
+          console.error("Error processing image:", error);
         }
-      }, [selectedVariable, fetchAndUpdateTextures, isFilterNearest]);
+      }, [imageUrls]);
+
+      if (isFilterNearest) {
+        fetchAndUpdateTextures("nearest");
+      } else {
+        fetchAndUpdateTextures("linear");
+      }
+      // fetchAndUpdateTextures("linear")
 
       // Handle the tick function to externally control weight and sphere wrapping
       const tick = (sliderValue: number, uSphereWrapAmount: number) => {
         if (materialRef.current) {
+
+
           if (windowIndexRef.current != Math.floor(sliderValue)) {
             windowIndexRef.current = Math.floor(sliderValue); // Loop through a max of 15 windows
             if (isFilterNearest) {
@@ -253,47 +217,45 @@ const SurfaceLayer = memo(
             }
           }
 
-          var weight = 0.0;
-          if (materialRef.current.uniforms.uTimeInterpolation.value) {
+          // const currentTime = elapsedTimeRef.current;
+          var weight = 0.0 
+          if ( materialRef.current.uniforms.uTimeInterpolation.value) {
             weight = sliderValue % 1; // Value between 0 and 1
-          }
+          } 
 
           if (materialRef.current) {
             materialRef.current.uniforms.uFrameWeight.value = weight;
           }
+
+          // materialRef.current.uniforms.uFrameWeight.value = weight % 1;
+          // materialRef.current.uniforms.uSphereWrapAmount.value = uSphereWrapAmount;
+          // materialRef.current.uniforms.uLayerOpacity.value = 1.0;
         }
       };
 
       const changeProjection = (globeState: boolean) => {
         if (materialRef.current) {
-          if (globeState) {
-            gsap.to(materialRef.current.uniforms.uSphereWrapAmount, {
-              value: 1.0,
-              duration: 2,
-            });
+          if ( globeState ) {
+            gsap.to(materialRef.current.uniforms.uSphereWrapAmount, { value: 1.0, duration: 2 });
           } else {
-            gsap.to(materialRef.current.uniforms.uSphereWrapAmount, {
-              value: 0.0,
-              duration: 2,
-            });
-          }
+            gsap.to(materialRef.current.uniforms.uSphereWrapAmount, { value: 0.0, duration: 2 });
+          } 
         }
       };
 
       const changeFilter = (filterState: boolean) => {
         if (materialRef.current) {
-          if (filterState) {
-            fetchAndUpdateTextures("linear");
-          } else {
-            fetchAndUpdateTextures("nearest");
-          }
+          if ( filterState ) {
+            fetchAndUpdateTextures("linear")
+            } else {
+              fetchAndUpdateTextures("nearest")
+            } 
         }
       };
 
       const changeTimeInterpolation = (timeInterpolationState: boolean) => {
         if (materialRef.current) {
-          materialRef.current.uniforms.uTimeInterpolation.value =
-            timeInterpolationState;
+          materialRef.current.uniforms.uTimeInterpolation.value = timeInterpolationState;
         }
       };
 
@@ -304,7 +266,6 @@ const SurfaceLayer = memo(
         changeFilter,
         changeTimeInterpolation,
       }));
-
       return (
         <mesh
           ref={surface_layer_ref}

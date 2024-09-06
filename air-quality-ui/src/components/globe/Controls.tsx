@@ -5,7 +5,11 @@ type ControlsProps = {
   isTimeRunning: boolean;
   onToggleTimeUpdate: () => void;
   onSliderChange: (value: number) => void;
-  onGlobeButtonClick: (globeAnimationState: boolean) => void; // New prop to pass globe state to parent
+  onGlobeButtonClick: (globeAnimationState: boolean) => void;
+  onLocationMarkerClick: (locationMarkerState: boolean) => void;
+  onGridFilterClick: (filterState: boolean) => void;
+  onTimeInterpolationClick: (filterState: boolean) => void;
+  onVariableSelect: (variable: string) => void; // New prop for variable selection
 };
 
 const Controls: React.FC<ControlsProps> = ({
@@ -13,10 +17,18 @@ const Controls: React.FC<ControlsProps> = ({
   onToggleTimeUpdate,
   onSliderChange,
   onGlobeButtonClick,
+  onLocationMarkerClick,
+  onGridFilterClick,
+  onTimeInterpolationClick,
+  onVariableSelect, // New prop passed from parent
 }) => {
   const [sliderValue, setSliderValue] = useState(0.0); // Default slider value
   const [globeAnimationState, setGlobeAnimationState] = useState(false); // State for globe animation
-  const [timeDelta, setTimeDelta] = useState(0.03); // State for the speed of the slider's advancement
+  const [locationMarkerState, setLocationMarkerState] = useState(false); // State for location marker
+  const [filterState, setGridFilterState] = useState(false); // State for grid filter
+  const [timeInterpolationState, setTimeInterpolationState] = useState(false); // State for time interpolation
+  const [timeDelta, setTimeDelta] = useState(0.02); // State for the speed of the slider's advancement
+  const [selectedVariable, setSelectedVariable] = useState('aqi'); // Default variable to display
 
   // Handle slider change from user input
   const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,7 +41,7 @@ const Controls: React.FC<ControlsProps> = ({
   const numForecastTimeSteps = numForecastHours / 3;
   
   const currentDate = forecastDetails.forecastBaseDate.plus({ hours: Math.floor(sliderValue * 3) }).toFormat('yyyy-MM-dd T'); 
-  
+
   // Effect to notify parent of slider changes
   useEffect(() => {
     onSliderChange(sliderValue);
@@ -40,16 +52,40 @@ const Controls: React.FC<ControlsProps> = ({
     if (isTimeRunning) {
       const interval = setInterval(() => {
         setSliderValue((prevValue) => (prevValue >= numForecastTimeSteps ? 0 : prevValue + timeDelta));
-      }, 10);
+      }, 20);
 
       return () => clearInterval(interval); // Clean up the interval
     }
   }, [isTimeRunning, timeDelta]);
 
-  // Handle globe button click with GSAP animation
+  // Handle globe button click
   const handleGlobeButtonClick = () => {
     setGlobeAnimationState((prevState) => !prevState); // Toggle globe animation state
     onGlobeButtonClick(!globeAnimationState); // Notify parent of the state change
+  };
+
+  // Handle location marker button click
+  const handleLocationMarkerClick = () => {
+    setLocationMarkerState((prevState) => !prevState); // Toggle location marker state
+    onLocationMarkerClick(!locationMarkerState); // Notify parent of the state change
+  };
+
+  // Handle grid filter button click
+  const handleGridFilterClick = () => {
+    setGridFilterState((prevState) => !prevState);
+    onGridFilterClick(!filterState); // Notify parent of the state change
+  };
+
+  const handleTimeInterpolationClick = () => {
+    setTimeInterpolationState((prevState) => !prevState);
+    onTimeInterpolationClick(!timeInterpolationState); // Notify parent of the state change
+  };
+
+  // Handle variable selection change
+  const handleVariableSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const variable = event.target.value;
+    setSelectedVariable(variable);
+    onVariableSelect(variable); // Notify parent of the variable change
   };
 
   // Increase timeDelta
@@ -71,6 +107,7 @@ const Controls: React.FC<ControlsProps> = ({
       >
         <span style={styles.icon}>{isTimeRunning ? '⏸️' : '▶️'}</span>
       </button>
+
       {/* Minus Button */}
       <button
         onClick={handleDecreaseTimeDelta}
@@ -102,6 +139,15 @@ const Controls: React.FC<ControlsProps> = ({
         />
       </div>
 
+      {/* Location Marker Button */}
+      <button
+        className="location-icon"
+        onClick={handleLocationMarkerClick}
+        style={styles.controlButton}
+      >
+        <span style={styles.icon}>📍</span>
+      </button>
+
       {/* Globe Button */}
       <button
         className="globe-icon"
@@ -111,6 +157,28 @@ const Controls: React.FC<ControlsProps> = ({
         <span style={styles.icon}>🌍</span>
       </button>
 
+      {/* Checkerboard Button */}
+      <button
+        className="checkerboard-icon"
+        onClick={handleGridFilterClick}
+        style={styles.checkerboardButton}
+      >
+      </button>
+
+      {/* Step Curve Button */}
+      <button
+        className="step-curve-icon"
+        onClick={handleTimeInterpolationClick}
+        style={styles.controlButton}
+      >
+        <span style={styles.icon}>🕒</span>
+      </button>
+
+        {/* Variable Selection Dropdown */}
+            <select value={selectedVariable} onChange={handleVariableSelectChange} style={styles.dropdown}>
+        <option value="aqi">AQI</option>
+        <option value="pm10">PM10</option>
+      </select>
     </div>
   );
 };
@@ -131,8 +199,8 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    fontSize: '32px', // Control the size of the button and the icon
-    backgroundColor: 'lightgray', // Remove the background color
+    fontSize: '32px',
+    backgroundColor: 'lightgray',
     border: 'none',
     borderRadius: '20%',
     cursor: 'pointer',
@@ -145,20 +213,39 @@ const styles = {
   slider: {
     width: '500px',
   },
-  globeButton: {
+  dropdown: {
+    width: '100px',
+    height: '40px',
+    fontSize: '16px',
+    borderRadius: '5px',
+    border: '1px solid lightgray',
+    padding: '5px',
+    cursor: 'pointer',
+  },
+  icon: {
+    fontSize: '28px',
+    lineHeight: '32px',
+  },
+  checkerboardButton: {
     width: '40px',
     height: '40px',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    fontSize: '32px', // Adjust the font size for the globe icon
-    backgroundColor: 'lightgray', // Remove background
+    fontSize: '32px',
+    backgroundColor: 'gray',
     border: 'none',
     borderRadius: '20%',
     cursor: 'pointer',
+    backgroundImage: `linear-gradient(45deg, #ccc 25%, transparent 25%), 
+                      linear-gradient(-45deg, #ccc 25%, transparent 25%), 
+                      linear-gradient(45deg, transparent 75%, #ccc 75%), 
+                      linear-gradient(-45deg, transparent 75%, #ccc 75%)`,
+    backgroundSize: '20px 20px',
+    backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px',
   },
-  icon: {
-    fontSize: '28px', // Make the icons fill the button
+  stepIcon: {
+    fontSize: '28px',
     lineHeight: '32px',
   },
 };
