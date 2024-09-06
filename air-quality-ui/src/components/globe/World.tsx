@@ -1,7 +1,8 @@
+import React, { useRef, useState } from 'react'; // Add this import
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import { useRef, useState } from 'react';
 import { SurfaceLayer, SurfaceLayerRef } from './SurfaceLayer';
+import LocationMarker, { LocationMarkerRef } from './LocationMarker';
 import Controls from './Controls';
 
 type WorldProps = {
@@ -14,8 +15,8 @@ const World = ({
   summarizedMeasurementData,
 }: WorldProps): JSX.Element => {
   const surface_layer_ref = useRef<SurfaceLayerRef>(null);
+  const markerRefs = useRef<LocationMarkerRef[]>([]); // Array of refs for LocationMarkers
   const [isTimeRunning, setIsTimeRunning] = useState(true); // State to control time updates
-  const [sliderValue, setSliderValue] = useState(0.5); // State for the slider value
 
   // Function to toggle the time update on and off
   const toggleTimeUpdate = () => {
@@ -25,7 +26,12 @@ const World = ({
   // Function to handle slider change
   const handleSliderChange = (value: number) => {
     surface_layer_ref.current?.tick(value, 0.0);
-    // setSliderValue(value);
+
+    // Loop through all marker refs and call tick method
+    markerRefs.current.forEach((ref) => {
+      if (ref.current) ref.current.tick(value, 0.0); // Update each marker with new value
+      // ref?.tick(value, 0.0); // Update each marker with new value
+    });
   };
 
   return (
@@ -40,9 +46,27 @@ const World = ({
           ref={surface_layer_ref}
           forecastData={forecastData}
           summarizedMeasurementData={summarizedMeasurementData}
-          isTimeRunning={isTimeRunning} // Pass the time control state
-          sliderValue={sliderValue} // Pass the slider value
         />
+
+        {Object.keys(forecastData).map((key, index) => {
+          const forecastSubset = forecastData[key];
+          const measurementSubset = summarizedMeasurementData[key];
+
+          // Properly create a ref for each marker using createRef
+          if (!markerRefs.current[index]) {
+            markerRefs.current[index] = React.createRef<LocationMarkerRef>();
+          }
+
+          return (
+            <LocationMarker
+              key={index}
+              ref={markerRefs.current[index]} // Attach the ref to the marker
+              forecastData={forecastSubset} // Passing the forecast data for this index
+              measurementData={measurementSubset} // Passing the measurement data for this index
+            />
+          );
+        })}
+
         <OrbitControls />
       </Canvas>
 

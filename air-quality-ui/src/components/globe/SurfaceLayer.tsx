@@ -16,8 +16,6 @@ type PlaneType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
 type SurfaceLayerProps = {
   forecastData: Record<string, ForecastResponseDto[]>;
   summarizedMeasurementData: Record<string, MeasurementSummaryResponseDto[]>;
-  isTimeRunning: boolean; // New prop to control the time updates
-  sliderValue: number; // New prop to control the slider value
 };
 
 export type SurfaceLayerRef = {
@@ -108,7 +106,7 @@ const createCanvasTextureFromCanvas = (canvas: HTMLCanvasElement, index: number)
 
 const SurfaceLayer = memo(
   forwardRef<SurfaceLayerRef, SurfaceLayerProps>(
-    ({ forecastData, summarizedMeasurementData, isTimeRunning, sliderValue }, ref) => { // Receive isTimeRunning as a prop
+    ({ forecastData, summarizedMeasurementData }, ref) => { // Receive isTimeRunning as a prop
       const surface_layer_ref = useRef<PlaneType>(null);
       const materialRef = useRef(
         new THREE.ShaderMaterial({
@@ -144,7 +142,6 @@ const SurfaceLayer = memo(
 
       const fullImageCanvasRef = useRef<HTMLCanvasElement | null>(null);
       const windowIndexRef = useRef(0);
-      const elapsedTimeRef = useRef(0);
 
       const { forecastDetails } = useForecastContext();
       const forecastBaseDate = forecastDetails.forecastBaseDate.toFormat('yyyy-MM-dd_HH');
@@ -186,57 +183,10 @@ const SurfaceLayer = memo(
 
       fetchAndUpdateTextures()
 
-      // useEffect(() => {
-      //   // if (!isTimeRunning) return; // If time is paused, stop the update loop
-
-      //   const interval = setInterval(() => {
-      //     // elapsedTimeRef.current += 0.05;
-      //     elapsedTimeRef.current = sliderValue;
-
-      //     if (elapsedTimeRef.current >= 1) {
-      //       windowIndexRef.current = (windowIndexRef.current + 1) % 40; // Loop through a max of 15 windows
-      //       elapsedTimeRef.current = 0; // Reset elapsed time
-      //       fetchAndUpdateTextures(); // Fetch and update textures on each new frame
-      //     }
-
-      //     const currentTime = elapsedTimeRef.current;
-      //     const weight = currentTime % 1; // Value between 0 and 1
-      //     // const weight = sliderValue; // Value between 0 and 1
-
-      //     if (materialRef.current) {
-      //       materialRef.current.uniforms.uFrameWeight.value = weight;
-      //     }
-      //   }, 1000 / 60); // Run updates at roughly 60 frames per second
-
-      //   return () => clearInterval(interval); // Cleanup interval on component unmount
-      // }, [fetchAndUpdateTextures, isTimeRunning,]); // Add isTimeRunning as a dependency
-
-      useEffect(() => {
-        // if (!isTimeRunning) return; // If time is paused, stop the update loop
-
-        // elapsedTimeRef.current += 0.05;
-          elapsedTimeRef.current = sliderValue;
-
-          if (windowIndexRef.current != Math.floor(sliderValue)) {
-            windowIndexRef.current = Math.floor(sliderValue); // Loop through a max of 15 windows
-            fetchAndUpdateTextures(); // Fetch and update textures on each new frame
-          }
-
-          // const currentTime = elapsedTimeRef.current;
-          const weight = sliderValue % 1; // Value between 0 and 1
-          // const weight = sliderValue; // Value between 0 and 1
-
-          if (materialRef.current) {
-            materialRef.current.uniforms.uFrameWeight.value = weight;
-          }
-
-      }, [sliderValue]); // Add isTimeRunning as a dependency
-
       // Handle the tick function to externally control weight and sphere wrapping
       const tick = (sliderValue: number, uSphereWrapAmount: number) => {
         if (materialRef.current) {
 
-          elapsedTimeRef.current = sliderValue;
 
           if (windowIndexRef.current != Math.floor(sliderValue)) {
             windowIndexRef.current = Math.floor(sliderValue); // Loop through a max of 15 windows
@@ -245,7 +195,6 @@ const SurfaceLayer = memo(
 
           // const currentTime = elapsedTimeRef.current;
           const weight = sliderValue % 1; // Value between 0 and 1
-          // const weight = sliderValue; // Value between 0 and 1
 
           if (materialRef.current) {
             materialRef.current.uniforms.uFrameWeight.value = weight;

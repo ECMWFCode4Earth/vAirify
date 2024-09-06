@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useForecastContext } from '../../context';
 
 type ControlsProps = {
   isTimeRunning: boolean;
@@ -19,26 +20,27 @@ const Controls: React.FC<ControlsProps> = ({
     setSliderValue(value);
   };
 
+  const { forecastDetails } = useForecastContext();
+  const numForecastHours = forecastDetails.maxForecastDate.diff(forecastDetails.forecastBaseDate, 'hours').hours;
+  const numForecastTimeSteps = numForecastHours / 3;
+  
+  const currentDate = forecastDetails.forecastBaseDate.plus({ hours: Math.floor(sliderValue * 3) }).toFormat('yyyy-MM-dd T'); 
+  
   // Effect to notify parent of slider changes
   useEffect(() => {
     onSliderChange(sliderValue);
   }, [sliderValue, onSliderChange]);
 
-  // Automatically advance the slider when isTimeRunning is true
-  useEffect(() => {
+    // Automatically advance the slider when isTimeRunning is true
+    useEffect(() => {
     if (isTimeRunning) {
-      const interval = setInterval(() => {
-        setSliderValue((prevValue) => {
-          // If slider hits max value (40), reset to 0
-          const newValue = prevValue >= 40 ? 0 : prevValue + 0.05;
-          return newValue;
-        });
-      }, 10); // Advance the slider every 100ms
+        const interval = setInterval(() => {
+        setSliderValue((prevValue) => (prevValue >= numForecastTimeSteps ? 0 : prevValue + 0.05));
+        }, 10);
 
-      // Cleanup the interval on pause or unmount
-      return () => clearInterval(interval);
+        return () => clearInterval(interval); // Clean up the interval
     }
-  }, [isTimeRunning]);
+    }, [isTimeRunning]);
 
   return (
     <div style={styles.controlsContainer}>
@@ -55,12 +57,12 @@ const Controls: React.FC<ControlsProps> = ({
 
       {/* Slider */}
       <div style={styles.sliderContainer}>
-        <label htmlFor="slider">Slider Value: {sliderValue.toFixed(1)}</label>
+        <label htmlFor="slider">{currentDate}</label>
         <input
           id="slider"
           type="range"
           min="0"
-          max="40"
+          max={numForecastTimeSteps.toString()}
           step="0.1"
           value={sliderValue}
           onChange={handleSliderChange}

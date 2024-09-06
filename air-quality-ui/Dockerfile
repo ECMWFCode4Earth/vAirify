@@ -4,12 +4,10 @@ WORKDIR /app
 
 COPY package.json package.json
 RUN npm i --verbose
-RUN ls -al node_modules
 
 COPY . .
 
 CMD ["npm", "run", "dev"]
-# CMD ["sleep", "infinity"]
 
 FROM development AS build
 
