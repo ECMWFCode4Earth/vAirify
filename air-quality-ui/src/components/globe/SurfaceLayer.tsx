@@ -3,13 +3,13 @@ import {
   useImperativeHandle,
   useRef,
   memo,
-  useEffect,
   useCallback,
 } from "react";
 import * as THREE from "three";
 import vertexShader from "./shaders/surfaceVert.glsl";
 import fragmentShader from "./shaders/surfaceFrag.glsl";
 import { useForecastContext } from '../../context';
+import { gsap } from 'gsap';
 
 type PlaneType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
 
@@ -21,6 +21,7 @@ type SurfaceLayerProps = {
 export type SurfaceLayerRef = {
   type: React.RefObject<PlaneType>;
   tick: (weight: number, uSphereWrapAmount: number) => void;
+  changeProjection: (globeState: boolean) => void;
 };
 
 // Preload textures globally so they are not reloaded during re-renders
@@ -205,9 +206,22 @@ const SurfaceLayer = memo(
           // materialRef.current.uniforms.uLayerOpacity.value = 1.0;
         }
       };
+
+      const changeProjection = (globeState: boolean) => {
+        if (materialRef.current) {
+          if ( globeState ) {
+            gsap.to(materialRef.current.uniforms.uSphereWrapAmount, { value: 1.0, duration: 2 });
+          } else {
+            gsap.to(materialRef.current.uniforms.uSphereWrapAmount, { value: 0.0, duration: 2 });
+          } 
+        }
+      };
+
+
       useImperativeHandle(ref, () => ({
         type: surface_layer_ref,
         tick,
+        changeProjection,
       }));
       return (
         <mesh

@@ -2,6 +2,8 @@ import { useRef, forwardRef, useImperativeHandle } from 'react';
 import { Mesh } from 'three';
 import CustomShaderMaterial from 'three-custom-shader-material';
 import * as THREE from 'three';
+import { useThree, useFrame } from '@react-three/fiber';
+import { gsap } from 'gsap';
 
 type LocationMarkerProps = {
   forecastData: ForecastResponseDto;
@@ -12,13 +14,16 @@ type LocationMarkerProps = {
 
 export type LocationMarkerRef = {
   tick: (weight: number, uSphereWrapAmount: number) => void;
+  changeProjection: (globeState: boolean) => void;
 };
 
 
 const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
   ({ forecastData, measurementData, thisRotationsFrame, nextRotationsFrame }, ref): JSX.Element => {
     const markerRef = useRef<Mesh>(null);
-    const materialRef = useRef<THREE.ShaderMaterial>(null); // Ref for the material
+    const ringRef = useRef<Mesh>(null); // Ref for the ring geometry
+    const { camera } = useThree(); // Access the camera
+    const prevCameraPosition = useRef(camera.position.clone()); // Store previous camera position
 
     // Uniform values from props or calculations
     const lat = forecastData[0].location.latitude;
@@ -41,10 +46,6 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
     
     const measurementDataArrayUniform = new Float32Array(measurementArray);
     
-    if ( forecastData[0].location_name === "Cape Town") {
-        console.log(measurementData)
-        console.log(measurementDataArrayUniform)
-    }
 
     // Animation or build time (example values)
     const shaderUniforms = {
@@ -55,17 +56,54 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
     const markerSize = 0.025;
     const markerColor = [0.25, 0.25, 0.25]; // Example color
 
+    // Scale based on camera zoom or position
+    const scaleBasedOnZoom = () => {
+        if (markerRef.current) {
+            // Calculate scale based on the camera's distance from the origin
+            const distance = camera.position.z; // Use camera's distance from the origin
+            const scaleFactor = distance / 10; // Adjust the denominator to control the sensitivity of the scaling
+    
+            markerRef.current.material.uniforms.uZoomLevel.value = scaleFactor
+            console.log(markerRef.current.material.uniforms.uZoomLevel.value)
+        }
+        };
+
+    // Track camera movement and apply scaling
+    useFrame(() => {
+        // Check if the z-axis of the camera has changed
+        if (camera.position.z !== prevCameraPosition.current.z) {
+          console.log('scale'); // Debugging to ensure scaling happens only on z-axis change
+          scaleBasedOnZoom(); // Adjust scale when the z-axis changes
+          prevCameraPosition.current.z = camera.position.z; // Update the z-axis position only
+        }
+      });
+
     // Implement the tick function
     const tick = (weight: number, uSphereWrapAmount: number) => {
       if (markerRef.current) {
         markerRef.current.material.uniforms.uFrameWeight.value = weight;
         markerRef.current.material.uniforms.uFrame.value = Math.floor(weight);
       }
+    //   scaleBasedOnZoom(); // Scale based on current zoom whenever tick is called
     };
+
+    const changeProjection = (globeState: boolean) => {
+        if (markerRef.current) {
+          if ( globeState ) {
+            gsap.to(markerRef.current.material.uniforms.uSphereWrapAmount, { value: 1.0, duration: 2 });
+            ringRef.current.visible = false; // Show the ring in flat projection
+          } else {
+            gsap.to(markerRef.current.material.uniforms.uSphereWrapAmount, { value: 0.0, duration: 2, onComplete: () => {
+                ringRef.current.visible = true; // Show the ring in flat projection
+            }});
+          } 
+        }
+      };
 
     // Expose the tick method to the parent component
     useImperativeHandle(ref, () => ({
       tick,
+      changeProjection
     }));
 
     return (
@@ -111,6 +149,8 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
               return color;
             }
 
+            #define M_PI 3.14159265
+
             uniform float uSphereWrapAmount;
             uniform float uLat;
             uniform float uLon;
@@ -119,6 +159,7 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
             uniform int uFrame;
             uniform int uVariableType;
             uniform float uFrameWeight;
+            uniform float uZoomLevel;
 
             varying vec3 vColor;
 
@@ -149,11 +190,27 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
               float lat = uLat;
               float lon = uLon;
 
-              vec3 posPlane = position * diff;
+            //   vec3 posPlane = position * 1.1 * uZoomLevel ;
+              vec3 posPlane = position * 0.3 ;
               posPlane.x += lon / 180.0 * 2.0;
               posPlane.y += lat / 90.0;
 
-              csm_Position = posPlane;
+                float r = 1.0;
+                float theta = 2. * M_PI * (posPlane.x / 4. + 0.5);
+                float phi = M_PI * (posPlane.y / 2. + 0.5 - 1.0);
+                float sinPhiRadius = sin( phi ) * r;
+
+                vec3 posSphere;
+                posSphere.x = sinPhiRadius * sin(theta);
+                posSphere.y = r * cos(phi);
+                posSphere.z = sinPhiRadius * cos(theta);
+
+                posPlane += position * diff;
+                posSphere += position * diff;
+
+                csm_Position = mix(posPlane, posSphere, uSphereWrapAmount) ;
+
+            //   csm_Position = posPlane;
 
             }
           `}
@@ -171,6 +228,7 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
           uniforms={{
             uSphereWrapAmount: shaderUniforms.uSphereWrapAmount,
             uFrameWeight: shaderUniforms.uFrameWeight,
+            uZoomLevel: { value: 0.11 },
             uFrame: { value: 0 },
             uLat: { value: lat },
             uLon: { value: lon },
@@ -184,8 +242,8 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
         />
 
         {/* Add a ring for the equator line */}
-        <mesh rotation={[0, 0, 0]} position={[lon / 180.0 * 2.0, lat / 180.0 * 2.0, 0.001]}>
-          <ringGeometry args={[markerSize - 0.01, markerSize + 0.005, 64]} />
+        <mesh ref={ringRef} rotation={[0, 0, 0]} position={[lon / 180.0 * 2.0, lat / 180.0 * 2.0, 0.001 ]}>
+          <ringGeometry args={[markerSize - 0.02, markerSize + 0.015, 64]} />
           <meshBasicMaterial color="black" side={THREE.DoubleSide} />
         </mesh>
       </mesh>

@@ -23,6 +23,16 @@ const World = ({
     setIsTimeRunning((prev) => !prev);
   };
 
+  const handleGlobeButtonClick = (globeState: boolean) => {
+    surface_layer_ref.current?.changeProjection(globeState);
+
+    // Loop through all marker refs and call tick method
+    markerRefs.current.forEach((ref) => {
+      if (ref.current) ref.current.changeProjection(globeState); // Update each marker with new value
+      // ref?.tick(value, 0.0); // Update each marker with new value
+    });
+  };
+  
   // Function to handle slider change
   const handleSliderChange = (value: number) => {
     surface_layer_ref.current?.tick(value, 0.0);
@@ -75,6 +85,7 @@ const World = ({
         isTimeRunning={isTimeRunning}
         onToggleTimeUpdate={toggleTimeUpdate}
         onSliderChange={handleSliderChange} // Handle slider value changes
+        onGlobeButtonClick={handleGlobeButtonClick}
       />
     </div>
   );

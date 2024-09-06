@@ -5,14 +5,17 @@ type ControlsProps = {
   isTimeRunning: boolean;
   onToggleTimeUpdate: () => void;
   onSliderChange: (value: number) => void;
+  onGlobeButtonClick: (globeAnimationState: boolean) => void; // New prop to pass globe state to parent
 };
 
 const Controls: React.FC<ControlsProps> = ({
   isTimeRunning,
   onToggleTimeUpdate,
   onSliderChange,
+  onGlobeButtonClick,
 }) => {
   const [sliderValue, setSliderValue] = useState(0.0); // Default slider value
+  const [globeAnimationState, setGlobeAnimationState] = useState(false); // State for globe animation
 
   // Handle slider change from user input
   const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,16 +34,24 @@ const Controls: React.FC<ControlsProps> = ({
     onSliderChange(sliderValue);
   }, [sliderValue, onSliderChange]);
 
-    // Automatically advance the slider when isTimeRunning is true
-    useEffect(() => {
+  // Automatically advance the slider when isTimeRunning is true
+  useEffect(() => {
     if (isTimeRunning) {
-        const interval = setInterval(() => {
+      const interval = setInterval(() => {
         setSliderValue((prevValue) => (prevValue >= numForecastTimeSteps ? 0 : prevValue + 0.05));
-        }, 10);
+      }, 10);
 
-        return () => clearInterval(interval); // Clean up the interval
+      return () => clearInterval(interval); // Clean up the interval
     }
-    }, [isTimeRunning]);
+  }, [isTimeRunning]);
+
+  // Handle globe button click with GSAP animation
+  const handleGlobeButtonClick = () => {
+    setGlobeAnimationState((prevState) => !prevState); // Toggle globe animation state
+
+    // Notify parent of the state change
+    onGlobeButtonClick(!globeAnimationState);
+  };
 
   return (
     <div style={styles.controlsContainer}>
@@ -69,6 +80,15 @@ const Controls: React.FC<ControlsProps> = ({
           style={styles.slider}
         />
       </div>
+
+      {/* New Globe Button */}
+      <button
+        className="globe-icon"
+        onClick={handleGlobeButtonClick}
+        style={styles.globeButton}
+      >
+        🌍
+      </button>
     </div>
   );
 };
@@ -98,6 +118,15 @@ const styles = {
   },
   slider: {
     width: '500px',
+  },
+  globeButton: {
+    fontSize: '24px',
+    padding: '10px',
+    backgroundColor: '#007bff',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
   },
 };
 
