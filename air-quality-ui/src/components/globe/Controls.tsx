@@ -16,6 +16,7 @@ const Controls: React.FC<ControlsProps> = ({
 }) => {
   const [sliderValue, setSliderValue] = useState(0.0); // Default slider value
   const [globeAnimationState, setGlobeAnimationState] = useState(false); // State for globe animation
+  const [timeDelta, setTimeDelta] = useState(0.03); // State for the speed of the slider's advancement
 
   // Handle slider change from user input
   const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,19 +39,27 @@ const Controls: React.FC<ControlsProps> = ({
   useEffect(() => {
     if (isTimeRunning) {
       const interval = setInterval(() => {
-        setSliderValue((prevValue) => (prevValue >= numForecastTimeSteps ? 0 : prevValue + 0.05));
+        setSliderValue((prevValue) => (prevValue >= numForecastTimeSteps ? 0 : prevValue + timeDelta));
       }, 10);
 
       return () => clearInterval(interval); // Clean up the interval
     }
-  }, [isTimeRunning]);
+  }, [isTimeRunning, timeDelta]);
 
   // Handle globe button click with GSAP animation
   const handleGlobeButtonClick = () => {
     setGlobeAnimationState((prevState) => !prevState); // Toggle globe animation state
+    onGlobeButtonClick(!globeAnimationState); // Notify parent of the state change
+  };
 
-    // Notify parent of the state change
-    onGlobeButtonClick(!globeAnimationState);
+  // Increase timeDelta
+  const handleIncreaseTimeDelta = () => {
+    setTimeDelta((prevDelta) => prevDelta + 0.01); // Increase by 0.01
+  };
+
+  // Decrease timeDelta
+  const handleDecreaseTimeDelta = () => {
+    setTimeDelta((prevDelta) => Math.max(0.01, prevDelta - 0.01)); // Decrease by 0.01, but don't go below 0.01
   };
 
   return (
@@ -58,12 +67,24 @@ const Controls: React.FC<ControlsProps> = ({
       {/* Button to toggle time update */}
       <button
         onClick={onToggleTimeUpdate}
-        style={{
-          ...styles.controlButton,
-          backgroundColor: isTimeRunning ? 'red' : 'green',
-        }}
+        style={styles.controlButton}
       >
-        {isTimeRunning ? 'Pause Time' : 'Resume Time'}
+        <span style={styles.icon}>{isTimeRunning ? '⏸️' : '▶️'}</span>
+      </button>
+      {/* Minus Button */}
+      <button
+        onClick={handleDecreaseTimeDelta}
+        style={styles.controlButton}
+      >
+        <span style={styles.icon}>➖</span>
+      </button>
+
+      {/* Plus Button */}
+      <button
+        onClick={handleIncreaseTimeDelta}
+        style={styles.controlButton}
+      >
+        <span style={styles.icon}>➕</span>
       </button>
 
       {/* Slider */}
@@ -81,14 +102,15 @@ const Controls: React.FC<ControlsProps> = ({
         />
       </div>
 
-      {/* New Globe Button */}
+      {/* Globe Button */}
       <button
         className="globe-icon"
         onClick={handleGlobeButtonClick}
         style={styles.globeButton}
       >
-        🌍
+        <span style={styles.icon}>🌍</span>
       </button>
+
     </div>
   );
 };
@@ -98,17 +120,21 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: '20px',
+    gap: '10px',
     padding: '10px',
     backgroundColor: '#f4f4f4',
     borderTop: '1px solid #ccc',
   },
   controlButton: {
-    padding: '10px 20px',
-    fontSize: '16px',
-    color: 'white',
+    width: '40px',
+    height: '40px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: '32px', // Control the size of the button and the icon
+    backgroundColor: 'lightgray', // Remove the background color
     border: 'none',
-    borderRadius: '5px',
+    borderRadius: '20%',
     cursor: 'pointer',
   },
   sliderContainer: {
@@ -120,13 +146,20 @@ const styles = {
     width: '500px',
   },
   globeButton: {
-    fontSize: '24px',
-    padding: '10px',
-    backgroundColor: '#007bff',
-    color: 'white',
+    width: '40px',
+    height: '40px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: '32px', // Adjust the font size for the globe icon
+    backgroundColor: 'lightgray', // Remove background
     border: 'none',
-    borderRadius: '5px',
+    borderRadius: '20%',
     cursor: 'pointer',
+  },
+  icon: {
+    fontSize: '28px', // Make the icons fill the button
+    lineHeight: '32px',
   },
 };
 
