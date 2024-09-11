@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react'; // Add this import
 import { Canvas } from '@react-three/fiber';
+import { Perf } from 'r3f-perf'
 import { OrbitControls } from '@react-three/drei';
 import { SurfaceLayer, SurfaceLayerRef } from './SurfaceLayer';
 import LocationMarker, { LocationMarkerRef } from './LocationMarker';
@@ -77,6 +78,10 @@ const World = ({
       <Canvas
         style={{ background: 'white', height: '600px', width: '100%' }}
         camera={{ position: [0, 0, 1.5], near: 0.1, far: 1000 }}
+        dpr={ 1 }
+        gl={ {
+            antialias: true,
+        } }
       >
         <ambientLight />
         <directionalLight position={[0, 5, 0]} />
@@ -110,6 +115,7 @@ const World = ({
         })}
 
         <OrbitControls />
+        <Perf position="top-left" />
       </Canvas>
 
       <Controls

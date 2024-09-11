@@ -26,7 +26,7 @@ const Controls: React.FC<ControlsProps> = ({
   const [globeAnimationState, setGlobeAnimationState] = useState(false); // State for globe animation
   const [locationMarkerState, setLocationMarkerState] = useState(false); // State for location marker
   const [filterState, setGridFilterState] = useState(false); // State for grid filter
-  const [timeInterpolationState, setTimeInterpolationState] = useState(false); // State for time interpolation
+  const [timeInterpolationState, setTimeInterpolationState] = useState(true); // State for time interpolation
   const [timeDelta, setTimeDelta] = useState(0.02); // State for the speed of the slider's advancement
   const [selectedVariable, setSelectedVariable] = useState('aqi'); // Default variable to display
 

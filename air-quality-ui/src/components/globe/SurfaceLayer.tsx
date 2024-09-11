@@ -12,6 +12,8 @@ import fragmentShader from "./shaders/surfaceFrag.glsl";
 import { useForecastContext } from "../../context";
 import { gsap } from "gsap";
 
+const API_URL = import.meta.env.VITE_AIR_QUALITY_API_URL
+
 type PlaneType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
 
 type SurfaceLayerProps = {
@@ -150,7 +152,7 @@ const SurfaceLayer = memo(
           uniforms: {
             uFrame: { value: 0 },
             uFrameWeight: { value: 0 },
-            uTimeInterpolation: { value: isTimeInterpolation },
+            uTimeInterpolation: { value: true },
             uSphereWrapAmount: { value: 0.0 },
             uHeightDisplacement: { value: 0.2 },
             uLayerHeight: { value: 0.0 },
@@ -192,12 +194,25 @@ const SurfaceLayer = memo(
       );
 
       // Generate image URLs based on the selected variable
+      // const imageUrls = [
+      //   `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`,
+      //   `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_2_of_3.webp`,
+      //   `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_3_of_3.webp`,
+      // ];
+
+      // const imageUrls = [
+      //   `http://64.225.143.231/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`,
+      //   `http://64.225.143.231/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_2_of_3.webp`,
+      //   `http://64.225.143.231/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_3_of_3.webp`,
+      // ];
+
       const imageUrls = [
-        `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`,
-        `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_2_of_3.webp`,
-        `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_3_of_3.webp`,
+        `/volume/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`,
+        `/volume/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_2_of_3.webp`,
+        `/volume/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_3_of_3.webp`,
       ];
 
+      
       const fetchAndUpdateTextures = useCallback(
         async (filter: string) => {
           try {

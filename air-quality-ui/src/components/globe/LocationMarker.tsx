@@ -367,10 +367,10 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
         
 
         {/* Add a ring for the equator line */}
-        <mesh ref={ringRef} rotation={[0, 0, 0]} position={[lon / 180.0 * 2.0, lat / 180.0 * 2.0, 0.001 ]}>
+        {/* <mesh ref={ringRef} rotation={[0, 0, 0]} position={[lon / 180.0 * 2.0, lat / 180.0 * 2.0, 0.001 ]}>
           <ringGeometry args={[markerSize - 0.02, markerSize + 0.015, 64]} />
           <meshBasicMaterial color="black" side={THREE.DoubleSide} />
-        </mesh>
+        </mesh> */}
       </mesh>
     );
   }
