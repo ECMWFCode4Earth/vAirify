@@ -24,10 +24,10 @@ const Controls: React.FC<ControlsProps> = ({
 }) => {
   const [sliderValue, setSliderValue] = useState(0.0); // Default slider value
   const [globeAnimationState, setGlobeAnimationState] = useState(false); // State for globe animation
-  const [locationMarkerState, setLocationMarkerState] = useState(false); // State for location marker
+  const [locationMarkerState, setLocationMarkerState] = useState(true); // State for location marker
   const [filterState, setGridFilterState] = useState(false); // State for grid filter
   const [timeInterpolationState, setTimeInterpolationState] = useState(true); // State for time interpolation
-  const [timeDelta, setTimeDelta] = useState(0.02); // State for the speed of the slider's advancement
+  const [timeDelta, setTimeDelta] = useState(0.06); // State for the speed of the slider's advancement
   const [selectedVariable, setSelectedVariable] = useState('aqi'); // Default variable to display
 
   // Handle slider change from user input
@@ -40,7 +40,7 @@ const Controls: React.FC<ControlsProps> = ({
   const numForecastHours = forecastDetails.maxForecastDate.diff(forecastDetails.forecastBaseDate, 'hours').hours;
   const numForecastTimeSteps = numForecastHours / 3;
   
-  const currentDate = forecastDetails.forecastBaseDate.plus({ hours: Math.floor(sliderValue * 3) }).toFormat('yyyy-MM-dd T'); 
+  const currentDate = forecastDetails.forecastBaseDate.plus({ hours: Math.floor(sliderValue * 3) }).toFormat('yyyy-MM-dd T')+' UTC'; 
 
   // Effect to notify parent of slider changes
   useEffect(() => {
@@ -52,7 +52,7 @@ const Controls: React.FC<ControlsProps> = ({
     if (isTimeRunning) {
       const interval = setInterval(() => {
         setSliderValue((prevValue) => (prevValue >= numForecastTimeSteps ? 0 : prevValue + timeDelta));
-      }, 20);
+      }, 25);
 
       return () => clearInterval(interval); // Clean up the interval
     }
@@ -90,12 +90,12 @@ const Controls: React.FC<ControlsProps> = ({
 
   // Increase timeDelta
   const handleIncreaseTimeDelta = () => {
-    setTimeDelta((prevDelta) => prevDelta + 0.01); // Increase by 0.01
+    setTimeDelta((prevDelta) => prevDelta + 0.02); // Increase by 0.01
   };
 
   // Decrease timeDelta
   const handleDecreaseTimeDelta = () => {
-    setTimeDelta((prevDelta) => Math.max(0.01, prevDelta - 0.01)); // Decrease by 0.01, but don't go below 0.01
+    setTimeDelta((prevDelta) => Math.max(0.02, prevDelta - 0.02)); // Decrease by 0.01, but don't go below 0.01
   };
 
   return (

@@ -1,9 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react'; // Add this import
 import { Canvas } from '@react-three/fiber';
-import { Perf } from 'r3f-perf';
+import { Perf } from 'r3f-perf'
 import { OrbitControls } from '@react-three/drei';
 import { SurfaceLayer, SurfaceLayerRef } from './SurfaceLayer';
-import LocationMarker, { LocationMarkerRef } from './LocationMarker'; // Updated LocationMarker with instancing
+import LocationMarker, { LocationMarkerRef } from './LocationMarker.loop';
 import Controls from './Controls';
 
 type WorldProps = {
@@ -16,12 +16,12 @@ const World = ({
   summarizedMeasurementData,
 }: WorldProps): JSX.Element => {
   const surface_layer_ref = useRef<SurfaceLayerRef>(null);
-  const markerRef = useRef<LocationMarkerRef>(null); // Single ref for instanced markers
-  const [isTimeRunning, setIsTimeRunning] = useState(false); // State to control time updates
-  const [isLocationMarkerOn, setIsLocationMarkerOn] = useState(true); // State for location marker
+  const markerRefs = useRef<LocationMarkerRef[]>([]); // Array of refs for LocationMarkers
+  const [isTimeRunning, setIsTimeRunning] = useState(true); // State to control time updates
+  const [isLocationMarkerOn, setIsLocationMarkerOn] = useState(false); // State for location marker
   const [isFilterNearest, setGridFilterState] = useState(false); // State for enlarge button
   const [isTimeInterpolation, setTimeInterpolationState] = useState(false); // State for enlarge button
-  const [selectedVariable, setSelectedVariable] = useState('aqi'); // State for selected variable from the dropdown
+  const [selectedVariable, setSelectedVariable] = useState("aqi"); // State for selected variable from the dropdown
 
   // Function to toggle the time update on and off
   const toggleTimeUpdate = () => {
@@ -31,13 +31,21 @@ const World = ({
   // Handle globe button state change
   const handleGlobeButtonClick = (globeState: boolean) => {
     surface_layer_ref.current?.changeProjection(globeState);
-    markerRef.current?.changeProjection(globeState);
+    markerRefs.current.forEach((ref) => {
+      if (ref?.current) {
+        ref.current.changeProjection(globeState);
+      }
+    });
   };
 
   // Handle location marker button state change
   const handleLocationMarkerButtonClick = (locationMarkerState: boolean) => {
     setIsLocationMarkerOn(locationMarkerState);
-    markerRef.current?.setVisible(locationMarkerState); // Update visibility for all markers
+    markerRefs.current.forEach((ref) => {
+      if (ref?.current) {
+        ref.current.setVisible(locationMarkerState);
+      }
+    });
   };
 
   // Handle grid filter button state change
@@ -60,17 +68,20 @@ const World = ({
   // Function to handle slider change
   const handleSliderChange = (value: number) => {
     surface_layer_ref.current?.tick(value, 0.0);
-    markerRef.current?.tick(value, 0.0); // Update all markers with new value
+    markerRefs.current.forEach((ref) => {
+      if (ref.current) ref.current.tick(value, 0.0); // Update each marker with new value
+    });
   };
-
 
   return (
     <div style={styles.worldContainer}>
       <Canvas
-        style={{ background: 'white', height: '80vh', width: '90%' }}
+        style={{ background: 'white', height: '600px', width: '100%' }}
         camera={{ position: [0, 0, 1.5], near: 0.1, far: 1000 }}
-        dpr={1}
-        gl={{ antialias: true }}
+        dpr={ 1 }
+        gl={ {
+            antialias: true,
+        } }
       >
         <ambientLight />
         <directionalLight position={[0, 5, 0]} />
@@ -83,14 +94,25 @@ const World = ({
           selectedVariable={selectedVariable} // Pass the selected variable from the dropdown
         />
 
-        {/* Instanced LocationMarker */}
-        <LocationMarker
-          ref={markerRef} // Attach the ref to the instanced marker
-          forecastData={forecastData} // Pass all forecast data
-          measurementData={summarizedMeasurementData} // Pass all measurement data
-          selectedVariable={selectedVariable} // Pass the selected variable to the marker
-          isVisible={isLocationMarkerOn} // Pass the state for location marker visibility
-        />
+        {Object.keys(forecastData).map((key, index) => {
+          const forecastSubset = forecastData[key];
+          const measurementSubset = summarizedMeasurementData[key];
+
+          if (!markerRefs.current[index]) {
+            markerRefs.current[index] = React.createRef<LocationMarkerRef>();
+          }
+
+          return (
+            <LocationMarker
+              key={index}
+              ref={markerRefs.current[index]} // Attach the ref to the marker
+              forecastData={forecastSubset} // Passing the forecast data for this index
+              measurementData={measurementSubset} // Passing the measurement data for this index
+              isLocationMarkerOn={isLocationMarkerOn} // Pass the location marker state
+              selectedVariable={selectedVariable} // Pass the selected variable to the marker
+            />
+          );
+        })}
 
         <OrbitControls />
         <Perf position="top-left" />

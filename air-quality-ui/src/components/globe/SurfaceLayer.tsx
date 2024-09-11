@@ -14,6 +14,12 @@ import { gsap } from "gsap";
 
 const API_URL = import.meta.env.VITE_AIR_QUALITY_API_URL
 
+const shaderUniforms = {
+  uSphereWrapAmount: { value: 0.0 },
+  uFrameWeight: { value: 0.5 },
+  uFrame: { value: 0.0 },
+};
+
 type PlaneType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
 
 type SurfaceLayerProps = {
@@ -153,7 +159,7 @@ const SurfaceLayer = memo(
             uFrame: { value: 0 },
             uFrameWeight: { value: 0 },
             uTimeInterpolation: { value: true },
-            uSphereWrapAmount: { value: 0.0 },
+            uSphereWrapAmount: shaderUniforms.uSphereWrapAmount,
             uHeightDisplacement: { value: 0.2 },
             uLayerHeight: { value: 0.0 },
             uLayerOpacity: { value: 0.0 },
@@ -194,11 +200,11 @@ const SurfaceLayer = memo(
       );
 
       // Generate image URLs based on the selected variable
-      // const imageUrls = [
-      //   `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`,
-      //   `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_2_of_3.webp`,
-      //   `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_3_of_3.webp`,
-      // ];
+      const imageUrls = [
+        `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`,
+        `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_2_of_3.webp`,
+        `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_3_of_3.webp`,
+      ];
 
       // const imageUrls = [
       //   `http://64.225.143.231/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`,
@@ -206,11 +212,11 @@ const SurfaceLayer = memo(
       //   `http://64.225.143.231/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_3_of_3.webp`,
       // ];
 
-      const imageUrls = [
-        `/volume/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`,
-        `/volume/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_2_of_3.webp`,
-        `/volume/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_3_of_3.webp`,
-      ];
+      // const imageUrls = [
+      //   `/volume/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`,
+      //   `/volume/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_2_of_3.webp`,
+      //   `/volume/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_3_of_3.webp`,
+      // ];
 
       
       const fetchAndUpdateTextures = useCallback(
@@ -280,19 +286,7 @@ const SurfaceLayer = memo(
       };
 
       const changeProjection = (globeState: boolean) => {
-        if (materialRef.current) {
-          if (globeState) {
-            gsap.to(materialRef.current.uniforms.uSphereWrapAmount, {
-              value: 1.0,
-              duration: 2,
-            });
-          } else {
-            gsap.to(materialRef.current.uniforms.uSphereWrapAmount, {
-              value: 0.0,
-              duration: 2,
-            });
-          }
-        }
+        gsap.to(shaderUniforms.uSphereWrapAmount, { value: globeState ? 1.0 : 0.0, duration: 2 });
       };
 
       const changeFilter = (filterState: boolean) => {

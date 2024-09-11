@@ -1,4 +1,4 @@
-import { useRef, forwardRef, useImperativeHandle } from 'react';
+import { useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
 import { Mesh } from 'three';
 import CustomShaderMaterial from 'three-custom-shader-material';
 import * as THREE from 'three';
@@ -10,6 +10,7 @@ type LocationMarkerProps = {
   measurementData: MeasurementSummaryResponseDto;
   thisRotationsFrame: THREE.Texture;
   nextRotationsFrame: THREE.Texture;
+    selectedVariable: string;
 };
 
 export type LocationMarkerRef = {
@@ -19,7 +20,7 @@ export type LocationMarkerRef = {
 
 
 const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
-  ({ forecastData, measurementData, thisRotationsFrame, nextRotationsFrame }, ref): JSX.Element => {
+  ({ forecastData, measurementData, thisRotationsFrame, nextRotationsFrame, selectedVariable }, ref): JSX.Element => {
     const markerRef = useRef<Mesh>(null);
     const ringRef = useRef<Mesh>(null); // Ref for the ring geometry
     const { camera } = useThree(); // Access the camera
@@ -29,24 +30,62 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
     const lat = forecastData[0].location.latitude;
     const lon = forecastData[0].location.longitude;
 
-    // Extract point data from forecastData
-    const forecastDataArray = forecastData.map((data) => data.overall_aqi_level);
-    const forecastDataArrayUniform = new Float32Array(forecastDataArray);
+    const createDataArrays = (forecastData: ForecastResponseDto[], measurementData: MeasurementSummaryResponseDto[], variable: string) => {
 
-    // and the same array for the average measurement data
-    const measurementArray = forecastData.map((forecastEntry) => {
-        // Find a corresponding measurement entry by matching valid_time and measurement_base_time
-        const matchingMeasurement = measurementData?.find(
-        (measurementEntry) => measurementEntry.measurement_base_time === forecastEntry.valid_time
-        );
-    
-        // If a matching measurement is found, return the overall_aqi_level, otherwise return a missing value (e.g., -1)
-        return matchingMeasurement ? matchingMeasurement.overall_aqi_level.mean : -1;
-    });
-    
-    const measurementDataArrayUniform = new Float32Array(measurementArray);
-    
+        let variable_name;
+        if ( variable === "aqi" ) {
+            variable_name = "overall_aqi_level";
+        } else if ( variable === "pm10" ) {
+            variable_name = "pm10";
+        }   
 
+        // Extract point data from forecastData
+        const forecastDataArray = forecastData.map((data) => data[variable_name]);
+        const forecastDataArrayUniform = new Float32Array(forecastDataArray);
+
+        // and the same array for the average measurement data
+        const measurementArray = forecastData.map((forecastEntry) => {
+            // Find a corresponding measurement entry by matching valid_time and measurement_base_time
+            const matchingMeasurement = measurementData?.find(
+            (measurementEntry) => measurementEntry.measurement_base_time === forecastEntry.valid_time
+            );
+             
+            if ( variable === "aqi") {
+                // If a matching measurement is found, return the overall_aqi_level, otherwise return a missing value (e.g., -1)
+                return matchingMeasurement && matchingMeasurement[variable_name] 
+                ? matchingMeasurement[variable_name].mean 
+                : -1;
+            } else {
+                return matchingMeasurement && matchingMeasurement[variable_name] 
+                ? matchingMeasurement[variable_name].mean.value
+                : -1;
+            }
+        });
+        
+        const measurementDataArrayUniform = new Float32Array(measurementArray);
+
+        return { forecastDataArrayUniform, measurementDataArrayUniform };
+    }
+
+    // // Extract point data from forecastData
+    // const forecastDataArray = forecastData.map((data) => data.overall_aqi_level);
+    // const forecastDataArrayUniform = new Float32Array(forecastDataArray);
+
+    // // and the same array for the average measurement data
+    // const measurementArray = forecastData.map((forecastEntry) => {
+    //     // Find a corresponding measurement entry by matching valid_time and measurement_base_time
+    //     const matchingMeasurement = measurementData?.find(
+    //     (measurementEntry) => measurementEntry.measurement_base_time === forecastEntry.valid_time
+    //     );
+    
+    //     // If a matching measurement is found, return the overall_aqi_level, otherwise return a missing value (e.g., -1)
+    //     return matchingMeasurement ? matchingMeasurement.overall_aqi_level.mean : -1;
+    // });
+    
+    // const measurementDataArrayUniform = new Float32Array(measurementArray);
+    
+    
+    const { forecastDataArrayUniform, measurementDataArrayUniform } = createDataArrays(forecastData, measurementData, selectedVariable);
     // Animation or build time (example values)
     const shaderUniforms = {
       uSphereWrapAmount: { value: 0.0 },
@@ -56,6 +95,16 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
     const markerSize = 0.025;
     const markerColor = [0.25, 0.25, 0.25]; // Example color
 
+    // Re-trigger component on selectedVariable change
+    useEffect(() => {
+        if (markerRef.current) {
+            const { forecastDataArrayUniform, measurementDataArrayUniform } = createDataArrays(forecastData, measurementData, selectedVariable);
+            markerRef.current.material.uniforms.uForecastData.value = forecastDataArrayUniform;
+            markerRef.current.material.uniforms.uMeasurementData.value = measurementDataArrayUniform;
+            markerRef.current.material.uniforms.uVariableIndex.value = selectedVariable === "aqi" ? 1.0 : 2.0; // Example to set variable type
+        }
+        }, [selectedVariable, forecastDataArrayUniform, measurementDataArrayUniform]);
+        
     // Scale based on camera zoom or position
     const scaleBasedOnZoom = () => {
         if (markerRef.current) {
@@ -135,10 +184,10 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
             }
 
             // Function to get color based on the value and variable type
-            vec3 getColorForValue(float value, int variableType) {
+            vec3 getColorForValue(float value, float uVariableIndex) {
               vec3 color;
               
-              if (variableType == 1) { // "aqi"
+              if (uVariableIndex == 1.0) { // "aqi"
                 if (value >= 1.0 && value < 2.0) {
                   color = vec3(129.0 / 255.0, 237.0 / 255.0, 229.0 / 255.0);
                 } else if (value >= 2.0 && value < 3.0) {
@@ -154,24 +203,46 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
                 } else {
                   color = vec3(0.15, 0.15, 0.15); // Default to dark grey
                 }
-              }
-              // Add more variable types as needed
-              else {
-                color = vec3(1.0, 1.0, 1.0); // Default to white
-              }
+              } else if (uVariableIndex == 2.0) { // "pm10"
+                if (value < 30.0) {
+                    color = vec3(1.0, 1.0, 1.0); 
+                } else if (value < 40.0) {
+                    color = vec3(233.0/ 255.0, 249.0/ 255.0, 188.0/ 255.0); // Green
+                } else if (value < 50.0) {
+                    color = vec3(198.0/ 255.0, 255.0/ 255.0, 199.0/ 255.0); // Blue
+                } else if (value < 60.0) {
+                    color = vec3(144.0/ 255.0, 237.0/ 255.0, 169.0/ 255.0); // Yellow
+                } else if (value < 80.0) {
+                    color = vec3(76.0/ 255.0, 180.0/ 255.0, 148.0/ 255.0); // Orange
+                } else if (value < 100.0) {
+                    color = vec3(48.0/ 255.0, 155.0/ 255.0, 138.0/ 255.0); // Purple
+                } else if (value < 150.0) {
+                    color = vec3(47.0/ 255.0, 137.0/ 255.0, 169.0/ 255.0); // Yellow
+                } else if (value < 200.0) {
+                    color = vec3(16.0/ 255.0, 99.0/ 255.0, 164.0/ 255.0); // Orange
+                } else if (value < 300.0) {
+                    color = vec3(13.0/ 255.0, 69.0/ 255.0, 126.0/ 255.0); // Purple
+                } else if (value < 500.0) {
+                    color = vec3(15.0/ 255.0, 26.0/ 255.0, 136.0/ 255.0); // Orange
+                } else if (value < 1000.0) {
+                    color = vec3(38.0/ 255.0, 2.0/ 255.0, 60.0/ 255.0); // Purple
+                } else {
+                    color = vec3(0.0, 0.0, 0.0); // Black for values out of range
+                }
+            }
 
               return color;
             }
 
             #define M_PI 3.14159265
 
+            uniform float uVariableIndex;
             uniform float uSphereWrapAmount;
             uniform float uLat;
             uniform float uLon;
             uniform float uForecastData[40];
             uniform float uMeasurementData[40];
             uniform int uFrame;
-            uniform int uVariableType;
             uniform float uFrameWeight;
             uniform float uZoomLevel;
             uniform bool uVariableSize;
@@ -199,36 +270,37 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
             float nextDiff; 
             float diff = 1.0;
 
-            forecastValue = clamp(forecastValue, 1.0, 6.0);
-            measurementValue = clamp(measurementValue, 1.0, 6.0);
-            nextForecastValue = clamp(nextForecastValue, 1.0, 6.0);
-            nextMeasurementValue = clamp(nextMeasurementValue, 1.0, 6.0);
+            float minValue;
+            float maxValue;
 
-            // if ( (forecastValue > 0.0) && (measurementValue > 0.0) ) {
-            //     thisDiff = abs(measurementValue-forecastValue);
-            //     // if ( (nextForecastValue > 0.0) && (nextMeasurementValue > 0.0) ) {
-            //         nextDiff = abs(nextMeasurementValue-nextForecastValue);
-            //         diff = mix(thisDiff, nextDiff, uFrameWeight);
-            //     // }
-            //     // diff = thisDiff;
+            if (uVariableIndex == 1.0) {
+                minValue = 1.0;
+                maxValue = 6.0;
+            } else if (uVariableIndex == 2.0) {
+                minValue = 0.0;
+                maxValue = 1000.0;
+            }
 
-            // } else { 
-            //     diff = 1.0;
-            // }
-            // if (diff < 1.0) {
-            //     diff = 1.0;
-            // }
+            forecastValue = clamp(forecastValue, minValue, maxValue);
+            measurementValue = clamp(measurementValue, minValue, maxValue);
+            nextForecastValue = clamp(nextForecastValue, minValue, maxValue);
+            nextMeasurementValue = clamp(nextMeasurementValue, minValue, maxValue);
 
             thisDiff = abs(measurementValue-forecastValue);
             nextDiff = abs(nextMeasurementValue-nextForecastValue);
             diff = mix(thisDiff, nextDiff, uFrameWeight);
-            diff = clamp(diff, 1.0, 6.0);
+
+            if (uVariableIndex == 1.0) {
+                diff = clamp(diff, 1.0, 6.0);
+            } else if (uVariableIndex == 2.0) {
+                diff = clamp(diff/10.0, 1.0, 4.0);
+            }
 
             vec3 color;
             if ( (measurementValueInterpolated > 0.0 ) || (diff > 1.0) ) {
-                color = getColorForValue(measurementValue, uVariableType); 
+                color = getColorForValue(measurementValue, uVariableIndex); 
             } else {
-                color = getColorForValue(0.0, uVariableType); 
+                color = getColorForValue(0.0, uVariableIndex); 
             }
             vColor = adjustSaturation(color, 2.0); // Increase saturation
 
@@ -288,15 +360,17 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
             uForecastData: { value: forecastDataArrayUniform },
             uMeasurementData: { value: measurementDataArrayUniform },
             uVariableType: { value: 1 }, // Example variable type
+            uVariableIndex: { value: 2.0 },
           }}
           transparent
         />
+        
 
         {/* Add a ring for the equator line */}
-        <mesh ref={ringRef} rotation={[0, 0, 0]} position={[lon / 180.0 * 2.0, lat / 180.0 * 2.0, 0.001 ]}>
+        {/* <mesh ref={ringRef} rotation={[0, 0, 0]} position={[lon / 180.0 * 2.0, lat / 180.0 * 2.0, 0.001 ]}>
           <ringGeometry args={[markerSize - 0.02, markerSize + 0.015, 64]} />
           <meshBasicMaterial color="black" side={THREE.DoubleSide} />
-        </mesh>
+        </mesh> */}
       </mesh>
     );
   }

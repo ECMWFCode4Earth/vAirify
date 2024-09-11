@@ -16,6 +16,7 @@ import {
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import GlobalSummaryTable from '../summary-grid/table/GlobalSummaryTable'
 import World from '../globe/World' // Import your Three.js scene component
+// import World from '../globe/World.loop' // Import your Three.js scene component
 
 const GlobalSummary = (): JSX.Element => {
   const { forecastDetails } = useForecastContext()
