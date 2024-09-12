@@ -4,13 +4,14 @@ import CustomShaderMaterial from 'three-custom-shader-material';
 import * as THREE from 'three';
 import { useThree, useFrame } from '@react-three/fiber';
 import { gsap } from 'gsap';
-import { Float } from '@react-three/drei';
+import { ForecastResponseDto, MeasurementSummaryResponseDto } from '../../services/types';
 
 type LocationMarkerProps = {
   forecastData: Record<string, ForecastResponseDto[]>;
   measurementData: Record<string, MeasurementSummaryResponseDto[]>;
   selectedVariable: string;
   isVisible: boolean;
+  cameraControlsRef: React.RefObject<any>; // Add a reference to CameraControls
 };
 
 export type LocationMarkerRef = {
@@ -108,7 +109,7 @@ const createDataArrays = (
 };
 
 const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
-  ({ forecastData, measurementData, selectedVariable, isVisible }, ref): JSX.Element => {
+  ({ forecastData, measurementData, selectedVariable, isVisible, cameraControlsRef }, ref): JSX.Element => {
    
     if (
       !forecastData || 
@@ -195,17 +196,26 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
 
     // Scale based on camera zoom or position
     const scaleBasedOnZoom = () => {
-      if (instancedMarkerRef.current) {
-        const distance = camera.position.z; // Camera distance from origin
-        const scaleFactor = distance / 10; // Adjust scale sensitivity
+      if (instancedMarkerRef.current && cameraControlsRef.current) {
+        const controls = cameraControlsRef.current;
+        const distance = controls.distance; // Access distance from CameraControls
+        const scaleFactor = distance ; // Adjust the scale factor based on the distance
         instancedMarkerRef.current.material.uniforms.uZoomLevel.value = scaleFactor;
       }
     };
+
+    useEffect(() => {
+      if (instancedMarkerRef.current) {
+        instancedMarkerRef.current.frustumCulled = false; // Disable frustum culling
+      }
+    }, []);
 
     useFrame(() => {
       // Dynamically update scale based on camera distance
       scaleBasedOnZoom();
     });
+
+
 
     // Implement the tick function
     const tick = (weight: number) => {
@@ -393,8 +403,8 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
               posSphere.z = sinPhiRadius * cos(theta);
 
                 if (uVariableSize) {
-                    posPlane += position * diff;
-                    posSphere += position * diff;
+                    posPlane += position * diff * uZoomLevel * 0.8;
+                    posSphere += position * diff * uZoomLevel * 0.3;
                 } else {
                     posPlane += position;
                     posSphere += position;

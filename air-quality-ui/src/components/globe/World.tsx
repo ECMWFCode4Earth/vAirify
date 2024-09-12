@@ -83,6 +83,7 @@ const World = ({
           measurementData={summarizedMeasurementData}
           selectedVariable={selectedVariable}
           isVisible={isLocationMarkerOn}
+          cameraControlsRef={cameraControlsRef}
         />
 
         <CameraControls ref={cameraControlsRef} />

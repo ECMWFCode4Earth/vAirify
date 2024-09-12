@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForecastContext } from '../../context';
+import { PlayArrow, Pause, Add, Remove, LocationOn, Public, AccessTime, GridOn } from '@mui/icons-material';
+import { Button, Select, MenuItem } from '@mui/material';
 
 type ControlsProps = {
   isTimeRunning: boolean;
@@ -9,7 +11,7 @@ type ControlsProps = {
   onLocationMarkerClick: (locationMarkerState: boolean) => void;
   onGridFilterClick: (filterState: boolean) => void;
   onTimeInterpolationClick: (filterState: boolean) => void;
-  onVariableSelect: (variable: string) => void; // New prop for variable selection
+  onVariableSelect: (variable: string) => void;
 };
 
 const Controls: React.FC<ControlsProps> = ({
@@ -20,19 +22,18 @@ const Controls: React.FC<ControlsProps> = ({
   onLocationMarkerClick,
   onGridFilterClick,
   onTimeInterpolationClick,
-  onVariableSelect, // New prop passed from parent
+  onVariableSelect,
 }) => {
-  const [sliderValue, setSliderValue] = useState(0.0); // Default slider value
-  const [globeAnimationState, setGlobeAnimationState] = useState(false); // State for globe animation
-  const [locationMarkerState, setLocationMarkerState] = useState(true); // State for location marker
-  const [filterState, setGridFilterState] = useState(false); // State for grid filter
-  const [timeInterpolationState, setTimeInterpolationState] = useState(true); // State for time interpolation
-  const [timeDelta, setTimeDelta] = useState(0.06); // State for the speed of the slider's advancement
-  const [selectedVariable, setSelectedVariable] = useState('aqi'); // Default variable to display
+  const [sliderValue, setSliderValue] = useState(0.0); 
+  const [globeAnimationState, setGlobeAnimationState] = useState(false); 
+  const [locationMarkerState, setLocationMarkerState] = useState(true); 
+  const [filterState, setGridFilterState] = useState(false); 
+  const [timeInterpolationState, setTimeInterpolationState] = useState(true); 
+  const [timeDelta, setTimeDelta] = useState(0.06); 
+  const [selectedVariable, setSelectedVariable] = useState('aqi'); 
 
-  // Handle slider change from user input
   const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(event.target.value); // Parse as float for decimal values
+    const value = parseFloat(event.target.value); 
     setSliderValue(value);
   };
 
@@ -40,91 +41,75 @@ const Controls: React.FC<ControlsProps> = ({
   const numForecastHours = forecastDetails.maxForecastDate.diff(forecastDetails.forecastBaseDate, 'hours').hours;
   const numForecastTimeSteps = numForecastHours / 3;
   
-  const currentDate = forecastDetails.forecastBaseDate.plus({ hours: Math.floor(sliderValue * 3) }).toFormat('yyyy-MM-dd T')+' UTC'; 
+  const currentDate = forecastDetails.forecastBaseDate.plus({ hours: Math.floor(sliderValue * 3) }).toFormat('yyyy-MM-dd T') + ' UTC';
 
-  // Effect to notify parent of slider changes
   useEffect(() => {
     onSliderChange(sliderValue);
   }, [sliderValue, onSliderChange]);
 
-  // Automatically advance the slider when isTimeRunning is true
   useEffect(() => {
     if (isTimeRunning) {
       const interval = setInterval(() => {
         setSliderValue((prevValue) => (prevValue >= numForecastTimeSteps ? 0 : prevValue + timeDelta));
       }, 25);
 
-      return () => clearInterval(interval); // Clean up the interval
+      return () => clearInterval(interval);
     }
   }, [isTimeRunning, timeDelta]);
 
-  // Handle globe button click
   const handleGlobeButtonClick = () => {
-    setGlobeAnimationState((prevState) => !prevState); // Toggle globe animation state
-    onGlobeButtonClick(!globeAnimationState); // Notify parent of the state change
+    setGlobeAnimationState((prevState) => !prevState); 
+    onGlobeButtonClick(!globeAnimationState); 
   };
 
-  // Handle location marker button click
   const handleLocationMarkerClick = () => {
-    setLocationMarkerState((prevState) => !prevState); // Toggle location marker state
-    onLocationMarkerClick(!locationMarkerState); // Notify parent of the state change
+    setLocationMarkerState((prevState) => !prevState); 
+    onLocationMarkerClick(!locationMarkerState); 
   };
 
-  // Handle grid filter button click
   const handleGridFilterClick = () => {
     setGridFilterState((prevState) => !prevState);
-    onGridFilterClick(!filterState); // Notify parent of the state change
+    onGridFilterClick(!filterState); 
   };
 
   const handleTimeInterpolationClick = () => {
     setTimeInterpolationState((prevState) => !prevState);
-    onTimeInterpolationClick(!timeInterpolationState); // Notify parent of the state change
+    onTimeInterpolationClick(!timeInterpolationState); 
   };
 
-  // Handle variable selection change
-  const handleVariableSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const variable = event.target.value;
+  const handleVariableSelectChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const variable = event.target.value as string;
     setSelectedVariable(variable);
-    onVariableSelect(variable); // Notify parent of the variable change
+    onVariableSelect(variable); 
   };
 
-  // Increase timeDelta
   const handleIncreaseTimeDelta = () => {
-    setTimeDelta((prevDelta) => prevDelta + 0.02); // Increase by 0.01
+    setTimeDelta((prevDelta) => prevDelta + 0.02); 
   };
 
-  // Decrease timeDelta
   const handleDecreaseTimeDelta = () => {
-    setTimeDelta((prevDelta) => Math.max(0.02, prevDelta - 0.02)); // Decrease by 0.01, but don't go below 0.01
+    setTimeDelta((prevDelta) => Math.max(0.02, prevDelta - 0.02)); 
   };
 
   return (
     <div style={styles.controlsContainer}>
-      {/* Button to toggle time update */}
-      <button
-        onClick={onToggleTimeUpdate}
-        style={styles.controlButton}
-      >
-        <span style={styles.icon}>{isTimeRunning ? '⏸️' : '▶️'}</span>
-      </button>
+      <Button 
+        onClick={onToggleTimeUpdate} 
+        style={{ 
+          ...styles.controlButton, 
+          backgroundColor: isTimeRunning ? '#1976d2' : 'lightgray',  // Blue when time is running
+        }}>
+        {isTimeRunning ? <Pause fontSize="large" style={isTimeRunning ? styles.activeIcon : undefined} /> : <PlayArrow fontSize="large" />}
+      </Button>
 
-      {/* Minus Button */}
-      <button
-        onClick={handleDecreaseTimeDelta}
-        style={styles.controlButton}
-      >
-        <span style={styles.icon}>➖</span>
-      </button>
+      <Button onClick={handleDecreaseTimeDelta} style={styles.controlButton}>
+        <Remove fontSize="large" />
+      </Button>
 
-      {/* Plus Button */}
-      <button
-        onClick={handleIncreaseTimeDelta}
-        style={styles.controlButton}
-      >
-        <span style={styles.icon}>➕</span>
-      </button>
+      <Button onClick={handleIncreaseTimeDelta} style={styles.controlButton}>
+        <Add fontSize="large" />
+      </Button>
 
-      {/* Slider */}
       <div style={styles.sliderContainer}>
         <label htmlFor="slider">{currentDate}</label>
         <input
@@ -139,46 +124,49 @@ const Controls: React.FC<ControlsProps> = ({
         />
       </div>
 
-      {/* Location Marker Button */}
-      <button
-        className="location-icon"
-        onClick={handleLocationMarkerClick}
-        style={styles.controlButton}
-      >
-        <span style={styles.icon}>📍</span>
-      </button>
+      <Button 
+        onClick={handleLocationMarkerClick} 
+        style={{ 
+          ...styles.controlButton, 
+          backgroundColor: locationMarkerState ? '#1976d2' : 'lightgray',  // Blue when location markers are visible
+        }}>
+        <LocationOn fontSize="large" style={locationMarkerState ? styles.activeIcon : undefined} />
+      </Button>
 
-      {/* Globe Button */}
-      <button
-        className="globe-icon"
-        onClick={handleGlobeButtonClick}
-        style={styles.globeButton}
-      >
-        <span style={styles.icon}>🌍</span>
-      </button>
+      <Button 
+        onClick={handleGlobeButtonClick} 
+        style={{ 
+          ...styles.globeButton, 
+          backgroundColor: globeAnimationState ? '#1976d2' : 'lightgray',  // Blue when globe animation is active
+        }}>
+        <Public fontSize="large" style={globeAnimationState ? styles.activeIcon : undefined} />
+      </Button>
 
-      {/* Checkerboard Button */}
-      <button
-        className="checkerboard-icon"
-        onClick={handleGridFilterClick}
-        style={styles.checkerboardButton}
-      >
-      </button>
+      <Button 
+        onClick={handleGridFilterClick} 
+        style={{ 
+          ...styles.checkerboardButton, 
+          backgroundColor: filterState ? '#1976d2' : 'lightgray',  // Blue when grid filter is active
+        }}>
+        <GridOn fontSize="large" style={filterState ? styles.activeIcon : undefined} />
+      </Button>
 
-      {/* Step Curve Button */}
-      <button
-        className="step-curve-icon"
-        onClick={handleTimeInterpolationClick}
-        style={styles.controlButton}
-      >
-        <span style={styles.icon}>🕒</span>
-      </button>
+      <Button 
+        onClick={handleTimeInterpolationClick} 
+        style={{ 
+          ...styles.controlButton, 
+          backgroundColor: timeInterpolationState ? '#1976d2' : 'lightgray',  // Blue when time interpolation is active
+        }}>
+        <AccessTime fontSize="large" style={timeInterpolationState ? styles.activeIcon : undefined} />
+      </Button>
 
-        {/* Variable Selection Dropdown */}
-            <select value={selectedVariable} onChange={handleVariableSelectChange} style={styles.dropdown}>
-        <option value="aqi">AQI</option>
-        <option value="pm10">PM10</option>
-      </select>
+      <Select 
+        value={selectedVariable} 
+        onChange={handleVariableSelectChange} 
+        style={styles.dropdown}>
+        <MenuItem value="aqi">AQI</MenuItem>
+        <MenuItem value="pm10">PM10</MenuItem>
+      </Select>
     </div>
   );
 };
@@ -188,22 +176,22 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: '10px',
+    gap: '10px', // Consistent gap between all controls
     padding: '10px',
     backgroundColor: '#f4f4f4',
     borderTop: '1px solid #ccc',
   },
   controlButton: {
-    width: '40px',
-    height: '40px',
+    width: '50px', // Make the buttons consistent in size
+    height: '50px', 
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    fontSize: '32px',
-    backgroundColor: 'lightgray',
     border: 'none',
-    borderRadius: '20%',
+    borderRadius: '10%', // Consistent round button shape
     cursor: 'pointer',
+    margin: '5px', // Add consistent margin around each button
+    padding: '10px', // Add padding for more consistent button sizing
   },
   sliderContainer: {
     display: 'flex',
@@ -220,33 +208,12 @@ const styles = {
     borderRadius: '5px',
     border: '1px solid lightgray',
     padding: '5px',
+    margin: '5px', // Add margin to match the buttons
     cursor: 'pointer',
   },
-  icon: {
-    fontSize: '28px',
-    lineHeight: '32px',
-  },
-  checkerboardButton: {
-    width: '40px',
-    height: '40px',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontSize: '32px',
-    backgroundColor: 'gray',
-    border: 'none',
-    borderRadius: '20%',
-    cursor: 'pointer',
-    backgroundImage: `linear-gradient(45deg, #ccc 25%, transparent 25%), 
-                      linear-gradient(-45deg, #ccc 25%, transparent 25%), 
-                      linear-gradient(45deg, transparent 75%, #ccc 75%), 
-                      linear-gradient(-45deg, transparent 75%, #ccc 75%)`,
-    backgroundSize: '20px 20px',
-    backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px',
-  },
-  stepIcon: {
-    fontSize: '28px',
-    lineHeight: '32px',
+  activeIcon: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 };
 
