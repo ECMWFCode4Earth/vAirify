@@ -89,13 +89,6 @@ float nextFrameData = remap(
 // interpolate between absolute values of both frames
 float intData = mix(thisFrameData, nextFrameData, uFrameWeight);
 
-// apply user scaling to data
-// float dataRemapped = userRemap(intData);
-
-// apply colormap to data
-// vec4 dataColor = applyColormap( dataRemapped, colorMap, cmap_index );
-
-
 // gl_FragColor = dataColor;
 gl_FragColor = vec4(1.0);
 
@@ -152,11 +145,7 @@ gl_FragColor = vec4(color/255., 1.0);
 
 // overlay lsmTexture
 vec4 lsmColor = texture2D(lsmTexture, vUv);
-// gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.0), lsmColor.a);
 
 gl_FragColor = mix(vec4(0.,0.,0.,1.),gl_FragColor,lsmColor.r);
-
-// gl_FragColor = vec4(testFrameData, testFrameData, testFrameData, 1.0);
-// gl_FragColor.a *= uLayerOpacity;
 
 }

@@ -104,14 +104,21 @@ const createDataArrays = (
     }
   }
 
-
-  console.log(measurementDataVec4Array);
-
   return { forecastDataVec4Array, measurementDataVec4Array };
 };
 
 const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
   ({ forecastData, measurementData, selectedVariable, isVisible }, ref): JSX.Element => {
+   
+    if (
+      !forecastData || 
+      Object.keys(forecastData).length === 0 || 
+      !measurementData || 
+      Object.keys(measurementData).length === 0
+    ) {
+      return null;
+    }
+    
     const instancedMarkerRef = useRef<InstancedMesh>(null);
 
     const [triggerRender, setTriggerRender] = useState(0); // Using a number state for forcing render
@@ -130,6 +137,7 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
 
     // Listen for changes in selectedVariable and trigger re-render
     useEffect(() => {
+
       // Trigger state update to force re-render
       setTriggerRender((prev) => prev + 1);
     }, [selectedVariable]); // Depend on `selectedVariable`
@@ -200,7 +208,7 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
     });
 
     // Implement the tick function
-    const tick = (weight: number, uSphereWrapAmount: number) => {
+    const tick = (weight: number) => {
       shaderUniforms.uFrameWeight.value = weight % 1;
       // shaderUniforms.uFrameWeight.value = 0.0;
       shaderUniforms.uFrame.value = Math.floor(weight).toFixed(1);
