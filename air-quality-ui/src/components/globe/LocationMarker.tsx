@@ -50,8 +50,13 @@ const createDataArrays = (
     // Process forecast data
     cityForecastData.forEach((forecastEntry) => {
       const forecastValue = forecastEntry[variable_name];
-      forecastDataArray.push(forecastValue);
+      if (variable === 'aqi') {
+        forecastDataArray.push(forecastValue);
+      } else {
+        forecastDataArray.push(forecastValue.value);
+      }
     });
+
 
     // Process measurement data by matching valid_time with measurement_base_time
     cityForecastData.forEach((forecastEntry) => {
@@ -72,11 +77,12 @@ const createDataArrays = (
         const measurementValue =
           matchingMeasurement && matchingMeasurement[variable_name]
             ? matchingMeasurement[variable_name].mean.value
-            : -1;
+            : -1.0;
         measurementDataArray.push(measurementValue);
       }
     });
   });
+
 
   // Convert the data into vec4 (RGBA format)
   const forecastDataVec4Array = new Float32Array(forecastDataArray.length * 4);
@@ -98,6 +104,8 @@ const createDataArrays = (
     }
   }
 
+
+  console.log(measurementDataVec4Array);
 
   return { forecastDataVec4Array, measurementDataVec4Array };
 };
@@ -231,7 +239,9 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
               vec3 color;
               
               if (uVariableIndex == 1.0) { // "aqi"
-                if (value >= 1.0 && value < 2.0) {
+                if (value == -1.0) {
+                  color = vec3(0.15, 0.15, 0.15); // Default to dark grey for missing values
+                } else if (value >= 1.0 && value < 2.0) {
                   color = vec3(129.0 / 255.0, 237.0 / 255.0, 229.0 / 255.0);
                 } else if (value >= 2.0 && value < 3.0) {
                   color = vec3(116.0 / 255.0, 201.0 / 255.0, 172.0 / 255.0);
@@ -247,7 +257,9 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
                   color = vec3(0.15, 0.15, 0.15); // Default to dark grey
                 }
               } else if (uVariableIndex == 2.0) { // "pm10"
-                if (value < 30.0) {
+                if (value == -1.0) {
+                  color = vec3(0.15, 0.15, 0.15); // Default to dark grey for missing values
+                } else if (value < 30.0) {
                     color = vec3(1.0, 1.0, 1.0); 
                 } else if (value < 40.0) {
                     color = vec3(233.0/ 255.0, 249.0/ 255.0, 188.0/ 255.0); // Green
@@ -281,8 +293,6 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
 
             uniform float uVariableIndex;
             uniform float uSphereWrapAmount;
-            uniform float uForecastData[100];
-            uniform float uMeasurementData[100];
             uniform float uFrame;
             uniform float uFrameWeight;
             uniform float uZoomLevel;
@@ -324,12 +334,14 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
                 minValue = 1.0;
                 maxValue = 6.0;
             } else if (uVariableIndex == 2.0) {
-                minValue = 0.0;
+                minValue = 1.0;
                 maxValue = 1000.0;
             }
 
             forecastValue = clamp(forecastValue, minValue, maxValue);
-            measurementValue = clamp(measurementValue, minValue, maxValue);
+            // if (measurementValue > 0.0) {
+              measurementValue = clamp(measurementValue, minValue, maxValue);
+            // }
             nextForecastValue = clamp(nextForecastValue, minValue, maxValue);
             nextMeasurementValue = clamp(nextMeasurementValue, minValue, maxValue);
 
@@ -349,6 +361,8 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
             } else {
                 color = getColorForValue(0.0, uVariableIndex); 
             }
+            // color = getColorForValue(measurementValue, uVariableIndex); 
+
             
             vColor = adjustSaturation(color, 2.0); // Increase saturation  
 

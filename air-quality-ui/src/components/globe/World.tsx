@@ -1,10 +1,11 @@
 import React, { useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Perf } from 'r3f-perf';
-import { OrbitControls } from '@react-three/drei';
+import { CameraControls } from '@react-three/drei';
 import { SurfaceLayer, SurfaceLayerRef } from './SurfaceLayer';
 import LocationMarker, { LocationMarkerRef } from './LocationMarker'; // Updated LocationMarker with instancing
 import Controls from './Controls';
+import * as THREE from 'three';
 
 type WorldProps = {
   forecastData: Record<string, ForecastResponseDto[]>;
@@ -17,6 +18,9 @@ const World = ({
 }: WorldProps): JSX.Element => {
   const surface_layer_ref = useRef<SurfaceLayerRef>(null);
   const markerRef = useRef<LocationMarkerRef>(null); // Single ref for instanced markers
+  const cameraControlsRef = useRef(null); // Ref for CameraControls
+
+
   const [isTimeRunning, setIsTimeRunning] = useState(true); // State to control time updates
   const [isLocationMarkerOn, setIsLocationMarkerOn] = useState(true); // State for location marker
   const [isFilterNearest, setGridFilterState] = useState(false); // State for enlarge button
@@ -32,6 +36,79 @@ const World = ({
   const handleGlobeButtonClick = (globeState: boolean) => {
     surface_layer_ref.current?.changeProjection(globeState);
     markerRef.current?.changeProjection(globeState);
+
+    console.log(cameraControlsRef)
+
+    if (cameraControlsRef.current) {
+      const controls = cameraControlsRef.current;
+
+      console.log('reset camera')
+
+      if (globeState) {
+        // Move the camera to a new position, e.g., when the globe state is true
+        controls.minDistance = 3.0
+        controls.minPolarAngle = 0
+        controls.maxPolarAngle = Math.PI 
+        controls.minAzimuthAngle = - Infinity
+        controls.maxAzimuthAngle = Infinity
+    
+        controls.dollyToCursor = false
+    
+      
+          var lat = 50.
+          var lon = 5.
+          var newTheta = lon * THREE.MathUtils.DEG2RAD
+          var newPhi = -1. * ( ( lat - 90. ) * THREE.MathUtils.DEG2RAD )
+    
+          // slower/smoother camera transition
+          controls.smoothTime = 1.5;
+          controls.rotateTo( newTheta, newPhi, true)
+          controls.smoothTime = 1.0;
+
+        controls.zoomTo( 0.75, true )
+
+
+        console.log(controls.mouseButtons)
+
+      } else {
+
+          controls.minDistance = 1.0
+          controls.minPolarAngle =  Math.PI *  0.5
+          controls.maxPolarAngle = Math.PI *  1.0
+          controls.minAzimuthAngle = 0
+          controls.maxAzimuthAngle = 0
+            
+          controls.maxPolarAngle = Math.PI *  1.0
+      
+          controls.smoothTime = 1.0;
+          controls.reset(true)
+      
+          // set camera smoothing back to normal after transition
+          setTimeout(function(){
+            controls.smoothTime = 3.0;
+          }, 5000);
+      
+          controls.dollyToCursor = true
+      
+      
+          // set map controls
+          // controls.mouseButtons = {
+          //   left: CameraControls.ACTION.TRUCK,
+          //   middle: CameraControls.ACTION.DOLLY,
+          //   wheel: CameraControls.ACTION.DOLLY,
+          //   right: CameraControls.ACTION.ROTATE
+          // }
+        
+          // controls.touches = {
+          // one: CameraControls.ACTION.TOUCH_TRUCK,
+          // two: CameraControls.ACTION.TOUCH_DOLLY,
+          // three: CameraControls.ACTION.TOUCH_ROTATE,
+          // }
+      
+        }
+      // controls.reset(true);
+    }
+
   };
 
   // Handle location marker button state change
@@ -92,7 +169,7 @@ const World = ({
           isVisible={isLocationMarkerOn} // Pass the state for location marker visibility
         />
 
-        <OrbitControls />
+        <CameraControls ref={cameraControlsRef} />
         <Perf position="top-left" />
       </Canvas>
 
