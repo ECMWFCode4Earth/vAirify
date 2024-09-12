@@ -220,30 +220,54 @@ const SurfaceLayer = memo(
 
       
       const fetchAndUpdateTextures = useCallback(
-        async (filter: string) => {
+        async (thisFrame, nextFrame, mode, filter: string) => {
           try {
             const fullCanvas =
               fullImageCanvasRef.current ||
               (await createCanvasTextureFromMultipleImages(imageUrls));
             fullImageCanvasRef.current = fullCanvas;
 
-            const thisCanvasTexture = createCanvasTextureFromCanvas(
-              fullCanvas,
-              windowIndexRef.current,
-              filter
-            );
-            const nextCanvasTexture = createCanvasTextureFromCanvas(
-              fullCanvas,
-              windowIndexRef.current + 1,
-              filter
-            );
-
             if (materialRef.current) {
-              materialRef.current.uniforms.thisDataTexture.value =
-                thisCanvasTexture;
-              materialRef.current.uniforms.nextDataTexture.value =
-                nextCanvasTexture;
+
+              let thisCanvasTexture, nextCanvasTexture;
+
+              if ( mode === "forward") {
+                nextCanvasTexture = createCanvasTextureFromCanvas(
+                  fullCanvas,
+                  nextFrame,
+                  filter
+                );
+                materialRef.current.uniforms.thisDataTexture.value = materialRef.current.uniforms.nextDataTexture.value
+                materialRef.current.uniforms.nextDataTexture.value = nextCanvasTexture;
+
+              } else if (mode === "backward") {
+                thisCanvasTexture = createCanvasTextureFromCanvas(
+                  fullCanvas,
+                  thisFrame,
+                  filter
+                );
+                materialRef.current.uniforms.nextDataTexture.value = materialRef.current.uniforms.thisDataTexture.value
+                materialRef.current.uniforms.thisDataTexture.value = thisCanvasTexture
+
+              } else if (mode === "reset") {
+                console.log('reset')
+                thisCanvasTexture = createCanvasTextureFromCanvas(
+                  fullCanvas,
+                  thisFrame,
+                  filter
+                );
+                nextCanvasTexture = createCanvasTextureFromCanvas(
+                  fullCanvas,
+                  nextFrame,
+                  filter
+                );
+                materialRef.current.uniforms.thisDataTexture.value = thisCanvasTexture
+                materialRef.current.uniforms.nextDataTexture.value = nextCanvasTexture;
+              }
+
             }
+
+            // }
           } catch (error) {
             console.error("Error processing image:", error);
           }
@@ -256,9 +280,9 @@ const SurfaceLayer = memo(
         // Reset canvas and reload textures
         fullImageCanvasRef.current = null;
         if (isFilterNearest) {
-          fetchAndUpdateTextures("nearest");
+          fetchAndUpdateTextures(windowIndexRef.current, windowIndexRef.current + 1, "reset", "nearest");
         } else {
-          fetchAndUpdateTextures("linear");
+          fetchAndUpdateTextures(windowIndexRef.current, windowIndexRef.current + 1, "reset", "linear");
         }
       }, [selectedVariable, fetchAndUpdateTextures, isFilterNearest]);
 
@@ -266,12 +290,29 @@ const SurfaceLayer = memo(
       const tick = (sliderValue: number, uSphereWrapAmount: number) => {
         if (materialRef.current) {
           if (windowIndexRef.current != Math.floor(sliderValue)) {
-            windowIndexRef.current = Math.floor(sliderValue); // Loop through a max of 15 windows
-            if (isFilterNearest) {
-              fetchAndUpdateTextures("nearest");
+            let thisFrame, nextFrame, mode;
+            if (Math.floor(sliderValue) > windowIndexRef.current) {
+              thisFrame = windowIndexRef.current + 1;
+              nextFrame = windowIndexRef.current + 2;
+              mode = "forward";
             } else {
-              fetchAndUpdateTextures("linear");
+              if (Math.floor(sliderValue) === 0) {
+                thisFrame = 0;
+                nextFrame = 1;
+                mode = "reset"
+              } else {
+                thisFrame = windowIndexRef.current - 1;
+                nextFrame = windowIndexRef.current;
+                mode = "backward";
+              }
             }
+            // console.log(mode)
+            if (isFilterNearest) {
+              fetchAndUpdateTextures(thisFrame, nextFrame, mode, "nearest");
+            } else {
+              fetchAndUpdateTextures(thisFrame, nextFrame, mode, "linear");
+            }
+            windowIndexRef.current = Math.floor(sliderValue); // Loop through a max of 15 windows
           }
 
           var weight = 0.0;

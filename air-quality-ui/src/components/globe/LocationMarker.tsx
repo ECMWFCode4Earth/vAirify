@@ -98,9 +98,6 @@ const createDataArrays = (
     }
   }
 
-  console.log(forecastDataVec4Array)
-
-
 
   return { forecastDataVec4Array, measurementDataVec4Array };
 };

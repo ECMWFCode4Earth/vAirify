@@ -99,16 +99,6 @@ float intData = mix(thisFrameData, nextFrameData, uFrameWeight);
 // gl_FragColor = dataColor;
 gl_FragColor = vec4(1.0);
 
-// float testFrameData = remap( 
-//     texture2D(
-//         thisDataTexture, 
-//         vUv
-//         ).r, 
-//     0.0, 
-//     1.0, 
-//     1.0, 
-//     7.0);
-
 vec3 color;
 
 // Define colors for each range
