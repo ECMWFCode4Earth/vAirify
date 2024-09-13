@@ -1,3 +1,4 @@
+import pprint
 from datetime import datetime
 from pandas import read_csv
 
@@ -127,6 +128,17 @@ def get_forecast_percentage_divergence(
         pollutant, "database_forecast", database_record_for_city_and_valid_time
     )
 
+    database_pollutant_value_3dp = round(database_pollutant_value, 3)
+
+    pprint.pprint(
+        "City: {}, Pollutant: {}, ECMWF value: {}, database value: {}".format(
+            test_city,
+            pollutant,
+            ecmwf_forecast_pollutant_value,
+            database_pollutant_value_3dp,
+        )
+    )
+
     return calculate_database_divergence_from_ecmwf_forecast_values(
-        database_pollutant_value, ecmwf_forecast_pollutant_value
+        database_pollutant_value_3dp, ecmwf_forecast_pollutant_value
     )
