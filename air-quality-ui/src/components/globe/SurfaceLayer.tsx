@@ -12,7 +12,7 @@ import { useForecastContext } from "../../context";
 import { gsap } from "gsap";
 import { useDataTextures } from "./useDataTextures";
 
-const API_URL = import.meta.env.VITE_AIR_QUALITY_API_URL
+// const API_URL = import.meta.env.VITE_AIR_QUALITY_API_URL
 
 const shaderUniforms = {
   uSphereWrapAmount: { value: 0.0 },
@@ -25,12 +25,13 @@ type PlaneType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
 type SurfaceLayerProps = {
   isFilterNearest: boolean;
   isTimeInterpolation: boolean;
-  selectedVariable: string; // Add this prop
+  selectedVariable: string; 
+  
 };
 
 export type SurfaceLayerRef = {
   type: React.RefObject<PlaneType>;
-  tick: (weight: number, uSphereWrapAmount: number) => void;
+  tick: (weight: number) => void;
   changeProjection: (globeState: boolean) => void;
   changeFilter: (filterState: boolean) => void;
   changeTimeInterpolation: (timeInterpolationState: boolean) => void;

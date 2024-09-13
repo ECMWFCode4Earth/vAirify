@@ -1,10 +1,13 @@
 import { useRef, forwardRef, useImperativeHandle, useEffect, useState } from 'react';
-import { InstancedMesh, Object3D, DataTexture, RGBAFormat, FloatType } from 'three';
+import { DataTexture, RGBAFormat, FloatType } from 'three';
 import CustomShaderMaterial from 'three-custom-shader-material';
 import * as THREE from 'three';
-import { useThree, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { gsap } from 'gsap';
 import { ForecastResponseDto, MeasurementSummaryResponseDto } from '../../services/types';
+import {
+  PollutantDataDto,
+} from '../../services/types'
 
 type LocationMarkerProps = {
   forecastData: Record<string, ForecastResponseDto[]>;
@@ -15,70 +18,72 @@ type LocationMarkerProps = {
 };
 
 export type LocationMarkerRef = {
-  tick: (weight: number, uSphereWrapAmount: number) => void;
+  tick: (weight: number) => void;
   changeProjection: (globeState: boolean) => void;
   setVisible: (isVisible: boolean) => void;
 };
 
-// Uniforms used in the custom shader material
 const shaderUniforms = {
   uSphereWrapAmount: { value: 0.0 },
   uFrameWeight: { value: 0.5 },
   uFrame: { value: 0.0 },
 };
 
-// Utility function to flatten forecast and measurement data
 const createDataArrays = (
   forecastData: Record<string, ForecastResponseDto[]>,
   measurementData: Record<string, MeasurementSummaryResponseDto[]>,
   variable: string
 ) => {
-  let variable_name;
+  let variable_name: keyof ForecastResponseDto;
+
   if (variable === 'aqi') {
-    variable_name = 'overall_aqi_level';
+    variable_name = 'overall_aqi_level' as keyof ForecastResponseDto;
   } else {
-    variable_name = variable;
+    variable_name = variable as keyof ForecastResponseDto; // Ensure variable is a valid key
   }
 
   const forecastDataArray: number[] = [];
   const measurementDataArray: number[] = [];
 
-  // Loop through each city and process forecast and measurement data
   Object.keys(forecastData).forEach((city) => {
     const cityForecastData = forecastData[city];
     const cityMeasurementData = measurementData[city] || []; // Measurement data may be missing for some cities
 
-    // Process forecast data
     cityForecastData.forEach((forecastEntry) => {
-      const forecastValue = forecastEntry[variable_name];
-      // console.log(forecastEntry)
-      if (variable === 'aqi') {
-        forecastDataArray.push(forecastValue);
-      } else {
-        forecastDataArray.push(forecastValue.value);
+      const forecastValue = forecastEntry[variable_name as keyof typeof forecastEntry];
+    
+      if (forecastValue !== undefined && forecastValue !== null) {
+        if (variable === 'aqi') {
+          if (typeof forecastValue === 'number') {
+            forecastDataArray.push(forecastValue); // Push the number value
+          }
+        } else {
+          if (typeof forecastValue === 'object' && 'value' in forecastValue) {
+            const value = (forecastValue as PollutantDataDto).value;
+            if (typeof value === 'number') {
+              forecastDataArray.push(value);
+            }
+          }
+        }
       }
     });
 
-
-    // Process measurement data by matching valid_time with measurement_base_time
     cityForecastData.forEach((forecastEntry) => {
       const matchingMeasurement = cityMeasurementData.find(
         (measurementEntry) =>
           measurementEntry.measurement_base_time === forecastEntry.valid_time
       );
-
+    
       if (variable === 'aqi') {
-        // For AQI, return the overall_aqi_level.mean, or -1 if no match is found
         const measurementValue =
-          matchingMeasurement && matchingMeasurement[variable_name]
-            ? matchingMeasurement[variable_name].mean
+          matchingMeasurement && matchingMeasurement[variable_name as keyof MeasurementSummaryResponseDto]
+            ? (matchingMeasurement[variable_name as keyof MeasurementSummaryResponseDto] as any).mean
             : -1;
         measurementDataArray.push(measurementValue);
       } else {
-        // For PM10, return the overall_aqi_level.mean.value, or -1 if no match is found
         const measurementValue =
-          matchingMeasurement && matchingMeasurement[variable_name]
-            ? matchingMeasurement[variable_name].mean.value
+          matchingMeasurement && matchingMeasurement[variable_name as keyof MeasurementSummaryResponseDto]
+            ? (matchingMeasurement[variable_name as keyof MeasurementSummaryResponseDto] as any).mean.value
             : -1.0;
         measurementDataArray.push(measurementValue);
       }
@@ -86,21 +91,17 @@ const createDataArrays = (
   });
 
 
-  // Convert the data into vec4 (RGBA format)
   const forecastDataVec4Array = new Float32Array(forecastDataArray.length * 4);
   const measurementDataVec4Array = new Float32Array(measurementDataArray.length * 4);
-
 
   const numCities = Object.keys(forecastData).length;
   const numEntries = forecastDataArray.length / numCities;
 
-  // Fill the vec4 array in column-major order (column-first layout)
   for (let row = 0; row < numEntries; row++) {
     for (let col = 0; col < numCities; col++) {
       const index = col * numEntries + row; // Row-major index
       const columnMajorIndex = row * numCities + col; // Column-major index
 
-      // Place the value in the red channel of the vec4
       forecastDataVec4Array.set([forecastDataArray[index], 0, 0, 0], columnMajorIndex * 4);
       measurementDataVec4Array.set([measurementDataArray[index], 0, 0, 0], columnMajorIndex * 4);
     }
@@ -110,7 +111,7 @@ const createDataArrays = (
 };
 
 const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
-  ({ forecastData, measurementData, selectedVariable, isVisible, cameraControlsRef }, ref): JSX.Element => {
+  ({ forecastData, measurementData, selectedVariable, isVisible, cameraControlsRef }, ref): JSX.Element | null => {
    
     if (
       !forecastData || 
@@ -121,36 +122,33 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
       return null;
     }
     
-    const instancedMarkerRef = useRef<InstancedMesh>(null);
+    type InstancedMeshWithUniforms = THREE.InstancedMesh & {
+      material: THREE.ShaderMaterial | THREE.ShaderMaterial;
+    };
 
-    const [triggerRender, setTriggerRender] = useState(0); // Using a number state for forcing render
+    // const instancedMarkerRef = useRef<InstancedMesh>(null);
+    const instancedMarkerRef = useRef<InstancedMeshWithUniforms>(null);
 
-    const { camera } = useThree(); // Access the camera
+    const [triggerRender, setTriggerRender] = useState(0);
 
-    // Create textures for forecast and measurement data
     const forecastDataTexture = useRef<DataTexture>();
     const measurementDataTexture = useRef<DataTexture>();
 
-    let MAX_MARKERS = Object.keys(forecastData).length; // Calculate dynamically based on forecastData length
+    let MAX_MARKERS = Object.keys(forecastData).length;
 
-    // Arrays to store latitude and longitude for each marker
     const latitudes = new Float32Array(MAX_MARKERS);
     const longitudes = new Float32Array(MAX_MARKERS);
 
-    // Listen for changes in selectedVariable and trigger re-render
     useEffect(() => {
-
-      // Trigger state update to force re-render
       setTriggerRender((prev) => prev + 1);
-    }, [selectedVariable]); // Depend on `selectedVariable`
+    }, [selectedVariable, forecastData, measurementData]); 
 
     useEffect(() => {
-      const firstKey = Object.keys(forecastData)[0]; // Get the first key
+      const firstKey = Object.keys(forecastData)[0]; 
       let numEntries = forecastData[firstKey].length;
 
       const { forecastDataVec4Array, measurementDataVec4Array } = createDataArrays(forecastData, measurementData, selectedVariable);
 
-      // Create textures for forecast and measurement data
       forecastDataTexture.current = new DataTexture(forecastDataVec4Array, MAX_MARKERS, numEntries, RGBAFormat, FloatType);
       forecastDataTexture.current.needsUpdate = true;
       forecastDataTexture.current.minFilter = THREE.NearestFilter
@@ -165,7 +163,6 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
 
     const markerSize = 0.025;
 
-    // Initialize markers' positions and other properties
     useEffect(() => {
       if (instancedMarkerRef.current) {
 
@@ -176,14 +173,12 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
           const lat = forecastData[city][0]?.location.latitude || 0;
           const lon = forecastData[city][0]?.location.longitude || 0;
 
-          // store lat and lon in the arrays
           latitudes[i] = lat;
           longitudes[i] = lon;
 
           i++;
         });
 
-        // Set markerIndex attribute (used in the shader to reference the correct data point)
         const markerIndices = new Float32Array(MAX_MARKERS);
         for (let i = 0; i < MAX_MARKERS; i++) {
           markerIndices[i] = i; // Each marker gets its index
@@ -195,34 +190,28 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
       }
     }, [forecastData, measurementData, selectedVariable]);
 
-    // Scale based on camera zoom or position
     const scaleBasedOnZoom = () => {
       if (instancedMarkerRef.current && cameraControlsRef.current) {
         const controls = cameraControlsRef.current;
-        const distance = controls.distance; // Access distance from CameraControls
-        const scaleFactor = distance ; // Adjust the scale factor based on the distance
+        const distance = controls.distance; 
+        const scaleFactor = distance ;
         instancedMarkerRef.current.material.uniforms.uZoomLevel.value = scaleFactor;
       }
     };
 
     useEffect(() => {
       if (instancedMarkerRef.current) {
-        instancedMarkerRef.current.frustumCulled = false; // Disable frustum culling
+        instancedMarkerRef.current.frustumCulled = false; 
       }
     }, []);
 
     useFrame(() => {
-      // Dynamically update scale based on camera distance
       scaleBasedOnZoom();
     });
 
-
-
-    // Implement the tick function
     const tick = (weight: number) => {
       shaderUniforms.uFrameWeight.value = weight % 1;
-      // shaderUniforms.uFrameWeight.value = 0.0;
-      shaderUniforms.uFrame.value = Math.floor(weight).toFixed(1);
+      shaderUniforms.uFrame.value = parseFloat(Math.floor(weight).toFixed(1));
     };
 
     const changeProjection = (globeState: boolean) => {
@@ -249,7 +238,7 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
     selectedVariable === "so2" ? 6 : undefined;
 
     return (
-      <instancedMesh ref={instancedMarkerRef} args={[null, null, MAX_MARKERS]}>
+      <instancedMesh ref={instancedMarkerRef} args={[undefined, undefined, MAX_MARKERS]}>
         <sphereGeometry args={[markerSize, 16, 16]} />
         <CustomShaderMaterial
           baseMaterial={THREE.MeshLambertMaterial}

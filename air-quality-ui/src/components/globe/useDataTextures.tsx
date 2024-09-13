@@ -80,7 +80,7 @@ const createCanvasTextureFromCanvas = (
 
     textureCanvas.width = 900;
     textureCanvas.height = 450;
-    textureContext.drawImage(
+    textureContext?.drawImage(
       canvas,
       index * 900,
       0,

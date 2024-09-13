@@ -1,12 +1,15 @@
 // World.tsx
-import { useRef, useState } from 'react';
+import { useRef, useState, CSSProperties } from 'react';
 import { Canvas } from '@react-three/fiber';
-// import { Perf } from 'r3f-perf';
 import { CameraControls } from '@react-three/drei';
 import { SurfaceLayer, SurfaceLayerRef } from './SurfaceLayer';
 import LocationMarker, { LocationMarkerRef } from './LocationMarker';
 import CameraSettings from './CameraSettings'; // Import the CameraSettings component
 import ControlsHandler from './ControlsHandler'; // Import the ControlsHandler component
+import {
+  ForecastResponseDto,
+  MeasurementSummaryResponseDto,
+} from '../../services/types'
 
 type WorldProps = {
   forecastData: Record<string, ForecastResponseDto[]>;
@@ -77,7 +80,6 @@ const World = ({
           isFilterNearest={isFilterNearest}
           isTimeInterpolation={isTimeInterpolation}
           selectedVariable={selectedVariable}
-          toggle={toggle}
         />
 
         <LocationMarker
@@ -104,17 +106,13 @@ const World = ({
         handleTimeInterpolationClick={handleTimeInterpolationClick}
         handleVariableSelect={handleVariableSelect}
         isTimeRunning={isTimeRunning}
-        isLocationMarkerOn={isLocationMarkerOn}
-        isFilterNearest={isFilterNearest}
-        isTimeInterpolation={isTimeInterpolation}
-        selectedVariable={selectedVariable}
         forecastData={forecastData}
       />
     </div>
   );
 };
 
-const styles = {
+const styles: { worldContainer: CSSProperties } = {
   worldContainer: {
     display: 'flex',
     flexDirection: 'column',

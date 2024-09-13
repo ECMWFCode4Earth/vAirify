@@ -12,7 +12,7 @@ export const getForecastData = async (
   baseTime: DateTime,
   locationName?: string,
   locationType: LocationType = 'city',
-): Promise<ForecastTextureResponseDto[]> => {
+): Promise<ForecastResponseDto[]> => {
   const params: Record<string, string> = {
     location_type: locationType,
     valid_time_from: dateFrom.toJSDate().toISOString(),
@@ -25,7 +25,7 @@ export const getForecastData = async (
 
 export const getForecastDataTexture = async (
   baseTime: DateTime,
-): Promise<ForecastResponseDto[]> => {
+): Promise<ForecastTextureResponseDto[]> => {
   const params: Record<string, string> = {
     base_time: baseTime.toJSDate().toISOString(),
   }

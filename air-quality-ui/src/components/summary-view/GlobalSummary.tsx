@@ -119,7 +119,7 @@ const GlobalSummary = (): JSX.Element => {
       )}
         {showMap && (
           <World
-            forecastData={forecastData}
+            forecastData={forecastData || {}}
             summarizedMeasurementData={summarizedMeasurementData}
             toggle={showMap ? 'world-visible' : 'world-hidden'}
           />

@@ -1,6 +1,9 @@
 // ControlsHandler.tsx
 import React from 'react';
 import Controls from './Controls';
+import {
+  ForecastResponseDto,
+} from '../../services/types'
 
 type ControlsHandlerProps = {
   toggleTimeUpdate: () => void;
@@ -11,10 +14,7 @@ type ControlsHandlerProps = {
   handleTimeInterpolationClick: (timeInterpolationState: boolean) => void;
   handleVariableSelect: (variable: string) => void;
   isTimeRunning: boolean;
-  isLocationMarkerOn: boolean;
-  isFilterNearest: boolean;
-  isTimeInterpolation: boolean;
-  selectedVariable: string;
+  forecastData: Record<string, ForecastResponseDto[]>;
 };
 
 const ControlsHandler: React.FC<ControlsHandlerProps> = ({
@@ -26,10 +26,7 @@ const ControlsHandler: React.FC<ControlsHandlerProps> = ({
   handleTimeInterpolationClick,
   handleVariableSelect,
   isTimeRunning,
-  isLocationMarkerOn,
-  isFilterNearest,
-  isTimeInterpolation,
-  selectedVariable,
+  forecastData,
 }) => {
   return (
     <Controls
@@ -41,6 +38,7 @@ const ControlsHandler: React.FC<ControlsHandlerProps> = ({
       onGridFilterClick={handleGridFilterClick}
       onTimeInterpolationClick={handleTimeInterpolationClick}
       onVariableSelect={handleVariableSelect}
+      forecastData={forecastData}
     />
   );
 };

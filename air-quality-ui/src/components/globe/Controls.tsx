@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useRef, CSSProperties } from 'react';
 import { useForecastContext } from '../../context';
 import { PlayArrow, Pause, Add, Remove, LocationOn, Public, AccessTime, GridOn } from '@mui/icons-material';
-import { Button, Select, MenuItem } from '@mui/material';
+import { Button, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import { ForecastResponseDto } from '../../services/types';
 
 type ControlsProps = {
@@ -94,8 +94,8 @@ const Controls: React.FC<ControlsProps> = ({
     onTimeInterpolationClick(!timeInterpolationState); 
   };
 
-  const handleVariableSelectChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    const variable = event.target.value as string;
+  const handleVariableSelectChange = (event: SelectChangeEvent<string>) => {
+    const variable = event.target.value;
     setSelectedVariable(variable);
     onVariableSelect(variable); 
   };
@@ -190,7 +190,7 @@ const Controls: React.FC<ControlsProps> = ({
   );
 };
 
-const styles = {
+const styles: { [key: string]: CSSProperties } = {
   controlsContainer: {
     display: 'flex',
     justifyContent: 'center',
@@ -202,7 +202,7 @@ const styles = {
   },
   controlButton: {
     width: '50px', // Make the buttons consistent in size
-    height: '50px', 
+    height: '50px',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -214,7 +214,7 @@ const styles = {
   },
   sliderContainer: {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column', // Make sure this is typed correctly
     alignItems: 'center',
   },
   slider: {
