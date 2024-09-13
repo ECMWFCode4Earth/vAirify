@@ -1,10 +1,11 @@
 // CameraSettings.tsx
+import { CameraControls } from '@react-three/drei'
 import React, { useEffect } from 'react'
 import * as THREE from 'three'
 
 type CameraSettingsProps = {
   globeState: boolean
-  cameraControlsRef: React.RefObject<any>
+  cameraControlsRef: React.RefObject<CameraControls>
   toggle: string
 }
 

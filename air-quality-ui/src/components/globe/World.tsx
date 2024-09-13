@@ -83,14 +83,19 @@ const World = ({
           selectedVariable={selectedVariable}
         />
 
-        <LocationMarker
-          ref={markerRef}
-          forecastData={forecastData}
-          measurementData={summarizedMeasurementData}
-          selectedVariable={selectedVariable}
-          isVisible={isLocationMarkerOn}
-          cameraControlsRef={cameraControlsRef}
-        />
+        {!forecastData ||
+        Object.keys(forecastData).length === 0 ||
+        !summarizedMeasurementData ||
+        Object.keys(summarizedMeasurementData).length === 0 ? null : (
+          <LocationMarker
+            ref={markerRef}
+            forecastData={forecastData}
+            measurementData={summarizedMeasurementData}
+            selectedVariable={selectedVariable}
+            isVisible={isLocationMarkerOn}
+            cameraControlsRef={cameraControlsRef}
+          />
+        )}
 
         <CameraControls ref={cameraControlsRef} />
         {/* <Perf position="top-left" /> */}

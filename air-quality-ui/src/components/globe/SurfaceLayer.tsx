@@ -127,7 +127,7 @@ const SurfaceLayer = memo(
           true,
           materialRef,
         )
-      }, [selectedVariable])
+      }, [selectedVariable, fetchAndUpdateTextures, isFilterNearest])
 
       // Handle the tick function to externally control weight and sphere wrapping
       const tick = (sliderValue: number) => {

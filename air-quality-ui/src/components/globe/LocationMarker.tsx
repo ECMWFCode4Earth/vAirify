@@ -1,3 +1,4 @@
+import { CameraControls } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { gsap } from 'gsap'
 import {
@@ -22,7 +23,7 @@ type LocationMarkerProps = {
   measurementData: Record<string, MeasurementSummaryResponseDto[]>
   selectedVariable: string
   isVisible: boolean
-  cameraControlsRef: React.RefObject<any>
+  cameraControlsRef: React.RefObject<CameraControls>
 }
 
 export type LocationMarkerRef = {
@@ -92,7 +93,7 @@ const createDataArrays = (
             ? (
                 matchingMeasurement[
                   variable_name as keyof MeasurementSummaryResponseDto
-                ] as any
+                ] as { mean: number }
               ).mean
             : -1
         measurementDataArray.push(measurementValue)
@@ -105,7 +106,7 @@ const createDataArrays = (
             ? (
                 matchingMeasurement[
                   variable_name as keyof MeasurementSummaryResponseDto
-                ] as any
+                ] as { mean: { value: number } }
               ).mean.value
             : -1.0
         measurementDataArray.push(measurementValue)
@@ -151,30 +152,16 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
     },
     ref,
   ): JSX.Element | null => {
-    if (
-      !forecastData ||
-      Object.keys(forecastData).length === 0 ||
-      !measurementData ||
-      Object.keys(measurementData).length === 0
-    ) {
-      return null
-    }
-
     type InstancedMeshWithUniforms = THREE.InstancedMesh & {
       material: THREE.ShaderMaterial | THREE.ShaderMaterial
     }
 
     const instancedMarkerRef = useRef<InstancedMeshWithUniforms>(null)
-
     const [, forceUpdate] = useReducer((x) => x + 1, 0)
-
     const forecastDataTexture = useRef<DataTexture>()
     const measurementDataTexture = useRef<DataTexture>()
 
     const MAX_MARKERS = Object.keys(forecastData).length
-
-    const latitudes = new Float32Array(MAX_MARKERS)
-    const longitudes = new Float32Array(MAX_MARKERS)
 
     useEffect(() => {
       forceUpdate()
@@ -208,13 +195,16 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
       measurementDataTexture.current.needsUpdate = true
       measurementDataTexture.current.minFilter = THREE.NearestFilter
       measurementDataTexture.current.magFilter = THREE.NearestFilter
-    }, [forecastData, measurementData, selectedVariable])
+    }, [forecastData, measurementData, selectedVariable, MAX_MARKERS])
 
     const markerSize = 0.025
 
     useEffect(() => {
       if (instancedMarkerRef.current) {
         instancedMarkerRef.current.visible = isVisible
+
+        const latitudes = new Float32Array(MAX_MARKERS)
+        const longitudes = new Float32Array(MAX_MARKERS)
 
         let i = 0
         Object.keys(forecastData).forEach((city) => {
@@ -245,7 +235,13 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
         )
         instancedMarkerRef.current.instanceMatrix.needsUpdate = true
       }
-    }, [forecastData, measurementData, selectedVariable])
+    }, [
+      forecastData,
+      measurementData,
+      selectedVariable,
+      MAX_MARKERS,
+      isVisible,
+    ])
 
     const scaleBasedOnZoom = () => {
       if (instancedMarkerRef.current && cameraControlsRef.current) {
