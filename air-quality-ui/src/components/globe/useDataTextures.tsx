@@ -52,8 +52,8 @@ const createCanvasTexturesFromImages = async (
       img.crossOrigin = 'Anonymous'
       img.onload = onLoadImage
       img.onerror = (error) => {
-        console.error(`Failed to load image: ${url}`, error)
-        reject(new Error(`Failed to load image: ${url}`))
+        console.error(`Failed to load data texture: ${url}`, error)
+        reject(new Error(`Failed to load data texture: ${url}`))
       }
       img.src = url
       images.push(img)

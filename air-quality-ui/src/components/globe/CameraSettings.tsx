@@ -15,8 +15,6 @@ const CameraSettings: React.FC<CameraSettingsProps> = ({
 }) => {
   useEffect(() => {
     if (cameraControlsRef.current) {
-      console.log('render camera settings')
-      console.log(globeState)
       const controls = cameraControlsRef.current
 
       if (globeState) {

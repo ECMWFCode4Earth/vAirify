@@ -91,7 +91,6 @@ const SurfaceLayer = memo(
                     ? 6
                     : undefined
       materialRef.current.uniforms.uVariableIndex.value = variableIndex
-      console.log(variableIndex)
 
       const windowIndexRef = useRef(0)
 
