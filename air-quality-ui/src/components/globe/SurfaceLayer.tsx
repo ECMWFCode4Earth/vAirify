@@ -7,6 +7,7 @@ import {
   useRef, // Import useEffect
 } from 'react'
 import * as THREE from 'three'
+import { useTexture } from '@react-three/drei';
 
 import fragmentShader from './shaders/surfaceFrag.glsl'
 import vertexShader from './shaders/surfaceVert.glsl'
@@ -37,25 +38,17 @@ export type SurfaceLayerRef = {
   changeTimeInterpolation: (timeInterpolationState: boolean) => void
 }
 
-// Preload textures globally so they are not reloaded during re-renders
-const loader = new THREE.TextureLoader()
-const cmap = loader.load('/all_colormaps.png')
-const lsm = loader.load('/NaturalEarthCoastline2.jpg')
-const height = loader.load('/gebco_08_rev_elev_2k_HQ.jpg')
-
-cmap.minFilter = THREE.NearestFilter
-cmap.magFilter = THREE.NearestFilter
-lsm.minFilter = THREE.NearestFilter
-lsm.magFilter = THREE.NearestFilter
-height.minFilter = THREE.NearestFilter
-height.magFilter = THREE.NearestFilter
-
 const geometry = new THREE.PlaneGeometry(4, 2, 64 * 4, 32 * 4)
 
 const SurfaceLayer = memo(
   forwardRef<SurfaceLayerRef, SurfaceLayerProps>(
     ({ isFilterNearest, isTimeInterpolation, selectedVariable }, ref) => {
       const surface_layer_ref = useRef<PlaneType>(null)
+
+      const lsm = useTexture('/NaturalEarthCoastline2.jpg');
+      lsm.minFilter = THREE.NearestFilter;
+      lsm.magFilter = THREE.NearestFilter;
+
       const materialRef = useRef(
         new THREE.ShaderMaterial({
           vertexShader: vertexShader,
@@ -78,11 +71,9 @@ const SurfaceLayer = memo(
             thisDataMax: { value: new Float32Array(1) },
             nextDataMin: { value: null },
             nextDataMax: { value: null },
-            referenceHeightTexture: { value: height },
             referenceDataMin: { value: null },
             referenceDataMax: { value: null },
             referenceDataHeightFlag: { value: false },
-            colorMap: { value: cmap },
             colorMapIndex: { value: 0.0 },
             lsmTexture: { value: lsm },
             uVariableIndex: { value: null },
