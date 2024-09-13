@@ -27,7 +27,7 @@ jest.mock('@react-three/drei', () => ({
 }))
 
 // Mock HTMLCanvasElement getContext method to prevent WebGL context from being called in tests
-window.HTMLCanvasElement.prototype.getContext = () => ({
-  fillStyle: jest.fn(),
-  fillRect: jest.fn(),
-})
+// window.HTMLCanvasElement.prototype.getContext = () => ({
+//   fillStyle: jest.fn(),
+//   fillRect: jest.fn(),
+// })
