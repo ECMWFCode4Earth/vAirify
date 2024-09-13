@@ -21,7 +21,7 @@ import GlobalSummaryTable from '../summary-grid/table/GlobalSummaryTable'
 const GlobalSummary = (): JSX.Element => {
   const { forecastDetails } = useForecastContext()
   const [showAllColoured, setShowAllColoured] = useState<boolean>(true)
-  const [showMap, setShowMap] = useState<boolean>(true)
+  const [showMap, setShowMap] = useState<boolean>(false)
 
   const wrapSetShowAllColoured = useCallback(
     (val: boolean) => {
@@ -116,13 +116,6 @@ const GlobalSummary = (): JSX.Element => {
           <LoadingSpinner />
         </span>
       )}
-      {showMap && (
-        <World
-          forecastData={forecastData || {}}
-          summarizedMeasurementData={summarizedMeasurementData}
-          toggle={showMap ? 'world-visible' : 'world-hidden'}
-        />
-      )}
       {!forecastPending && !summaryPending && (
         <div className={classes['summary-container']}>
           <SummaryViewHeader
@@ -135,6 +128,13 @@ const GlobalSummary = (): JSX.Element => {
             showAllColoured={showAllColoured}
           />
           <MapViewHeader setShowMap={wrapSetShowMap} showMap={showMap} />
+          {showMap && (
+            <World
+              forecastData={forecastData || {}}
+              summarizedMeasurementData={summarizedMeasurementData}
+              toggle={showMap ? 'world-visible' : 'world-hidden'}
+            />
+          )}
         </div>
       )}
     </>

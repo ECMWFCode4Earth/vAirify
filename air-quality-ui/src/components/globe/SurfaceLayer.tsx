@@ -38,7 +38,7 @@ export type SurfaceLayerRef = {
   changeTimeInterpolation: (timeInterpolationState: boolean) => void
 }
 
-const geometry = new THREE.PlaneGeometry(4, 2, 64 * 4, 32 * 4)
+// const geometry =
 
 const SurfaceLayer = memo(
   forwardRef<SurfaceLayerRef, SurfaceLayerProps>(
@@ -190,7 +190,7 @@ const SurfaceLayer = memo(
       return (
         <mesh
           ref={surface_layer_ref}
-          geometry={geometry}
+          geometry={new THREE.PlaneGeometry(4, 2, 64 * 4, 32 * 4)}
           material={materialRef.current}
           renderOrder={1}
         />
