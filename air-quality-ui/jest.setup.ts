@@ -26,8 +26,6 @@ jest.mock('@react-three/drei', () => ({
   CameraControls: jest.fn(),
 }))
 
-// Mock HTMLCanvasElement getContext method to prevent WebGL context from being called in tests
-// window.HTMLCanvasElement.prototype.getContext = () => ({
-//   fillStyle: jest.fn(),
-//   fillRect: jest.fn(),
-// })
+jest.mock('three-custom-shader-material', () => {
+  return jest.fn(() => null) // Mock CustomShaderMaterial
+})
