@@ -113,6 +113,8 @@ export const useDataTextures = (
         fullImageCanvasRef.current = fullCanvas
 
         if (materialRef.current) {
+          console.log('fetchAndUpdateTextures', mode, filter)
+
           let thisCanvasTexture, nextCanvasTexture
 
           if (mode === 'forward') {
@@ -161,6 +163,7 @@ export const useDataTextures = (
 
   const updateTextureFilter = useCallback(
     (filter: string, materialRef: React.RefObject<THREE.ShaderMaterial>) => {
+      console.log('updateTextureFilter', filter)
       if (materialRef.current) {
         materialRef.current.uniforms.thisDataTexture.value.magFilter =
           filter === 'nearest' ? THREE.NearestFilter : THREE.LinearFilter

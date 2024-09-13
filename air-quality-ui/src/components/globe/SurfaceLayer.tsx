@@ -42,6 +42,11 @@ const SurfaceLayer = memo(
   forwardRef<SurfaceLayerRef, SurfaceLayerProps>(
     ({ isFilterNearest, isTimeInterpolation, selectedVariable }, ref) => {
       const surface_layer_ref = useRef<PlaneType>(null)
+      const isFilterNearestRef = useRef(isFilterNearest)
+
+      useEffect(() => {
+        isFilterNearestRef.current = isFilterNearest
+      }, [isFilterNearest])
 
       const lsm = useTexture('/NaturalEarthCoastline2.jpg')
       lsm.minFilter = THREE.NearestFilter
@@ -109,14 +114,14 @@ const SurfaceLayer = memo(
 
       useEffect(() => {
         fetchAndUpdateTextures(
-          0,
-          1,
+          windowIndexRef.current,
+          windowIndexRef.current + 1,
           'reset',
-          isFilterNearest ? 'nearest' : 'linear',
+          isFilterNearestRef.current ? 'nearest' : 'linear',
           true,
           materialRef,
         )
-      }, [selectedVariable, fetchAndUpdateTextures, isFilterNearest])
+      }, [selectedVariable, fetchAndUpdateTextures])
 
       // Handle the tick function to externally control weight and sphere wrapping
       const tick = (sliderValue: number) => {
