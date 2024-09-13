@@ -11,7 +11,6 @@ export const MapViewHeader = ({
   showMap,
   setShowMap,
 }: MapViewHeaderProps): JSX.Element => {
-
   return (
     <div className={classes['table-header']}>
       <div className={`ag-theme-quartz ${classes['table-switch-container']}`}>

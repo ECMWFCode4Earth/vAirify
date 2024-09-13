@@ -1,243 +1,316 @@
-import { useRef, forwardRef, useImperativeHandle, useEffect, useReducer } from 'react';
-import { DataTexture, RGBAFormat, FloatType } from 'three';
-import CustomShaderMaterial from 'three-custom-shader-material';
-import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
-import { gsap } from 'gsap';
-import { ForecastResponseDto, MeasurementSummaryResponseDto } from '../../services/types';
+import { useFrame } from '@react-three/fiber'
+import { gsap } from 'gsap'
 import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useReducer,
+  useRef,
+} from 'react'
+import { DataTexture, FloatType, RGBAFormat } from 'three'
+import * as THREE from 'three'
+import CustomShaderMaterial from 'three-custom-shader-material'
+
+import {
+  ForecastResponseDto,
+  MeasurementSummaryResponseDto,
   PollutantDataDto,
 } from '../../services/types'
 
 type LocationMarkerProps = {
-  forecastData: Record<string, ForecastResponseDto[]>;
-  measurementData: Record<string, MeasurementSummaryResponseDto[]>;
-  selectedVariable: string;
-  isVisible: boolean;
-  cameraControlsRef: React.RefObject<any>;
-};
+  forecastData: Record<string, ForecastResponseDto[]>
+  measurementData: Record<string, MeasurementSummaryResponseDto[]>
+  selectedVariable: string
+  isVisible: boolean
+  cameraControlsRef: React.RefObject<any>
+}
 
 export type LocationMarkerRef = {
-  tick: (weight: number) => void;
-  changeProjection: (globeState: boolean) => void;
-  setVisible: (isVisible: boolean) => void;
-};
+  tick: (weight: number) => void
+  changeProjection: (globeState: boolean) => void
+  setVisible: (isVisible: boolean) => void
+}
 
 const shaderUniforms = {
   uSphereWrapAmount: { value: 0.0 },
   uFrameWeight: { value: 0.5 },
   uFrame: { value: 0.0 },
-};
+}
 
 const createDataArrays = (
   forecastData: Record<string, ForecastResponseDto[]>,
   measurementData: Record<string, MeasurementSummaryResponseDto[]>,
-  variable: string
+  variable: string,
 ) => {
-  let variable_name: keyof ForecastResponseDto;
+  let variable_name: keyof ForecastResponseDto
 
   if (variable === 'aqi') {
-    variable_name = 'overall_aqi_level' as keyof ForecastResponseDto;
+    variable_name = 'overall_aqi_level' as keyof ForecastResponseDto
   } else {
-    variable_name = variable as keyof ForecastResponseDto;
+    variable_name = variable as keyof ForecastResponseDto
   }
 
-  const forecastDataArray: number[] = [];
-  const measurementDataArray: number[] = [];
+  const forecastDataArray: number[] = []
+  const measurementDataArray: number[] = []
 
   Object.keys(forecastData).forEach((city) => {
-    const cityForecastData = forecastData[city];
-    const cityMeasurementData = measurementData[city] || [];
+    const cityForecastData = forecastData[city]
+    const cityMeasurementData = measurementData[city] || []
 
     cityForecastData.forEach((forecastEntry) => {
-      const forecastValue = forecastEntry[variable_name as keyof typeof forecastEntry];
-    
+      const forecastValue =
+        forecastEntry[variable_name as keyof typeof forecastEntry]
+
       if (forecastValue !== undefined && forecastValue !== null) {
         if (variable === 'aqi') {
           if (typeof forecastValue === 'number') {
-            forecastDataArray.push(forecastValue);
+            forecastDataArray.push(forecastValue)
           }
         } else {
           if (typeof forecastValue === 'object' && 'value' in forecastValue) {
-            const value = (forecastValue as PollutantDataDto).value;
+            const value = (forecastValue as PollutantDataDto).value
             if (typeof value === 'number') {
-              forecastDataArray.push(value);
+              forecastDataArray.push(value)
             }
           }
         }
       }
-    });
+    })
 
     cityForecastData.forEach((forecastEntry) => {
       const matchingMeasurement = cityMeasurementData.find(
         (measurementEntry) =>
-          measurementEntry.measurement_base_time === forecastEntry.valid_time
-      );
-    
+          measurementEntry.measurement_base_time === forecastEntry.valid_time,
+      )
+
       if (variable === 'aqi') {
         const measurementValue =
-          matchingMeasurement && matchingMeasurement[variable_name as keyof MeasurementSummaryResponseDto]
-            ? (matchingMeasurement[variable_name as keyof MeasurementSummaryResponseDto] as any).mean
-            : -1;
-        measurementDataArray.push(measurementValue);
+          matchingMeasurement &&
+          matchingMeasurement[
+            variable_name as keyof MeasurementSummaryResponseDto
+          ]
+            ? (
+                matchingMeasurement[
+                  variable_name as keyof MeasurementSummaryResponseDto
+                ] as any
+              ).mean
+            : -1
+        measurementDataArray.push(measurementValue)
       } else {
         const measurementValue =
-          matchingMeasurement && matchingMeasurement[variable_name as keyof MeasurementSummaryResponseDto]
-            ? (matchingMeasurement[variable_name as keyof MeasurementSummaryResponseDto] as any).mean.value
-            : -1.0;
-        measurementDataArray.push(measurementValue);
+          matchingMeasurement &&
+          matchingMeasurement[
+            variable_name as keyof MeasurementSummaryResponseDto
+          ]
+            ? (
+                matchingMeasurement[
+                  variable_name as keyof MeasurementSummaryResponseDto
+                ] as any
+              ).mean.value
+            : -1.0
+        measurementDataArray.push(measurementValue)
       }
-    });
-  });
+    })
+  })
 
+  const forecastDataVec4Array = new Float32Array(forecastDataArray.length * 4)
+  const measurementDataVec4Array = new Float32Array(
+    measurementDataArray.length * 4,
+  )
 
-  const forecastDataVec4Array = new Float32Array(forecastDataArray.length * 4);
-  const measurementDataVec4Array = new Float32Array(measurementDataArray.length * 4);
-
-  const numCities = Object.keys(forecastData).length;
-  const numEntries = forecastDataArray.length / numCities;
+  const numCities = Object.keys(forecastData).length
+  const numEntries = forecastDataArray.length / numCities
 
   for (let row = 0; row < numEntries; row++) {
     for (let col = 0; col < numCities; col++) {
-      const index = col * numEntries + row; 
-      const columnMajorIndex = row * numCities + col; 
+      const index = col * numEntries + row
+      const columnMajorIndex = row * numCities + col
 
-      forecastDataVec4Array.set([forecastDataArray[index], 0, 0, 0], columnMajorIndex * 4);
-      measurementDataVec4Array.set([measurementDataArray[index], 0, 0, 0], columnMajorIndex * 4);
+      forecastDataVec4Array.set(
+        [forecastDataArray[index], 0, 0, 0],
+        columnMajorIndex * 4,
+      )
+      measurementDataVec4Array.set(
+        [measurementDataArray[index], 0, 0, 0],
+        columnMajorIndex * 4,
+      )
     }
   }
 
-  return { forecastDataVec4Array, measurementDataVec4Array };
-};
+  return { forecastDataVec4Array, measurementDataVec4Array }
+}
 
 const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
-  ({ forecastData, measurementData, selectedVariable, isVisible, cameraControlsRef }, ref): JSX.Element | null => {
-   
+  (
+    {
+      forecastData,
+      measurementData,
+      selectedVariable,
+      isVisible,
+      cameraControlsRef,
+    },
+    ref,
+  ): JSX.Element | null => {
     if (
-      !forecastData || 
-      Object.keys(forecastData).length === 0 || 
-      !measurementData || 
+      !forecastData ||
+      Object.keys(forecastData).length === 0 ||
+      !measurementData ||
       Object.keys(measurementData).length === 0
     ) {
-      return null;
+      return null
     }
-    
+
     type InstancedMeshWithUniforms = THREE.InstancedMesh & {
-      material: THREE.ShaderMaterial | THREE.ShaderMaterial;
-    };
+      material: THREE.ShaderMaterial | THREE.ShaderMaterial
+    }
 
-    const instancedMarkerRef = useRef<InstancedMeshWithUniforms>(null);
+    const instancedMarkerRef = useRef<InstancedMeshWithUniforms>(null)
 
-    const [, forceUpdate] = useReducer(x => x + 1, 0);
+    const [, forceUpdate] = useReducer((x) => x + 1, 0)
 
-    const forecastDataTexture = useRef<DataTexture>();
-    const measurementDataTexture = useRef<DataTexture>();
+    const forecastDataTexture = useRef<DataTexture>()
+    const measurementDataTexture = useRef<DataTexture>()
 
-    let MAX_MARKERS = Object.keys(forecastData).length;
+    const MAX_MARKERS = Object.keys(forecastData).length
 
-    const latitudes = new Float32Array(MAX_MARKERS);
-    const longitudes = new Float32Array(MAX_MARKERS);
-
-    useEffect(() => {
-      forceUpdate();
-    }, [selectedVariable, forecastData, measurementData]); 
+    const latitudes = new Float32Array(MAX_MARKERS)
+    const longitudes = new Float32Array(MAX_MARKERS)
 
     useEffect(() => {
-      const firstKey = Object.keys(forecastData)[0]; 
-      let numEntries = forecastData[firstKey].length;
+      forceUpdate()
+    }, [selectedVariable, forecastData, measurementData])
 
-      const { forecastDataVec4Array, measurementDataVec4Array } = createDataArrays(forecastData, measurementData, selectedVariable);
+    useEffect(() => {
+      const firstKey = Object.keys(forecastData)[0]
+      const numEntries = forecastData[firstKey].length
 
-      forecastDataTexture.current = new DataTexture(forecastDataVec4Array, MAX_MARKERS, numEntries, RGBAFormat, FloatType);
-      forecastDataTexture.current.needsUpdate = true;
+      const { forecastDataVec4Array, measurementDataVec4Array } =
+        createDataArrays(forecastData, measurementData, selectedVariable)
+
+      forecastDataTexture.current = new DataTexture(
+        forecastDataVec4Array,
+        MAX_MARKERS,
+        numEntries,
+        RGBAFormat,
+        FloatType,
+      )
+      forecastDataTexture.current.needsUpdate = true
       forecastDataTexture.current.minFilter = THREE.NearestFilter
       forecastDataTexture.current.magFilter = THREE.NearestFilter
 
-      measurementDataTexture.current = new DataTexture(measurementDataVec4Array, MAX_MARKERS, numEntries, RGBAFormat, FloatType);
-      measurementDataTexture.current.needsUpdate = true;
+      measurementDataTexture.current = new DataTexture(
+        measurementDataVec4Array,
+        MAX_MARKERS,
+        numEntries,
+        RGBAFormat,
+        FloatType,
+      )
+      measurementDataTexture.current.needsUpdate = true
       measurementDataTexture.current.minFilter = THREE.NearestFilter
       measurementDataTexture.current.magFilter = THREE.NearestFilter
-    }, [forecastData, measurementData, selectedVariable]);
+    }, [forecastData, measurementData, selectedVariable])
 
-
-    const markerSize = 0.025;
+    const markerSize = 0.025
 
     useEffect(() => {
       if (instancedMarkerRef.current) {
+        instancedMarkerRef.current.visible = isVisible
 
-        instancedMarkerRef.current.visible = isVisible;
-
-        let i = 0;
+        let i = 0
         Object.keys(forecastData).forEach((city) => {
-          const lat = forecastData[city][0]?.location.latitude || 0;
-          const lon = forecastData[city][0]?.location.longitude || 0;
+          const lat = forecastData[city][0]?.location.latitude || 0
+          const lon = forecastData[city][0]?.location.longitude || 0
 
-          latitudes[i] = lat;
-          longitudes[i] = lon;
+          latitudes[i] = lat
+          longitudes[i] = lon
 
-          i++;
-        });
+          i++
+        })
 
-        const markerIndices = new Float32Array(MAX_MARKERS);
+        const markerIndices = new Float32Array(MAX_MARKERS)
         for (let i = 0; i < MAX_MARKERS; i++) {
-          markerIndices[i] = i;
+          markerIndices[i] = i
         }
-        instancedMarkerRef.current.geometry.setAttribute('lat', new THREE.InstancedBufferAttribute(latitudes, 1));
-        instancedMarkerRef.current.geometry.setAttribute('lon', new THREE.InstancedBufferAttribute(longitudes, 1));
-        instancedMarkerRef.current.geometry.setAttribute('markerIndex', new THREE.InstancedBufferAttribute(markerIndices, 1));
-        instancedMarkerRef.current.instanceMatrix.needsUpdate = true;
+        instancedMarkerRef.current.geometry.setAttribute(
+          'lat',
+          new THREE.InstancedBufferAttribute(latitudes, 1),
+        )
+        instancedMarkerRef.current.geometry.setAttribute(
+          'lon',
+          new THREE.InstancedBufferAttribute(longitudes, 1),
+        )
+        instancedMarkerRef.current.geometry.setAttribute(
+          'markerIndex',
+          new THREE.InstancedBufferAttribute(markerIndices, 1),
+        )
+        instancedMarkerRef.current.instanceMatrix.needsUpdate = true
       }
-    }, [forecastData, measurementData, selectedVariable]);
+    }, [forecastData, measurementData, selectedVariable])
 
     const scaleBasedOnZoom = () => {
       if (instancedMarkerRef.current && cameraControlsRef.current) {
-        const controls = cameraControlsRef.current;
-        const distance = controls.distance; 
-        const scaleFactor = distance ;
-        instancedMarkerRef.current.material.uniforms.uZoomLevel.value = scaleFactor;
+        const controls = cameraControlsRef.current
+        const distance = controls.distance
+        const scaleFactor = distance
+        instancedMarkerRef.current.material.uniforms.uZoomLevel.value =
+          scaleFactor
       }
-    };
+    }
 
     useEffect(() => {
       if (instancedMarkerRef.current) {
-        instancedMarkerRef.current.frustumCulled = false; 
+        instancedMarkerRef.current.frustumCulled = false
       }
-    }, []);
+    }, [])
 
     useFrame(() => {
-      scaleBasedOnZoom();
-    });
+      scaleBasedOnZoom()
+    })
 
     const tick = (weight: number) => {
-      shaderUniforms.uFrameWeight.value = weight % 1;
-      shaderUniforms.uFrame.value = parseFloat(Math.floor(weight).toFixed(1));
-    };
+      shaderUniforms.uFrameWeight.value = weight % 1
+      shaderUniforms.uFrame.value = parseFloat(Math.floor(weight).toFixed(1))
+    }
 
     const changeProjection = (globeState: boolean) => {
-      gsap.to(shaderUniforms.uSphereWrapAmount, { value: globeState ? 1.0 : 0.0, duration: 2 });
-    };
+      gsap.to(shaderUniforms.uSphereWrapAmount, {
+        value: globeState ? 1.0 : 0.0,
+        duration: 2,
+      })
+    }
 
     const setVisible = (isVisible: boolean) => {
       if (instancedMarkerRef.current) {
-        instancedMarkerRef.current.visible = isVisible;
+        instancedMarkerRef.current.visible = isVisible
       }
-    };
+    }
 
     useImperativeHandle(ref, () => ({
       tick,
       changeProjection,
-      setVisible
-    }));
+      setVisible,
+    }))
 
-    const variableIndex = selectedVariable === "aqi" ? 1 :
-    selectedVariable === "pm2_5" ? 2 :
-    selectedVariable === "pm10" ? 3 :
-    selectedVariable === "o3" ? 4 :
-    selectedVariable === "no2" ? 5 :
-    selectedVariable === "so2" ? 6 : undefined;
+    const variableIndex =
+      selectedVariable === 'aqi'
+        ? 1
+        : selectedVariable === 'pm2_5'
+          ? 2
+          : selectedVariable === 'pm10'
+            ? 3
+            : selectedVariable === 'o3'
+              ? 4
+              : selectedVariable === 'no2'
+                ? 5
+                : selectedVariable === 'so2'
+                  ? 6
+                  : undefined
 
     return (
-      <instancedMesh ref={instancedMarkerRef} args={[undefined, undefined, MAX_MARKERS]}>
+      <instancedMesh
+        ref={instancedMarkerRef}
+        args={[undefined, undefined, MAX_MARKERS]}
+      >
         <sphereGeometry args={[markerSize, 16, 16]} />
         <CustomShaderMaterial
           baseMaterial={THREE.MeshLambertMaterial}
@@ -484,16 +557,15 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
             measurementTexture: { value: measurementDataTexture.current },
             uVariableIndex: { value: variableIndex },
             uMaxMarkers: { value: forecastDataTexture.current?.image.width },
-            uNumTimseSteps: { value: forecastDataTexture.current?.image.height },
+            uNumTimseSteps: {
+              value: forecastDataTexture.current?.image.height,
+            },
           }}
           transparent
         />
       </instancedMesh>
-    );
-  }
+    )
+  },
+)
 
-
-
-);
-
-export default LocationMarker;
+export default LocationMarker

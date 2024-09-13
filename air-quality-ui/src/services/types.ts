@@ -45,7 +45,7 @@ export type ForecastTextureResponseDto = {
   texture_uri: string
   min_value: number
   max_value: number
-} 
+}
 
 export type MeasurementsResponseDto = {
   measurement_date: string

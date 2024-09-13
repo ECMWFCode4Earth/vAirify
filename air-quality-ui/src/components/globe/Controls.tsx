@@ -1,20 +1,36 @@
-import React, { useState, useEffect, useRef, CSSProperties, useReducer } from 'react';
-import { useForecastContext } from '../../context';
-import { PlayArrow, Pause, Add, Remove, LocationOn, Public, AccessTime, GridOn } from '@mui/icons-material';
-import { Button, Select, MenuItem, SelectChangeEvent } from '@mui/material';
-import { ForecastResponseDto } from '../../services/types';
+import {
+  AccessTime,
+  Add,
+  GridOn,
+  LocationOn,
+  Pause,
+  PlayArrow,
+  Public,
+  Remove,
+} from '@mui/icons-material'
+import { Button, MenuItem, Select, SelectChangeEvent } from '@mui/material'
+import React, {
+  CSSProperties,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from 'react'
+
+import { useForecastContext } from '../../context'
+import { ForecastResponseDto } from '../../services/types'
 
 type ControlsProps = {
-  isTimeRunning: boolean;
-  onToggleTimeUpdate: () => void;
-  onSliderChange: (value: number) => void;
-  onGlobeButtonClick: (globeAnimationState: boolean) => void;
-  onLocationMarkerClick: (locationMarkerState: boolean) => void;
-  onGridFilterClick: (filterState: boolean) => void;
-  onTimeInterpolationClick: (filterState: boolean) => void;
-  onVariableSelect: (variable: string) => void;
-  forecastData: Record<string, ForecastResponseDto[]>;
-};
+  isTimeRunning: boolean
+  onToggleTimeUpdate: () => void
+  onSliderChange: (value: number) => void
+  onGlobeButtonClick: (globeAnimationState: boolean) => void
+  onLocationMarkerClick: (locationMarkerState: boolean) => void
+  onGridFilterClick: (filterState: boolean) => void
+  onTimeInterpolationClick: (filterState: boolean) => void
+  onVariableSelect: (variable: string) => void
+  forecastData: Record<string, ForecastResponseDto[]>
+}
 
 const Controls: React.FC<ControlsProps> = ({
   isTimeRunning,
@@ -27,96 +43,114 @@ const Controls: React.FC<ControlsProps> = ({
   onVariableSelect,
   forecastData,
 }) => {
-  const [sliderValue, setSliderValue] = useState(0.0); 
-  const [globeAnimationState, setGlobeAnimationState] = useState(false); 
-  const [locationMarkerState, setLocationMarkerState] = useState(true); 
-  const [filterState, setGridFilterState] = useState(false); 
-  const [timeInterpolationState, setTimeInterpolationState] = useState(true); 
-  const [timeDelta, setTimeDelta] = useState(0.06); 
-  const [selectedVariable, setSelectedVariable] = useState('aqi'); 
+  const [sliderValue, setSliderValue] = useState(0.0)
+  const [globeAnimationState, setGlobeAnimationState] = useState(false)
+  const [locationMarkerState, setLocationMarkerState] = useState(true)
+  const [filterState, setGridFilterState] = useState(false)
+  const [timeInterpolationState, setTimeInterpolationState] = useState(true)
+  const [timeDelta, setTimeDelta] = useState(0.06)
+  const [selectedVariable, setSelectedVariable] = useState('aqi')
 
   const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(event.target.value); 
-    setSliderValue(value);
-  };
+    const value = parseFloat(event.target.value)
+    setSliderValue(value)
+  }
 
-  const { forecastDetails } = useForecastContext();
-  const numForecastTimeStepsRef = useRef<number>(0);
-  const [, forceUpdate] = useReducer(x => x + 1, 0);
+  const { forecastDetails } = useForecastContext()
+  const numForecastTimeStepsRef = useRef<number>(0)
+  const [, forceUpdate] = useReducer((x) => x + 1, 0)
 
   useEffect(() => {
-    const numForecastHours = forecastDetails.maxForecastDate.diff(forecastDetails.forecastBaseDate, 'hours').hours;
-    const newNumForecastTimeSteps = numForecastHours / 3;
+    const numForecastHours = forecastDetails.maxForecastDate.diff(
+      forecastDetails.forecastBaseDate,
+      'hours',
+    ).hours
+    const newNumForecastTimeSteps = numForecastHours / 3
 
     if (numForecastTimeStepsRef.current !== newNumForecastTimeSteps) {
-      numForecastTimeStepsRef.current = newNumForecastTimeSteps;
-      forceUpdate();  // This will trigger a re-render
+      numForecastTimeStepsRef.current = newNumForecastTimeSteps
+      forceUpdate() // This will trigger a re-render
     }
-  }, [forecastDetails.maxForecastDate, forecastDetails.forecastBaseDate]);
+  }, [forecastDetails.maxForecastDate, forecastDetails.forecastBaseDate])
 
-  const currentDate = forecastDetails.forecastBaseDate.plus({ hours: Math.floor(sliderValue * 3) }).toFormat('yyyy-MM-dd T') + ' UTC';
+  const currentDate =
+    forecastDetails.forecastBaseDate
+      .plus({ hours: Math.floor(sliderValue * 3) })
+      .toFormat('yyyy-MM-dd T') + ' UTC'
 
   useEffect(() => {
-    setSliderValue(0);
-  }, [forecastData]);
-  
+    setSliderValue(0)
+  }, [forecastData])
+
   useEffect(() => {
-    onSliderChange(sliderValue);
-  }, [sliderValue, onSliderChange]);
+    onSliderChange(sliderValue)
+  }, [sliderValue, onSliderChange])
 
   useEffect(() => {
     if (isTimeRunning) {
       const interval = setInterval(() => {
-        setSliderValue((prevValue) => (prevValue >= numForecastTimeStepsRef.current ? 0 : prevValue + timeDelta));
-      }, 25);
+        setSliderValue((prevValue) =>
+          prevValue >= numForecastTimeStepsRef.current
+            ? 0
+            : prevValue + timeDelta,
+        )
+      }, 25)
 
-      return () => clearInterval(interval);
+      return () => clearInterval(interval)
     }
-  }, [isTimeRunning, timeDelta]);
+  }, [isTimeRunning, timeDelta])
 
   const handleGlobeButtonClick = () => {
-    setGlobeAnimationState((prevState) => !prevState); 
-    onGlobeButtonClick(!globeAnimationState); 
-  };
+    setGlobeAnimationState((prevState) => !prevState)
+    onGlobeButtonClick(!globeAnimationState)
+  }
 
   const handleLocationMarkerClick = () => {
-    setLocationMarkerState((prevState) => !prevState); 
-    onLocationMarkerClick(!locationMarkerState); 
-  };
+    setLocationMarkerState((prevState) => !prevState)
+    onLocationMarkerClick(!locationMarkerState)
+  }
 
   const handleGridFilterClick = () => {
-    setGridFilterState((prevState) => !prevState);
-    onGridFilterClick(!filterState); 
-  };
+    setGridFilterState((prevState) => !prevState)
+    onGridFilterClick(!filterState)
+  }
 
   const handleTimeInterpolationClick = () => {
-    setTimeInterpolationState((prevState) => !prevState);
-    onTimeInterpolationClick(!timeInterpolationState); 
-  };
+    setTimeInterpolationState((prevState) => !prevState)
+    onTimeInterpolationClick(!timeInterpolationState)
+  }
 
   const handleVariableSelectChange = (event: SelectChangeEvent<string>) => {
-    const variable = event.target.value;
-    setSelectedVariable(variable);
-    onVariableSelect(variable); 
-  };
+    const variable = event.target.value
+    setSelectedVariable(variable)
+    onVariableSelect(variable)
+  }
 
   const handleIncreaseTimeDelta = () => {
-    setTimeDelta((prevDelta) => prevDelta + 0.02); 
-  };
+    setTimeDelta((prevDelta) => prevDelta + 0.02)
+  }
 
   const handleDecreaseTimeDelta = () => {
-    setTimeDelta((prevDelta) => Math.max(0.02, prevDelta - 0.02)); 
-  };
+    setTimeDelta((prevDelta) => Math.max(0.02, prevDelta - 0.02))
+  }
 
   return (
     <div style={styles.controlsContainer}>
-      <Button 
-        onClick={onToggleTimeUpdate} 
-        style={{ 
-          ...styles.controlButton, 
-          backgroundColor: isTimeRunning ? '#1976d2' : 'lightgray', 
-        }}>
-        {isTimeRunning ? <Pause fontSize="large" style={isTimeRunning ? styles.activeIcon : undefined} /> : <PlayArrow fontSize="large" />}
+      <Button
+        onClick={onToggleTimeUpdate}
+        style={{
+          ...styles.controlButton,
+          backgroundColor: isTimeRunning ? '#1976d2' : 'lightgray',
+        }}
+      >
+        {isTimeRunning ? (
+          <Pause
+            fontSize="large"
+            style={isTimeRunning ? styles.activeIcon : undefined}
+          />
+        ) : (
+          <PlayArrow fontSize="large" />
+        )}
       </Button>
 
       <Button onClick={handleDecreaseTimeDelta} style={styles.controlButton}>
@@ -141,54 +175,71 @@ const Controls: React.FC<ControlsProps> = ({
         />
       </div>
 
-      <Button 
-        onClick={handleLocationMarkerClick} 
-        style={{ 
-          ...styles.controlButton, 
-          backgroundColor: locationMarkerState ? '#1976d2' : 'lightgray',  
-        }}>
-        <LocationOn fontSize="large" style={locationMarkerState ? styles.activeIcon : undefined} />
+      <Button
+        onClick={handleLocationMarkerClick}
+        style={{
+          ...styles.controlButton,
+          backgroundColor: locationMarkerState ? '#1976d2' : 'lightgray',
+        }}
+      >
+        <LocationOn
+          fontSize="large"
+          style={locationMarkerState ? styles.activeIcon : undefined}
+        />
       </Button>
 
-      <Button 
-        onClick={handleGlobeButtonClick} 
-        style={{ 
-          ...styles.globeButton, 
+      <Button
+        onClick={handleGlobeButtonClick}
+        style={{
+          ...styles.globeButton,
           backgroundColor: globeAnimationState ? '#1976d2' : 'lightgray',
-        }}>
-        <Public fontSize="large" style={globeAnimationState ? styles.activeIcon : undefined} />
+        }}
+      >
+        <Public
+          fontSize="large"
+          style={globeAnimationState ? styles.activeIcon : undefined}
+        />
       </Button>
 
-      <Button 
-        onClick={handleGridFilterClick} 
-        style={{ 
-          ...styles.checkerboardButton, 
-          backgroundColor: filterState ? '#1976d2' : 'lightgray',  
-        }}>
-        <GridOn fontSize="large" style={filterState ? styles.activeIcon : undefined} />
+      <Button
+        onClick={handleGridFilterClick}
+        style={{
+          ...styles.checkerboardButton,
+          backgroundColor: filterState ? '#1976d2' : 'lightgray',
+        }}
+      >
+        <GridOn
+          fontSize="large"
+          style={filterState ? styles.activeIcon : undefined}
+        />
       </Button>
 
-      <Button 
-        onClick={handleTimeInterpolationClick} 
-        style={{ 
-          ...styles.controlButton, 
-          backgroundColor: timeInterpolationState ? '#1976d2' : 'lightgray', 
-        }}>
-        <AccessTime fontSize="large" style={timeInterpolationState ? styles.activeIcon : undefined} />
+      <Button
+        onClick={handleTimeInterpolationClick}
+        style={{
+          ...styles.controlButton,
+          backgroundColor: timeInterpolationState ? '#1976d2' : 'lightgray',
+        }}
+      >
+        <AccessTime
+          fontSize="large"
+          style={timeInterpolationState ? styles.activeIcon : undefined}
+        />
       </Button>
 
-      <Select 
-        value={selectedVariable} 
-        onChange={handleVariableSelectChange} 
-        style={styles.dropdown}>
+      <Select
+        value={selectedVariable}
+        onChange={handleVariableSelectChange}
+        style={styles.dropdown}
+      >
         <MenuItem value="aqi">AQI</MenuItem>
         <MenuItem value="pm2_5">PM2.5</MenuItem>
         <MenuItem value="pm10">PM10</MenuItem>
         <MenuItem value="o3">O3</MenuItem>
       </Select>
     </div>
-  );
-};
+  )
+}
 
 const styles: { [key: string]: CSSProperties } = {
   controlsContainer: {
@@ -234,6 +285,6 @@ const styles: { [key: string]: CSSProperties } = {
     color: 'white',
     fontWeight: 'bold',
   },
-};
+}
 
-export default Controls;
+export default Controls

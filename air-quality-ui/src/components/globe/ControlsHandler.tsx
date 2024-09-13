@@ -1,21 +1,20 @@
 // ControlsHandler.tsx
-import React from 'react';
-import Controls from './Controls';
-import {
-  ForecastResponseDto,
-} from '../../services/types'
+import React from 'react'
+
+import Controls from './Controls'
+import { ForecastResponseDto } from '../../services/types'
 
 type ControlsHandlerProps = {
-  toggleTimeUpdate: () => void;
-  handleSliderChange: (value: number) => void;
-  handleGlobeButtonClick: (globeState: boolean) => void;
-  handleLocationMarkerButtonClick: (locationMarkerState: boolean) => void;
-  handleGridFilterClick: (filterState: boolean) => void;
-  handleTimeInterpolationClick: (timeInterpolationState: boolean) => void;
-  handleVariableSelect: (variable: string) => void;
-  isTimeRunning: boolean;
-  forecastData: Record<string, ForecastResponseDto[]>;
-};
+  toggleTimeUpdate: () => void
+  handleSliderChange: (value: number) => void
+  handleGlobeButtonClick: (globeState: boolean) => void
+  handleLocationMarkerButtonClick: (locationMarkerState: boolean) => void
+  handleGridFilterClick: (filterState: boolean) => void
+  handleTimeInterpolationClick: (timeInterpolationState: boolean) => void
+  handleVariableSelect: (variable: string) => void
+  isTimeRunning: boolean
+  forecastData: Record<string, ForecastResponseDto[]>
+}
 
 const ControlsHandler: React.FC<ControlsHandlerProps> = ({
   toggleTimeUpdate,
@@ -40,7 +39,7 @@ const ControlsHandler: React.FC<ControlsHandlerProps> = ({
       onVariableSelect={handleVariableSelect}
       forecastData={forecastData}
     />
-  );
-};
+  )
+}
 
-export default ControlsHandler;
+export default ControlsHandler

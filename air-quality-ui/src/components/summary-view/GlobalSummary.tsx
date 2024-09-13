@@ -4,8 +4,8 @@ import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { useCallback, useMemo, useState } from 'react'
 
 import classes from './GlobalSummary.module.css'
-import { SummaryViewHeader } from './SummaryViewHeader'
 import { MapViewHeader } from './MapViewHeader'
+import { SummaryViewHeader } from './SummaryViewHeader'
 import { useForecastContext } from '../../context'
 import { getForecastData } from '../../services/forecast-data-service'
 import { getValidForecastTimesBetween } from '../../services/forecast-time-service'
@@ -15,8 +15,8 @@ import {
   MeasurementSummaryResponseDto,
 } from '../../services/types'
 import { LoadingSpinner } from '../common/LoadingSpinner'
-import GlobalSummaryTable from '../summary-grid/table/GlobalSummaryTable'
 import World from '../globe/World'
+import GlobalSummaryTable from '../summary-grid/table/GlobalSummaryTable'
 
 const GlobalSummary = (): JSX.Element => {
   const { forecastDetails } = useForecastContext()
@@ -73,7 +73,6 @@ const GlobalSummary = (): JSX.Element => {
     )
   }, [forecastDetails])
 
-
   const {
     data: summarizedMeasurementData,
     isPending: summaryPending,
@@ -117,13 +116,13 @@ const GlobalSummary = (): JSX.Element => {
           <LoadingSpinner />
         </span>
       )}
-        {showMap && (
-          <World
-            forecastData={forecastData || {}}
-            summarizedMeasurementData={summarizedMeasurementData}
-            toggle={showMap ? 'world-visible' : 'world-hidden'}
-          />
-        )}
+      {showMap && (
+        <World
+          forecastData={forecastData || {}}
+          summarizedMeasurementData={summarizedMeasurementData}
+          toggle={showMap ? 'world-visible' : 'world-hidden'}
+        />
+      )}
       {!forecastPending && !summaryPending && (
         <div className={classes['summary-container']}>
           <SummaryViewHeader
@@ -135,10 +134,7 @@ const GlobalSummary = (): JSX.Element => {
             summarizedMeasurements={summarizedMeasurementData}
             showAllColoured={showAllColoured}
           />
-          <MapViewHeader
-            setShowMap={wrapSetShowMap}
-            showMap={showMap}
-          />
+          <MapViewHeader setShowMap={wrapSetShowMap} showMap={showMap} />
         </div>
       )}
     </>
