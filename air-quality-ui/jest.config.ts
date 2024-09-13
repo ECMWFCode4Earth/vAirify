@@ -31,7 +31,7 @@ export default {
   moduleNameMapper: {
     '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/test/__ mocks __/fileMock.js',
     '\\.(css|less)$': 'identity-obj-proxy',
-    '\\.glsl$': '<rootDir>/test/__ mocks __/fileMock.js',
+    '\\.glsl$': '<rootDir>/test/__ mocks __/glslMock.js',
   },
   testPathIgnorePatterns: ['/node_modules/', '/system_tests/'],
   setupFiles: ['./jest.setup.ts'],
