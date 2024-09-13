@@ -10,27 +10,24 @@ Object.defineProperty(global.self, 'crypto', {
   },
 })
 
-// moke three.js and react-three-fiber components which rely on WebGL
-jest.mock('@react-three/fiber', () => {
-  const ReactThreeFiber = jest.requireActual('@react-three/fiber');
+// mock three.js and react-three-fiber components which rely on WebGL
+jest.mock('three', () => ({
+  WebGLRenderer: jest.fn(),
+  Scene: jest.fn(),
+  PerspectiveCamera: jest.fn(),
+}))
 
-  return {
-    ...ReactThreeFiber,
-    Canvas: ({ children }) => <div>{children}</div>, // Mocking the Canvas
-  };
-});
+jest.mock('three-stdlib', () => ({
+  LottieLoader: jest.fn(),
+}))
 
-jest.mock('@react-three/drei', () => {
-  return {
-    CameraControls: () => <div />, // Mocking CameraControls component
-    // Add more mocks as needed
-  };
-});
+// Mock @react-three/drei components like CameraControls
+jest.mock('@react-three/drei', () => ({
+  CameraControls: jest.fn(),
+}))
 
-window.HTMLCanvasElement.prototype.getContext = () => {
-  return {
-    fillStyle: jest.fn(),
-    fillRect: jest.fn(),
-    // Add more mocked methods if needed
-  };
-};
+// Mock HTMLCanvasElement getContext method to prevent WebGL context from being called in tests
+window.HTMLCanvasElement.prototype.getContext = () => ({
+  fillStyle: jest.fn(),
+  fillRect: jest.fn(),
+})
