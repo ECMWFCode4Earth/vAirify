@@ -1,0 +1,25 @@
+database_record_for_city_and_valid_time=================================
+{'_id': ObjectId('66e2e0ec82fe53ac6629b017'),
+  'source': 'cams-production', 'location_type': 'city',
+  'forecast_valid_time': datetime.datetime(2024, 9, 11, 12, 0),
+  'forecast_base_time': datetime.datetime(2024, 9, 11, 0, 0),
+  'name': 'Beijing',
+  'forecast_range': 12,
+  'last_modified_time': datetime.datetime(2024, 9, 12, 12, 39, 8, 334000),
+  'location': {'type': 'Point', 'coordinates': [116.39723, 39.9075]},
+  'no2': {'aqi_level': 2, 'value': 80.7019431223734},
+  'o3': {'aqi_level': 1, 'value': 0.002250411998695606},
+  'overall_aqi_level': 6,
+  'pm10': {'aqi_level': 5, 'value': 127.5380515134725},
+  'pm2_5': {'aqi_level': 6, 'value': 89.29688661501235},
+  'so2': {'aqi_level': 1, 'value': 46.11757736705557},
+  'created_time': datetime.datetime(2024, 9, 12, 12, 39, 8, 334000)}
+=================================
+
+FTP: {'location_id': 'CN003',
+  'valid_time': '2024-09-11T12:00',
+  'O3': 0.002,
+  'NO2': 80.698,
+  'PM10': 127.538,
+  'PM2.5': 89.297,
+  'location_name': 'Beijing'}

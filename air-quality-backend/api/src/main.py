@@ -10,7 +10,7 @@ origins = [
 ]
 
 load_dotenv()
-config.fileConfig("./logging.ini", disable_existing_loggers=False)
+config.fileConfig("../logging.ini", disable_existing_loggers=False)
 
 app = FastAPI()
 app.add_middleware(

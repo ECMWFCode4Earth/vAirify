@@ -126,7 +126,10 @@ def get_forecast_percentage_divergence(
     database_pollutant_value = get_pollutant_value(
         pollutant, "database_forecast", database_record_for_city_and_valid_time
     )
-
+    print("ecmwf_record_for_city_and_valid_time: " + str(ecmwf_record_for_city_and_valid_time))
+    print("database_record_for_city_and_valid_time: " + str(database_record_for_city_and_valid_time))
+    print("database_pollutant_value: " + str(database_pollutant_value))
+    print("ecmwf_forecast_pollutant_value: " + str(ecmwf_forecast_pollutant_value))
     return calculate_database_divergence_from_ecmwf_forecast_values(
         database_pollutant_value, ecmwf_forecast_pollutant_value
     )
