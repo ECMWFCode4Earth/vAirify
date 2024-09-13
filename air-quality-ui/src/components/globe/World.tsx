@@ -11,11 +11,13 @@ import ControlsHandler from './ControlsHandler'; // Import the ControlsHandler c
 type WorldProps = {
   forecastData: Record<string, ForecastResponseDto[]>;
   summarizedMeasurementData: Record<string, MeasurementSummaryResponseDto[]>;
+  toggle: string;
 };
 
 const World = ({
   forecastData,
   summarizedMeasurementData,
+  toggle
 }: WorldProps): JSX.Element => {
   const surface_layer_ref = useRef<SurfaceLayerRef>(null);
   const markerRef = useRef<LocationMarkerRef>(null);
@@ -75,6 +77,7 @@ const World = ({
           isFilterNearest={isFilterNearest}
           isTimeInterpolation={isTimeInterpolation}
           selectedVariable={selectedVariable}
+          toggle={toggle}
         />
 
         <LocationMarker
@@ -89,7 +92,7 @@ const World = ({
         <CameraControls ref={cameraControlsRef} />
         {/* <Perf position="top-left" /> */}
 
-        <CameraSettings globeState={globeState} cameraControlsRef={cameraControlsRef} />
+        <CameraSettings globeState={globeState} cameraControlsRef={cameraControlsRef} toggle={toggle} />
       </Canvas>
 
       <ControlsHandler
@@ -105,6 +108,7 @@ const World = ({
         isFilterNearest={isFilterNearest}
         isTimeInterpolation={isTimeInterpolation}
         selectedVariable={selectedVariable}
+        forecastData={forecastData}
       />
     </div>
   );

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useForecastContext } from '../../context';
 import { PlayArrow, Pause, Add, Remove, LocationOn, Public, AccessTime, GridOn } from '@mui/icons-material';
 import { Button, Select, MenuItem } from '@mui/material';
+import { ForecastResponseDto } from '../../services/types';
 
 type ControlsProps = {
   isTimeRunning: boolean;
@@ -12,6 +13,7 @@ type ControlsProps = {
   onGridFilterClick: (filterState: boolean) => void;
   onTimeInterpolationClick: (filterState: boolean) => void;
   onVariableSelect: (variable: string) => void;
+  forecastData: Record<string, ForecastResponseDto[]>;
 };
 
 const Controls: React.FC<ControlsProps> = ({
@@ -23,6 +25,7 @@ const Controls: React.FC<ControlsProps> = ({
   onGridFilterClick,
   onTimeInterpolationClick,
   onVariableSelect,
+  forecastData,
 }) => {
   const [sliderValue, setSliderValue] = useState(0.0); 
   const [globeAnimationState, setGlobeAnimationState] = useState(false); 
@@ -38,11 +41,25 @@ const Controls: React.FC<ControlsProps> = ({
   };
 
   const { forecastDetails } = useForecastContext();
-  const numForecastHours = forecastDetails.maxForecastDate.diff(forecastDetails.forecastBaseDate, 'hours').hours;
-  const numForecastTimeSteps = numForecastHours / 3;
-  
+  const numForecastTimeStepsRef = useRef<number>(0);
+  const [reRender, setReRender] = useState(false);
+
+  useEffect(() => {
+    const numForecastHours = forecastDetails.maxForecastDate.diff(forecastDetails.forecastBaseDate, 'hours').hours;
+    const newNumForecastTimeSteps = numForecastHours / 3;
+
+    if (numForecastTimeStepsRef.current !== newNumForecastTimeSteps) {
+      numForecastTimeStepsRef.current = newNumForecastTimeSteps;
+      setReRender((prev) => !prev);
+    }
+  }, [forecastDetails.maxForecastDate, forecastDetails.forecastBaseDate]);
+
   const currentDate = forecastDetails.forecastBaseDate.plus({ hours: Math.floor(sliderValue * 3) }).toFormat('yyyy-MM-dd T') + ' UTC';
 
+  useEffect(() => {
+    setSliderValue(0);
+  }, [forecastData]);
+  
   useEffect(() => {
     onSliderChange(sliderValue);
   }, [sliderValue, onSliderChange]);
@@ -50,7 +67,7 @@ const Controls: React.FC<ControlsProps> = ({
   useEffect(() => {
     if (isTimeRunning) {
       const interval = setInterval(() => {
-        setSliderValue((prevValue) => (prevValue >= numForecastTimeSteps ? 0 : prevValue + timeDelta));
+        setSliderValue((prevValue) => (prevValue >= numForecastTimeStepsRef.current ? 0 : prevValue + timeDelta));
       }, 25);
 
       return () => clearInterval(interval);
@@ -97,7 +114,7 @@ const Controls: React.FC<ControlsProps> = ({
         onClick={onToggleTimeUpdate} 
         style={{ 
           ...styles.controlButton, 
-          backgroundColor: isTimeRunning ? '#1976d2' : 'lightgray',  // Blue when time is running
+          backgroundColor: isTimeRunning ? '#1976d2' : 'lightgray', 
         }}>
         {isTimeRunning ? <Pause fontSize="large" style={isTimeRunning ? styles.activeIcon : undefined} /> : <PlayArrow fontSize="large" />}
       </Button>
@@ -116,7 +133,7 @@ const Controls: React.FC<ControlsProps> = ({
           id="slider"
           type="range"
           min="0"
-          max={numForecastTimeSteps.toString()}
+          max={numForecastTimeStepsRef.current.toString()}
           step="0.1"
           value={sliderValue}
           onChange={handleSliderChange}
@@ -128,7 +145,7 @@ const Controls: React.FC<ControlsProps> = ({
         onClick={handleLocationMarkerClick} 
         style={{ 
           ...styles.controlButton, 
-          backgroundColor: locationMarkerState ? '#1976d2' : 'lightgray',  // Blue when location markers are visible
+          backgroundColor: locationMarkerState ? '#1976d2' : 'lightgray',  
         }}>
         <LocationOn fontSize="large" style={locationMarkerState ? styles.activeIcon : undefined} />
       </Button>
@@ -137,7 +154,7 @@ const Controls: React.FC<ControlsProps> = ({
         onClick={handleGlobeButtonClick} 
         style={{ 
           ...styles.globeButton, 
-          backgroundColor: globeAnimationState ? '#1976d2' : 'lightgray',  // Blue when globe animation is active
+          backgroundColor: globeAnimationState ? '#1976d2' : 'lightgray',
         }}>
         <Public fontSize="large" style={globeAnimationState ? styles.activeIcon : undefined} />
       </Button>
@@ -146,7 +163,7 @@ const Controls: React.FC<ControlsProps> = ({
         onClick={handleGridFilterClick} 
         style={{ 
           ...styles.checkerboardButton, 
-          backgroundColor: filterState ? '#1976d2' : 'lightgray',  // Blue when grid filter is active
+          backgroundColor: filterState ? '#1976d2' : 'lightgray',  
         }}>
         <GridOn fontSize="large" style={filterState ? styles.activeIcon : undefined} />
       </Button>
@@ -155,7 +172,7 @@ const Controls: React.FC<ControlsProps> = ({
         onClick={handleTimeInterpolationClick} 
         style={{ 
           ...styles.controlButton, 
-          backgroundColor: timeInterpolationState ? '#1976d2' : 'lightgray',  // Blue when time interpolation is active
+          backgroundColor: timeInterpolationState ? '#1976d2' : 'lightgray', 
         }}>
         <AccessTime fontSize="large" style={timeInterpolationState ? styles.activeIcon : undefined} />
       </Button>
@@ -165,7 +182,9 @@ const Controls: React.FC<ControlsProps> = ({
         onChange={handleVariableSelectChange} 
         style={styles.dropdown}>
         <MenuItem value="aqi">AQI</MenuItem>
+        <MenuItem value="pm2_5">PM2.5</MenuItem>
         <MenuItem value="pm10">PM10</MenuItem>
+        <MenuItem value="o3">O3</MenuItem>
       </Select>
     </div>
   );

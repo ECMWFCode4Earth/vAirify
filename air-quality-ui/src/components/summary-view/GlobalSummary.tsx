@@ -16,13 +16,12 @@ import {
 } from '../../services/types'
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import GlobalSummaryTable from '../summary-grid/table/GlobalSummaryTable'
-import World from '../globe/World' // Import your Three.js scene component
-// import World from '../globe/World.loop' // Import your Three.js scene component
+import World from '../globe/World'
 
 const GlobalSummary = (): JSX.Element => {
   const { forecastDetails } = useForecastContext()
   const [showAllColoured, setShowAllColoured] = useState<boolean>(true)
-  const [showMap, setShowMap] = useState<boolean>(false)
+  const [showMap, setShowMap] = useState<boolean>(true)
 
   const wrapSetShowAllColoured = useCallback(
     (val: boolean) => {
@@ -118,6 +117,13 @@ const GlobalSummary = (): JSX.Element => {
           <LoadingSpinner />
         </span>
       )}
+        {showMap && (
+          <World
+            forecastData={forecastData}
+            summarizedMeasurementData={summarizedMeasurementData}
+            toggle={showMap ? 'world-visible' : 'world-hidden'}
+          />
+        )}
       {!forecastPending && !summaryPending && (
         <div className={classes['summary-container']}>
           <SummaryViewHeader
@@ -133,12 +139,6 @@ const GlobalSummary = (): JSX.Element => {
             setShowMap={wrapSetShowMap}
             showMap={showMap}
           />
-          {showMap && (
-            <World
-              forecastData={forecastData}
-              summarizedMeasurementData={summarizedMeasurementData}
-            />
-          )}
         </div>
       )}
     </>

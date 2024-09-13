@@ -36,8 +36,8 @@ const createDataArrays = (
   let variable_name;
   if (variable === 'aqi') {
     variable_name = 'overall_aqi_level';
-  } else if (variable === 'pm10') {
-    variable_name = 'pm10';
+  } else {
+    variable_name = variable;
   }
 
   const forecastDataArray: number[] = [];
@@ -51,6 +51,7 @@ const createDataArrays = (
     // Process forecast data
     cityForecastData.forEach((forecastEntry) => {
       const forecastValue = forecastEntry[variable_name];
+      // console.log(forecastEntry)
       if (variable === 'aqi') {
         forecastDataArray.push(forecastValue);
       } else {
@@ -240,6 +241,13 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
       setVisible
     }));
 
+    const variableIndex = selectedVariable === "aqi" ? 1 :
+    selectedVariable === "pm2_5" ? 2 :
+    selectedVariable === "pm10" ? 3 :
+    selectedVariable === "o3" ? 4 :
+    selectedVariable === "no2" ? 5 :
+    selectedVariable === "so2" ? 6 : undefined;
+
     return (
       <instancedMesh ref={instancedMarkerRef} args={[null, null, MAX_MARKERS]}>
         <sphereGeometry args={[markerSize, 16, 16]} />
@@ -258,51 +266,81 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
               
               if (uVariableIndex == 1.0) { // "aqi"
                 if (value == -1.0) {
-                  color = vec3(0.15, 0.15, 0.15); // Default to dark grey for missing values
+                  color = vec3(38, 38, 38); // Default to dark grey for missing values
                 } else if (value >= 1.0 && value < 2.0) {
-                  color = vec3(129.0 / 255.0, 237.0 / 255.0, 229.0 / 255.0);
+                  color = vec3(129.0, 237.0, 229.0);
                 } else if (value >= 2.0 && value < 3.0) {
-                  color = vec3(116.0 / 255.0, 201.0 / 255.0, 172.0 / 255.0);
+                  color = vec3(116.0, 201.0, 172.0);
                 } else if (value >= 3.0 && value < 4.0) {
-                  color = vec3(238.0 / 255.0, 230.0 / 255.0, 97.0 / 255.0);
+                  color = vec3(238.0, 230.0, 97.0);
                 } else if (value >= 4.0 && value < 5.0) {
-                  color = vec3(236.0 / 255.0, 94.0 / 255.0, 87.0 / 255.0);
+                  color = vec3(236.0, 94.00, 87.0);
                 } else if (value >= 5.0 && value < 6.0) {
-                  color = vec3(137.0 / 255.0, 26.0 / 255.0, 52.0 / 255.0);
+                  color = vec3(137.0, 26.0, 52.0);
                 } else if (value >= 6.0 && value < 7.0) {
-                  color = vec3(115.0 / 255.0, 40.0 / 255.0, 125.0 / 255.0);
+                  color = vec3(115.0, 40.0, 125.0);
                 } else {
-                  color = vec3(0.15, 0.15, 0.15); // Default to dark grey
-                }
-              } else if (uVariableIndex == 2.0) { // "pm10"
+                  color = vec3(38, 38, 38); // Default to dark grey
+              }
+              } else if ( (uVariableIndex == 2.0) || (uVariableIndex == 3.0) ){ // "pm25 and pm10"
                 if (value == -1.0) {
-                  color = vec3(0.15, 0.15, 0.15); // Default to dark grey for missing values
+                  color = vec3(38, 38, 38); // Default to dark grey for missing values
                 } else if (value < 30.0) {
-                    color = vec3(1.0, 1.0, 1.0); 
+                    color = vec3(255.0, 255.0, 255.0); 
                 } else if (value < 40.0) {
-                    color = vec3(233.0/ 255.0, 249.0/ 255.0, 188.0/ 255.0); // Green
+                    color = vec3(233.0, 249.0, 188.0); // Green
                 } else if (value < 50.0) {
-                    color = vec3(198.0/ 255.0, 255.0/ 255.0, 199.0/ 255.0); // Blue
+                    color = vec3(198.0, 255.0, 199.0); // Blue
                 } else if (value < 60.0) {
-                    color = vec3(144.0/ 255.0, 237.0/ 255.0, 169.0/ 255.0); // Yellow
+                    color = vec3(144.0, 237.0, 169.0); // Yellow
                 } else if (value < 80.0) {
-                    color = vec3(76.0/ 255.0, 180.0/ 255.0, 148.0/ 255.0); // Orange
+                    color = vec3(76.0, 180.0, 148.0); // Orange
                 } else if (value < 100.0) {
-                    color = vec3(48.0/ 255.0, 155.0/ 255.0, 138.0/ 255.0); // Purple
+                    color = vec3(48.0, 155.0, 138.0); // Purple
                 } else if (value < 150.0) {
-                    color = vec3(47.0/ 255.0, 137.0/ 255.0, 169.0/ 255.0); // Yellow
+                    color = vec3(47.0, 137.0, 169.0); // Yellow
                 } else if (value < 200.0) {
-                    color = vec3(16.0/ 255.0, 99.0/ 255.0, 164.0/ 255.0); // Orange
+                    color = vec3(16.0, 99.0, 164.0); // Orange
                 } else if (value < 300.0) {
-                    color = vec3(13.0/ 255.0, 69.0/ 255.0, 126.0/ 255.0); // Purple
+                    color = vec3(13.0, 69.0, 126.0); // Purple
                 } else if (value < 500.0) {
-                    color = vec3(15.0/ 255.0, 26.0/ 255.0, 136.0/ 255.0); // Orange
+                    color = vec3(15.0, 26.0, 136.0); // Orange
                 } else if (value < 1000.0) {
-                    color = vec3(38.0/ 255.0, 2.0/ 255.0, 60.0/ 255.0); // Purple
+                    color = vec3(38.0, 2.0, 60.0); // Purple
                 } else {
                     color = vec3(0.0, 0.0, 0.0); // Black for values out of range
+              }
+              } else if (uVariableIndex == 4.0) { // "o3"
+                if (value < 10.0) {
+                    color = vec3(144.0, 190.0, 228.0); // Red
+                } else if (value < 20.0) {
+                    color = vec3(20.0, 145.0, 216.0); // Green
+                } else if (value < 30.0) {
+                    color = vec3(15.0, 109.0, 179.0); // Blue
+                } else if (value < 40.0) {
+                    color = vec3(35.0, 79.0, 146.0); // Yellow
+                } else if (value < 50.0) {
+                    color = vec3(37.0, 133.0, 100.0); // Orange
+                } else if (value < 60.0) {
+                    color = vec3(96.0, 168.0, 83.0); // Purple
+                } else if (value < 70.0) {
+                    color = vec3(157.0, 193.0, 99.0); // Yellow
+                } else if (value < 80.0) {
+                    color = vec3(255.0,242.0, 148.0); // Orange
+                } else if (value < 90.0) {
+                    color = vec3(240.0, 203.0, 62.0); // Purple
+                } else if (value < 100.0) {
+                    color = vec3(229.0, 172.0, 59.0); // Orange
+                } else if (value < 120.0) {
+                    color = vec3(214.0, 124.0, 62.0); // Purple
+                } else if (value < 150.0) {
+                    color = vec3(196.0, 49.0, 50.0); // Purple
+                } else {
+                    color = vec3(142.0, 25.0, 35.0); // Black for values out of range
                 }
             }
+                
+            color = color / 255.0;
 
               return color;
             }
@@ -351,33 +389,51 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
             if (uVariableIndex == 1.0) {
                 minValue = 1.0;
                 maxValue = 6.0;
-            } else if (uVariableIndex == 2.0) {
+            } else if ( (uVariableIndex == 2.0) || (uVariableIndex == 3.0) ) {
                 minValue = 1.0;
                 maxValue = 1000.0;
-            }
-
+            } else if (uVariableIndex == 4.0) {
+                minValue = 1.0;
+                maxValue = 500.0;
+          }
             forecastValue = clamp(forecastValue, minValue, maxValue);
             // if (measurementValue > 0.0) {
-              measurementValue = clamp(measurementValue, minValue, maxValue);
+              // measurementValue = clamp(measurementValue, minValue, maxValue);
             // }
             nextForecastValue = clamp(nextForecastValue, minValue, maxValue);
             nextMeasurementValue = clamp(nextMeasurementValue, minValue, maxValue);
 
-            thisDiff = abs(measurementValue-forecastValue);
-            nextDiff = abs(nextMeasurementValue-nextForecastValue);
+            if (measurementValue != -1.0) {
+              thisDiff = abs(measurementValue-forecastValue);
+            } else {
+              thisDiff = 0.0;
+            }
+            if (nextMeasurementValue != -1.0) {
+              nextDiff = abs(nextMeasurementValue-nextForecastValue);
+            } else {
+              nextDiff = 0.0;
+            }
             diff = mix(thisDiff, nextDiff, uFrameWeight);
 
             if (uVariableIndex == 1.0) {
                 diff = clamp(diff * 0.8, 1.0, 6.0);
-            } else if (uVariableIndex == 2.0) {
+            } else if ( (uVariableIndex == 2.0) || (uVariableIndex == 3.0) ) {
                 diff = clamp(diff/20.0, 1.0, 4.0);
+            } else if (uVariableIndex == 4.0) {
+                diff = clamp(diff/30.0, 1.0, 5.0);
+            }
+
+            if ( measurementValueInterpolated < 0.0 ) {
+              diff = 0.5;
             }
 
             vec3 color;
-            if ( (measurementValueInterpolated > 0.0 ) || (diff > 1.0) ) {
+            // if ( (measurementValueInterpolated > 0.0 ) || (diff > 1.0) ) {
+            if ( (measurementValueInterpolated > 0.0 )  ) {
                 color = getColorForValue(measurementValue, uVariableIndex); 
             } else {
-                color = getColorForValue(0.0, uVariableIndex); 
+                // color = getColorForValue(0.0, uVariableIndex); 
+                color = vec3(0.15, 0.15, 0.15); 
             }
             // color = getColorForValue(measurementValue, uVariableIndex); 
 
@@ -438,7 +494,7 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
             uOpacity: { value: 1.0 },
             forecastTexture: { value: forecastDataTexture.current },
             measurementTexture: { value: measurementDataTexture.current },
-            uVariableIndex: { value: selectedVariable === 'aqi' ? 1 : 2 },
+            uVariableIndex: { value: variableIndex },
             uMaxMarkers: { value: forecastDataTexture.current?.image.width },
             uNumTimseSteps: { value: forecastDataTexture.current?.image.height },
           }}

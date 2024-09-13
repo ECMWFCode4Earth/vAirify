@@ -3,7 +3,7 @@ FROM node:22.4.0-alpine AS development
 WORKDIR /app
 
 COPY package.json package.json
-RUN npm i --verbose
+RUN npm i
 
 COPY . .
 

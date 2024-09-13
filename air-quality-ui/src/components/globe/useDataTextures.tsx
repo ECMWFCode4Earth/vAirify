@@ -1,7 +1,5 @@
 import { useRef, useCallback } from "react";
 import * as THREE from "three";
-import { getForecastDataTexture } from '../../services/forecast-data-service'
-import { useForecastContext } from '../../context'
 
 const API_URL = import.meta.env.VITE_AIR_QUALITY_API_URL
 
@@ -10,8 +8,6 @@ const generateImageUrls = (
   selectedVariable: string
 ): string[] => {
 
-    const { forecastDetails } = useForecastContext()
-    // const response = getForecastDataTexture(forecastDetails.forecastBaseDate)
 
   return [
     `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`,
@@ -115,6 +111,7 @@ export const useDataTextures = (
   const fullImageCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const imageUrls = generateImageUrls(forecastBaseDate, selectedVariable);
+  console.log(imageUrls)
 
   const fetchAndUpdateTextures = useCallback(
     async (

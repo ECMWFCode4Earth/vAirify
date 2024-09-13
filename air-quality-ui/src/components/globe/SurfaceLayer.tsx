@@ -91,18 +91,19 @@ const SurfaceLayer = memo(
             colorMap: { value: cmap },
             colorMapIndex: { value: 0.0 },
             lsmTexture: { value: lsm },
-            uVariableIndex: { value: variableIndex },
+            uVariableIndex: { value: null },
           },
         })
       );
 
-      var variableIndex;
-      if (selectedVariable === "aqi") {
-        variableIndex = 1;
-      } else if (selectedVariable === "pm10") {
-        variableIndex = 2;
-      }
+      const variableIndex = selectedVariable === "aqi" ? 1 :
+               selectedVariable === "pm2_5" ? 2 :
+               selectedVariable === "pm10" ? 3 :
+               selectedVariable === "o3" ? 4 :
+               selectedVariable === "no2" ? 5 :
+               selectedVariable === "so2" ? 6 : undefined;
       materialRef.current.uniforms.uVariableIndex.value = variableIndex;
+      console.log(variableIndex)
 
       const windowIndexRef = useRef(0);
 
@@ -144,9 +145,6 @@ const SurfaceLayer = memo(
               thisFrame = windowIndexRef.current - 1;
               nextFrame = windowIndexRef.current;
               mode = "backward";
-              // thisFrame = Math.floor(sliderValue);
-              // nextFrame = thisFrame + 1;
-              // mode = sliderValue > thisFrame ? "forward" : "backward";
             }
             fetchAndUpdateTextures(
               thisFrame,
@@ -164,9 +162,6 @@ const SurfaceLayer = memo(
             : 0;
 
           materialRef.current.uniforms.uFrameWeight.value = weight;
-          // shaderUniforms.uFrameWeight.value = weight;
-          // console.log(materialRef.current.uniforms.uTimeInterpolation.value)
-          // console.log(materialRef.current.uniforms.uFrameWeight.value)
 
         }
       };

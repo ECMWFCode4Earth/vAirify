@@ -5,11 +5,15 @@ import * as THREE from 'three';
 type CameraSettingsProps = {
   globeState: boolean;
   cameraControlsRef: React.RefObject<any>;
+  toggle: string;
 };
 
-const CameraSettings: React.FC<CameraSettingsProps> = ({ globeState, cameraControlsRef }) => {
+const CameraSettings: React.FC<CameraSettingsProps> = ({ globeState, cameraControlsRef, toggle }) => {
   useEffect(() => {
     if (cameraControlsRef.current) {
+
+        console.log('render camera settings');
+        console.log(globeState)
       const controls = cameraControlsRef.current;
 
       if (globeState) {
@@ -59,7 +63,7 @@ const CameraSettings: React.FC<CameraSettingsProps> = ({ globeState, cameraContr
         }, 5000);
       }
     }
-  }, [globeState, cameraControlsRef]);
+  }, [globeState, cameraControlsRef, toggle]);
 
   return null;
 };
