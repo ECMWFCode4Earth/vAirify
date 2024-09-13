@@ -1,7 +1,7 @@
 import { useRef, useCallback } from "react";
 import * as THREE from "three";
 
-const API_URL = import.meta.env.VITE_AIR_QUALITY_API_URL
+// const API_URL = import.meta.env.VITE_AIR_QUALITY_API_URL
 
 const generateImageUrls = (
   forecastBaseDate: string,

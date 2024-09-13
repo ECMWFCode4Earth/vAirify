@@ -1,4 +1,4 @@
-import { useRef, forwardRef, useImperativeHandle, useEffect, useState } from 'react';
+import { useRef, forwardRef, useImperativeHandle, useEffect, useReducer } from 'react';
 import { DataTexture, RGBAFormat, FloatType } from 'three';
 import CustomShaderMaterial from 'three-custom-shader-material';
 import * as THREE from 'three';
@@ -14,7 +14,7 @@ type LocationMarkerProps = {
   measurementData: Record<string, MeasurementSummaryResponseDto[]>;
   selectedVariable: string;
   isVisible: boolean;
-  cameraControlsRef: React.RefObject<any>; // Add a reference to CameraControls
+  cameraControlsRef: React.RefObject<any>;
 };
 
 export type LocationMarkerRef = {
@@ -39,7 +39,7 @@ const createDataArrays = (
   if (variable === 'aqi') {
     variable_name = 'overall_aqi_level' as keyof ForecastResponseDto;
   } else {
-    variable_name = variable as keyof ForecastResponseDto; // Ensure variable is a valid key
+    variable_name = variable as keyof ForecastResponseDto;
   }
 
   const forecastDataArray: number[] = [];
@@ -47,7 +47,7 @@ const createDataArrays = (
 
   Object.keys(forecastData).forEach((city) => {
     const cityForecastData = forecastData[city];
-    const cityMeasurementData = measurementData[city] || []; // Measurement data may be missing for some cities
+    const cityMeasurementData = measurementData[city] || [];
 
     cityForecastData.forEach((forecastEntry) => {
       const forecastValue = forecastEntry[variable_name as keyof typeof forecastEntry];
@@ -55,7 +55,7 @@ const createDataArrays = (
       if (forecastValue !== undefined && forecastValue !== null) {
         if (variable === 'aqi') {
           if (typeof forecastValue === 'number') {
-            forecastDataArray.push(forecastValue); // Push the number value
+            forecastDataArray.push(forecastValue);
           }
         } else {
           if (typeof forecastValue === 'object' && 'value' in forecastValue) {
@@ -99,8 +99,8 @@ const createDataArrays = (
 
   for (let row = 0; row < numEntries; row++) {
     for (let col = 0; col < numCities; col++) {
-      const index = col * numEntries + row; // Row-major index
-      const columnMajorIndex = row * numCities + col; // Column-major index
+      const index = col * numEntries + row; 
+      const columnMajorIndex = row * numCities + col; 
 
       forecastDataVec4Array.set([forecastDataArray[index], 0, 0, 0], columnMajorIndex * 4);
       measurementDataVec4Array.set([measurementDataArray[index], 0, 0, 0], columnMajorIndex * 4);
@@ -126,10 +126,9 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
       material: THREE.ShaderMaterial | THREE.ShaderMaterial;
     };
 
-    // const instancedMarkerRef = useRef<InstancedMesh>(null);
     const instancedMarkerRef = useRef<InstancedMeshWithUniforms>(null);
 
-    const [triggerRender, setTriggerRender] = useState(0);
+    const [, forceUpdate] = useReducer(x => x + 1, 0);
 
     const forecastDataTexture = useRef<DataTexture>();
     const measurementDataTexture = useRef<DataTexture>();
@@ -140,7 +139,7 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
     const longitudes = new Float32Array(MAX_MARKERS);
 
     useEffect(() => {
-      setTriggerRender((prev) => prev + 1);
+      forceUpdate();
     }, [selectedVariable, forecastData, measurementData]); 
 
     useEffect(() => {
@@ -181,7 +180,7 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
 
         const markerIndices = new Float32Array(MAX_MARKERS);
         for (let i = 0; i < MAX_MARKERS; i++) {
-          markerIndices[i] = i; // Each marker gets its index
+          markerIndices[i] = i;
         }
         instancedMarkerRef.current.geometry.setAttribute('lat', new THREE.InstancedBufferAttribute(latitudes, 1));
         instancedMarkerRef.current.geometry.setAttribute('lon', new THREE.InstancedBufferAttribute(longitudes, 1));

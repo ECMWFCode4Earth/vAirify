@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, CSSProperties } from 'react';
+import React, { useState, useEffect, useRef, CSSProperties, useReducer } from 'react';
 import { useForecastContext } from '../../context';
 import { PlayArrow, Pause, Add, Remove, LocationOn, Public, AccessTime, GridOn } from '@mui/icons-material';
 import { Button, Select, MenuItem, SelectChangeEvent } from '@mui/material';
@@ -42,7 +42,7 @@ const Controls: React.FC<ControlsProps> = ({
 
   const { forecastDetails } = useForecastContext();
   const numForecastTimeStepsRef = useRef<number>(0);
-  const [reRender, setReRender] = useState(false);
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
 
   useEffect(() => {
     const numForecastHours = forecastDetails.maxForecastDate.diff(forecastDetails.forecastBaseDate, 'hours').hours;
@@ -50,7 +50,7 @@ const Controls: React.FC<ControlsProps> = ({
 
     if (numForecastTimeStepsRef.current !== newNumForecastTimeSteps) {
       numForecastTimeStepsRef.current = newNumForecastTimeSteps;
-      setReRender((prev) => !prev);
+      forceUpdate();  // This will trigger a re-render
     }
   }, [forecastDetails.maxForecastDate, forecastDetails.forecastBaseDate]);
 
