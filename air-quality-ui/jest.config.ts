@@ -19,6 +19,7 @@ export default {
                 metaObjectReplacement: {
                   env: {
                     VITE_AIR_QUALITY_API_URL: testUrl,
+                    VITE_AIR_QUALITY_UI_URL: testUrl,
                   },
                 },
               },

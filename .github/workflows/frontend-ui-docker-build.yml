@@ -21,7 +21,7 @@ jobs:
       - name: build
         run: |
           cd air-quality-ui
-          docker build . -t ghcr.io/${REPO}/vairify-frontend:latest --build-arg VITE_AIR_QUALITY_API_URL=${{ vars.VAIRIFY_API_URL }}
+          docker build . -t ghcr.io/${REPO}/vairify-frontend:latest --build-arg VITE_AIR_QUALITY_API_URL=${{ vars.VAIRIFY_API_URL }} --build-arg VITE_AIR_QUALITY_UI_URL=${{ vars.VAIRIFY_UI_URL }}
       - name: publish
         run: |
           docker push ghcr.io/${REPO}/vairify-frontend:latest

@@ -14,8 +14,6 @@ import vertexShader from './shaders/surfaceVert.glsl'
 import { useDataTextures } from './useDataTextures'
 import { useForecastContext } from '../../context'
 
-// const API_URL = import.meta.env.VITE_AIR_QUALITY_API_URL
-
 const shaderUniforms = {
   uSphereWrapAmount: { value: 0.0 },
   uFrameWeight: { value: 0.5 },

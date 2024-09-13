@@ -10,6 +10,7 @@ From within air-quality-ui:
 ### Create .env file with content
 ```
 VITE_AIR_QUALITY_API_URL=http://localhost:8000
+VITE_AIR_QUALITY_UI_URL=http://localhost:5173
 ```
 
 ### Start

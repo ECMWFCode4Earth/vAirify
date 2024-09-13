@@ -1,29 +1,17 @@
 import { useCallback, useRef } from 'react'
 import * as THREE from 'three'
 
-// const API_URL = import.meta.env.VITE_AIR_QUALITY_API_URL
+const UI_URL = import.meta.env.VITE_AIR_QUALITY_UI_URL
 
 const generateImageUrls = (
   forecastBaseDate: string,
   selectedVariable: string,
 ): string[] => {
   return [
-    `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`,
-    `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_2_of_3.webp`,
-    `http://localhost:5173/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_3_of_3.webp`,
+    `${UI_URL}/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`,
+    `${UI_URL}/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_2_of_3.webp`,
+    `${UI_URL}/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_3_of_3.webp`,
   ]
-
-  // const imageUrls = [
-  //   `http://64.225.143.231/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`,
-  //   `http://64.225.143.231/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_2_of_3.webp`,
-  //   `http://64.225.143.231/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_3_of_3.webp`,
-  // ];
-
-  // const imageUrls = [
-  //   `/volume/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_1_of_3.webp`,
-  //   `/volume/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_2_of_3.webp`,
-  //   `/volume/data_textures/${forecastBaseDate}/${selectedVariable}_${forecastBaseDate}_CAMS_global.chunk_3_of_3.webp`,
-  // ];
 }
 
 const createCanvasTextureFromMultipleImages = async (
@@ -59,7 +47,10 @@ const createCanvasTextureFromMultipleImages = async (
       const img = new Image()
       img.crossOrigin = 'Anonymous'
       img.onload = onLoadImage
-      img.onerror = (error) => reject(error)
+      img.onerror = (error) => {
+        console.error(`Failed to load image: ${url}`, error)
+        reject(new Error(`Failed to load image: ${url}`))
+      }
       img.src = url
       images.push(img)
     })
