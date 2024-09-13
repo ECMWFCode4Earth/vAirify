@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 
 import { fetchJson } from './fetch-common'
-import { ForecastResponseDto } from './types'
+import { ForecastResponseDto, ForecastTextureResponseDto } from './types'
 import { LocationType } from '../models'
 
 const API_URL = import.meta.env.VITE_AIR_QUALITY_API_URL
@@ -21,4 +21,13 @@ export const getForecastData = async (
     ...(locationName && { location_name: locationName }),
   }
   return fetchJson(`${API_URL}/air-pollutant/forecast`, params)
+}
+
+export const getForecastDataTexture = async (
+  baseTime: DateTime,
+): Promise<ForecastTextureResponseDto[]> => {
+  const params: Record<string, string> = {
+    base_time: baseTime.toJSDate().toISOString(),
+  }
+  return fetchJson(`${API_URL}/air-pollutant/data_textures`, params)
 }

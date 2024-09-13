@@ -75,6 +75,7 @@ services:
       target: development
     environment:
       - VITE_AIR_QUALITY_API_URL=${VITE_AIR_QUALITY_API_URL}
+      - VITE_AIR_QUALITY_UI_URL=${VITE_AIR_QUALITY_UI_URL}
     volumes:
       - ./air-quality-ui/:/app/
       - nodemodules:/app/node_modules

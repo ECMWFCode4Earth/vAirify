@@ -35,6 +35,18 @@ export type ForecastResponseDto = {
   overall_aqi_level: number
 } & ForecastPollutantDataDto
 
+export type ForecastTextureResponseDto = {
+  base_time: string
+  variable: string
+  time_start: number
+  time_end: number
+  chunk: string
+  source: string
+  texture_uri: string
+  min_value: number
+  max_value: number
+}
+
 export type MeasurementsResponseDto = {
   measurement_date: string
   location_type: LocationType
