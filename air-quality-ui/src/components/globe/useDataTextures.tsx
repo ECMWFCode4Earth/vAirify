@@ -14,31 +14,35 @@ const generateImageUrls = (
   ]
 }
 
-const createCanvasTextureFromMultipleImages = async (
+const createCanvasTexturesFromImages = async (
   imageUrls: string[],
-): Promise<HTMLCanvasElement> => {
+): Promise<HTMLCanvasElement[]> => {
   return new Promise((resolve, reject) => {
     const images: HTMLImageElement[] = []
     let imagesLoaded = 0
+    const canvases: HTMLCanvasElement[] = []
 
     const onLoadImage = () => {
       imagesLoaded++
       if (imagesLoaded === imageUrls.length) {
-        const canvas = document.createElement('canvas')
-        const context = canvas.getContext('2d')
+        try {
+          images.forEach((img) => {
+            const canvas = document.createElement('canvas')
+            const context = canvas.getContext('2d')
 
-        if (context) {
-          const singleImageWidth = images[0].width
-          const singleImageHeight = images[0].height
-          canvas.width = singleImageWidth * imageUrls.length
-          canvas.height = singleImageHeight
-          images.forEach((img, index) => {
-            context.drawImage(img, index * singleImageWidth, 0)
+            if (context) {
+              canvas.width = img.width
+              canvas.height = img.height
+              context.drawImage(img, 0, 0)
+              canvases.push(canvas)
+            } else {
+              throw new Error('Failed to get canvas context')
+            }
           })
 
-          resolve(canvas)
-        } else {
-          reject(new Error('Failed to get canvas context'))
+          resolve(canvases)
+        } catch (error) {
+          reject(error)
         }
       }
     }
@@ -58,18 +62,44 @@ const createCanvasTextureFromMultipleImages = async (
 }
 
 const createCanvasTextureFromCanvas = (
-  canvas: HTMLCanvasElement,
+  canvas: HTMLCanvasElement[],
   index: number,
   filter: string,
 ): THREE.CanvasTexture => {
-  const context = canvas.getContext('2d')
+  let canvasIndex: number
+  let frameIndex: number
+  if (index < 16) {
+    canvasIndex = 0
+    frameIndex = index
+  } else if (index < 32) {
+    canvasIndex = 1
+    frameIndex = index - 16
+  } else if (index < 48) {
+    canvasIndex = 2
+    frameIndex = index - 32
+  } else {
+    canvasIndex = 0
+    frameIndex = 0
+  }
+
+  const context = canvas[canvasIndex].getContext('2d')
   if (context) {
     const textureCanvas = document.createElement('canvas')
     const textureContext = textureCanvas.getContext('2d')
 
     textureCanvas.width = 900
     textureCanvas.height = 450
-    textureContext?.drawImage(canvas, index * 900, 0, 900, 450, 0, 0, 900, 450)
+    textureContext?.drawImage(
+      canvas[canvasIndex],
+      frameIndex * 900,
+      0,
+      900,
+      450,
+      0,
+      0,
+      900,
+      450,
+    )
 
     const texture = new THREE.CanvasTexture(textureCanvas)
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping
@@ -89,10 +119,9 @@ export const useDataTextures = (
   forecastBaseDate: string,
   selectedVariable: string,
 ) => {
-  const fullImageCanvasRef = useRef<HTMLCanvasElement | null>(null)
+  const canvasesRef = useRef<HTMLCanvasElement[] | null>(null)
 
   const imageUrls = generateImageUrls(forecastBaseDate, selectedVariable)
-  console.log(imageUrls)
 
   const fetchAndUpdateTextures = useCallback(
     async (
@@ -103,23 +132,22 @@ export const useDataTextures = (
       newVariable: boolean,
       materialRef: React.RefObject<THREE.ShaderMaterial>,
     ) => {
-      if (newVariable && fullImageCanvasRef.current) {
-        fullImageCanvasRef.current = null
+      if (newVariable && canvasesRef.current) {
+        canvasesRef.current = null
       }
       try {
-        const fullCanvas =
-          fullImageCanvasRef.current ||
-          (await createCanvasTextureFromMultipleImages(imageUrls))
-        fullImageCanvasRef.current = fullCanvas
+        const canvases =
+          canvasesRef.current ||
+          (await createCanvasTexturesFromImages(imageUrls))
+
+        canvasesRef.current = canvases
 
         if (materialRef.current) {
-          console.log('fetchAndUpdateTextures', mode, filter)
-
           let thisCanvasTexture, nextCanvasTexture
 
           if (mode === 'forward') {
             nextCanvasTexture = createCanvasTextureFromCanvas(
-              fullCanvas,
+              canvases,
               nextFrame,
               filter,
             )
@@ -129,7 +157,7 @@ export const useDataTextures = (
               nextCanvasTexture
           } else if (mode === 'backward') {
             thisCanvasTexture = createCanvasTextureFromCanvas(
-              fullCanvas,
+              canvases, // Using the correct canvas for the frame
               thisFrame,
               filter,
             )
@@ -139,12 +167,12 @@ export const useDataTextures = (
               thisCanvasTexture
           } else if (mode === 'reset') {
             thisCanvasTexture = createCanvasTextureFromCanvas(
-              fullCanvas,
+              canvases,
               thisFrame,
               filter,
             )
             nextCanvasTexture = createCanvasTextureFromCanvas(
-              fullCanvas,
+              canvases,
               nextFrame,
               filter,
             )

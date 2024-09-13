@@ -1,10 +1,9 @@
-// World.tsx
 import { CameraControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import { CSSProperties, useRef, useState } from 'react'
 
-import CameraSettings from './CameraSettings' // Import the CameraSettings component
-import ControlsHandler from './ControlsHandler' // Import the ControlsHandler component
+import CameraSettings from './CameraSettings'
+import ControlsHandler from './ControlsHandler'
 import LocationMarker, { LocationMarkerRef } from './LocationMarker'
 import { SurfaceLayer, SurfaceLayerRef } from './SurfaceLayer'
 import {
@@ -98,7 +97,6 @@ const World = ({
         )}
 
         <CameraControls ref={cameraControlsRef} />
-        {/* <Perf position="top-left" /> */}
 
         <CameraSettings
           globeState={globeState}

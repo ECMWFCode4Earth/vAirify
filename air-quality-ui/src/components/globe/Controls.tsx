@@ -69,7 +69,7 @@ const Controls: React.FC<ControlsProps> = ({
 
     if (numForecastTimeStepsRef.current !== newNumForecastTimeSteps) {
       numForecastTimeStepsRef.current = newNumForecastTimeSteps
-      forceUpdate() // This will trigger a re-render
+      forceUpdate()
     }
   }, [forecastDetails.maxForecastDate, forecastDetails.forecastBaseDate])
 
@@ -246,26 +246,26 @@ const styles: { [key: string]: CSSProperties } = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: '10px', // Consistent gap between all controls
+    gap: '10px',
     padding: '10px',
     backgroundColor: '#f4f4f4',
     borderTop: '1px solid #ccc',
   },
   controlButton: {
-    width: '50px', // Make the buttons consistent in size
+    width: '50px',
     height: '50px',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     border: 'none',
-    borderRadius: '10%', // Consistent round button shape
+    borderRadius: '10%',
     cursor: 'pointer',
-    margin: '5px', // Add consistent margin around each button
-    padding: '10px', // Add padding for more consistent button sizing
+    margin: '5px',
+    padding: '10px',
   },
   sliderContainer: {
     display: 'flex',
-    flexDirection: 'column', // Make sure this is typed correctly
+    flexDirection: 'column',
     alignItems: 'center',
   },
   slider: {
@@ -278,7 +278,7 @@ const styles: { [key: string]: CSSProperties } = {
     borderRadius: '5px',
     border: '1px solid lightgray',
     padding: '5px',
-    margin: '5px', // Add margin to match the buttons
+    margin: '5px',
     cursor: 'pointer',
   },
   activeIcon: {

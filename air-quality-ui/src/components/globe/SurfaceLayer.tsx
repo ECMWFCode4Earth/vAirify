@@ -1,12 +1,6 @@
 import { useTexture } from '@react-three/drei'
 import { gsap } from 'gsap'
-import {
-  forwardRef,
-  memo,
-  useEffect,
-  useImperativeHandle,
-  useRef, // Import useEffect
-} from 'react'
+import { forwardRef, memo, useEffect, useImperativeHandle, useRef } from 'react'
 import * as THREE from 'three'
 
 import fragmentShader from './shaders/surfaceFrag.glsl'
@@ -35,8 +29,6 @@ export type SurfaceLayerRef = {
   changeFilter: (filterState: boolean) => void
   changeTimeInterpolation: (timeInterpolationState: boolean) => void
 }
-
-// const geometry =
 
 const SurfaceLayer = memo(
   forwardRef<SurfaceLayerRef, SurfaceLayerProps>(
@@ -123,7 +115,6 @@ const SurfaceLayer = memo(
         )
       }, [selectedVariable, fetchAndUpdateTextures])
 
-      // Handle the tick function to externally control weight and sphere wrapping
       const tick = (sliderValue: number) => {
         if (materialRef.current) {
           if (windowIndexRef.current != Math.floor(sliderValue)) {
@@ -176,7 +167,6 @@ const SurfaceLayer = memo(
 
       const changeTimeInterpolation = (timeInterpolationState: boolean) => {
         if (materialRef.current) {
-          // console.log('change time', timeInterpolationState)
           materialRef.current.uniforms.uTimeInterpolation.value =
             timeInterpolationState
         }

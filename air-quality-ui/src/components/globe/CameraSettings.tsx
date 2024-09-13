@@ -1,4 +1,3 @@
-// CameraSettings.tsx
 import { CameraControls } from '@react-three/drei'
 import React, { useEffect } from 'react'
 import * as THREE from 'three'
@@ -21,7 +20,6 @@ const CameraSettings: React.FC<CameraSettingsProps> = ({
       const controls = cameraControlsRef.current
 
       if (globeState) {
-        // Globe settings
         controls.minDistance = 1.2
         controls.maxDistance = 1.6
         controls.minPolarAngle = 0
