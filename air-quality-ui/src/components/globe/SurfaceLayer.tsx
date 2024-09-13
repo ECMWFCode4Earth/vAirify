@@ -1,3 +1,4 @@
+import { useTexture } from '@react-three/drei'
 import { gsap } from 'gsap'
 import {
   forwardRef,
@@ -7,7 +8,6 @@ import {
   useRef, // Import useEffect
 } from 'react'
 import * as THREE from 'three'
-import { useTexture } from '@react-three/drei';
 
 import fragmentShader from './shaders/surfaceFrag.glsl'
 import vertexShader from './shaders/surfaceVert.glsl'
@@ -45,9 +45,9 @@ const SurfaceLayer = memo(
     ({ isFilterNearest, isTimeInterpolation, selectedVariable }, ref) => {
       const surface_layer_ref = useRef<PlaneType>(null)
 
-      const lsm = useTexture('/NaturalEarthCoastline2.jpg');
-      lsm.minFilter = THREE.NearestFilter;
-      lsm.magFilter = THREE.NearestFilter;
+      const lsm = useTexture('/NaturalEarthCoastline2.jpg')
+      lsm.minFilter = THREE.NearestFilter
+      lsm.magFilter = THREE.NearestFilter
 
       const materialRef = useRef(
         new THREE.ShaderMaterial({
