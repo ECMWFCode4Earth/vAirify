@@ -32,7 +32,7 @@ jobs:
             exit"
       - name: copy compose
         run: |
-          scp deployment/compose.yaml ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}:/usr/config
+          scp deployment/compose-${{ inputs.environment }}.yaml ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}:/usr/config/compose.yaml
       - name: activate docker
         run: |  
           ssh ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} "cd /usr/config && \\
