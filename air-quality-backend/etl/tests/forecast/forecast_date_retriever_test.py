@@ -43,7 +43,7 @@ def test__retrieve_dates_requiring_forecast__aligns_override_if_present(
 @freeze_time("2024-05-28 02:34:56")
 @patch("etl.src.forecast.forecast_date_retriever.align_to_cams_publish_time")
 @patch("etl.src.forecast.forecast_date_retriever.get_forecast_dates_between")
-def test__retrieve_dates_requiring_forecast__default_finds_db_dates_for_a_week(
+def test__retrieve_dates_requiring_forecast__default_finds_db_dates_for_two_weeks(
         mock_get_forecast_dates_from_db,
         mock_align_date_to_cams_publish
 ):
@@ -53,7 +53,7 @@ def test__retrieve_dates_requiring_forecast__default_finds_db_dates_for_a_week(
     retrieve_dates_requiring_forecast()
 
     mock_get_forecast_dates_from_db.assert_called_with(
-        datetime(2024, 5, 21),
+        datetime(2024, 5, 14),
         datetime(2024, 5, 28))
 
 

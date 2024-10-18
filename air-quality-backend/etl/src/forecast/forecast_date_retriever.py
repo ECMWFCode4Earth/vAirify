@@ -15,7 +15,7 @@ def retrieve_dates_requiring_forecast() -> [datetime]:
 
     base_date = align_to_cams_publish_time(base_date)
 
-    forecast_retrieval_period_env = int(os.getenv("FORECAST_RETRIEVAL_PERIOD", 7))
+    forecast_retrieval_period_env = int(os.getenv("FORECAST_RETRIEVAL_PERIOD", 14))
     search_start_date = base_date - timedelta(days=forecast_retrieval_period_env)
 
     dates = pd.date_range(search_start_date, base_date, freq="12h")

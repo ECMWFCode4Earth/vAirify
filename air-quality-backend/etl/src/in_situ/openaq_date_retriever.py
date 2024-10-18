@@ -38,7 +38,7 @@ def dates_without_measurements(
 # have any data at all, that period is returned.
 #
 def retrieve_dates_requiring_in_situ_data() -> [datetime]:
-    in_situ_retrieval_period = int(os.getenv("IN_SITU_RETRIEVAL_PERIOD", 7))
+    in_situ_retrieval_period = int(os.getenv("IN_SITU_RETRIEVAL_PERIOD", 14))
 
     cur_date = datetime.utcnow()
     search_end_date = cur_date - timedelta(days=1)
