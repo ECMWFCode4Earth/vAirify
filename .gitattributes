@@ -1,0 +1,15 @@
+# Use LF for all text files
+* text eol=lf
+
+# Image files are auto detected
+*.gif -text
+*.jpg -text
+*.jpeg -text
+*.pdf -text
+*.png -text
+*.webp -text
+
+# Binary data files
+*.db binary
+*.grib binary
+*.idx binary
