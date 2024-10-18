@@ -4,11 +4,13 @@ export class BasePage {
   readonly page: Page
 
   readonly baseAPIURL: string
+  readonly deployedUIURL: string
 
   constructor(page: Page) {
     this.page = page
 
     this.baseAPIURL = 'http://localhost:8000/air-pollutant'
+    this.deployedUIURL = 'http://64.225.143.231/city/summary'
   }
 
   async captureNetworkRequestsAsArray(

@@ -9,6 +9,8 @@ export class SummaryPage extends BasePage {
   readonly allCells: Locator
   readonly grid: Locator
   readonly highlightValuesToggle: Locator
+  readonly locationFilterIcon: Locator
+  readonly locationFilterTextBox: Locator
   readonly scroller: Locator
   readonly timeRange: Locator
   readonly title: Locator
@@ -21,6 +23,10 @@ export class SummaryPage extends BasePage {
     this.allCells = page.locator('[role=gridcell]')
     this.grid = page.getByTestId('summary-grid')
     this.highlightValuesToggle = page.getByRole('checkbox')
+    this.locationFilterIcon = page.locator(
+      '//span[contains(@class, "ag-icon-menu")]',
+    )
+    this.locationFilterTextBox = page.getByLabel('Filter Value')
     this.scroller = page.locator('.ag-body-horizontal-scroll-viewport')
     this.timeRange = page.getByText('Time Range:')
     this.title = page.locator('title')
@@ -90,6 +96,19 @@ export class SummaryPage extends BasePage {
         throw new Error(`Number ${text} has more than one decimal place`)
       }
     }
+  }
+
+  async filterByCity(cityName: string, page: Page) {
+    await this.locationFilterIcon.click()
+    await this.locationFilterTextBox.click()
+    await this.locationFilterTextBox.fill(cityName)
+    await this.grid.click()
+    await this.waitForLoad()
+    // awaiting a div to be hidden that matches another locator needed when asserting the grid
+    await page
+      .locator('.ag-center-cols-container > div:nth-child(23) > div')
+      .first()
+      .waitFor({ state: 'hidden' })
   }
 
   async getColumnHeaderAndText(
