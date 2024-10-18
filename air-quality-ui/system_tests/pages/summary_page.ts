@@ -22,11 +22,15 @@ export class SummaryPage extends BasePage {
     this.agCell = page.locator('role=gridcell')
     this.allCells = page.locator('[role=gridcell]')
     this.grid = page.getByTestId('summary-grid')
-    this.highlightValuesToggle = page.getByRole('checkbox')
+    this.highlightValuesToggle = page
+      .locator('div')
+      .filter({ hasText: /^Highlight all AQI values$/ })
+      .getByRole('checkbox')
     this.locationFilterIcon = page.locator(
       '//span[contains(@class, "ag-icon-menu")]',
     )
     this.locationFilterTextBox = page.getByLabel('Filter Value')
+
     this.scroller = page.locator('.ag-body-horizontal-scroll-viewport')
     this.timeRange = page.getByText('Time Range:')
     this.title = page.locator('title')
