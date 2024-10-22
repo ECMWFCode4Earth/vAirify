@@ -1,36 +1,62 @@
 import '@testing-library/jest-dom'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { BrowserRouter } from 'react-router-dom'
 
 import { LocationCellRenderer } from './LocationCellRenderer'
 
-describe('LocationCellRenderer component', () => {
-  const city = 'Bristol'
-  const eGridCell = document.createElement('div')
+const mockAddEventListener = jest.fn()
 
-  const renderComponent = () => {
-    const user = userEvent.setup()
-    render(<LocationCellRenderer value={city} eGridCell={eGridCell} />, {
-      wrapper: BrowserRouter,
-    })
-    return { user }
+describe('LocationCellRenderer component', () => {
+  const eGridCell: Partial<HTMLElement> = {
+    addEventListener: mockAddEventListener,
+    setAttribute: () => {},
+    removeEventListener: () => {},
   }
 
+  const renderComponent = (city: string) =>
+    render(
+      <LocationCellRenderer
+        value={city}
+        eGridCell={eGridCell as HTMLElement}
+      />,
+      {
+        wrapper: BrowserRouter,
+      },
+    )
+
+  afterEach(() => {
+    mockAddEventListener.mockClear()
+  })
+
   it('renders the location', () => {
-    renderComponent()
+    const city = 'London'
+    renderComponent(city)
     expect(screen.getByRole('link')).toHaveTextContent(city)
   })
 
   it('Navigates to single city page on click', async () => {
-    const { user } = renderComponent()
+    const city = 'Paris'
+    const user = userEvent.setup()
+    renderComponent(city)
     await user.click(screen.getByRole('link'))
-    expect(document.location.pathname).toBe(`/city/${city}`)
+    expect(window.location.pathname).toBe(`/city/${city}`)
   })
 
-  it('Navigates to single city page on typing Enter', async () => {
-    const { user } = renderComponent()
-    await user.type(eGridCell, '[Enter]')
-    expect(document.location.pathname).toBe(`/city/${city}`)
+  it('Binds keyboard event handler to eGridCell', async () => {
+    // Cannot test actual interaction because eGridCell is not added to the DOM
+    // by LocationCellRenderer, so all we can do is test calls
+    const city = 'Bristol'
+    renderComponent(city)
+
+    expect(mockAddEventListener).toHaveBeenCalledTimes(1)
+    const [eventName, eventCallback] = mockAddEventListener.mock
+      .calls[0] as Parameters<HTMLElement['addEventListener']>
+    expect(eventName).toEqual('keydown')
+
+    act(() => {
+      ;(eventCallback as EventListener)({ code: 'Enter' } as KeyboardEvent)
+    })
+    expect(window.location.pathname).toBe(`/city/${city}`)
   })
 })
