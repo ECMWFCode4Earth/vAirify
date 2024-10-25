@@ -13,3 +13,6 @@
 *.db binary
 *.grib binary
 *.idx binary
+
+# Archive files
+*.xmind binary
