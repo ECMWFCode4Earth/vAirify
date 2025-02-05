@@ -1,1 +1,1 @@
-0 */1 * * * conda run --no-capture-output -n air-quality-backend PYTHONPATH=/app python3 "/app/etl/scripts/run_in_situ_etl.py"
+0 */12 * * * conda run --no-capture-output -n air-quality-backend PYTHONPATH=/app python3 "/app/etl/scripts/run_in_situ_etl.py"
