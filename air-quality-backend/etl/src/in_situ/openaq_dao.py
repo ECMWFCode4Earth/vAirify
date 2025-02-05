@@ -11,7 +11,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 LOCATIONS_PATH = "v3/locations"
-MEASUREMENTS_PATH = "v3/sensors/{sensor_id}/measurements"
+MEASUREMENTS_PATH = "v3/sensors/{sensor_id}/measurements/hourly"
 SUPPORTED_PARAMETERS = ["o3", "no2", "pm10", "so2", "pm25"]
 
 
@@ -83,15 +83,56 @@ def _make_request(
     session: requests.Session, url: str, headers: dict
 ) -> requests.Response:
     """Make a request and handle rate limiting"""
-    try:
-        response = session.get(url, headers=headers)
-        rate_limiter.wait_if_needed(response)
-        response.raise_for_status()
-        return response
-    except requests.exceptions.RequestException as e:
-        if hasattr(e.response, "headers"):
-            rate_limiter.wait_if_needed(e.response)
-        raise
+    max_retries = 3  # Maximum number of retries for rate limit
+    retry_count = 0
+
+    while retry_count < max_retries:
+        try:
+            response = session.get(url, headers=headers)
+
+            # Handle 429 Too Many Requests
+            if response.status_code == 429:
+                retry_count += 1
+                wait_time = 300  # Default wait time if header not present
+
+                # Try to get wait time from response headers
+                if "retry-after" in response.headers:
+                    wait_time = int(response.headers["retry-after"])
+
+                logging.warning(
+                    f"Rate limit exceeded (429). Waiting {wait_time} seconds. "
+                    f"Retry {retry_count}/{max_retries}"
+                )
+                time.sleep(wait_time)
+                continue
+
+            rate_limiter.wait_if_needed(response)
+            response.raise_for_status()
+            return response
+
+        except requests.exceptions.RequestException as e:
+            if hasattr(e.response, "headers"):
+                rate_limiter.wait_if_needed(e.response)
+
+            # If it's a rate limit error, continue the retry loop
+            if hasattr(e.response, "status_code") and e.response.status_code == 429:
+                if retry_count < max_retries - 1:  # Don't sleep on last retry
+                    retry_count += 1
+                    wait_time = 300
+                    if "retry-after" in e.response.headers:
+                        wait_time = int(e.response.headers["retry-after"])
+                    logging.warning(
+                        f"Rate limit exceeded (429) in error. Waiting {wait_time} seconds. "
+                        f"Retry {retry_count}/{max_retries}"
+                    )
+                    time.sleep(wait_time)
+                    continue
+            raise
+
+    # If we've exhausted all retries
+    raise requests.exceptions.RequestException(
+        f"Failed to make request after {max_retries} retries due to rate limiting"
+    )
 
 
 def _get_locations_with_sensors(city, session, date_from: datetime) -> list:
@@ -176,9 +217,10 @@ def _get_measurements_for_sensor(
     sensor_info, date_from, date_to, session, city
 ) -> list:
     """Get measurements for a specific sensor ID"""
+    # Ensure dates are in UTC and format them correctly
     query_params = {
-        "datetime_from": date_from.strftime("%Y-%m-%dT%H:%M:%S%z"),
-        "datetime_to": date_to.strftime("%Y-%m-%dT%H:%M:%S%z"),
+        "datetime_from": date_from.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "datetime_to": date_to.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "limit": 1000,
         "page": 1,
     }
@@ -194,7 +236,7 @@ def _get_measurements_for_sensor(
     try:
         response = _make_request(session, url, headers)
         measurements_found = response.json().get("meta", {}).get("found", 0)
-        logging.info(
+        logging.debug(
             f"Found {measurements_found} {sensor_info['parameter']} measurements for sensor {sensor_info['id']} in city {city['name']} at location {sensor_info['location_name']}"
         )
         response.raise_for_status()
@@ -205,17 +247,58 @@ def _get_measurements_for_sensor(
         for m in measurements:
             period = m.get("period", {})
             datetime_from = period.get("datetimeFrom", {})
+            datetime_to = period.get("datetimeTo", {})
             parameter = m.get("parameter", {})
+            summary = m.get("summary", {})
+
+            # Skip measurements without average value
+            if "avg" not in summary:
+                continue
+
+            # Calculate midpoint between from and to times
+            try:
+                from_time = datetime.strptime(
+                    datetime_from.get("utc"), "%Y-%m-%dT%H:%M:%SZ"
+                )
+                to_time = datetime.strptime(
+                    datetime_to.get("utc"), "%Y-%m-%dT%H:%M:%SZ"
+                )
+                mid_time = from_time + (to_time - from_time) / 2
+
+                # Format midpoint time in the same format as the API
+                mid_time_utc = mid_time.strftime("%Y-%m-%dT%H:%M:%SZ")
+                # For local time, use the same hour offset as the original local time
+                local_offset = (
+                    datetime_from.get("local", "").split("+")[1]
+                    if "+" in datetime_from.get("local", "")
+                    else ""
+                )
+                mid_time_local = (
+                    f"{mid_time.strftime('%Y-%m-%dT%H:%M:%S')}+{local_offset}"
+                    if local_offset
+                    else mid_time_utc
+                )
+            except (ValueError, TypeError, AttributeError):
+                logging.warning(
+                    f"Failed to calculate midpoint time for measurement from sensor {sensor_info['id']}. "
+                    f"Using from time instead."
+                )
+                mid_time_utc = datetime_from.get("utc")
+                mid_time_local = datetime_from.get("local")
+
+            logging.debug(
+                f"Processing measurement from {datetime_from.get('utc')} to {datetime_to.get('utc')} with mid time {mid_time_utc}."
+            )
 
             transformed_measurements.append(
                 {
                     "parameter": sensor_info["parameter"],
-                    "value": m.get("value"),
+                    "value": summary.get("avg"),
                     "unit": parameter.get("units"),
                     "location": sensor_info["location_name"],
                     "date": {
-                        "utc": datetime_from.get("utc"),
-                        "local": datetime_from.get("local"),
+                        "utc": mid_time_utc,
+                        "local": mid_time_local,
                     },
                     "coordinates": sensor_info["coordinates"],
                     "entity": "OpenAQ",
