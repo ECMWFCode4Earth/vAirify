@@ -274,5 +274,4 @@ def fetch_in_situ_measurements(cities, date_from: datetime, date_to: datetime):
                 "type": city["type"],  # Ensure type is passed through
             },
         }
-        # Removed sleep as rate limiting is now handled by RateLimiter
     return in_situ_data_by_city
