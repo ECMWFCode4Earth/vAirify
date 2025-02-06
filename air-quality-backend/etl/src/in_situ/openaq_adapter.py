@@ -25,17 +25,17 @@ MIN_MEASUREMENT_VALUE = 0
 
 def measurement_is_valid(measurement):
     pollutant = required_pollutant_data[measurement["parameter"]]
-    if (
-        pollutant not in pollutants_with_molecular_weight()
-        and measurement["unit"] == "ppm"
-    ):
+    if pollutant not in pollutants_with_molecular_weight() and measurement["unit"] in [
+        "ppm",
+        "ppb",
+    ]:
         logging.info(
             f"Unsupported unit found for pollutant without "
             f"molecular weight {measurement['unit']}"
         )
         return False
 
-    valid_unit = measurement["unit"] in ["µg/m³", "ppm"]
+    valid_unit = measurement["unit"] in ["µg/m³", "ppm", "ppb"]
     if not valid_unit:
         logging.info(f"Unsupported unit found {measurement['unit']}")
 
@@ -115,7 +115,6 @@ def transform_city(city_data) -> list[InSituMeasurement]:
 def enrich_with_forecast_data(
     in_situ_measurements: list[InSituMeasurement], forecast_data: ForecastData
 ):
-
     in_situ_readings = forecast_data.enrich_in_situ_measurements(
         in_situ_measurements,
         [ForecastDataType.TEMPERATURE, ForecastDataType.SURFACE_PRESSURE],
@@ -130,11 +129,14 @@ def enrich_with_forecast_data(
         in_situ_reading["metadata"]["estimated_temperature_k"] = t
 
         for pollutant in pollutants_with_molecular_weight():
-            if (
-                pollutant.value in in_situ_reading
-                and in_situ_reading[pollutant.value]["original_unit"] == "ppm"
-            ):
+            if pollutant.value in in_situ_reading and in_situ_reading[pollutant.value][
+                "original_unit"
+            ] in ["ppm", "ppb"]:
                 original_value = in_situ_reading[pollutant.value]["original_value"]
+
+                # Convert ppb to ppm if needed
+                if in_situ_reading[pollutant.value]["original_unit"] == "ppb":
+                    original_value = original_value / 1000
 
                 in_situ_reading[pollutant.value]["value"] = convert_ppm_to_mgm3(
                     original_value, pollutant, sp, t

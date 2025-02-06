@@ -1,6 +1,7 @@
 import logging
 import math
 from multiprocessing.pool import ThreadPool
+import time
 
 from datetime import datetime, timedelta
 
@@ -9,7 +10,7 @@ from ..forecast.forecast_dao import (
     fetch_forecast_data,
     CAMS_FORECAST_INTERVAL_HOURS,
 )
-from .openaq_dao import fetch_in_situ_measurements
+from .openaq_dao import fetch_in_situ_measurements, rate_limiter
 from .openaq_adapter import (
     transform_city,
     enrich_with_forecast_data,
@@ -19,7 +20,7 @@ from .openaq_adapter import (
 def retrieve_openaq_in_situ_data(
     cities, end_date: datetime, period_hours
 ) -> list[InSituMeasurement]:
-
+    start_time = time.time()  # Start timing
     start_date = end_date - timedelta(hours=period_hours)
 
     pool = ThreadPool(processes=2)
@@ -37,13 +38,22 @@ def retrieve_openaq_in_situ_data(
     logging.info("Transforming in situ data")
     transformed_in_situ_data = []
     for city_name, city_data in in_situ_measurements_by_city.items():
+        logging.debug(f"Transforming in situ data for city: {city_name}")
         transformed_city_data = transform_city(city_data)
         enriched_city_data = enrich_with_forecast_data(
             transformed_city_data, extracted_forecast_data
         )
         transformed_in_situ_data.extend(enriched_city_data)
 
-    logging.info("Transforming in situ data complete")
+    # Log metrics at the end
+    processing_time = time.time() - start_time
+    api_calls = rate_limiter.get_api_calls()  # Get total API calls from rate limiter
+    logging.info(
+        f"OpenAQ ETL completed - "
+        f"Total API calls: {api_calls}, "
+        f"Processing time: {processing_time:.2f} seconds"
+    )
+
     return transformed_in_situ_data
 
 
