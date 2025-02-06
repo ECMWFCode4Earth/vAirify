@@ -267,39 +267,8 @@ def _get_measurements_for_sensor(
             if "avg" not in summary:
                 continue
 
-            # Calculate midpoint between from and to times
-            try:
-                from_time = datetime.strptime(
-                    datetime_from.get("utc"), "%Y-%m-%dT%H:%M:%SZ"
-                )
-                to_time = datetime.strptime(
-                    datetime_to.get("utc"), "%Y-%m-%dT%H:%M:%SZ"
-                )
-                mid_time = from_time + (to_time - from_time) / 2
-
-                # Format midpoint time in the same format as the API
-                mid_time_utc = mid_time.strftime("%Y-%m-%dT%H:%M:%SZ")
-                # For local time, use the same hour offset as the original local time
-                local_offset = (
-                    datetime_from.get("local", "").split("+")[1]
-                    if "+" in datetime_from.get("local", "")
-                    else ""
-                )
-                mid_time_local = (
-                    f"{mid_time.strftime('%Y-%m-%dT%H:%M:%S')}+{local_offset}"
-                    if local_offset
-                    else mid_time_utc
-                )
-            except (ValueError, TypeError, AttributeError):
-                logging.warning(
-                    f"Failed to calculate midpoint time for measurement from sensor {sensor_info['id']}. "
-                    f"Using from time instead."
-                )
-                mid_time_utc = datetime_from.get("utc")
-                mid_time_local = datetime_from.get("local")
-
             logging.debug(
-                f"Processing measurement from {datetime_from.get('utc')} to {datetime_to.get('utc')} with mid time {mid_time_utc}."
+                f"Processing measurement from {datetime_from.get('utc')} to {datetime_to.get('utc')}"
             )
 
             transformed_measurements.append(
@@ -309,8 +278,8 @@ def _get_measurements_for_sensor(
                     "unit": parameter.get("units"),
                     "location": sensor_info["location_name"],
                     "date": {
-                        "utc": mid_time_utc,
-                        "local": mid_time_local,
+                        "utc": datetime_to.get("utc"),  # Use end time of the period
+                        "local": datetime_to.get("local"),  # Use end time of the period
                     },
                     "coordinates": sensor_info["coordinates"],
                     "entity": "OpenAQ",
