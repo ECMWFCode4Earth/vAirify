@@ -1,6 +1,6 @@
 import { CameraControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import { CSSProperties, useRef, useState } from 'react'
+import { CSSProperties, useRef, useState, useEffect } from 'react'
 
 import CameraSettings from './CameraSettings'
 import ControlsHandler from './ControlsHandler'
@@ -66,12 +66,26 @@ const World = ({
     markerRef.current?.tick(value)
   }
 
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setIsFullscreen(false)
+      }
+    }
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+    }
+  }, [])
+
   const handleFullscreenToggle = () => {
-    setIsFullscreen(!isFullscreen)
     if (!isFullscreen) {
       document.documentElement.requestFullscreen?.()
+      setIsFullscreen(true)
     } else {
       document.exitFullscreen?.()
+      setIsFullscreen(false)
     }
   }
 
@@ -86,7 +100,7 @@ const World = ({
         <Canvas
           style={{ 
             background: 'white', 
-            height: isFullscreen ? '90vh' : '100%',
+            height: '100%',
             width: '100%' 
           }}
           camera={{ position: [0, 0, 1.4], near: 0.01, far: 1000 }}
@@ -124,22 +138,21 @@ const World = ({
             toggle={toggle}
           />
         </Canvas>
-      </div>
-
-      <div style={styles.controlsContainer}>
-        <ControlsHandler
-          toggleTimeUpdate={toggleTimeUpdate}
-          handleSliderChange={handleSliderChange}
-          handleGlobeButtonClick={handleGlobeButtonClick}
-          handleLocationMarkerButtonClick={handleLocationMarkerButtonClick}
-          handleGridFilterClick={handleGridFilterClick}
-          handleTimeInterpolationClick={handleTimeInterpolationClick}
-          handleVariableSelect={handleVariableSelect}
-          isTimeRunning={isTimeRunning}
-          forecastData={forecastData}
-          isFullscreen={isFullscreen}
-          onFullscreenToggle={handleFullscreenToggle}
-        />
+        <div style={styles.controlsOverlay}>
+          <ControlsHandler
+            toggleTimeUpdate={toggleTimeUpdate}
+            handleSliderChange={handleSliderChange}
+            handleGlobeButtonClick={handleGlobeButtonClick}
+            handleLocationMarkerButtonClick={handleLocationMarkerButtonClick}
+            handleGridFilterClick={handleGridFilterClick}
+            handleTimeInterpolationClick={handleTimeInterpolationClick}
+            handleVariableSelect={handleVariableSelect}
+            isTimeRunning={isTimeRunning}
+            forecastData={forecastData}
+            isFullscreen={isFullscreen}
+            onFullscreenToggle={handleFullscreenToggle}
+          />
+        </div>
       </div>
     </div>
   )
@@ -149,15 +162,17 @@ const styles: {
   worldContainer: CSSProperties
   fullscreenContainer: CSSProperties
   canvasContainer: CSSProperties
-  controlsContainer: CSSProperties
+  controlsOverlay: CSSProperties
 } = {
   worldContainer: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     width: '100%',
-    maxWidth: '400px',
-    height: '300px',
+    height: '270px',
+    position: 'relative',
+    maxWidth: 'none',
+    overflow: 'hidden',
   },
   fullscreenContainer: {
     position: 'fixed',
@@ -172,19 +187,26 @@ const styles: {
     flexDirection: 'column',
     maxWidth: 'none',
     height: '100vh',
+    overflow: 'hidden',
   },
   canvasContainer: {
+    position: 'relative',
     flex: 1,
     width: '100%',
     display: 'flex',
     justifyContent: 'center',
     minHeight: 0,
   },
-  controlsContainer: {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    padding: '10px 0',
+  controlsOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    zIndex: 10,
+    backgroundColor: 'rgba(244, 244, 244, 0.9)',
+    borderRadius: '8px',
+    padding: '4px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   },
 }
 

@@ -142,24 +142,11 @@ const Controls: React.FC<ControlsProps> = ({
   }
 
   return (
-    <div style={styles.controlsContainer}>
-      {isFullscreen && (
-        <Button
-          onClick={onFullscreenToggle}
-          style={{
-            ...styles.controlButton,
-            position: 'fixed',
-            top: '20px',
-            left: '20px',
-            backgroundColor: '#1976d2',
-            color: 'white',
-            zIndex: 1001,
-          }}
-        >
-          <ArrowBack fontSize="small" />
-        </Button>
-      )}
-
+    <div style={{
+      ...styles.controlsContainer,
+      width: isFullscreen ? '600px' : '350px',
+      margin: isFullscreen ? '10px 8px 40px 8px' : '8px',
+    }}>
       <Button
         onClick={onToggleTimeUpdate}
         style={{
@@ -190,7 +177,15 @@ const Controls: React.FC<ControlsProps> = ({
       )}
 
       <div style={styles.sliderContainer}>
-        <label htmlFor="slider">{currentDate}</label>
+        <label 
+          htmlFor="slider" 
+          style={{
+            fontSize: isFullscreen ? '14px' : '12px',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {currentDate}
+        </label>
         <input
           id="slider"
           type="range"
@@ -217,24 +212,20 @@ const Controls: React.FC<ControlsProps> = ({
               style={locationMarkerState ? styles.activeIcon : undefined}
             />
           </Button>
-        </>
-      )}
 
-      <Button
-        onClick={handleGlobeButtonClick}
-        style={{
-          ...styles.controlButton,
-          backgroundColor: globeAnimationState ? '#1976d2' : 'lightgray',
-        }}
-      >
-        <Public
-          fontSize="small"
-          style={globeAnimationState ? styles.activeIcon : undefined}
-        />
-      </Button>
+          <Button
+            onClick={handleGlobeButtonClick}
+            style={{
+              ...styles.controlButton,
+              backgroundColor: globeAnimationState ? '#1976d2' : 'lightgray',
+            }}
+          >
+            <Public
+              fontSize="small"
+              style={globeAnimationState ? styles.activeIcon : undefined}
+            />
+          </Button>
 
-      {isFullscreen && (
-        <>
           <Button
             onClick={handleGridFilterClick}
             style={{
@@ -266,18 +257,19 @@ const Controls: React.FC<ControlsProps> = ({
       <Select
         value={selectedVariable}
         onChange={handleVariableSelectChange}
-        style={styles.dropdown}
+        style={{
+          ...styles.dropdown,
+          fontSize: isFullscreen ? '14px' : '12px',
+          height: isFullscreen ? '32px' : '28px',
+        }}
       >
-        <MenuItem value="aqi">AQI</MenuItem>
-        <MenuItem value="pm2_5">PM2.5</MenuItem>
-        <MenuItem value="pm10">PM10</MenuItem>
-        <MenuItem value="o3">O3</MenuItem>
+        <MenuItem value="aqi" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>AQI</MenuItem>
+        <MenuItem value="pm2_5" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>PM2.5</MenuItem>
+        <MenuItem value="pm10" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>PM10</MenuItem>
+        <MenuItem value="o3" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>O3</MenuItem>
       </Select>
 
-      <Button
-        onClick={onFullscreenToggle}
-        style={styles.controlButton}
-      >
+      <Button onClick={onFullscreenToggle} style={styles.controlButton}>
         {isFullscreen ? (
           <FullscreenExit fontSize="small" />
         ) : (
@@ -295,11 +287,9 @@ const styles: { [key: string]: CSSProperties } = {
     justifyContent: 'center',
     alignItems: 'center',
     gap: '8px',
-    padding: '8px',
     backgroundColor: '#f4f4f4',
     borderTop: '1px solid #ccc',
     maxWidth: '100%',
-    width: '400px',
   },
   controlButton: {
     width: '32px',
@@ -326,7 +316,6 @@ const styles: { [key: string]: CSSProperties } = {
   dropdown: {
     width: '80px',
     height: '32px',
-    fontSize: '14px',
     borderRadius: '4px',
     border: '1px solid lightgray',
     padding: '4px',
