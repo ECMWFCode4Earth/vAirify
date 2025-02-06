@@ -150,6 +150,7 @@ def _get_locations_with_sensors(city, session, date_from: datetime) -> list:
 
     headers = {"X-API-Key": os.environ.get("OPEN_AQ_API_KEY")}
     sensor_ids = []
+    active_locations = set()  # Track unique active locations
 
     try:
         response = _make_request(session, url, headers)
@@ -191,6 +192,9 @@ def _get_locations_with_sensors(city, session, date_from: datetime) -> list:
 
             coordinates = location.get("coordinates", {})
             is_monitor = location.get("isMonitor", False)
+            location_name = location.get("name")
+            active_locations.add(location_name)  # Add to active locations set
+
             for sensor in location.get("sensors", []):
                 parameter = sensor.get("parameter", {}).get("name")
                 if parameter in SUPPORTED_PARAMETERS:
@@ -198,7 +202,7 @@ def _get_locations_with_sensors(city, session, date_from: datetime) -> list:
                         {
                             "id": sensor.get("id"),
                             "parameter": parameter,
-                            "location_name": location.get("name"),
+                            "location_name": location_name,
                             "coordinates": {
                                 "latitude": coordinates.get("latitude"),
                                 "longitude": coordinates.get("longitude"),
@@ -206,6 +210,14 @@ def _get_locations_with_sensors(city, session, date_from: datetime) -> list:
                             "is_monitor": is_monitor,
                         }
                     )
+
+        if active_locations:
+            logging.info(
+                f"Found {len(active_locations)} active locations in {city['name']}: "
+                f"{', '.join(sorted(active_locations))}"
+            )
+        else:
+            logging.info(f"No active locations found in {city['name']}")
 
         return sensor_ids
     except requests.exceptions.RequestException as e:
@@ -236,7 +248,7 @@ def _get_measurements_for_sensor(
     try:
         response = _make_request(session, url, headers)
         measurements_found = response.json().get("meta", {}).get("found", 0)
-        logging.debug(
+        logging.info(
             f"Found {measurements_found} {sensor_info['parameter']} measurements for sensor {sensor_info['id']} in city {city['name']} at location {sensor_info['location_name']}"
         )
         response.raise_for_status()
@@ -326,7 +338,6 @@ def _call_openaq_api_v3(city, date_from: datetime, date_to: datetime, session) -
     sensor_ids = _get_locations_with_sensors(city, session, date_from)
 
     if not sensor_ids:
-        logging.warning(f"No active locations found for city: {city['name']}")
         return []
 
     # Step 2: Get measurements for each sensor
