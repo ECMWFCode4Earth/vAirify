@@ -4,7 +4,6 @@ import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { useCallback, useMemo, useState } from 'react'
 
 import classes from './GlobalSummary.module.css'
-import { MapViewHeader } from './MapViewHeader'
 import { SummaryViewHeader } from './SummaryViewHeader'
 import { useForecastContext } from '../../context'
 import { getForecastData } from '../../services/forecast-data-service'
@@ -17,24 +16,17 @@ import {
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import World from '../globe/World'
 import GlobalSummaryTable from '../summary-grid/table/GlobalSummaryTable'
+import SummaryBarChart from './charts/SummaryBarChart'
 
 const GlobalSummary = (): JSX.Element => {
   const { forecastDetails } = useForecastContext()
   const [showAllColoured, setShowAllColoured] = useState<boolean>(true)
-  const [showMap, setShowMap] = useState<boolean>(false)
 
   const wrapSetShowAllColoured = useCallback(
     (val: boolean) => {
       setShowAllColoured(val)
     },
     [setShowAllColoured],
-  )
-
-  const wrapSetShowMap = useCallback(
-    (val: boolean) => {
-      setShowMap(val)
-    },
-    [setShowMap],
   )
 
   const {
@@ -127,14 +119,21 @@ const GlobalSummary = (): JSX.Element => {
             summarizedMeasurements={summarizedMeasurementData}
             showAllColoured={showAllColoured}
           />
-          <MapViewHeader setShowMap={wrapSetShowMap} showMap={showMap} />
-          {showMap && (
-            <World
-              forecastData={forecastData || {}}
-              summarizedMeasurementData={summarizedMeasurementData}
-              toggle={showMap ? 'world-visible' : 'world-hidden'}
-            />
-          )}
+          <div className={classes['charts-row']}>
+            <div className={classes['chart-container']}>
+              <SummaryBarChart title="AQI Distribution" />
+            </div>
+            <div className={classes['chart-container']}>
+              <SummaryBarChart title="Pollutant Trends" />
+            </div>
+            <div className={classes['chart-container']}>
+              <World
+                forecastData={forecastData || {}}
+                summarizedMeasurementData={summarizedMeasurementData}
+                toggle="world-visible"
+              />
+            </div>
+          </div>
         </div>
       )}
     </>
