@@ -22,6 +22,7 @@ const GlobalSummary = (): JSX.Element => {
   const { forecastDetails } = useForecastContext()
   const [showAllColoured, setShowAllColoured] = useState<boolean>(true)
   const [measurementCounts, setMeasurementCounts] = useState<MeasurementCounts | null>(null)
+  const [hoveredCity, setHoveredCity] = useState<string | null>(null)
 
   const wrapSetShowAllColoured = useCallback(
     (val: boolean) => {
@@ -136,6 +137,7 @@ const GlobalSummary = (): JSX.Element => {
             forecast={forecastData}
             summarizedMeasurements={summarizedMeasurementData}
             showAllColoured={showAllColoured}
+            onCityHover={setHoveredCity}
           />
           <div className={classes['charts-row']}>
             <div className={classes['chart-container']}>
@@ -143,6 +145,7 @@ const GlobalSummary = (): JSX.Element => {
                 title="Measurement Counts by Pollutant" 
                 measurementCounts={measurementCounts}
                 totalCities={Object.keys(forecastData || {}).length}
+                selectedCity={hoveredCity}
               />
             </div>
             <div className={classes['chart-container']}>

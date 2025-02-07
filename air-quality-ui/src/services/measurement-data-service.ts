@@ -49,7 +49,12 @@ export const getMeasurementSummary = async (
 
 interface MeasurementCounts {
   [city: string]: {
-    [pollutant: string]: number
+    [pollutant: string]: number;
+    so2_locations: number;
+    no2_locations: number;
+    o3_locations: number;
+    pm10_locations: number;
+    pm2_5_locations: number;
   }
 }
 

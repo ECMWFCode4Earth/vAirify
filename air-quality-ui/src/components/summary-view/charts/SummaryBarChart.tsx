@@ -1,18 +1,21 @@
 import ReactECharts from 'echarts-for-react'
 import { MeasurementCounts } from '../../../services/measurement-data-service'
 import { pollutantTypeDisplayShort } from '../../../models'
+import { useMemo } from 'react'
 
 interface SummaryBarChartProps {
   title: string
   measurementCounts?: MeasurementCounts | null
   totalCities: number
+  selectedCity: string | null
 }
 
-const SummaryBarChart = ({ title, measurementCounts, totalCities }: SummaryBarChartProps): JSX.Element => {
+const SummaryBarChart = ({ selectedCity, title, measurementCounts, totalCities }: SummaryBarChartProps): JSX.Element => {
   const getChartData = () => {
     if (!measurementCounts) return { pollutants: [], counts: [], coverage: [], maxCount: 0, maxPercentage: 0 }
     
     const pollutants = ['so2', 'no2', 'o3', 'pm10', 'pm2_5']
+    const pollutantLabels = pollutants.map(p => pollutantTypeDisplayShort[p])
 
     const counts = pollutants.map(pollutant => ({
       value: Object.values(measurementCounts).reduce((sum, cityData) => {
@@ -46,7 +49,8 @@ const SummaryBarChart = ({ title, measurementCounts, totalCities }: SummaryBarCh
     const maxPercentage = Math.ceil(Math.max(...coverage.map(item => item.value)))
 
     return {
-      pollutants: pollutants.map(p => pollutantTypeDisplayShort[p]),
+      pollutants,
+      pollutantLabels,
       counts,
       coverage,
       maxCount,
@@ -54,7 +58,92 @@ const SummaryBarChart = ({ title, measurementCounts, totalCities }: SummaryBarCh
     }
   }
 
-  const { pollutants, counts, coverage, maxCount, maxPercentage } = getChartData()
+  const { pollutants, pollutantLabels, counts, coverage, maxCount, maxPercentage } = getChartData()
+
+  const filteredData = useMemo(() => {
+    if (!selectedCity) {
+      return { pollutants, pollutantLabels, counts, coverage, maxCount, maxPercentage }
+    }
+    
+    // Check if the city has any measurements
+    if (!measurementCounts?.[selectedCity]) {
+      // Return zeros for all pollutants if city has no measurements
+      const emptyData = pollutants.map(pollutant => ({
+        value: 0,
+        label: {
+          show: true,
+          position: 'left',
+          fontSize: 10
+        }
+      }))
+      
+      return {
+        pollutants,
+        pollutantLabels,
+        counts: emptyData,
+        coverage: pollutants.map(() => ({
+          value: 0,
+          label: {
+            show: true,
+            position: 'right',
+            fontSize: 10,
+            formatter: '0'
+          }
+        })),
+        maxCount: 0,
+        maxPercentage: 0 // No locations when no data
+      }
+    }
+    
+    const newCounts = pollutants.map(pollutant => ({
+      value: measurementCounts[selectedCity][pollutant] || 0,
+      label: {
+        show: true,
+        position: 'left',
+        fontSize: 10
+      }
+    }))
+    
+    // Calculate new maxCount based on selected city's values
+    const newMaxCount = Math.max(...newCounts.map(item => item.value))
+
+    // For a selected city, show number of locations with data for each pollutant
+    const locationCounts = pollutants.map(pollutant => {
+      // Safely access the location count for each pollutant
+      const locationCount = measurementCounts[selectedCity]?.[`${pollutant}_locations`] ?? 0
+      return {
+        value: locationCount,
+        label: {
+          show: true,
+          position: 'right',
+          fontSize: 10,
+          formatter: locationCount > 0 ? locationCount.toString() : '0'
+        }
+      }
+    })
+    
+    // Calculate max locations, ensuring it's at least 1 to avoid scale issues
+    const maxLocations = Math.max(1, ...locationCounts.map(item => item.value))
+    
+    return {
+      pollutants,
+      pollutantLabels,
+      counts: newCounts,
+      coverage: locationCounts,
+      maxCount: newMaxCount || 1, // Use 1 as minimum to avoid empty chart
+      maxPercentage: maxLocations
+    }
+  }, [selectedCity, measurementCounts, pollutants, pollutantLabels, coverage, maxPercentage])
+
+  const getBarColor = (value: number, maxValue: number, isCount: boolean) => {
+    // Calculate color intensity (0-1)
+    const intensity = maxValue > 0 ? value / maxValue : 0
+    // Use blue for counts and green for coverage
+    const baseColor = isCount 
+      ? '24, 144, 255'  // blue
+      : '82, 196, 26'   // green
+    return `rgba(${baseColor}, ${0.3 + (intensity * 0.7)})`
+  }
 
   const options = {
     title: [
@@ -68,7 +157,7 @@ const SummaryBarChart = ({ title, measurementCounts, totalCities }: SummaryBarCh
         }
       },
       {
-        text: 'cities covered',
+        text: selectedCity ? 'individual locations' : 'cities covered',
         left: '75%',
         top: 0,
         textAlign: 'center',
@@ -84,8 +173,27 @@ const SummaryBarChart = ({ title, measurementCounts, totalCities }: SummaryBarCh
       }
     },
     grid: [
-      { right: '55%', width: '35%', bottom: '3%', top: '15%' },
-      { left: '55%', width: '35%', bottom: '3%', top: '15%' },
+      { 
+        right: '55%',  // Left chart
+        width: '35%', 
+        bottom: '3%', 
+        top: '15%',
+        left: '8%'
+      },
+      { 
+        left: '55%',   // Right chart
+        width: '35%', 
+        bottom: '3%', 
+        top: '15%',
+        right: '8%'
+      },
+      {  // Center grid for labels
+        left: '50.3%',
+        right: '45%',
+        bottom: '3%',
+        top: '15%',
+        z: 999  // Ensure labels are on top
+      }
     ],
     xAxis: [
       {
@@ -93,7 +201,7 @@ const SummaryBarChart = ({ title, measurementCounts, totalCities }: SummaryBarCh
         inverse: true,
         position: 'top',
         gridIndex: 0,
-        max: maxCount,
+        max: filteredData.maxCount,
         axisLabel: {
           formatter: '{value}',
           fontSize: 10
@@ -103,17 +211,22 @@ const SummaryBarChart = ({ title, measurementCounts, totalCities }: SummaryBarCh
         type: 'value',
         position: 'top',
         gridIndex: 1,
-        max: maxPercentage,
+        max: filteredData.maxPercentage,
         axisLabel: {
-          formatter: '{value}%',
+          formatter: selectedCity ? '{value}' : '{value}%',
           fontSize: 10
         }
+      },
+      {  // Add dummy xAxis for center grid
+        type: 'value',
+        gridIndex: 2,
+        show: false
       }
     ],
     yAxis: [
       {
         type: 'category',
-        data: pollutants,
+        data: filteredData.pollutantLabels,
         gridIndex: 0,
         position: 'right',
         axisLabel: { show: false },
@@ -122,14 +235,26 @@ const SummaryBarChart = ({ title, measurementCounts, totalCities }: SummaryBarCh
       },
       {
         type: 'category',
-        data: pollutants,
+        data: filteredData.pollutantLabels,
         gridIndex: 1,
         position: 'left',
+        axisLabel: { show: false },  // Hide these labels
+        axisLine: { show: false },
+        axisTick: { show: false }
+      },
+      {  // Center axis for labels
+        type: 'category',
+        data: filteredData.pollutantLabels,
+        gridIndex: 2,
+        position: 'center',
         axisLabel: {
-          margin: 30,
-          fontSize: 11,
-          align: 'center'
-        }
+          fontSize: 14,
+          align: 'center',
+          verticalAlign: 'middle',
+          inside: false
+        },
+        axisLine: { show: false },
+        axisTick: { show: false }
       }
     ],
     series: [
@@ -138,7 +263,12 @@ const SummaryBarChart = ({ title, measurementCounts, totalCities }: SummaryBarCh
         type: 'bar',
         xAxisIndex: 0,
         yAxisIndex: 0,
-        data: counts,
+        data: filteredData.counts.map(item => ({
+          ...item,
+          itemStyle: {
+            color: getBarColor(item.value, filteredData.maxCount, true)
+          }
+        })),
         barWidth: '60%',
         label: {
           show: true,
@@ -151,13 +281,25 @@ const SummaryBarChart = ({ title, measurementCounts, totalCities }: SummaryBarCh
         type: 'bar',
         xAxisIndex: 1,
         yAxisIndex: 1,
-        data: coverage,
+        data: filteredData.coverage.map(item => ({
+          ...item,
+          itemStyle: {
+            color: getBarColor(item.value, filteredData.maxPercentage, false)
+          }
+        })),
         barWidth: '60%',
         label: {
           show: true,
           position: 'right',
           fontSize: 10
         }
+      },
+      {  // Add dummy series for center grid
+        type: 'bar',
+        xAxisIndex: 2,
+        yAxisIndex: 2,
+        data: [],
+        silent: true
       }
     ]
   }
