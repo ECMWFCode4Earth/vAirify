@@ -29,6 +29,7 @@ export interface GlobalSummaryTableProps {
   forecast: Record<string, ForecastResponseDto[]>
   summarizedMeasurements: Record<string, MeasurementSummaryResponseDto[]>
   showAllColoured: boolean
+  onCityHover?: (cityName: string | null) => void
 }
 
 const maxWidth = 115
@@ -136,9 +137,15 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
   })),
 ]
 
-const createGridOptions = (): GridOptions => ({
+const createGridOptions = (onCityHover?: (cityName: string | null) => void): GridOptions => ({
   autoSizeStrategy: {
     type: 'fitCellContents',
+  },
+  onCellMouseOver: (event) => {
+    onCityHover?.(event.data.locationName)
+  },
+  onCellMouseOut: () => {
+    onCityHover?.(null)
   },
 })
 
@@ -146,6 +153,7 @@ const GlobalSummaryTable = ({
   forecast,
   summarizedMeasurements,
   showAllColoured,
+  onCityHover,
 }: Partial<GlobalSummaryTableProps>): JSX.Element => {
   const rowData = useMemo(() => {
     if (!forecast || !summarizedMeasurements) {
@@ -160,7 +168,7 @@ const GlobalSummaryTable = ({
   if (showAllColoured != undefined) {
     columnDefs = createColDefs(showAllColoured)
   }
-  const gridOptions = createGridOptions()
+  const gridOptions = createGridOptions(onCityHover)
   return (
     <div
       className={`ag-theme-quartz ${classes['summary-grid-wrapper']}`}
