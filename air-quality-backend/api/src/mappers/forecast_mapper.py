@@ -26,3 +26,20 @@ def database_to_api_result(measurement: Forecast) -> ForecastDto:
 
 def map_forecast(measurements_from_database: List[Forecast]) -> List[ForecastDto]:
     return list(map(database_to_api_result, measurements_from_database))
+
+
+def map_measurement_counts(measurements_from_database: List[Forecast]) -> dict:
+    """Maps database measurements to a count of measurements per city and pollutant"""
+    counts = {}
+    pollutants = ["no2", "o3", "pm2_5", "pm10", "so2"]
+
+    for measurement in measurements_from_database:
+        city = measurement["location_name"]
+        if city not in counts:
+            counts[city] = {pollutant: 0 for pollutant in pollutants}
+
+        for pollutant in pollutants:
+            if measurement[pollutant] is not None:
+                counts[city][pollutant] += 1
+
+    return counts

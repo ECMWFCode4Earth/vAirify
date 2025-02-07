@@ -66,3 +66,20 @@ def map_summarized_measurements(
     averages: List[InSituAveragedMeasurement],
 ) -> List[MeasurementSummaryDto]:
     return list(map(map_summarized_measurement, averages))
+
+
+def map_measurement_counts(measurements: List[InSituMeasurement]) -> dict:
+    """Maps database measurements to a count of measurements per city and pollutant"""
+    counts = {}
+    pollutants = ["no2", "o3", "pm2_5", "pm10", "so2"]
+
+    for measurement in measurements:
+        city = measurement["name"]
+        if city not in counts:
+            counts[city] = {pollutant: 0 for pollutant in pollutants}
+
+        for pollutant in pollutants:
+            if pollutant in measurement and measurement[pollutant]["value"] is not None:
+                counts[city][pollutant] += 1
+
+    return counts

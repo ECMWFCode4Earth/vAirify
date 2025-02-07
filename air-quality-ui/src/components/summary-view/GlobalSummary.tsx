@@ -1,14 +1,14 @@
 import { useQueries, useQuery } from '@tanstack/react-query'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, useEffect } from 'react'
 
 import classes from './GlobalSummary.module.css'
 import { SummaryViewHeader } from './SummaryViewHeader'
 import { useForecastContext } from '../../context'
 import { getForecastData } from '../../services/forecast-data-service'
 import { getValidForecastTimesBetween } from '../../services/forecast-time-service'
-import { getMeasurementSummary } from '../../services/measurement-data-service'
+import { getMeasurementSummary, getMeasurementCounts } from '../../services/measurement-data-service'
 import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,
@@ -97,6 +97,23 @@ const GlobalSummary = (): JSX.Element => {
       return { data: measurementsByLocation, isError: false, isPending: false }
     },
   })
+
+  useEffect(() => {
+    const fetchMeasurementCounts = async () => {
+      try {
+        const counts = await getMeasurementCounts(
+          forecastDetails.forecastBaseDate,
+          forecastDetails.maxForecastDate,
+          'city'
+        )
+        console.log('Measurement counts by city and pollutant:', counts['Los Angeles'].pm2_5)
+      } catch (error) {
+        console.error('Error fetching measurement counts:', error)
+      }
+    }
+
+    fetchMeasurementCounts()
+  }, [forecastDetails])
 
   if (forecastDataError || summaryDataError) {
     return <span>Error occurred</span>
