@@ -163,7 +163,6 @@ const GlobalSummary = (): JSX.Element => {
           <div className={classes['charts-row']}>
             <div className={classes['chart-container']}>
               <SummaryBarChart 
-                title="" 
                 measurementCounts={measurementCounts}
                 totalCities={Object.keys(forecastData || {}).length}
                 selectedCity={hoveredCity}

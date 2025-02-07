@@ -4,13 +4,12 @@ import { pollutantTypeDisplayShort, PollutantType } from '../../../models'
 import { useMemo } from 'react'
 
 interface SummaryBarChartProps {
-  title: string
   measurementCounts?: MeasurementCounts | null
   totalCities: number
   selectedCity: string | null
 }
 
-const SummaryBarChart = ({ selectedCity, title, measurementCounts, totalCities }: SummaryBarChartProps): JSX.Element => {
+const SummaryBarChart = ({ selectedCity, measurementCounts, totalCities }: SummaryBarChartProps): JSX.Element => {
   const pollutants: PollutantType[] = ['so2', 'no2', 'o3', 'pm10', 'pm2_5', ]
   
   const getChartData = () => {
@@ -50,7 +49,6 @@ const SummaryBarChart = ({ selectedCity, title, measurementCounts, totalCities }
     const maxPercentage = Math.ceil(Math.max(...coverage.map(item => item.value)))
 
     return {
-      pollutantsList: pollutants,
       pollutantLabels,
       counts,
       coverage,
@@ -59,7 +57,7 @@ const SummaryBarChart = ({ selectedCity, title, measurementCounts, totalCities }
     }
   }
 
-  const { pollutantsList, pollutantLabels, counts, coverage, maxCount, maxPercentage } = getChartData()
+  const { pollutantLabels, counts, coverage, maxCount, maxPercentage } = getChartData()
 
   const filteredData = useMemo(() => {
     if (!selectedCity) {
