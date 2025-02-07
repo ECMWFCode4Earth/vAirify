@@ -9,7 +9,6 @@ import {
   Remove,
   Fullscreen,
   FullscreenExit,
-  ArrowBack,
 } from '@mui/icons-material'
 import { Button, MenuItem, Select, SelectChangeEvent } from '@mui/material'
 import React, {

@@ -1,6 +1,7 @@
 import { CameraControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import { CSSProperties, useRef, useState, useEffect } from 'react'
+import * as THREE from 'three'
 
 import CameraSettings from './CameraSettings'
 import ControlsHandler from './ControlsHandler'
@@ -11,20 +12,26 @@ import {
   MeasurementSummaryResponseDto,
 } from '../../services/types'
 
-type WorldProps = {
+interface WorldProps {
   forecastData: Record<string, ForecastResponseDto[]>
   summarizedMeasurementData: Record<string, MeasurementSummaryResponseDto[]>
   toggle: string
+  selectedCity?: {
+    name: string
+    latitude: number
+    longitude: number
+  } | null
 }
 
 const World = ({
   forecastData,
   summarizedMeasurementData,
   toggle,
+  selectedCity
 }: WorldProps): JSX.Element => {
   const surface_layer_ref = useRef<SurfaceLayerRef>(null)
   const markerRef = useRef<LocationMarkerRef>(null)
-  const cameraControlsRef = useRef(null)
+  const cameraControlsRef = useRef<CameraControls | null>(null)
 
   const [isTimeRunning, setIsTimeRunning] = useState(true)
   const [isLocationMarkerOn, setIsLocationMarkerOn] = useState(true)
@@ -33,6 +40,13 @@ const World = ({
   const [selectedVariable, setSelectedVariable] = useState('aqi')
   const [globeState, setGlobeState] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
+
+  // Default camera position
+  const defaultCameraPosition = {
+    phi: Math.PI / 2, // 90 degrees
+    theta: Math.PI,    // 180 degrees
+    distance: 1.4
+  }
 
   const toggleTimeUpdate = () => setIsTimeRunning((prev) => !prev)
 
@@ -88,6 +102,41 @@ const World = ({
       setIsFullscreen(false)
     }
   }
+
+  useEffect(() => {
+    if (selectedCity && cameraControlsRef.current) {
+      const controls = cameraControlsRef.current
+      const { latitude, longitude } = selectedCity
+
+      // Switch to globe view when zooming to a city
+      if (!globeState) {
+        setGlobeState(true)
+        surface_layer_ref.current?.changeProjection(true)
+        markerRef.current?.changeProjection(true)
+      }
+
+      const phi = (90 - latitude) * THREE.MathUtils.DEG2RAD
+      const theta = (longitude) * THREE.MathUtils.DEG2RAD
+      
+      controls.rotateTo(theta, phi, true)
+      controls.dollyTo(0.3, true)
+      controls.smoothTime = 1.0
+    } else if (cameraControlsRef.current) {
+      // Reset to default position when no city is selected
+      const controls = cameraControlsRef.current
+      
+      // Switch back to map view
+      if (globeState) {
+        setGlobeState(false)
+        surface_layer_ref.current?.changeProjection(false)
+        markerRef.current?.changeProjection(false)
+      }
+
+      controls.rotateTo(defaultCameraPosition.theta, defaultCameraPosition.phi, true)
+      controls.dollyTo(defaultCameraPosition.distance, true)
+      controls.smoothTime = 1.0
+    }
+  }, [selectedCity, globeState])
 
   return (
     <div 
