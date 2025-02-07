@@ -145,6 +145,7 @@ const World = ({
         ...(isFullscreen && styles.fullscreenContainer),
       }}
     >
+      <div style={styles.title}>Air Quality Map</div>
       <div style={styles.canvasContainer}>
         <Canvas
           style={{ 
@@ -212,6 +213,7 @@ const styles: {
   fullscreenContainer: CSSProperties
   canvasContainer: CSSProperties
   controlsOverlay: CSSProperties
+  title: CSSProperties
 } = {
   worldContainer: {
     display: 'flex',
@@ -222,6 +224,7 @@ const styles: {
     position: 'relative',
     maxWidth: 'none',
     overflow: 'hidden',
+    paddingTop: '20px',
   },
   fullscreenContainer: {
     position: 'fixed',
@@ -245,6 +248,7 @@ const styles: {
     display: 'flex',
     justifyContent: 'center',
     minHeight: 0,
+    marginTop: '4px',
   },
   controlsOverlay: {
     position: 'absolute',
@@ -257,6 +261,14 @@ const styles: {
     padding: '4px',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   },
+  title: {
+    fontSize: '12px',
+    textAlign: 'center',
+    position: 'absolute',
+    width: '100%',
+    top: '4px',
+    zIndex: 1,
+  }
 }
 
 export default World
