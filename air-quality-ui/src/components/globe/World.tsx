@@ -145,7 +145,7 @@ const World = ({
         ...(isFullscreen && styles.fullscreenContainer),
       }}
     >
-      <div style={styles.title}>Air Quality Map</div>
+      <div style={styles.title}>colour: measured value (black=missing data); size: deviation from forecast</div>
       <div style={styles.canvasContainer}>
         <Canvas
           style={{ 
@@ -224,7 +224,7 @@ const styles: {
     position: 'relative',
     maxWidth: 'none',
     overflow: 'hidden',
-    paddingTop: '20px',
+    paddingTop: '6px',
   },
   fullscreenContainer: {
     position: 'fixed',
@@ -248,7 +248,7 @@ const styles: {
     display: 'flex',
     justifyContent: 'center',
     minHeight: 0,
-    marginTop: '4px',
+    marginTop: '6px',
   },
   controlsOverlay: {
     position: 'absolute',
@@ -266,8 +266,10 @@ const styles: {
     textAlign: 'center',
     position: 'absolute',
     width: '100%',
-    top: '4px',
+    top: '0px',
     zIndex: 1,
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    fontWeight: 'normal'
   }
 }
 

@@ -26,7 +26,7 @@ const SummaryScatterChart = ({
   selectedCity 
 }: SummaryScatterChartProps): JSX.Element => {
   const [selectedPollutants, setSelectedPollutants] = useState<Set<PollutantType>>(
-    new Set(['pm2_5', 'pm10', 'o3', 'no2', 'so2'])
+    new Set(['pm2_5', 'pm10', 'o3', 'no2', 'so2'] as PollutantType[])
   )
 
   const togglePollutant = (pollutant: PollutantType) => {
@@ -42,8 +42,9 @@ const SummaryScatterChart = ({
   const getChartData = () => {
     if (!summarizedMeasurements || !forecast) return []
 
-    const pollutants: PollutantType[] = ['pm2_5', 'pm10', 'o3', 'no2', 'so2']
-      .filter(p => selectedPollutants.has(p))
+    const allPollutants = ['pm2_5', 'pm10', 'o3', 'no2', 'so2'] as const;
+    const pollutants: PollutantType[] = allPollutants
+      .filter(p => selectedPollutants.has(p as PollutantType));
     
     return Object.entries(summarizedMeasurements).flatMap(([cityName, measurements]) => {
       if (selectedCity && selectedCity !== cityName) return []
@@ -65,7 +66,7 @@ const SummaryScatterChart = ({
           return {
             value: [measuredValue, forecastValue],
             name: cityName,
-            pollutant: pollutant,
+            pollutant: pollutant as PollutantType,
             timestamp: measurement.measurement_base_time,
             itemStyle: {
               color: pollutantColors[pollutant]
@@ -98,12 +99,14 @@ const SummaryScatterChart = ({
     tooltip: {
       trigger: 'item',
       formatter: function(params: any) {
-        const timestamp = DateTime.fromISO(params.data.timestamp).toFormat('dd MMM HH:mm')
-        return `${params.data.name}<br/>
-                ${pollutantTypeDisplay[params.data.pollutant]}<br/>
-                Time: ${timestamp} UTC<br/>
-                Measured: ${params.value[0].toFixed(1)} µg/m³<br/>
-                Forecast: ${params.value[1].toFixed(1)} µg/m³`
+        if (params.data) {
+          return `${params.data.name}<br/>
+                  ${pollutantTypeDisplay[params.data.pollutant as PollutantType]}<br/>
+                  Measured: ${params.data.value[0].toFixed(1)} µg/m³<br/>
+                  Forecast: ${params.data.value[1].toFixed(1)} µg/m³<br/>
+                  Time: ${DateTime.fromISO(params.data.timestamp).toFormat('yyyy-MM-dd HH:mm')}`
+        }
+        return ''
       }
     },
     grid: {
