@@ -148,7 +148,7 @@ const SummaryBarChart = ({ selectedCity, title, measurementCounts, totalCities }
   const options = {
     title: [
       {
-        text: 'number of measurements',
+        text: 'Number of Measurements',
         left: '25%',
         top: 0,
         textAlign: 'center',
@@ -157,7 +157,7 @@ const SummaryBarChart = ({ selectedCity, title, measurementCounts, totalCities }
         }
       },
       {
-        text: selectedCity ? 'individual locations' : 'cities covered',
+        text: selectedCity ? 'Individual Locations' : 'Cities Covered',
         left: '75%',
         top: 0,
         textAlign: 'center',
@@ -189,6 +189,8 @@ const SummaryBarChart = ({ selectedCity, title, measurementCounts, totalCities }
         left: '48.5%',   // Fixed position in the middle
         width: '10%',
         top: '17%',
+        bottom: '3%', 
+
         z: 999
       }
     ],

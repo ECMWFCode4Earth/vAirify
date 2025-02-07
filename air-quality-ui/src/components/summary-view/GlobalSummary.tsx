@@ -17,6 +17,7 @@ import { LoadingSpinner } from '../common/LoadingSpinner'
 import World from '../globe/World'
 import GlobalSummaryTable from '../summary-grid/table/GlobalSummaryTable'
 import SummaryBarChart from './charts/SummaryBarChart'
+import SummaryScatterChart from './charts/SummaryScatterChart'
 
 const GlobalSummary = (): JSX.Element => {
   const { forecastDetails } = useForecastContext()
@@ -142,14 +143,19 @@ const GlobalSummary = (): JSX.Element => {
           <div className={classes['charts-row']}>
             <div className={classes['chart-container']}>
               <SummaryBarChart 
-                title="Measurement Counts by Pollutant" 
+                title="" 
                 measurementCounts={measurementCounts}
                 totalCities={Object.keys(forecastData || {}).length}
                 selectedCity={hoveredCity}
               />
             </div>
             <div className={classes['chart-container']}>
-              <SummaryBarChart title="Pollutant Trends" />
+              <SummaryScatterChart 
+                title="Forecast vs. Measurement (3-hourly avg)"
+                summarizedMeasurements={summarizedMeasurementData}
+                forecast={forecastData}
+                selectedCity={hoveredCity}
+              />
             </div>
             <div className={classes['chart-container']}>
               <World
