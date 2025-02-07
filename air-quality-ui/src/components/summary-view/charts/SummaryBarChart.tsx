@@ -1,6 +1,6 @@
 import ReactECharts from 'echarts-for-react'
 import { MeasurementCounts } from '../../../services/measurement-data-service'
-import { pollutantTypeDisplayShort } from '../../../models'
+import { pollutantTypeDisplayShort, PollutantType } from '../../../models'
 import { useMemo } from 'react'
 
 interface SummaryBarChartProps {
@@ -11,10 +11,11 @@ interface SummaryBarChartProps {
 }
 
 const SummaryBarChart = ({ selectedCity, title, measurementCounts, totalCities }: SummaryBarChartProps): JSX.Element => {
+  const pollutants: PollutantType[] = ['so2', 'no2', 'o3', 'pm10', 'pm2_5', ]
+  
   const getChartData = () => {
-    if (!measurementCounts) return { pollutants: [], counts: [], coverage: [], maxCount: 0, maxPercentage: 0 }
+    if (!measurementCounts) return { pollutantsList: [], counts: [], coverage: [], maxCount: 0, maxPercentage: 0 }
     
-    const pollutants = ['so2', 'no2', 'o3', 'pm10', 'pm2_5']
     const pollutantLabels = pollutants.map(p => pollutantTypeDisplayShort[p])
 
     const counts = pollutants.map(pollutant => ({
@@ -49,7 +50,7 @@ const SummaryBarChart = ({ selectedCity, title, measurementCounts, totalCities }
     const maxPercentage = Math.ceil(Math.max(...coverage.map(item => item.value)))
 
     return {
-      pollutants,
+      pollutantsList: pollutants,
       pollutantLabels,
       counts,
       coverage,
@@ -58,7 +59,7 @@ const SummaryBarChart = ({ selectedCity, title, measurementCounts, totalCities }
     }
   }
 
-  const { pollutants, pollutantLabels, counts, coverage, maxCount, maxPercentage } = getChartData()
+  const { pollutantsList, pollutantLabels, counts, coverage, maxCount, maxPercentage } = getChartData()
 
   const filteredData = useMemo(() => {
     if (!selectedCity) {
@@ -68,30 +69,18 @@ const SummaryBarChart = ({ selectedCity, title, measurementCounts, totalCities }
     // Check if the city has any measurements
     if (!measurementCounts?.[selectedCity]) {
       // Return zeros for all pollutants if city has no measurements
-      const emptyData = pollutants.map(pollutant => ({
+      const emptyData = pollutants.map(() => ({
         value: 0,
-        label: {
-          show: true,
-          position: 'left',
-          fontSize: 10
-        }
+        itemStyle: { color: '#e0e0e0' }
       }))
       
       return {
         pollutants,
         pollutantLabels,
         counts: emptyData,
-        coverage: pollutants.map(() => ({
-          value: 0,
-          label: {
-            show: true,
-            position: 'right',
-            fontSize: 10,
-            formatter: '0'
-          }
-        })),
-        maxCount: 0,
-        maxPercentage: 0 // No locations when no data
+        coverage: emptyData,
+        maxCount: 1,
+        maxPercentage: 1
       }
     }
     
