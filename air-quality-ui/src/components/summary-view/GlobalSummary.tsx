@@ -8,7 +8,7 @@ import { SummaryViewHeader } from './SummaryViewHeader'
 import { useForecastContext } from '../../context'
 import { getForecastData } from '../../services/forecast-data-service'
 import { getValidForecastTimesBetween } from '../../services/forecast-time-service'
-import { getMeasurementSummary, getMeasurementCounts } from '../../services/measurement-data-service'
+import { getMeasurementSummary, getMeasurementCounts, MeasurementCounts } from '../../services/measurement-data-service'
 import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,
@@ -21,6 +21,7 @@ import SummaryBarChart from './charts/SummaryBarChart'
 const GlobalSummary = (): JSX.Element => {
   const { forecastDetails } = useForecastContext()
   const [showAllColoured, setShowAllColoured] = useState<boolean>(true)
+  const [measurementCounts, setMeasurementCounts] = useState<MeasurementCounts | null>(null)
 
   const wrapSetShowAllColoured = useCallback(
     (val: boolean) => {
@@ -106,7 +107,7 @@ const GlobalSummary = (): JSX.Element => {
           forecastDetails.maxForecastDate,
           'city'
         )
-        console.log('Measurement counts by city and pollutant:', counts['Los Angeles'].pm2_5)
+        setMeasurementCounts(counts)
       } catch (error) {
         console.error('Error fetching measurement counts:', error)
       }
@@ -138,7 +139,11 @@ const GlobalSummary = (): JSX.Element => {
           />
           <div className={classes['charts-row']}>
             <div className={classes['chart-container']}>
-              <SummaryBarChart title="AQI Distribution" />
+              <SummaryBarChart 
+                title="Measurement Counts by Pollutant" 
+                measurementCounts={measurementCounts}
+                totalCities={Object.keys(forecastData || {}).length}
+              />
             </div>
             <div className={classes['chart-container']}>
               <SummaryBarChart title="Pollutant Trends" />
