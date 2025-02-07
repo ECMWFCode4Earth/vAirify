@@ -174,25 +174,22 @@ const SummaryBarChart = ({ selectedCity, title, measurementCounts, totalCities }
     },
     grid: [
       { 
+        left: '8%',
         right: '55%',  // Left chart
-        width: '35%', 
         bottom: '3%', 
-        top: '15%',
-        left: '8%'
+        top: '17%',
       },
       { 
         left: '55%',   // Right chart
-        width: '35%', 
+        right: '8%',
         bottom: '3%', 
-        top: '15%',
-        right: '8%'
+        top: '17%',
       },
-      {  // Center grid for labels
-        left: '50.3%',
-        right: '45%',
-        bottom: '3%',
-        top: '15%',
-        z: 999  // Ensure labels are on top
+      {  // Center grid for labels - use absolute positioning
+        left: '48.5%',   // Fixed position in the middle
+        width: '10%',
+        top: '17%',
+        z: 999
       }
     ],
     xAxis: [
@@ -228,7 +225,7 @@ const SummaryBarChart = ({ selectedCity, title, measurementCounts, totalCities }
         type: 'category',
         data: filteredData.pollutantLabels,
         gridIndex: 0,
-        position: 'right',
+        position: 'center',
         axisLabel: { show: false },
         axisLine: { show: false },
         axisTick: { show: false }
@@ -237,8 +234,8 @@ const SummaryBarChart = ({ selectedCity, title, measurementCounts, totalCities }
         type: 'category',
         data: filteredData.pollutantLabels,
         gridIndex: 1,
-        position: 'left',
-        axisLabel: { show: false },  // Hide these labels
+        position: 'center',
+        axisLabel: { show: false },
         axisLine: { show: false },
         axisTick: { show: false }
       },
@@ -251,7 +248,8 @@ const SummaryBarChart = ({ selectedCity, title, measurementCounts, totalCities }
           fontSize: 14,
           align: 'center',
           verticalAlign: 'middle',
-          inside: false
+          inside: true,
+          width: '100%'  // Use full width of the grid
         },
         axisLine: { show: false },
         axisTick: { show: false }
