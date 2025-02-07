@@ -8,7 +8,7 @@ import { SummaryViewHeader } from './SummaryViewHeader'
 import { useForecastContext } from '../../context'
 import { getForecastData } from '../../services/forecast-data-service'
 import { getValidForecastTimesBetween } from '../../services/forecast-time-service'
-import { getMeasurementSummary, getMeasurementCounts } from '../../services/measurement-data-service'
+import { getMeasurementSummary, getMeasurementCounts, type MeasurementCounts } from '../../services/measurement-data-service'
 import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,

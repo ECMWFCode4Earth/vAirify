@@ -47,7 +47,7 @@ export const getMeasurementSummary = async (
   return queryMeasurements('/measurements/summary', params)
 }
 
-interface MeasurementCounts {
+export interface MeasurementCounts {
   [city: string]: {
     [pollutant: string]: number;
     so2_locations: number;
