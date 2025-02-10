@@ -1,7 +1,7 @@
 import { useQueries, useQuery } from '@tanstack/react-query'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-import { useCallback, useMemo, useState, useEffect } from 'react'
+import { useCallback, useMemo, useState, useEffect, useRef } from 'react'
 
 import classes from './GlobalSummary.module.css'
 import { SummaryViewHeader } from './SummaryViewHeader'
@@ -22,6 +22,7 @@ import SummaryScatterChart from './charts/SummaryScatterChart'
 const GlobalSummary = (): JSX.Element => {
   const { forecastDetails } = useForecastContext()
   const [showAllColoured, setShowAllColoured] = useState<boolean>(true)
+  const enableHoverRef = useRef(true)
   const [enableHover, setEnableHover] = useState<boolean>(true)
   const [measurementCounts, setMeasurementCounts] = useState<MeasurementCounts | null>(null)
   const [hoveredCity, setHoveredCity] = useState<string | null>(null)
@@ -29,6 +30,10 @@ const GlobalSummary = (): JSX.Element => {
     name: string
     latitude: number
     longitude: number
+  } | null>(null)
+  const [lastHoveredState, setLastHoveredState] = useState<{
+    city: string | null,
+    coords: { name: string, latitude: number, longitude: number } | null
   } | null>(null)
 
   const wrapSetShowAllColoured = useCallback(
@@ -40,13 +45,37 @@ const GlobalSummary = (): JSX.Element => {
 
   const wrapSetEnableHover = useCallback(
     (val: boolean) => {
-      setEnableHover(val)
+      console.log('wrapSetEnableHover called with:', val)
+      console.log('Current states:', {
+        enableHover,
+        hoveredCity,
+        selectedCityCoords,
+        lastHoveredState
+      })
+      
+      enableHoverRef.current = val
+      
       if (!val) {
+        console.log('Disabling hover, saving state:', {
+          city: hoveredCity,
+          coords: selectedCityCoords
+        })
+        setLastHoveredState({
+          city: hoveredCity,
+          coords: selectedCityCoords
+        })
         setHoveredCity(null)
         setSelectedCityCoords(null)
+      } else {
+        console.log('Enabling hover, lastHoveredState:', lastHoveredState)
+        if (lastHoveredState) {
+          setHoveredCity(lastHoveredState.city)
+          setSelectedCityCoords(lastHoveredState.coords)
+        }
       }
+      setEnableHover(val)
     },
-    [setEnableHover],
+    [enableHover, hoveredCity, selectedCityCoords, lastHoveredState],
   )
 
   const {
@@ -137,7 +166,14 @@ const GlobalSummary = (): JSX.Element => {
 
   const handleCityHover = useCallback(
     (cityName: string | null, latitude?: number, longitude?: number) => {
-      if (!enableHover) return
+      console.log('handleCityHover called:', {
+        cityName,
+        latitude,
+        longitude,
+        enableHover: enableHoverRef.current
+      })
+      
+      if (!enableHoverRef.current) return
       
       setHoveredCity(cityName)
       if (cityName && latitude !== undefined && longitude !== undefined) {
@@ -150,8 +186,18 @@ const GlobalSummary = (): JSX.Element => {
         setSelectedCityCoords(null)
       }
     },
-    [enableHover],
+    [],
   )
+
+  // Add effect to monitor state changes
+  useEffect(() => {
+    console.log('State updated:', {
+      enableHover,
+      hoveredCity,
+      selectedCityCoords,
+      lastHoveredState
+    })
+  }, [enableHover, hoveredCity, selectedCityCoords, lastHoveredState])
 
   if (forecastDataError || summaryDataError) {
     return <span>Error occurred</span>
@@ -176,13 +222,14 @@ const GlobalSummary = (): JSX.Element => {
             summarizedMeasurements={summarizedMeasurementData}
             showAllColoured={showAllColoured}
             onCityHover={handleCityHover}
+            enableHover={enableHover}
           />
           <div className={classes['charts-row']}>
             <div className={classes['chart-container']}>
               <SummaryBarChart 
                 measurementCounts={measurementCounts}
                 totalCities={Object.keys(forecastData || {}).length}
-                selectedCity={enableHover ? hoveredCity : null}
+                selectedCity={hoveredCity}
               />
             </div>
             <div className={classes['chart-container']}>
@@ -190,14 +237,14 @@ const GlobalSummary = (): JSX.Element => {
                 title="Forecast vs. Measurement (3-hourly avg)"
                 summarizedMeasurements={summarizedMeasurementData}
                 forecast={forecastData}
-                selectedCity={enableHover ? hoveredCity : null}
+                selectedCity={hoveredCity}
               />
             </div>
             <div className={classes['chart-container']}>
               <World
                 forecastData={forecastData || {}}
                 summarizedMeasurementData={summarizedMeasurementData}
-                selectedCity={enableHover ? selectedCityCoords : null}
+                selectedCity={selectedCityCoords}
               />
             </div>
           </div>
