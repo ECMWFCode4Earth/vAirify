@@ -18,13 +18,21 @@ jest.mock('../../context', () => ({
 }))
 
 const mockSetShowAllColoured: (val: boolean) => void = jest.fn()
+const mockSetEnableHover: (val: boolean) => void = jest.fn()
 
 describe('SummaryViewHeader component', () => {
+  beforeEach(() => {
+    mockSetShowAllColoured.mockClear()
+    mockSetEnableHover.mockClear()
+  })
+
   it('Shows correct message for context dates', async () => {
     render(
       <SummaryViewHeader
         showAllColoured={false}
         setShowAllColoured={mockSetShowAllColoured}
+        enableHover={true}
+        setEnableHover={mockSetEnableHover}
       />,
     )
     await waitFor(() => {
@@ -33,11 +41,14 @@ describe('SummaryViewHeader component', () => {
       ).toBeInTheDocument()
     })
   })
+
   it('Calls setShowAllColoured on switch click', async () => {
     render(
       <SummaryViewHeader
         showAllColoured={false}
         setShowAllColoured={mockSetShowAllColoured}
+        enableHover={true}
+        setEnableHover={mockSetEnableHover}
       />,
     )
     await act(async () => {

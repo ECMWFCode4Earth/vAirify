@@ -26,6 +26,7 @@ const GlobalSummary = (): JSX.Element => {
   const [enableHover, setEnableHover] = useState<boolean>(true)
   const [measurementCounts, setMeasurementCounts] = useState<MeasurementCounts | null>(null)
   const [hoveredCity, setHoveredCity] = useState<string | null>(null)
+  const [hoveredVar, setHoveredVar] = useState<string | undefined>(undefined)
   const [selectedCityCoords, setSelectedCityCoords] = useState<{
     name: string
     latitude: number
@@ -45,21 +46,10 @@ const GlobalSummary = (): JSX.Element => {
 
   const wrapSetEnableHover = useCallback(
     (val: boolean) => {
-      console.log('wrapSetEnableHover called with:', val)
-      console.log('Current states:', {
-        enableHover,
-        hoveredCity,
-        selectedCityCoords,
-        lastHoveredState
-      })
       
       enableHoverRef.current = val
       
       if (!val) {
-        console.log('Disabling hover, saving state:', {
-          city: hoveredCity,
-          coords: selectedCityCoords
-        })
         setLastHoveredState({
           city: hoveredCity,
           coords: selectedCityCoords
@@ -67,7 +57,6 @@ const GlobalSummary = (): JSX.Element => {
         setHoveredCity(null)
         setSelectedCityCoords(null)
       } else {
-        console.log('Enabling hover, lastHoveredState:', lastHoveredState)
         if (lastHoveredState) {
           setHoveredCity(lastHoveredState.city)
           setSelectedCityCoords(lastHoveredState.coords)
@@ -165,17 +154,12 @@ const GlobalSummary = (): JSX.Element => {
   }, [forecastDetails])
 
   const handleCityHover = useCallback(
-    (cityName: string | null, latitude?: number, longitude?: number) => {
-      console.log('handleCityHover called:', {
-        cityName,
-        latitude,
-        longitude,
-        enableHover: enableHoverRef.current
-      })
+    (cityName: string | null, latitude?: number, longitude?: number, columnId?: string) => {
       
       if (!enableHoverRef.current) return
       
       setHoveredCity(cityName)
+      setHoveredVar(columnId)
       if (cityName && latitude !== undefined && longitude !== undefined) {
         setSelectedCityCoords({
           name: cityName,
@@ -189,15 +173,6 @@ const GlobalSummary = (): JSX.Element => {
     [],
   )
 
-  // Add effect to monitor state changes
-  useEffect(() => {
-    console.log('State updated:', {
-      enableHover,
-      hoveredCity,
-      selectedCityCoords,
-      lastHoveredState
-    })
-  }, [enableHover, hoveredCity, selectedCityCoords, lastHoveredState])
 
   if (forecastDataError || summaryDataError) {
     return <span>Error occurred</span>
@@ -245,6 +220,7 @@ const GlobalSummary = (): JSX.Element => {
                 forecastData={forecastData || {}}
                 summarizedMeasurementData={summarizedMeasurementData}
                 selectedCity={selectedCityCoords}
+                selectedVariable={hoveredVar === 'aqiLevel' ? 'aqi' : (hoveredVar || 'aqi')}
               />
             </div>
           </div>

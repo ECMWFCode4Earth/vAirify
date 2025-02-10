@@ -25,11 +25,11 @@ import {
 import { aqiCellRules, pollutantCellRules } from '../cell/cell-rules/CellRules'
 import { LocationCellRenderer } from '../cell/location-cell-renderer/LocationCellRenderer'
 
-interface GlobalSummaryTableProps {
-  forecast?: Record<string, ForecastResponseDto[]>
-  summarizedMeasurements?: Record<string, MeasurementSummaryResponseDto[]>
+export interface GlobalSummaryTableProps {
+  forecast: Record<string, ForecastResponseDto[]> | undefined
+  summarizedMeasurements: Record<string, MeasurementSummaryResponseDto> | undefined
   showAllColoured: boolean
-  onCityHover: (cityName: string | null, latitude?: number, longitude?: number) => void
+  onCityHover: (cityName: string | null, latitude?: number, longitude?: number, columnId?: string) => void
 }
 
 const maxWidth = 115
@@ -139,18 +139,24 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
 
 const createGridOptions = (
   forecast: Record<string, ForecastResponseDto[]> | undefined,
-  onCityHover?: (cityName: string | null, latitude?: number, longitude?: number) => void
+  onCityHover?: (cityName: string | null, latitude?: number, longitude?: number, columnId?: string) => void
 ): GridOptions => ({
   autoSizeStrategy: {
     type: 'fitCellContents',
   },
   onCellMouseOver: (event) => {
     const cityName = event.data.locationName
+    const columnId = event.column?.getColId()
+    
+    // Extract pollutant name from columnId, including aqiLevel
+    const pollutantMatch = columnId?.match(/(?:forecast|measurements)\.(pm2_5|pm10|o3|no2|so2|aqiLevel)/)
+    const pollutantName = pollutantMatch ? pollutantMatch[1] : 'aqiLevel'
+    
     if (cityName && forecast?.[cityName]?.[0]) {
       const { latitude, longitude } = forecast[cityName][0].location
-      onCityHover?.(cityName, latitude, longitude)
+      onCityHover?.(cityName, latitude, longitude, columnId ? pollutantName : 'aqiLevel')
     } else {
-      onCityHover?.(cityName)
+      onCityHover?.(cityName, undefined, undefined, columnId ? pollutantName : 'aqiLevel')
     }
   },
   onCellMouseOut: () => {

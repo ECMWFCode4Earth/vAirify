@@ -34,6 +34,7 @@ type ControlsProps = {
   forecastData: Record<string, ForecastResponseDto[]>
   isFullscreen?: boolean
   onFullscreenToggle: () => void
+  selectedVariable?: string
 }
 
 const Controls: React.FC<ControlsProps> = ({
@@ -48,6 +49,7 @@ const Controls: React.FC<ControlsProps> = ({
   forecastData,
   isFullscreen = false,
   onFullscreenToggle,
+  selectedVariable: externalSelectedVariable,
 }) => {
   const [sliderValue, setSliderValue] = useState(0.0)
   const [globeAnimationState, setGlobeAnimationState] = useState(false)
@@ -55,7 +57,7 @@ const Controls: React.FC<ControlsProps> = ({
   const [filterState, setGridFilterState] = useState(false)
   const [timeInterpolationState, setTimeInterpolationState] = useState(true)
   const [timeDelta, setTimeDelta] = useState(0.06)
-  const [selectedVariable, setSelectedVariable] = useState('aqi')
+  const [selectedVariable, setSelectedVariable] = useState(externalSelectedVariable || 'aqi')
 
   const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(event.target.value)
@@ -131,6 +133,12 @@ const Controls: React.FC<ControlsProps> = ({
     setSelectedVariable(variable)
     onVariableSelect(variable)
   }
+
+  useEffect(() => {
+    if (externalSelectedVariable && selectedVariable !== externalSelectedVariable) {
+      setSelectedVariable(externalSelectedVariable)
+    }
+  }, [externalSelectedVariable])
 
   const handleIncreaseTimeDelta = () => {
     setTimeDelta((prevDelta) => prevDelta + 0.02)

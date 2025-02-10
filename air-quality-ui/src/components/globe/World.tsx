@@ -20,12 +20,14 @@ interface WorldProps {
     latitude: number
     longitude: number
   } | null
+  selectedVariable?: string
 }
 
 const World = ({
   forecastData,
   summarizedMeasurementData,
-  selectedCity
+  selectedCity,
+  selectedVariable: externalSelectedVariable
 }: WorldProps): JSX.Element => {
   const surface_layer_ref = useRef<SurfaceLayerRef>(null)
   const markerRef = useRef<LocationMarkerRef>(null)
@@ -35,7 +37,7 @@ const World = ({
   const [isLocationMarkerOn, setIsLocationMarkerOn] = useState(true)
   const [isFilterNearest, setGridFilterState] = useState(false)
   const [isTimeInterpolation, setTimeInterpolationState] = useState(true)
-  const [selectedVariable, setSelectedVariable] = useState('aqi')
+  const [selectedVariable, setSelectedVariable] = useState(externalSelectedVariable || 'aqi')
   const [globeState, setGlobeState] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
 
@@ -136,6 +138,13 @@ const World = ({
     }
   }, [selectedCity, globeState])
 
+  // Update selectedVariable when external prop changes
+  useEffect(() => {
+    if (externalSelectedVariable) {
+      setSelectedVariable(externalSelectedVariable)
+    }
+  }, [externalSelectedVariable])
+
   return (
     <div 
       style={{
@@ -198,6 +207,7 @@ const World = ({
             forecastData={forecastData}
             isFullscreen={isFullscreen}
             onFullscreenToggle={handleFullscreenToggle}
+            selectedVariable={selectedVariable}
           />
         </div>
       </div>

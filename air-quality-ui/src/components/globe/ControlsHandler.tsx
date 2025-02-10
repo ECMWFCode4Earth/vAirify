@@ -16,6 +16,7 @@ type ControlsHandlerProps = {
   forecastData: Record<string, ForecastResponseDto[]>
   isFullscreen: boolean
   onFullscreenToggle: () => void
+  selectedVariable?: string
 }
 
 const ControlsHandler: React.FC<ControlsHandlerProps> = ({
@@ -30,6 +31,7 @@ const ControlsHandler: React.FC<ControlsHandlerProps> = ({
   forecastData,
   isFullscreen,
   onFullscreenToggle,
+  selectedVariable,
 }) => {
   return (
     <Controls
@@ -44,6 +46,7 @@ const ControlsHandler: React.FC<ControlsHandlerProps> = ({
       forecastData={forecastData}
       isFullscreen={isFullscreen}
       onFullscreenToggle={onFullscreenToggle}
+      selectedVariable={selectedVariable}
     />
   )
 }
