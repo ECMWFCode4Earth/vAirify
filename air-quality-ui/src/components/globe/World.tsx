@@ -44,11 +44,8 @@ const World = ({
   const [isLocationMarkerOn, setIsLocationMarkerOn] = useState(true)
   const [isFilterNearest, setGridFilterState] = useState(false)
   const [isTimeInterpolation, setTimeInterpolationState] = useState(true)
+  const [selectedVariable, setSelectedVariable] = useState(externalSelectedVariable || 'aqi')
   const [globeState, setGlobeState] = useState(false)
-
-  // Map aqiLevel to aqi before setting the state
-  const mappedVariable = externalSelectedVariable === 'aqiLevel' ? 'aqi' : externalSelectedVariable
-  const [selectedVariable, setSelectedVariable] = useState(mappedVariable || 'aqi')
 
   // Default camera position
   const defaultCameraPosition = {
@@ -89,13 +86,10 @@ const World = ({
     markerRef.current?.tick(value)
   }
 
-  // Add debug statements to fullscreen event listener
+  // Add fullscreen change event listener
   useEffect(() => {
     const handleFullscreenChange = () => {
-      console.log('Fullscreen change event triggered')
-      console.log('document.fullscreenElement:', document.fullscreenElement)
-      if (!document.fullscreenElement && typeof onToggleFullscreen === 'function') {
-        console.log('Exiting fullscreen, calling onToggleFullscreen')
+      if (!document.fullscreenElement) {
         onToggleFullscreen()
       }
     }
@@ -141,62 +135,21 @@ const World = ({
     }
   }, [selectedCity, globeState])
 
-  // Update useEffect to handle the mapping
+  // Update selectedVariable when external prop changes
   useEffect(() => {
     if (externalSelectedVariable) {
-      const mappedVar = externalSelectedVariable === 'aqiLevel' ? 'aqi' : externalSelectedVariable
-      setSelectedVariable(mappedVar)
+      setSelectedVariable(externalSelectedVariable)
     }
   }, [externalSelectedVariable])
 
-  // Update the fullscreen toggle handler
+  // Add fullscreen toggle handler
   const handleFullscreenToggle = () => {
-    console.log('World: Fullscreen toggle clicked')
-    console.log('World: Current fullscreen state:', isFullscreen)
-    console.log('World: document.fullscreenElement:', document.fullscreenElement)
-    console.log('World: requestFullscreen available:', !!document.documentElement.requestFullscreen)
-    
-    try {
-      if (!isFullscreen) {
-        console.log('World: Attempting to enter fullscreen')
-        if (document.documentElement.requestFullscreen) {
-          document.documentElement.requestFullscreen()
-            .then(() => {
-              console.log('World: Entered fullscreen successfully')
-              if (typeof onToggleFullscreen === 'function') {
-                onToggleFullscreen()
-              } else {
-                console.error('World: onToggleFullscreen is not a function')
-              }
-            })
-            .catch(err => {
-              console.error('World: Error entering fullscreen:', err)
-            })
-        } else {
-          console.warn('World: requestFullscreen not available')
-        }
-      } else {
-        console.log('World: Attempting to exit fullscreen')
-        if (document.exitFullscreen) {
-          document.exitFullscreen()
-            .then(() => {
-              console.log('World: Exited fullscreen successfully')
-              if (typeof onToggleFullscreen === 'function') {
-                onToggleFullscreen()
-              } else {
-                console.error('World: onToggleFullscreen is not a function')
-              }
-            })
-            .catch(err => {
-              console.error('World: Error exiting fullscreen:', err)
-            })
-        } else {
-          console.warn('World: exitFullscreen not available')
-        }
-      }
-    } catch (err) {
-      console.error('World: Error in fullscreen toggle:', err)
+    if (!isFullscreen) {
+      document.documentElement.requestFullscreen?.()
+    } else {
+      document.exitFullscreen?.()
     }
+    onToggleFullscreen()
   }
 
   return (
@@ -262,7 +215,7 @@ const World = ({
             isTimeRunning={isTimeRunning}
             forecastData={forecastData}
             isFullscreen={isFullscreen}
-            onFullscreenToggle={handleFullscreenToggle}
+            onToggleFullscreen={handleFullscreenToggle}
             selectedVariable={selectedVariable}
           />
         </div>

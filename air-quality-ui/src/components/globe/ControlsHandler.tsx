@@ -14,7 +14,7 @@ type ControlsHandlerProps = {
   handleVariableSelect: (variable: string) => void
   isTimeRunning: boolean
   forecastData: Record<string, ForecastResponseDto[]>
-  isFullscreen?: boolean
+  isFullscreen: boolean
   onFullscreenToggle: () => void
   selectedVariable?: string
 }
@@ -29,19 +29,10 @@ const ControlsHandler: React.FC<ControlsHandlerProps> = ({
   handleVariableSelect,
   isTimeRunning,
   forecastData,
-  isFullscreen = false,
+  isFullscreen,
   onFullscreenToggle,
   selectedVariable,
 }) => {
-  
-  const handleFullscreenToggle = () => {
-    if (typeof onFullscreenToggle === 'function') {
-      onFullscreenToggle()
-    } else {
-      console.error('ControlsHandler: onFullscreenToggle is not a function', onFullscreenToggle)
-    }
-  }
-
   return (
     <Controls
       isTimeRunning={isTimeRunning}
@@ -54,7 +45,7 @@ const ControlsHandler: React.FC<ControlsHandlerProps> = ({
       onVariableSelect={handleVariableSelect}
       forecastData={forecastData}
       isFullscreen={isFullscreen}
-      onFullscreenToggle={handleFullscreenToggle}
+      onFullscreenToggle={onFullscreenToggle}
       selectedVariable={selectedVariable}
     />
   )

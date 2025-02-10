@@ -148,38 +148,6 @@ const Controls: React.FC<ControlsProps> = ({
     setTimeDelta((prevDelta) => Math.max(0.02, prevDelta - 0.02))
   }
 
-  const handleFullscreenClick = () => {
-    console.log('Controls: Fullscreen button clicked')
-    console.log('Controls: document.fullscreenElement available:', !!document.fullscreenElement)
-    console.log('Controls: requestFullscreen available:', !!document.documentElement.requestFullscreen)
-    if (typeof onFullscreenToggle === 'function') {
-      onFullscreenToggle()
-    } else {
-      console.error('Controls: onFullscreenToggle is not a function', onFullscreenToggle)
-    }
-  }
-
-  // Only render the fullscreen button if we have a toggle handler
-  const renderFullscreenButton = () => {
-    if (typeof onFullscreenToggle !== 'function') {
-      return null
-    }
-    
-    return (
-      <Button
-        style={styles.controlButton}
-        onClick={(e) => {
-          console.log('Controls: Button clicked with event:', e)
-          console.log('Controls: Fullscreen button raw click')
-          handleFullscreenClick()
-        }}
-        data-testid="fullscreen-button"
-      >
-        {isFullscreen ? <FullscreenExit fontSize="small" /> : <Fullscreen fontSize="small" />}
-      </Button>
-    )
-  }
-
   return (
     <div style={{
       ...styles.controlsContainer,
@@ -310,14 +278,19 @@ const Controls: React.FC<ControlsProps> = ({
         <MenuItem value="so2" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>SO2</MenuItem>
       </Select>
 
-      {renderFullscreenButton()}
+      <Button onClick={onFullscreenToggle} style={styles.controlButton}>
+        {isFullscreen ? (
+          <FullscreenExit fontSize="small" />
+        ) : (
+          <Fullscreen fontSize="small" />
+        )}
+      </Button>
     </div>
   )
 }
 
 const styles: { [key: string]: CSSProperties } = {
   controlsContainer: {
-    position: 'relative',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -325,6 +298,7 @@ const styles: { [key: string]: CSSProperties } = {
     backgroundColor: '#f4f4f4',
     borderTop: '1px solid #ccc',
     maxWidth: '100%',
+    padding: '4px',
   },
   controlButton: {
     width: '32px',
