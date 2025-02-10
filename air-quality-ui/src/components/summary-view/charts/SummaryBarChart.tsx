@@ -2,6 +2,7 @@ import ReactECharts from 'echarts-for-react'
 import { MeasurementCounts } from '../../../services/measurement-data-service'
 import { pollutantTypeDisplayShort, PollutantType } from '../../../models'
 import { useMemo } from 'react'
+import { pollutantColors } from '../../../models/pollutant-colors'
 
 interface SummaryBarChartProps {
   measurementCounts?: MeasurementCounts | null
@@ -123,13 +124,9 @@ const SummaryBarChart = ({ selectedCity, measurementCounts, totalCities }: Summa
   }, [selectedCity, measurementCounts, pollutants, pollutantLabels, coverage, maxPercentage])
 
   const getBarColor = (value: number, maxValue: number, isCount: boolean) => {
-    // Calculate color intensity (0-1)
-    const intensity = maxValue > 0 ? value / maxValue : 0
-    // Use blue for counts and green for coverage
-    const baseColor = isCount 
-      ? '24, 144, 255'  // blue
-      : '82, 196, 26'   // green
-    return `rgba(${baseColor}, ${0.3 + (intensity * 0.7)})`
+    if (value === 0) return '#e0e0e0'
+    const pollutant = pollutants[Math.floor(value) % pollutants.length]
+    return pollutantColors[pollutant]
   }
 
   const options = {
@@ -250,10 +247,12 @@ const SummaryBarChart = ({ selectedCity, measurementCounts, totalCities }: Summa
         type: 'bar',
         xAxisIndex: 0,
         yAxisIndex: 0,
-        data: filteredData.counts.map(item => ({
+        data: filteredData.counts.map((item, index) => ({
           ...item,
           itemStyle: {
-            color: getBarColor(item.value, filteredData.maxCount, true)
+            color: selectedCity ? 
+              (item.value === 0 ? '#e0e0e0' : pollutantColors[pollutants[index]]) :
+              pollutantColors[pollutants[index]]
           }
         })),
         barWidth: '60%',
@@ -268,10 +267,12 @@ const SummaryBarChart = ({ selectedCity, measurementCounts, totalCities }: Summa
         type: 'bar',
         xAxisIndex: 1,
         yAxisIndex: 1,
-        data: filteredData.coverage.map(item => ({
+        data: filteredData.coverage.map((item, index) => ({
           ...item,
           itemStyle: {
-            color: getBarColor(item.value, filteredData.maxPercentage, false)
+            color: selectedCity ? 
+              (item.value === 0 ? '#e0e0e0' : pollutantColors[pollutants[index]]) :
+              pollutantColors[pollutants[index]]
           }
         })),
         barWidth: '60%',

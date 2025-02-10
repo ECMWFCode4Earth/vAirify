@@ -1,20 +1,27 @@
 .table-header {
-    width: 100%;
     display: flex;
     justify-content: space-between;
-    padding-bottom: 0px;
+    align-items: center;
+    padding: 0px;
 }
 
 .table-date {
-    display: flex;
-    align-items: center;
+    flex: 1;
 }
 
-.table-switch-label {
-    padding-bottom: 3px;
+.switches-container {
+    display: flex;
+    gap: 16px;
+    align-items: center;
 }
 
 .table-switch-container {
     display: flex;
     align-items: center;
+    gap: 8px;
+}
+
+.table-switch-label {
+    font-size: 14px;
+    white-space: nowrap;
 }

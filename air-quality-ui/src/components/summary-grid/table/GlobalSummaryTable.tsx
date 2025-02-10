@@ -25,11 +25,11 @@ import {
 import { aqiCellRules, pollutantCellRules } from '../cell/cell-rules/CellRules'
 import { LocationCellRenderer } from '../cell/location-cell-renderer/LocationCellRenderer'
 
-export interface GlobalSummaryTableProps {
-  forecast: Record<string, ForecastResponseDto[]>
-  summarizedMeasurements: Record<string, MeasurementSummaryResponseDto[]>
+interface GlobalSummaryTableProps {
+  forecast?: Record<string, ForecastResponseDto[]>
+  summarizedMeasurements?: Record<string, MeasurementSummaryResponseDto[]>
   showAllColoured: boolean
-  onCityHover?: (cityName: string | null) => void
+  onCityHover: (cityName: string | null, latitude?: number, longitude?: number) => void
 }
 
 const maxWidth = 115
@@ -137,12 +137,21 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
   })),
 ]
 
-const createGridOptions = (onCityHover?: (cityName: string | null) => void): GridOptions => ({
+const createGridOptions = (
+  forecast: Record<string, ForecastResponseDto[]> | undefined,
+  onCityHover?: (cityName: string | null, latitude?: number, longitude?: number) => void
+): GridOptions => ({
   autoSizeStrategy: {
     type: 'fitCellContents',
   },
   onCellMouseOver: (event) => {
-    onCityHover?.(event.data.locationName)
+    const cityName = event.data.locationName
+    if (cityName && forecast?.[cityName]?.[0]) {
+      const { latitude, longitude } = forecast[cityName][0].location
+      onCityHover?.(cityName, latitude, longitude)
+    } else {
+      onCityHover?.(cityName)
+    }
   },
   onCellMouseOut: () => {
     onCityHover?.(null)
@@ -154,7 +163,7 @@ const GlobalSummaryTable = ({
   summarizedMeasurements,
   showAllColoured,
   onCityHover,
-}: Partial<GlobalSummaryTableProps>): JSX.Element => {
+}: GlobalSummaryTableProps): JSX.Element => {
   const rowData = useMemo(() => {
     if (!forecast || !summarizedMeasurements) {
       return null
@@ -168,7 +177,10 @@ const GlobalSummaryTable = ({
   if (showAllColoured != undefined) {
     columnDefs = createColDefs(showAllColoured)
   }
-  const gridOptions = createGridOptions(onCityHover)
+  const gridOptions = useMemo(
+    () => createGridOptions(forecast, onCityHover),
+    [forecast, onCityHover]
+  )
   return (
     <div
       className={`ag-theme-quartz ${classes['summary-grid-wrapper']}`}

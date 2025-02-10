@@ -15,7 +15,6 @@ import {
 interface WorldProps {
   forecastData: Record<string, ForecastResponseDto[]>
   summarizedMeasurementData: Record<string, MeasurementSummaryResponseDto[]>
-  toggle: string
   selectedCity?: {
     name: string
     latitude: number
@@ -26,7 +25,6 @@ interface WorldProps {
 const World = ({
   forecastData,
   summarizedMeasurementData,
-  toggle,
   selectedCity
 }: WorldProps): JSX.Element => {
   const surface_layer_ref = useRef<SurfaceLayerRef>(null)
@@ -145,7 +143,7 @@ const World = ({
         ...(isFullscreen && styles.fullscreenContainer),
       }}
     >
-      <div style={styles.title}>colour: measured value (black=missing data); size: deviation from forecast</div>
+      <div style={styles.title}>circle colour: obs value (black=no data); circle size: obs minus fc</div>
       <div style={styles.canvasContainer}>
         <Canvas
           style={{ 
@@ -185,7 +183,6 @@ const World = ({
           <CameraSettings
             globeState={globeState}
             cameraControlsRef={cameraControlsRef}
-            toggle={toggle}
           />
         </Canvas>
         <div style={styles.controlsOverlay}>

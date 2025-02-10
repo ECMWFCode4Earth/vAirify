@@ -22,6 +22,7 @@ import SummaryScatterChart from './charts/SummaryScatterChart'
 const GlobalSummary = (): JSX.Element => {
   const { forecastDetails } = useForecastContext()
   const [showAllColoured, setShowAllColoured] = useState<boolean>(true)
+  const [enableHover, setEnableHover] = useState<boolean>(true)
   const [measurementCounts, setMeasurementCounts] = useState<MeasurementCounts | null>(null)
   const [hoveredCity, setHoveredCity] = useState<string | null>(null)
   const [selectedCityCoords, setSelectedCityCoords] = useState<{
@@ -35,6 +36,17 @@ const GlobalSummary = (): JSX.Element => {
       setShowAllColoured(val)
     },
     [setShowAllColoured],
+  )
+
+  const wrapSetEnableHover = useCallback(
+    (val: boolean) => {
+      setEnableHover(val)
+      if (!val) {
+        setHoveredCity(null)
+        setSelectedCityCoords(null)
+      }
+    },
+    [setEnableHover],
   )
 
   const {
@@ -123,20 +135,23 @@ const GlobalSummary = (): JSX.Element => {
     fetchMeasurementCounts()
   }, [forecastDetails])
 
-  const handleCityHover = useCallback((cityName: string | null) => {
-    setHoveredCity(cityName)
-    
-    if (cityName && forecastData?.[cityName]?.[0]) {
-      const cityData = forecastData[cityName][0]
-      setSelectedCityCoords({
-        name: cityName,
-        latitude: cityData.location.latitude,
-        longitude: cityData.location.longitude
-      })
-    } else {
-      setSelectedCityCoords(null)
-    }
-  }, [forecastData])
+  const handleCityHover = useCallback(
+    (cityName: string | null, latitude?: number, longitude?: number) => {
+      if (!enableHover) return
+      
+      setHoveredCity(cityName)
+      if (cityName && latitude !== undefined && longitude !== undefined) {
+        setSelectedCityCoords({
+          name: cityName,
+          latitude,
+          longitude,
+        })
+      } else {
+        setSelectedCityCoords(null)
+      }
+    },
+    [enableHover],
+  )
 
   if (forecastDataError || summaryDataError) {
     return <span>Error occurred</span>
@@ -153,6 +168,8 @@ const GlobalSummary = (): JSX.Element => {
           <SummaryViewHeader
             setShowAllColoured={wrapSetShowAllColoured}
             showAllColoured={showAllColoured}
+            setEnableHover={wrapSetEnableHover}
+            enableHover={enableHover}
           />
           <GlobalSummaryTable
             forecast={forecastData}
@@ -165,7 +182,7 @@ const GlobalSummary = (): JSX.Element => {
               <SummaryBarChart 
                 measurementCounts={measurementCounts}
                 totalCities={Object.keys(forecastData || {}).length}
-                selectedCity={hoveredCity}
+                selectedCity={enableHover ? hoveredCity : null}
               />
             </div>
             <div className={classes['chart-container']}>
@@ -173,15 +190,14 @@ const GlobalSummary = (): JSX.Element => {
                 title="Forecast vs. Measurement (3-hourly avg)"
                 summarizedMeasurements={summarizedMeasurementData}
                 forecast={forecastData}
-                selectedCity={hoveredCity}
+                selectedCity={enableHover ? hoveredCity : null}
               />
             </div>
             <div className={classes['chart-container']}>
               <World
                 forecastData={forecastData || {}}
                 summarizedMeasurementData={summarizedMeasurementData}
-                toggle="world-visible"
-                selectedCity={selectedCityCoords}
+                selectedCity={enableHover ? selectedCityCoords : null}
               />
             </div>
           </div>

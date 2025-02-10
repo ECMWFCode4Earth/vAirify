@@ -1,22 +1,15 @@
 import ReactECharts from 'echarts-for-react'
 import { useState } from 'react'
 import { ForecastResponseDto, MeasurementSummaryResponseDto } from '../../../services/types'
-import { PollutantType, pollutantTypeDisplay, pollutantTypeDisplayShort } from '../../../models'
+import { pollutantTypeDisplay, pollutantTypeDisplayShort, PollutantType } from '../../../models'
 import { DateTime } from 'luxon'
+import { pollutantColors } from '../../../models/pollutant-colors'
 
 interface SummaryScatterChartProps {
   title: string
   summarizedMeasurements?: Record<string, MeasurementSummaryResponseDto[]>
   forecast?: Record<string, ForecastResponseDto[]>
   selectedCity: string | null
-}
-
-const pollutantColors: Record<PollutantType, string> = {
-  pm2_5: '#1f77b4',  // blue
-  pm10: '#ff7f0e',   // orange
-  no2: '#2ca02c',    // green
-  o3: '#d62728',     // red
-  so2: '#9467bd'     // purple
 }
 
 const SummaryScatterChart = ({ 
