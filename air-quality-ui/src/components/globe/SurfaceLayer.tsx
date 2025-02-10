@@ -7,6 +7,8 @@ import fragmentShader from './shaders/surfaceFrag.glsl'
 import vertexShader from './shaders/surfaceVert.glsl'
 import { useDataTextures } from './useDataTextures'
 import { useForecastContext } from '../../context'
+import { createContourUniforms } from './utils/shaderUniforms'
+import { getVariableIndex } from '../../models/variable-indices'
 
 const shaderUniforms = {
   uSphereWrapAmount: { value: 0.0 },
@@ -72,24 +74,12 @@ const SurfaceLayer = memo(
             colorMapIndex: { value: 0.0 },
             lsmTexture: { value: lsm },
             uVariableIndex: { value: null },
+            ...createContourUniforms(selectedVariable),
           },
         }),
       )
 
-      const variableIndex =
-        selectedVariable === 'aqi'
-          ? 1
-          : selectedVariable === 'pm2_5'
-            ? 2
-            : selectedVariable === 'pm10'
-              ? 3
-              : selectedVariable === 'o3'
-                ? 4
-                : selectedVariable === 'no2'
-                  ? 5
-                  : selectedVariable === 'so2'
-                    ? 6
-                    : undefined
+      const variableIndex = getVariableIndex(selectedVariable)
       materialRef.current.uniforms.uVariableIndex.value = variableIndex
 
       const windowIndexRef = useRef(0)
@@ -113,6 +103,15 @@ const SurfaceLayer = memo(
           materialRef,
         )
       }, [selectedVariable, fetchAndUpdateTextures])
+
+      useEffect(() => {
+        if (materialRef.current && selectedVariable) {
+          const contourUniforms = createContourUniforms(selectedVariable)
+          if (contourUniforms) {
+            Object.assign(materialRef.current.uniforms, contourUniforms)
+          }
+        }
+      }, [selectedVariable])
 
       const tick = (sliderValue: number) => {
         if (materialRef.current) {

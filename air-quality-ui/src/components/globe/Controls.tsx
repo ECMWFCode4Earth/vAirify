@@ -265,7 +265,9 @@ const Controls: React.FC<ControlsProps> = ({
         <MenuItem value="aqi" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>AQI</MenuItem>
         <MenuItem value="pm2_5" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>PM2.5</MenuItem>
         <MenuItem value="pm10" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>PM10</MenuItem>
+        <MenuItem value="no2" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>NO2</MenuItem>
         <MenuItem value="o3" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>O3</MenuItem>
+        <MenuItem value="so2" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>SO2</MenuItem>
       </Select>
 
       <Button onClick={onFullscreenToggle} style={styles.controlButton}>
