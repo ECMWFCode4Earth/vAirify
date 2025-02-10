@@ -33,9 +33,11 @@ const World = ({
   summarizedMeasurementData,
   selectedCity,
   selectedVariable: externalSelectedVariable,
-  isFullscreen,
-  onToggleFullscreen
+  isFullscreen = false,
+  onToggleFullscreen,
 }: WorldProps): JSX.Element => {
+  const [isFullscreenInternal, setIsFullscreenInternal] = useState(isFullscreen)
+
   const surface_layer_ref = useRef<SurfaceLayerRef>(null)
   const markerRef = useRef<LocationMarkerRef>(null)
   const cameraControlsRef = useRef<CameraControls | null>(null)
@@ -86,11 +88,45 @@ const World = ({
     markerRef.current?.tick(value)
   }
 
-  // Add fullscreen change event listener
+  const handleFullscreenToggle = async () => {
+    console.log('Fullscreen toggle clicked. Current state:', isFullscreenInternal)
+    try {
+      if (!isFullscreenInternal) {
+        console.log('Attempting to enter fullscreen...')
+        await document.documentElement.requestFullscreen?.()
+        console.log('Entered fullscreen successfully')
+        setIsFullscreenInternal(true)
+        // Only call onToggleFullscreen if it exists
+        if (typeof onToggleFullscreen === 'function') {
+          onToggleFullscreen()
+        }
+      } else {
+        console.log('Attempting to exit fullscreen...')
+        await document.exitFullscreen?.()
+        console.log('Exited fullscreen successfully')
+        setIsFullscreenInternal(false)
+        // Only call onToggleFullscreen if it exists
+        if (typeof onToggleFullscreen === 'function') {
+          onToggleFullscreen()
+        }
+      }
+    } catch (err) {
+      console.error('Error toggling fullscreen:', err)
+    }
+  }
+
   useEffect(() => {
     const handleFullscreenChange = () => {
+      console.log('Fullscreen change event fired')
+      console.log('document.fullscreenElement:', document.fullscreenElement)
       if (!document.fullscreenElement) {
-        onToggleFullscreen()
+        console.log('No fullscreen element, updating internal state')
+        setIsFullscreenInternal(false)
+        // Only call onToggleFullscreen if it exists
+        if (typeof onToggleFullscreen === 'function') {
+          console.log('Calling parent onToggleFullscreen')
+          onToggleFullscreen()
+        }
       }
     }
 
@@ -142,18 +178,13 @@ const World = ({
     }
   }, [externalSelectedVariable])
 
-  // Add fullscreen toggle handler
-  const handleFullscreenToggle = () => {
-    if (!isFullscreen) {
-      document.documentElement.requestFullscreen?.()
-    } else {
-      document.exitFullscreen?.()
-    }
-    onToggleFullscreen()
-  }
+  // Sync internal state with prop when it changes
+  useEffect(() => {
+    setIsFullscreenInternal(isFullscreen)
+  }, [isFullscreen])
 
   return (
-    <div style={isFullscreen ? styles.fullscreenContainer : styles.worldContainer}>
+    <div style={isFullscreenInternal ? styles.fullscreenContainer : styles.worldContainer}>
       <div style={styles.title}>
         circle colour: obs value (black=no data); circle size: obs minus fc
       </div>
@@ -200,8 +231,8 @@ const World = ({
         </Canvas>
         <ColorBar 
           pollutant={selectedVariable as PollutantType | 'aqi'} 
-          width={isFullscreen ? 80 : 60}
-          height={isFullscreen ? 300 : 200}
+          width={isFullscreenInternal ? 80 : 60}
+          height={isFullscreenInternal ? 300 : 200}
         />
         <div style={styles.controlsOverlay}>
           <ControlsHandler
@@ -214,8 +245,8 @@ const World = ({
             handleVariableSelect={handleVariableSelect}
             isTimeRunning={isTimeRunning}
             forecastData={forecastData}
-            isFullscreen={isFullscreen}
-            onToggleFullscreen={handleFullscreenToggle}
+            isFullscreen={isFullscreenInternal}
+            onFullscreenToggle={handleFullscreenToggle}
             selectedVariable={selectedVariable}
           />
         </div>

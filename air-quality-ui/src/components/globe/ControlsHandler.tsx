@@ -29,10 +29,17 @@ const ControlsHandler: React.FC<ControlsHandlerProps> = ({
   handleVariableSelect,
   isTimeRunning,
   forecastData,
-  isFullscreen,
+  isFullscreen = false,
   onFullscreenToggle,
   selectedVariable,
 }) => {
+  console.log('ControlsHandler render - isFullscreen:', isFullscreen)
+  console.log('ControlsHandler onFullscreenToggle type:', typeof onFullscreenToggle)
+  
+  if (!onFullscreenToggle) {
+    console.error('onFullscreenToggle is undefined!')
+  }
+
   return (
     <Controls
       isTimeRunning={isTimeRunning}
@@ -45,7 +52,14 @@ const ControlsHandler: React.FC<ControlsHandlerProps> = ({
       onVariableSelect={handleVariableSelect}
       forecastData={forecastData}
       isFullscreen={isFullscreen}
-      onFullscreenToggle={onFullscreenToggle}
+      onFullscreenToggle={() => {
+        console.log('Fullscreen toggle called in ControlsHandler')
+        if (typeof onFullscreenToggle === 'function') {
+          onFullscreenToggle()
+        } else {
+          console.error('onFullscreenToggle is not a function:', onFullscreenToggle)
+        }
+      }}
       selectedVariable={selectedVariable}
     />
   )

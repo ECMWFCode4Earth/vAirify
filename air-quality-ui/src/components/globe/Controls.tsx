@@ -32,7 +32,7 @@ type ControlsProps = {
   onTimeInterpolationClick: (filterState: boolean) => void
   onVariableSelect: (variable: string) => void
   forecastData: Record<string, ForecastResponseDto[]>
-  isFullscreen?: boolean
+  isFullscreen: boolean
   onFullscreenToggle: () => void
   selectedVariable?: string
 }
@@ -51,6 +51,10 @@ const Controls: React.FC<ControlsProps> = ({
   onFullscreenToggle,
   selectedVariable: externalSelectedVariable,
 }) => {
+  if (typeof onFullscreenToggle !== 'function') {
+    console.error('onFullscreenToggle is not a function in Controls:', onFullscreenToggle)
+  }
+
   const [sliderValue, setSliderValue] = useState(0.0)
   const [globeAnimationState, setGlobeAnimationState] = useState(false)
   const [locationMarkerState, setLocationMarkerState] = useState(true)
@@ -278,7 +282,13 @@ const Controls: React.FC<ControlsProps> = ({
         <MenuItem value="so2" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>SO2</MenuItem>
       </Select>
 
-      <Button onClick={onFullscreenToggle} style={styles.controlButton}>
+      <Button 
+        onClick={() => {
+          console.log('Fullscreen button clicked in Controls')
+          onFullscreenToggle()
+        }} 
+        style={styles.controlButton}
+      >
         {isFullscreen ? (
           <FullscreenExit fontSize="small" />
         ) : (
