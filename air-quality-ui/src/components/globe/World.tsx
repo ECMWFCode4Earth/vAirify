@@ -11,6 +11,9 @@ import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,
 } from '../../services/types'
+import { ColorBar } from './ColorBar'
+import { PollutantType } from '../../models/types'
+import { pollutantTypeDisplay } from '../../models/pollutant-display'
 
 interface WorldProps {
   forecastData: Record<string, ForecastResponseDto[]>
@@ -21,13 +24,17 @@ interface WorldProps {
     longitude: number
   } | null
   selectedVariable?: string
+  isFullscreen: boolean
+  onToggleFullscreen: () => void
 }
 
 const World = ({
   forecastData,
   summarizedMeasurementData,
   selectedCity,
-  selectedVariable: externalSelectedVariable
+  selectedVariable: externalSelectedVariable,
+  isFullscreen,
+  onToggleFullscreen
 }: WorldProps): JSX.Element => {
   const surface_layer_ref = useRef<SurfaceLayerRef>(null)
   const markerRef = useRef<LocationMarkerRef>(null)
@@ -37,9 +44,11 @@ const World = ({
   const [isLocationMarkerOn, setIsLocationMarkerOn] = useState(true)
   const [isFilterNearest, setGridFilterState] = useState(false)
   const [isTimeInterpolation, setTimeInterpolationState] = useState(true)
-  const [selectedVariable, setSelectedVariable] = useState(externalSelectedVariable || 'aqi')
   const [globeState, setGlobeState] = useState(false)
-  const [isFullscreen, setIsFullscreen] = useState(false)
+
+  // Map aqiLevel to aqi before setting the state
+  const mappedVariable = externalSelectedVariable === 'aqiLevel' ? 'aqi' : externalSelectedVariable
+  const [selectedVariable, setSelectedVariable] = useState(mappedVariable || 'aqi')
 
   // Default camera position
   const defaultCameraPosition = {
@@ -80,10 +89,14 @@ const World = ({
     markerRef.current?.tick(value)
   }
 
+  // Add debug statements to fullscreen event listener
   useEffect(() => {
     const handleFullscreenChange = () => {
-      if (!document.fullscreenElement) {
-        setIsFullscreen(false)
+      console.log('Fullscreen change event triggered')
+      console.log('document.fullscreenElement:', document.fullscreenElement)
+      if (!document.fullscreenElement && typeof onToggleFullscreen === 'function') {
+        console.log('Exiting fullscreen, calling onToggleFullscreen')
+        onToggleFullscreen()
       }
     }
 
@@ -91,17 +104,7 @@ const World = ({
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange)
     }
-  }, [])
-
-  const handleFullscreenToggle = () => {
-    if (!isFullscreen) {
-      document.documentElement.requestFullscreen?.()
-      setIsFullscreen(true)
-    } else {
-      document.exitFullscreen?.()
-      setIsFullscreen(false)
-    }
-  }
+  }, [onToggleFullscreen])
 
   useEffect(() => {
     if (selectedCity && cameraControlsRef.current) {
@@ -138,21 +141,69 @@ const World = ({
     }
   }, [selectedCity, globeState])
 
-  // Update selectedVariable when external prop changes
+  // Update useEffect to handle the mapping
   useEffect(() => {
     if (externalSelectedVariable) {
-      setSelectedVariable(externalSelectedVariable)
+      const mappedVar = externalSelectedVariable === 'aqiLevel' ? 'aqi' : externalSelectedVariable
+      setSelectedVariable(mappedVar)
     }
   }, [externalSelectedVariable])
 
+  // Update the fullscreen toggle handler
+  const handleFullscreenToggle = () => {
+    console.log('World: Fullscreen toggle clicked')
+    console.log('World: Current fullscreen state:', isFullscreen)
+    console.log('World: document.fullscreenElement:', document.fullscreenElement)
+    console.log('World: requestFullscreen available:', !!document.documentElement.requestFullscreen)
+    
+    try {
+      if (!isFullscreen) {
+        console.log('World: Attempting to enter fullscreen')
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen()
+            .then(() => {
+              console.log('World: Entered fullscreen successfully')
+              if (typeof onToggleFullscreen === 'function') {
+                onToggleFullscreen()
+              } else {
+                console.error('World: onToggleFullscreen is not a function')
+              }
+            })
+            .catch(err => {
+              console.error('World: Error entering fullscreen:', err)
+            })
+        } else {
+          console.warn('World: requestFullscreen not available')
+        }
+      } else {
+        console.log('World: Attempting to exit fullscreen')
+        if (document.exitFullscreen) {
+          document.exitFullscreen()
+            .then(() => {
+              console.log('World: Exited fullscreen successfully')
+              if (typeof onToggleFullscreen === 'function') {
+                onToggleFullscreen()
+              } else {
+                console.error('World: onToggleFullscreen is not a function')
+              }
+            })
+            .catch(err => {
+              console.error('World: Error exiting fullscreen:', err)
+            })
+        } else {
+          console.warn('World: exitFullscreen not available')
+        }
+      }
+    } catch (err) {
+      console.error('World: Error in fullscreen toggle:', err)
+    }
+  }
+
   return (
-    <div 
-      style={{
-        ...styles.worldContainer,
-        ...(isFullscreen && styles.fullscreenContainer),
-      }}
-    >
-      <div style={styles.title}>circle colour: obs value (black=no data); circle size: obs minus fc</div>
+    <div style={isFullscreen ? styles.fullscreenContainer : styles.worldContainer}>
+      <div style={styles.title}>
+        circle colour: obs value (black=no data); circle size: obs minus fc
+      </div>
       <div style={styles.canvasContainer}>
         <Canvas
           style={{ 
@@ -194,6 +245,11 @@ const World = ({
             cameraControlsRef={cameraControlsRef}
           />
         </Canvas>
+        <ColorBar 
+          pollutant={selectedVariable as PollutantType | 'aqi'} 
+          width={isFullscreen ? 80 : 60}
+          height={isFullscreen ? 300 : 200}
+        />
         <div style={styles.controlsOverlay}>
           <ControlsHandler
             toggleTimeUpdate={toggleTimeUpdate}

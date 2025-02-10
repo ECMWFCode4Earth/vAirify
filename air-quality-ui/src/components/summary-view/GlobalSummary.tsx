@@ -26,7 +26,7 @@ const GlobalSummary = (): JSX.Element => {
   const [enableHover, setEnableHover] = useState<boolean>(true)
   const [measurementCounts, setMeasurementCounts] = useState<MeasurementCounts | null>(null)
   const [hoveredCity, setHoveredCity] = useState<string | null>(null)
-  const [hoveredVar, setHoveredVar] = useState<string | undefined>(undefined)
+  const [hoveredVar, setHoveredVar] = useState<'aqi' | 'pm2_5' | 'pm10' | 'no2' | 'o3' | 'so2' | undefined>(undefined)
   const [selectedCityCoords, setSelectedCityCoords] = useState<{
     name: string
     latitude: number
@@ -36,6 +36,7 @@ const GlobalSummary = (): JSX.Element => {
     city: string | null,
     coords: { name: string, latitude: number, longitude: number } | null
   } | null>(null)
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
   const wrapSetShowAllColoured = useCallback(
     (val: boolean) => {
@@ -155,11 +156,12 @@ const GlobalSummary = (): JSX.Element => {
 
   const handleCityHover = useCallback(
     (cityName: string | null, latitude?: number, longitude?: number, columnId?: string) => {
-      
       if (!enableHoverRef.current) return
       
       setHoveredCity(cityName)
-      setHoveredVar(columnId)
+      setHoveredVar(columnId === 'aqiLevel' ? 'aqi' : 
+        (columnId as 'pm2_5' | 'pm10' | 'no2' | 'o3' | 'so2' | undefined))
+      
       if (cityName && latitude !== undefined && longitude !== undefined) {
         setSelectedCityCoords({
           name: cityName,
@@ -173,6 +175,19 @@ const GlobalSummary = (): JSX.Element => {
     [],
   )
 
+  const handleFullscreenToggle = () => {
+    console.log('GlobalSummary: Toggling fullscreen')
+    setIsFullscreen(prev => !prev)
+  }
+
+  // Add a function to transform the measurement data into the correct format
+  const transformMeasurementData = (data: Record<string, MeasurementSummaryResponseDto[]>): Record<string, MeasurementSummaryResponseDto> => {
+    return Object.entries(data).reduce((acc, [location, measurements]) => {
+      // Take the latest measurement for each location
+      acc[location] = measurements[measurements.length - 1]
+      return acc
+    }, {} as Record<string, MeasurementSummaryResponseDto>)
+  }
 
   if (forecastDataError || summaryDataError) {
     return <span>Error occurred</span>
@@ -193,8 +208,8 @@ const GlobalSummary = (): JSX.Element => {
             enableHover={enableHover}
           />
           <GlobalSummaryTable
-            forecast={forecastData}
-            summarizedMeasurements={summarizedMeasurementData}
+            forecast={forecastData || {}}
+            summarizedMeasurements={summarizedMeasurementData ? transformMeasurementData(summarizedMeasurementData) : {}}
             showAllColoured={showAllColoured}
             onCityHover={handleCityHover}
             enableHover={enableHover}
@@ -218,9 +233,11 @@ const GlobalSummary = (): JSX.Element => {
             <div className={classes['chart-container']}>
               <World
                 forecastData={forecastData || {}}
-                summarizedMeasurementData={summarizedMeasurementData}
+                summarizedMeasurementData={summarizedMeasurementData || {}}
                 selectedCity={selectedCityCoords}
                 selectedVariable={hoveredVar === 'aqiLevel' ? 'aqi' : (hoveredVar || 'aqi')}
+                isFullscreen={isFullscreen}
+                onToggleFullscreen={handleFullscreenToggle}
               />
             </div>
           </div>

@@ -140,4 +140,17 @@ export function getColorForValue(value: number, pollutant: PollutantType | 'aqi'
   }
   
   return hexToRgb(contours.levels[contours.levels.length - 1].color)
+}
+
+// Add a helper function to get contour info for plotting
+export function getContourInfo(pollutant: PollutantType | 'aqi') {
+  const contours = pollutantContours[pollutant]
+  if (!contours) return null
+
+  return {
+    levels: contours.levels.map(l => l.threshold),
+    colors: contours.levels.map(l => l.color),
+    minValue: contours.minValue,
+    maxValue: contours.maxValue
+  }
 } 
