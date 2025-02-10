@@ -146,14 +146,25 @@ const World = ({
         setGlobeState(true)
         surface_layer_ref.current?.changeProjection(true)
         markerRef.current?.changeProjection(true)
+
+        const phi = -1.0 * (latitude - 90) * THREE.MathUtils.DEG2RAD
+        const theta = longitude * THREE.MathUtils.DEG2RAD
+
+        // Wait 1 second before camera movement after switching to globe view
+        setTimeout(() => {
+          controls.rotateTo(theta, phi, true)
+          controls.dollyTo(0.3, true)
+          controls.smoothTime = 1.0
+        }, 100)
+      } else {
+        const phi = -1.0 * (latitude - 90) * THREE.MathUtils.DEG2RAD
+        const theta = longitude * THREE.MathUtils.DEG2RAD
+        
+        controls.rotateTo(theta, phi, true)
+        controls.dollyTo(0.3, true)
+        controls.smoothTime = 1.0
       }
 
-      const phi = (90 - latitude) * THREE.MathUtils.DEG2RAD
-      const theta = (longitude) * THREE.MathUtils.DEG2RAD
-      
-      controls.rotateTo(theta, phi, true)
-      controls.dollyTo(0.3, true)
-      controls.smoothTime = 1.0
     } else if (cameraControlsRef.current) {
       // Reset to default position when no city is selected
       const controls = cameraControlsRef.current
@@ -163,13 +174,20 @@ const World = ({
         setGlobeState(false)
         surface_layer_ref.current?.changeProjection(false)
         markerRef.current?.changeProjection(false)
-      }
 
-      controls.rotateTo(defaultCameraPosition.theta, defaultCameraPosition.phi, true)
-      controls.dollyTo(defaultCameraPosition.distance, true)
-      controls.smoothTime = 1.0
+        // Wait 1 second before camera movement after switching to map view
+        setTimeout(() => {
+          controls.rotateTo(defaultCameraPosition.theta, defaultCameraPosition.phi, true)
+          controls.dollyTo(defaultCameraPosition.distance, true)
+          controls.smoothTime = 1.0
+        }, 1000)
+      } else {
+        controls.rotateTo(defaultCameraPosition.theta, defaultCameraPosition.phi, true)
+        controls.dollyTo(defaultCameraPosition.distance, true)
+        controls.smoothTime = 1.0
+      }
     }
-  }, [selectedCity, globeState])
+  }, [selectedCity])
 
   // Update selectedVariable when external prop changes
   useEffect(() => {

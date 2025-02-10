@@ -35,7 +35,7 @@ const CameraSettings: React.FC<CameraSettingsProps> = ({
 
         controls.smoothTime = 1.5
         controls.rotateTo(newTheta, newPhi, true)
-        controls.zoomTo(0.75, true)
+        controls.zoomTo(0.6, true)
 
         setTimeout(() => {
           controls.smoothTime = 1.0

@@ -33,12 +33,6 @@ const ControlsHandler: React.FC<ControlsHandlerProps> = ({
   onFullscreenToggle,
   selectedVariable,
 }) => {
-  console.log('ControlsHandler render - isFullscreen:', isFullscreen)
-  console.log('ControlsHandler onFullscreenToggle type:', typeof onFullscreenToggle)
-  
-  if (!onFullscreenToggle) {
-    console.error('onFullscreenToggle is undefined!')
-  }
 
   return (
     <Controls

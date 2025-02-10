@@ -22,8 +22,8 @@ import SummaryScatterChart from './charts/SummaryScatterChart'
 const GlobalSummary = (): JSX.Element => {
   const { forecastDetails } = useForecastContext()
   const [showAllColoured, setShowAllColoured] = useState<boolean>(true)
-  const enableHoverRef = useRef(true)
-  const [enableHover, setEnableHover] = useState<boolean>(true)
+  const enableHoverRef = useRef(false)
+  const [enableHover, setEnableHover] = useState<boolean>(false)
   const [measurementCounts, setMeasurementCounts] = useState<MeasurementCounts | null>(null)
   const [hoveredCity, setHoveredCity] = useState<string | null>(null)
   const [hoveredVar, setHoveredVar] = useState<string | undefined>(undefined)
@@ -36,6 +36,7 @@ const GlobalSummary = (): JSX.Element => {
     city: string | null,
     coords: { name: string, latitude: number, longitude: number } | null
   } | null>(null)
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
   const wrapSetShowAllColoured = useCallback(
     (val: boolean) => {
@@ -173,6 +174,9 @@ const GlobalSummary = (): JSX.Element => {
     [],
   )
 
+  const handleFullscreenToggle = useCallback(() => {
+    setIsFullscreen(prev => !prev)
+  }, [])
 
   if (forecastDataError || summaryDataError) {
     return <span>Error occurred</span>
@@ -221,6 +225,8 @@ const GlobalSummary = (): JSX.Element => {
                 summarizedMeasurementData={summarizedMeasurementData}
                 selectedCity={selectedCityCoords}
                 selectedVariable={hoveredVar === 'aqiLevel' ? 'aqi' : (hoveredVar || 'aqi')}
+                isFullscreen={isFullscreen}
+                onToggleFullscreen={handleFullscreenToggle}
               />
             </div>
           </div>
