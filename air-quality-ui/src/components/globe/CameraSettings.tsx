@@ -5,13 +5,11 @@ import * as THREE from 'three'
 type CameraSettingsProps = {
   globeState: boolean
   cameraControlsRef: React.RefObject<CameraControls>
-  toggle: string
 }
 
 const CameraSettings: React.FC<CameraSettingsProps> = ({
   globeState,
-  cameraControlsRef,
-  toggle,
+  cameraControlsRef
 }) => {
   useEffect(() => {
     if (cameraControlsRef.current) {
@@ -37,7 +35,7 @@ const CameraSettings: React.FC<CameraSettingsProps> = ({
 
         controls.smoothTime = 1.5
         controls.rotateTo(newTheta, newPhi, true)
-        controls.zoomTo(0.75, true)
+        controls.zoomTo(0.6, true)
 
         setTimeout(() => {
           controls.smoothTime = 1.0
@@ -63,7 +61,7 @@ const CameraSettings: React.FC<CameraSettingsProps> = ({
         }, 5000)
       }
     }
-  }, [globeState, cameraControlsRef, toggle])
+  }, [globeState, cameraControlsRef])
 
   return null
 }

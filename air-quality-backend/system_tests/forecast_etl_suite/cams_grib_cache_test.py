@@ -31,11 +31,12 @@ def setup_grib_cache_tests():
 
 def test__grib_cache__file_not_stored_when_not_set_to_cache(setup_grib_cache_tests):
     with mock.patch.dict(
-        os.environ, {
+        os.environ,
+        {
             "FORECAST_BASE_TIME": "2024-6-10 00",
             "STORE_GRIB_FILES": "False",
-            "FORECAST_RETRIEVAL_PERIOD": "0"
-        }
+            "FORECAST_RETRIEVAL_PERIOD": "0",
+        },
     ):
         main()
 
@@ -51,10 +52,7 @@ def test__grib_cache__file_not_stored_when_not_set_to_cache(setup_grib_cache_tes
 def test__grib_cache__file_not_stored_by_default(setup_grib_cache_tests):
     with mock.patch.dict(
         os.environ,
-        {
-            "FORECAST_BASE_TIME": "2024-6-10 00",
-            "FORECAST_RETRIEVAL_PERIOD": "0"
-        },
+        {"FORECAST_BASE_TIME": "2024-6-10 00", "FORECAST_RETRIEVAL_PERIOD": "0"},
     ):
         main()
 
@@ -69,11 +67,12 @@ def test__grib_cache__file_not_stored_by_default(setup_grib_cache_tests):
 
 def test__grib_cache__file_stored_when_set_to_cache(setup_grib_cache_tests):
     with mock.patch.dict(
-        os.environ, {
+        os.environ,
+        {
             "FORECAST_BASE_TIME": "2024-6-10 00",
             "STORE_GRIB_FILES": "True",
-            "FORECAST_RETRIEVAL_PERIOD": "0"
-        }
+            "FORECAST_RETRIEVAL_PERIOD": "0",
+        },
     ):
         main()
 

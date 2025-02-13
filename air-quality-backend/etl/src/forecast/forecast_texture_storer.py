@@ -45,12 +45,18 @@ def _chunk_data_array(
         chunk = rgb_data_array[:, start_index:end_index, :]
         chunks.append(chunk)
 
-        time_start = pd.to_datetime(
-            time_vector.data[start_time_step:end_time_step].min(), unit="s"
-        ).isoformat(timespec='milliseconds') + '+00:00'
-        time_end = pd.to_datetime(
-            time_vector.data[start_time_step:end_time_step].max(), unit="s"
-        ).isoformat(timespec='milliseconds') + '+00:00'
+        time_start = (
+            pd.to_datetime(
+                time_vector.data[start_time_step:end_time_step].min(), unit="s"
+            ).isoformat(timespec="milliseconds")
+            + "+00:00"
+        )
+        time_end = (
+            pd.to_datetime(
+                time_vector.data[start_time_step:end_time_step].max(), unit="s"
+            ).isoformat(timespec="milliseconds")
+            + "+00:00"
+        )
         time_steps_dict[len(chunks) - 1] = {
             "time_start": time_start,
             "time_end": time_end,
@@ -151,7 +157,7 @@ def save_data_textures(
             file_format,
         )
         document = {
-            "forecast_base_time": datetime.strptime(forecast_date, '%Y-%m-%d_%H'),
+            "forecast_base_time": datetime.strptime(forecast_date, "%Y-%m-%d_%H"),
             "variable": variable_name,
             "source": "cams-production",
             "min_value": min_value,
@@ -193,5 +199,7 @@ def delete_data_textures_before(archive_date: datetime):
         logging.info(f"Deleting folder '{folder_to_delete}'")
         shutil.rmtree(folder_to_delete)
 
-    logging.info(f"Deleted {len(folders_to_delete)} data texture folders "
-                 f"from {data_textures_folder}")
+    logging.info(
+        f"Deleted {len(folders_to_delete)} data texture folders "
+        f"from {data_textures_folder}"
+    )

@@ -1,12 +1,13 @@
 import logging as log
 from datetime import datetime
-from typing import List
+from typing import List, Dict
 
 from fastapi import Query, APIRouter
 
 from src.mappers.measurements_mapper import (
     map_measurements,
     map_summarized_measurements,
+    map_measurement_counts,
 )
 from .types import MeasurementSummaryDto, MeasurementDto
 from shared.src.database.in_situ import ApiSource, get_averaged, find_by_criteria
@@ -50,3 +51,26 @@ async def get_measurements_summary(
     )
     log.info(f"Found results for {len(averaged_measurements)} locations")
     return map_summarized_measurements(averaged_measurements)
+
+
+@router.get("/air-pollutant/measurements/counts")
+async def get_measurement_counts(
+    date_from: datetime,
+    date_to: datetime,
+    location_type: AirQualityLocationType = "city",
+    location_names: List[str] = Query(None),
+) -> Dict:
+    """Get count of measurements per city and pollutant for a given time range"""
+    log.info(
+        f"Fetching measurement counts between {date_from} - {date_to} for {location_type}"
+    )
+    measurements = find_by_criteria(
+        date_from,
+        date_to,
+        location_type,
+        location_names,
+    )
+
+    counts = map_measurement_counts(measurements)
+    log.info(f"Found measurement counts for {len(counts)} locations")
+    return counts

@@ -7,6 +7,8 @@ import {
   PlayArrow,
   Public,
   Remove,
+  Fullscreen,
+  FullscreenExit,
 } from '@mui/icons-material'
 import { Button, MenuItem, Select, SelectChangeEvent } from '@mui/material'
 import React, {
@@ -30,6 +32,9 @@ type ControlsProps = {
   onTimeInterpolationClick: (filterState: boolean) => void
   onVariableSelect: (variable: string) => void
   forecastData: Record<string, ForecastResponseDto[]>
+  isFullscreen: boolean
+  onFullscreenToggle: () => void
+  selectedVariable?: string
 }
 
 const Controls: React.FC<ControlsProps> = ({
@@ -42,14 +47,21 @@ const Controls: React.FC<ControlsProps> = ({
   onTimeInterpolationClick,
   onVariableSelect,
   forecastData,
+  isFullscreen = false,
+  onFullscreenToggle,
+  selectedVariable: externalSelectedVariable,
 }) => {
+  if (typeof onFullscreenToggle !== 'function') {
+    console.error('onFullscreenToggle is not a function in Controls:', onFullscreenToggle)
+  }
+
   const [sliderValue, setSliderValue] = useState(0.0)
   const [globeAnimationState, setGlobeAnimationState] = useState(false)
   const [locationMarkerState, setLocationMarkerState] = useState(true)
   const [filterState, setGridFilterState] = useState(false)
   const [timeInterpolationState, setTimeInterpolationState] = useState(true)
   const [timeDelta, setTimeDelta] = useState(0.06)
-  const [selectedVariable, setSelectedVariable] = useState('aqi')
+  const [selectedVariable, setSelectedVariable] = useState(externalSelectedVariable || 'aqi')
 
   const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(event.target.value)
@@ -126,6 +138,12 @@ const Controls: React.FC<ControlsProps> = ({
     onVariableSelect(variable)
   }
 
+  useEffect(() => {
+    if (externalSelectedVariable && selectedVariable !== externalSelectedVariable) {
+      setSelectedVariable(externalSelectedVariable)
+    }
+  }, [externalSelectedVariable])
+
   const handleIncreaseTimeDelta = () => {
     setTimeDelta((prevDelta) => prevDelta + 0.02)
   }
@@ -135,7 +153,11 @@ const Controls: React.FC<ControlsProps> = ({
   }
 
   return (
-    <div style={styles.controlsContainer}>
+    <div style={{
+      ...styles.controlsContainer,
+      width: isFullscreen ? '600px' : '350px',
+      margin: isFullscreen ? '10px 8px 40px 8px' : '8px',
+    }}>
       <Button
         onClick={onToggleTimeUpdate}
         style={{
@@ -145,24 +167,36 @@ const Controls: React.FC<ControlsProps> = ({
       >
         {isTimeRunning ? (
           <Pause
-            fontSize="large"
+            fontSize="small"
             style={isTimeRunning ? styles.activeIcon : undefined}
           />
         ) : (
-          <PlayArrow fontSize="large" />
+          <PlayArrow fontSize="small" />
         )}
       </Button>
 
-      <Button onClick={handleDecreaseTimeDelta} style={styles.controlButton}>
-        <Remove fontSize="large" />
-      </Button>
+      {isFullscreen && (
+        <>
+          <Button onClick={handleDecreaseTimeDelta} style={styles.controlButton}>
+            <Remove fontSize="small" />
+          </Button>
 
-      <Button onClick={handleIncreaseTimeDelta} style={styles.controlButton}>
-        <Add fontSize="large" />
-      </Button>
+          <Button onClick={handleIncreaseTimeDelta} style={styles.controlButton}>
+            <Add fontSize="small" />
+          </Button>
+        </>
+      )}
 
       <div style={styles.sliderContainer}>
-        <label htmlFor="slider">{currentDate}</label>
+        <label 
+          htmlFor="slider" 
+          style={{
+            fontSize: isFullscreen ? '14px' : '12px',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {currentDate}
+        </label>
         <input
           id="slider"
           type="range"
@@ -175,68 +209,92 @@ const Controls: React.FC<ControlsProps> = ({
         />
       </div>
 
-      <Button
-        onClick={handleLocationMarkerClick}
-        style={{
-          ...styles.controlButton,
-          backgroundColor: locationMarkerState ? '#1976d2' : 'lightgray',
-        }}
-      >
-        <LocationOn
-          fontSize="large"
-          style={locationMarkerState ? styles.activeIcon : undefined}
-        />
-      </Button>
+      {isFullscreen && (
+        <>
+          <Button
+            onClick={handleLocationMarkerClick}
+            style={{
+              ...styles.controlButton,
+              backgroundColor: locationMarkerState ? '#1976d2' : 'lightgray',
+            }}
+          >
+            <LocationOn
+              fontSize="small"
+              style={locationMarkerState ? styles.activeIcon : undefined}
+            />
+          </Button>
 
-      <Button
-        onClick={handleGlobeButtonClick}
-        style={{
-          ...styles.globeButton,
-          backgroundColor: globeAnimationState ? '#1976d2' : 'lightgray',
-        }}
-      >
-        <Public
-          fontSize="large"
-          style={globeAnimationState ? styles.activeIcon : undefined}
-        />
-      </Button>
+          <Button
+            onClick={handleGlobeButtonClick}
+            style={{
+              ...styles.controlButton,
+              backgroundColor: globeAnimationState ? '#1976d2' : 'lightgray',
+            }}
+          >
+            <Public
+              fontSize="small"
+              style={globeAnimationState ? styles.activeIcon : undefined}
+            />
+          </Button>
 
-      <Button
-        onClick={handleGridFilterClick}
-        style={{
-          ...styles.checkerboardButton,
-          backgroundColor: filterState ? '#1976d2' : 'lightgray',
-        }}
-      >
-        <GridOn
-          fontSize="large"
-          style={filterState ? styles.activeIcon : undefined}
-        />
-      </Button>
+          <Button
+            onClick={handleGridFilterClick}
+            style={{
+              ...styles.checkerboardButton,
+              backgroundColor: filterState ? '#1976d2' : 'lightgray',
+            }}
+          >
+            <GridOn
+              fontSize="small"
+              style={filterState ? styles.activeIcon : undefined}
+            />
+          </Button>
 
-      <Button
-        onClick={handleTimeInterpolationClick}
-        style={{
-          ...styles.controlButton,
-          backgroundColor: timeInterpolationState ? '#1976d2' : 'lightgray',
-        }}
-      >
-        <AccessTime
-          fontSize="large"
-          style={timeInterpolationState ? styles.activeIcon : undefined}
-        />
-      </Button>
+          <Button
+            onClick={handleTimeInterpolationClick}
+            style={{
+              ...styles.controlButton,
+              backgroundColor: timeInterpolationState ? '#1976d2' : 'lightgray',
+            }}
+          >
+            <AccessTime
+              fontSize="small"
+              style={timeInterpolationState ? styles.activeIcon : undefined}
+            />
+          </Button>
+        </>
+      )}
 
       <Select
         value={selectedVariable}
         onChange={handleVariableSelectChange}
-        style={styles.dropdown}
+        style={{
+          ...styles.dropdown,
+          fontSize: isFullscreen ? '14px' : '12px',
+          height: isFullscreen ? '32px' : '28px',
+        }}
       >
-        <MenuItem value="aqi">AQI</MenuItem>
-        <MenuItem value="pm2_5">PM2.5</MenuItem>
-        <MenuItem value="pm10">PM10</MenuItem>
-        <MenuItem value="o3">O3</MenuItem>
+        <MenuItem value="aqi" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>AQI</MenuItem>
+        <MenuItem value="pm2_5" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>PM2.5</MenuItem>
+        <MenuItem value="pm10" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>PM10</MenuItem>
+        <MenuItem value="no2" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>NO2</MenuItem>
+        <MenuItem value="o3" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>O3</MenuItem>
+        <MenuItem value="so2" style={{ fontSize: isFullscreen ? '14px' : '12px' }}>SO2</MenuItem>
       </Select>
+
+      <Button 
+        onClick={() => {
+          console.log('Fullscreen button clicked in Controls')
+          onFullscreenToggle()
+        }} 
+        style={styles.controlButton}
+      >
+        {isFullscreen ? (
+          <FullscreenExit fontSize="small" />
+        ) : (
+          <Fullscreen fontSize="small" />
+        )}
+      </Button>
     </div>
   )
 }
@@ -246,45 +304,73 @@ const styles: { [key: string]: CSSProperties } = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: '10px',
-    padding: '10px',
+    gap: '8px',
     backgroundColor: '#f4f4f4',
     borderTop: '1px solid #ccc',
+    maxWidth: '100%',
+    padding: '4px',
   },
   controlButton: {
-    width: '50px',
-    height: '50px',
+    width: '32px',
+    height: '32px',
+    minWidth: '32px',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     border: 'none',
-    borderRadius: '10%',
+    borderRadius: '4px',
     cursor: 'pointer',
-    margin: '5px',
-    padding: '10px',
+    margin: '2px',
+    padding: '4px',
   },
   sliderContainer: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    flex: 1,
   },
   slider: {
-    width: '500px',
+    width: '140px',
   },
   dropdown: {
-    width: '100px',
-    height: '40px',
-    fontSize: '16px',
-    borderRadius: '5px',
+    width: '80px',
+    height: '32px',
+    borderRadius: '4px',
     border: '1px solid lightgray',
-    padding: '5px',
-    margin: '5px',
+    padding: '4px',
+    margin: '2px',
     cursor: 'pointer',
   },
   activeIcon: {
     color: 'white',
     fontWeight: 'bold',
   },
+  globeButton: {
+    width: '32px',
+    height: '32px',
+    minWidth: '32px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    margin: '2px',
+    padding: '4px',
+  },
+  checkerboardButton: {
+    width: '32px',
+    height: '32px',
+    minWidth: '32px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    margin: '2px',
+    padding: '4px',
+  }
 }
 
 export default Controls

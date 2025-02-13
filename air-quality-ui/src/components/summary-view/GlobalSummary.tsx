@@ -1,15 +1,14 @@
 import { useQueries, useQuery } from '@tanstack/react-query'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, useEffect, useRef } from 'react'
 
 import classes from './GlobalSummary.module.css'
-import { MapViewHeader } from './MapViewHeader'
 import { SummaryViewHeader } from './SummaryViewHeader'
 import { useForecastContext } from '../../context'
 import { getForecastData } from '../../services/forecast-data-service'
 import { getValidForecastTimesBetween } from '../../services/forecast-time-service'
-import { getMeasurementSummary } from '../../services/measurement-data-service'
+import { getMeasurementSummary, getMeasurementCounts, type MeasurementCounts } from '../../services/measurement-data-service'
 import {
   ForecastResponseDto,
   MeasurementSummaryResponseDto,
@@ -17,11 +16,27 @@ import {
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import World from '../globe/World'
 import GlobalSummaryTable from '../summary-grid/table/GlobalSummaryTable'
+import SummaryBarChart from './charts/SummaryBarChart'
+import SummaryScatterChart from './charts/SummaryScatterChart'
 
 const GlobalSummary = (): JSX.Element => {
   const { forecastDetails } = useForecastContext()
   const [showAllColoured, setShowAllColoured] = useState<boolean>(true)
-  const [showMap, setShowMap] = useState<boolean>(false)
+  const enableHoverRef = useRef(false)
+  const [enableHover, setEnableHover] = useState<boolean>(false)
+  const [measurementCounts, setMeasurementCounts] = useState<MeasurementCounts | null>(null)
+  const [hoveredCity, setHoveredCity] = useState<string | null>(null)
+  const [hoveredVar, setHoveredVar] = useState<string | undefined>(undefined)
+  const [selectedCityCoords, setSelectedCityCoords] = useState<{
+    name: string
+    latitude: number
+    longitude: number
+  } | null>(null)
+  const [lastHoveredState, setLastHoveredState] = useState<{
+    city: string | null,
+    coords: { name: string, latitude: number, longitude: number } | null
+  } | null>(null)
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
   const wrapSetShowAllColoured = useCallback(
     (val: boolean) => {
@@ -30,11 +45,27 @@ const GlobalSummary = (): JSX.Element => {
     [setShowAllColoured],
   )
 
-  const wrapSetShowMap = useCallback(
+  const wrapSetEnableHover = useCallback(
     (val: boolean) => {
-      setShowMap(val)
+      
+      enableHoverRef.current = val
+      
+      if (!val) {
+        setLastHoveredState({
+          city: hoveredCity,
+          coords: selectedCityCoords
+        })
+        setHoveredCity(null)
+        setSelectedCityCoords(null)
+      } else {
+        if (lastHoveredState) {
+          setHoveredCity(lastHoveredState.city)
+          setSelectedCityCoords(lastHoveredState.coords)
+        }
+      }
+      setEnableHover(val)
     },
-    [setShowMap],
+    [enableHover, hoveredCity, selectedCityCoords, lastHoveredState],
   )
 
   const {
@@ -106,6 +137,47 @@ const GlobalSummary = (): JSX.Element => {
     },
   })
 
+  useEffect(() => {
+    const fetchMeasurementCounts = async () => {
+      try {
+        const counts = await getMeasurementCounts(
+          forecastDetails.forecastBaseDate,
+          forecastDetails.maxForecastDate,
+          'city'
+        )
+        setMeasurementCounts(counts)
+      } catch (error) {
+        console.error('Error fetching measurement counts:', error)
+      }
+    }
+
+    fetchMeasurementCounts()
+  }, [forecastDetails])
+
+  const handleCityHover = useCallback(
+    (cityName: string | null, latitude?: number, longitude?: number, columnId?: string) => {
+      
+      if (!enableHoverRef.current) return
+      
+      setHoveredCity(cityName)
+      setHoveredVar(columnId)
+      if (cityName && latitude !== undefined && longitude !== undefined) {
+        setSelectedCityCoords({
+          name: cityName,
+          latitude,
+          longitude,
+        })
+      } else {
+        setSelectedCityCoords(null)
+      }
+    },
+    [],
+  )
+
+  const handleFullscreenToggle = useCallback(() => {
+    setIsFullscreen(prev => !prev)
+  }, [])
+
   if (forecastDataError || summaryDataError) {
     return <span>Error occurred</span>
   }
@@ -121,20 +193,43 @@ const GlobalSummary = (): JSX.Element => {
           <SummaryViewHeader
             setShowAllColoured={wrapSetShowAllColoured}
             showAllColoured={showAllColoured}
+            setEnableHover={wrapSetEnableHover}
+            enableHover={enableHover}
           />
           <GlobalSummaryTable
             forecast={forecastData}
             summarizedMeasurements={summarizedMeasurementData}
             showAllColoured={showAllColoured}
+            onCityHover={handleCityHover}
+            enableHover={enableHover}
           />
-          <MapViewHeader setShowMap={wrapSetShowMap} showMap={showMap} />
-          {showMap && (
-            <World
-              forecastData={forecastData || {}}
-              summarizedMeasurementData={summarizedMeasurementData}
-              toggle={showMap ? 'world-visible' : 'world-hidden'}
-            />
-          )}
+          <div className={classes['charts-row']}>
+            <div className={classes['chart-container']}>
+              <SummaryBarChart 
+                measurementCounts={measurementCounts}
+                totalCities={Object.keys(forecastData || {}).length}
+                selectedCity={hoveredCity}
+              />
+            </div>
+            <div className={classes['chart-container']}>
+              <SummaryScatterChart 
+                title="Forecast vs. Measurement (3-hourly avg)"
+                summarizedMeasurements={summarizedMeasurementData}
+                forecast={forecastData}
+                selectedCity={hoveredCity}
+              />
+            </div>
+            <div className={classes['chart-container']}>
+              <World
+                forecastData={forecastData || {}}
+                summarizedMeasurementData={summarizedMeasurementData}
+                selectedCity={selectedCityCoords}
+                selectedVariable={hoveredVar === 'aqiLevel' ? 'aqi' : (hoveredVar || 'aqi')}
+                isFullscreen={isFullscreen}
+                onToggleFullscreen={handleFullscreenToggle}
+              />
+            </div>
+          </div>
         </div>
       )}
     </>

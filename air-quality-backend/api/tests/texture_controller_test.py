@@ -18,8 +18,8 @@ def test__get_data_texture__no_results():
         return_value=[],
     ) as mock_fetch_data:
         response = client.get(
-            "/air-pollutant/data_textures",
-            params=default_request_params)
+            "/air-pollutant/data_textures", params=default_request_params
+        )
         assert response.status_code == 404
         assert response.json() == {}
         mock_fetch_data.assert_called_once_with(
@@ -36,28 +36,28 @@ def test__required_query_params__error_if_not_supplied():
 def test__get_data_texture__with_results():
     mock_db_results = [
         {
-            'time_start': datetime(2024, 7, 24, 0, 0),
-            'source': 'cams-production',
-            'forecast_base_time': datetime(2024, 7, 24, 0, 0).astimezone(UTC),
-            'variable': 'no2',
-            'time_end': datetime(2024, 7, 25, 21, 0),
-            'chunk': '1 of 3',
-            'max_value': 100.0,
-            'min_value': 0.0,
-            'texture_uri': '/app/data_textures/2024-07-24_00/no2_2024-07-24_00_CAMS',
-            'units': 'kg m**-3 * 1e-9',
+            "time_start": datetime(2024, 7, 24, 0, 0),
+            "source": "cams-production",
+            "forecast_base_time": datetime(2024, 7, 24, 0, 0).astimezone(UTC),
+            "variable": "no2",
+            "time_end": datetime(2024, 7, 25, 21, 0),
+            "chunk": "1 of 3",
+            "max_value": 100.0,
+            "min_value": 0.0,
+            "texture_uri": "/app/data_textures/2024-07-24_00/no2_2024-07-24_00_CAMS",
+            "units": "kg m**-3 * 1e-9",
         },
         {
-            'time_start': datetime(2024, 7, 24, 0, 0),
-            'forecast_base_time': datetime(2024, 7, 24, 0, 0).astimezone(UTC),
-            'source': 'cams-production',
-            'variable': 'o3',
-            'time_end': datetime(2024, 7, 25, 21, 0),
-            'chunk': '1 of 3',
-            'max_value': 500.0,
-            'min_value': 0.0,
-            'texture_uri': '/app/data_textures/2024-07-24_00/o3_2024-07-24_00_CAMS',
-            'units': 'kg m**-3 * 1e-9',
+            "time_start": datetime(2024, 7, 24, 0, 0),
+            "forecast_base_time": datetime(2024, 7, 24, 0, 0).astimezone(UTC),
+            "source": "cams-production",
+            "variable": "o3",
+            "time_end": datetime(2024, 7, 25, 21, 0),
+            "chunk": "1 of 3",
+            "max_value": 500.0,
+            "min_value": 0.0,
+            "texture_uri": "/app/data_textures/2024-07-24_00/o3_2024-07-24_00_CAMS",
+            "units": "kg m**-3 * 1e-9",
         },
     ]
     mock_results = [
@@ -70,7 +70,7 @@ def test__get_data_texture__with_results():
             "source": "cams-production",
             "texture_uri": "/2024-07-24_00/no2_2024-07-24_00_CAMS",
             "min_value": 0.0,
-            "max_value": 100.0
+            "max_value": 100.0,
         },
         {
             "base_time": "2024-07-24T00:00:00Z",
@@ -81,7 +81,7 @@ def test__get_data_texture__with_results():
             "source": "cams-production",
             "texture_uri": "/2024-07-24_00/o3_2024-07-24_00_CAMS",
             "min_value": 0.0,
-            "max_value": 500.0
+            "max_value": 500.0,
         },
     ]
     with patch(
@@ -89,8 +89,8 @@ def test__get_data_texture__with_results():
         return_value=mock_db_results,
     ) as mock_fetch_data:
         response = client.get(
-            "/air-pollutant/data_textures",
-            params=default_request_params)
+            "/air-pollutant/data_textures", params=default_request_params
+        )
         assert response.status_code == 200
         assert response.json() == mock_results
 
@@ -105,8 +105,8 @@ def test__get_data_texture__exception_handling():
         side_effect=Exception("Database error"),
     ) as mock_fetch_data:
         response = client.get(
-            "/air-pollutant/data_textures",
-            params=default_request_params)
+            "/air-pollutant/data_textures", params=default_request_params
+        )
         assert response.status_code == 500
         assert response.json() == {"detail": "Internal Server Error"}
         mock_fetch_data.assert_called_once_with(

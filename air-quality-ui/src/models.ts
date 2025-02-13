@@ -20,4 +20,12 @@ export const pollutantTypeDisplay: Record<PollutantType, string> = {
   so2: 'Sulphur Dioxide',
 }
 
+export const pollutantTypeDisplayShort: Record<PollutantType, string> = {
+  no2: 'NO2',
+  o3: 'O3',
+  pm2_5: 'PM2.5',
+  pm10: 'PM10',
+  so2: 'SO2',
+}
+
 export type LocationType = 'city'
