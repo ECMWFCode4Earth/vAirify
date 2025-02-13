@@ -7,8 +7,8 @@ from shared.src.database.in_situ import get_in_situ_dates_between
 
 
 def dates_without_measurements(
-        dates_from_db: list[datetime],
-        potential_dates: list[datetime]):
+    dates_from_db: list[datetime], potential_dates: list[datetime]
+):
     date_without_measurement = []
     for potential_date in potential_dates:
         for hour in range(0, 23):
@@ -47,16 +47,15 @@ def retrieve_dates_requiring_in_situ_data() -> [datetime]:
     if search_end_date <= search_start_date:
         return [cur_date]
 
-    dates = pd.date_range(search_start_date,
-                          search_end_date,
-                          inclusive="right",
-                          freq="24h")
+    dates = pd.date_range(
+        search_start_date, search_end_date, inclusive="right", freq="24h"
+    )
     potential_dates = [i.to_pydatetime() for i in dates]
 
     dates_from_db = get_in_situ_dates_between(search_start_date, search_end_date)
     dates_requiring_in_situ_data = dates_without_measurements(
-        dates_from_db,
-        potential_dates)
+        dates_from_db, potential_dates
+    )
 
     dates_requiring_in_situ_data.append(cur_date)
 
