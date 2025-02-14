@@ -1,0 +1,38 @@
+# Application name
+name: vairify
+
+# Local development flag
+localDevelopment: false
+
+# MongoDB configuration
+mongodb:
+  image: mongo
+  tag: latest
+  port: 27017
+  replicas: 1
+  persistence:
+    enabled: true
+    size: 10Gi
+  env:
+    auth: false
+
+# ETL Insitu configuration
+etlInsitu:
+  image: eccr.ecmwf.int/cams-applications/vairify-etl-insitu
+  tag: latest
+  replicas: 1
+  env:
+    MONGO_DB_URI: mongodb://mongodb:27017/
+    MONGO_DB_NAME: DUMMY_MONGO_DB_NAME
+    OPEN_AQ_API_URL: DUMMY_OPEN_AQ_API_URL
+    OPEN_AQ_API_KEY: DUMMY_OPEN_AQ_API_KEY
+    CDSAPI_URL: DUMMY_CDSAPI_URL
+    CDSAPI_KEY: DUMMY_CDSAPI_KEY
+    STORE_GRIB_FILES: "false"
+
+# Common settings
+ingress:
+  enable: true
+  hostname: ""
+  ingressclass: ""
+  secretName: "" 

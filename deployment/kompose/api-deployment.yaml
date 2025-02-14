@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose --file compose.yaml convert
+    kompose.version: 1.35.0 (HEAD)
+  labels:
+    io.kompose.service: api
+  name: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: api
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose --file compose.yaml convert
+        kompose.version: 1.35.0 (HEAD)
+      labels:
+        io.kompose.service: api
+    spec:
+      containers:
+        - env:
+            - name: MONGO_DB_NAME
+            - name: MONGO_DB_URI
+              value: mongodb://mongo:27017
+          image: ghcr.io/ecmwfcode4earth/vairify/vairify-backend-api
+          name: backend-api
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+      restartPolicy: Always

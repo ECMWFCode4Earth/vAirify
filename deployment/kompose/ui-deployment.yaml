@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose --file compose.yaml convert
+    kompose.version: 1.35.0 (HEAD)
+  labels:
+    io.kompose.service: ui
+  name: ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: ui
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose --file compose.yaml convert
+        kompose.version: 1.35.0 (HEAD)
+      labels:
+        io.kompose.service: ui
+    spec:
+      containers:
+        - image: ghcr.io/ecmwfcode4earth/vairify/vairify-frontend
+          name: frontend-ui
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /app/data_textures
+              name: data-textures
+      restartPolicy: Always
+      volumes:
+        - name: data-textures
+          persistentVolumeClaim:
+            claimName: data-textures
