@@ -1,4 +1,4 @@
-name: Harbor forecast ETL docker images build and publish 
+name: Harbor insitu ETL docker image build and publish 
 
 on:
   [workflow_dispatch]
@@ -18,14 +18,12 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          buildkitd-flags: --debug
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./air-quality-backend
-          file: ./air-quality-backend/Dockerfile.forecast
+          file: ./air-quality-backend/Dockerfile.insitu
           platforms: linux/amd64
           push: true
-          tags: "eccr.ecmwf.int/cams-applications/vairify-etl-forecast:latest"
+          tags: "eccr.ecmwf.int/cams-applications/vairify-etl-insitu:latest" 

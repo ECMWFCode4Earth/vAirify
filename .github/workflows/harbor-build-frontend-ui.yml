@@ -1,4 +1,4 @@
-name: Harbor forecast ETL docker images build and publish 
+name: Harbor UI docker image build and publish 
 
 on:
   [workflow_dispatch]
@@ -18,14 +18,15 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          buildkitd-flags: --debug
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./air-quality-backend
-          file: ./air-quality-backend/Dockerfile.forecast
+          context: ./air-quality-ui
+          file: ./air-quality-ui/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: "eccr.ecmwf.int/cams-applications/vairify-etl-forecast:latest"
+          build-args: |
+            VITE_AIR_QUALITY_API_URL=${{ vars.VAIRIFY_API_URL_HARBOR }}
+            VITE_AIR_QUALITY_UI_URL=${{ vars.VAIRIFY_UI_URL_HARBOR }}
+          tags: "eccr.ecmwf.int/cams-applications/vairify-frontend:latest" 
