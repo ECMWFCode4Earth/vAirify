@@ -193,7 +193,8 @@ def _get_locations_with_sensors(city, session, date_from: datetime) -> list:
             coordinates = location.get("coordinates", {})
             is_monitor = location.get("isMonitor", False)
             location_name = location.get("name")
-            active_locations.add(location_name)  # Add to active locations set
+            if location_name is not None:
+                active_locations.add(location_name)  # Add to active locations set
 
             for sensor in location.get("sensors", []):
                 parameter = sensor.get("parameter", {}).get("name")
