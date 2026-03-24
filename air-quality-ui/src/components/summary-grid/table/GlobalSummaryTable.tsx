@@ -26,9 +26,10 @@ import { aqiCellRules, pollutantCellRules } from '../cell/cell-rules/CellRules'
 import { LocationCellRenderer } from '../cell/location-cell-renderer/LocationCellRenderer'
 
 export interface GlobalSummaryTableProps {
-  forecast: Record<string, ForecastResponseDto[]>
-  summarizedMeasurements: Record<string, MeasurementSummaryResponseDto[]>
+  forecast: Record<string, ForecastResponseDto[]> | undefined
+  summarizedMeasurements: Record<string, MeasurementSummaryResponseDto> | undefined
   showAllColoured: boolean
+  onCityHover: (cityName: string | null, latitude?: number, longitude?: number, columnId?: string) => void
 }
 
 const maxWidth = 115
@@ -136,9 +137,30 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
   })),
 ]
 
-const createGridOptions = (): GridOptions => ({
+const createGridOptions = (
+  forecast: Record<string, ForecastResponseDto[]> | undefined,
+  onCityHover?: (cityName: string | null, latitude?: number, longitude?: number, columnId?: string) => void
+): GridOptions => ({
   autoSizeStrategy: {
     type: 'fitCellContents',
+  },
+  onCellMouseOver: (event) => {
+    const cityName = event.data.locationName
+    const columnId = event.column?.getColId()
+    
+    // Extract pollutant name from columnId, including aqiLevel
+    const pollutantMatch = columnId?.match(/(?:forecast|measurements)\.(pm2_5|pm10|o3|no2|so2|aqiLevel)/)
+    const pollutantName = pollutantMatch ? pollutantMatch[1] : 'aqiLevel'
+    
+    if (cityName && forecast?.[cityName]?.[0]) {
+      const { latitude, longitude } = forecast[cityName][0].location
+      onCityHover?.(cityName, latitude, longitude, columnId ? pollutantName : 'aqiLevel')
+    } else {
+      onCityHover?.(cityName, undefined, undefined, columnId ? pollutantName : 'aqiLevel')
+    }
+  },
+  onCellMouseOut: () => {
+    onCityHover?.(null)
   },
 })
 
@@ -146,7 +168,8 @@ const GlobalSummaryTable = ({
   forecast,
   summarizedMeasurements,
   showAllColoured,
-}: Partial<GlobalSummaryTableProps>): JSX.Element => {
+  onCityHover,
+}: GlobalSummaryTableProps): JSX.Element => {
   const rowData = useMemo(() => {
     if (!forecast || !summarizedMeasurements) {
       return null
@@ -160,7 +183,10 @@ const GlobalSummaryTable = ({
   if (showAllColoured != undefined) {
     columnDefs = createColDefs(showAllColoured)
   }
-  const gridOptions = createGridOptions()
+  const gridOptions = useMemo(
+    () => createGridOptions(forecast, onCityHover),
+    [forecast, onCityHover]
+  )
   return (
     <div
       className={`ag-theme-quartz ${classes['summary-grid-wrapper']}`}

@@ -17,6 +17,8 @@ import {
   MeasurementSummaryResponseDto,
   PollutantDataDto,
 } from '../../services/types'
+import { createContourUniforms } from './utils/shaderUniforms'
+import { getVariableIndex } from '../../models/variable-indices'
 
 type LocationMarkerProps = {
   forecastData: Record<string, ForecastResponseDto[]>
@@ -287,123 +289,20 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
       setVisible,
     }))
 
-    const variableIndex =
-      selectedVariable === 'aqi'
-        ? 1
-        : selectedVariable === 'pm2_5'
-          ? 2
-          : selectedVariable === 'pm10'
-            ? 3
-            : selectedVariable === 'o3'
-              ? 4
-              : selectedVariable === 'no2'
-                ? 5
-                : selectedVariable === 'so2'
-                  ? 6
-                  : undefined
+    const variableIndex = getVariableIndex(selectedVariable)
 
-    return (
-      <instancedMesh
-        ref={instancedMarkerRef}
-        args={[undefined, undefined, MAX_MARKERS]}
-      >
-        <sphereGeometry args={[markerSize, 16, 16]} />
-        <CustomShaderMaterial
-          baseMaterial={THREE.MeshLambertMaterial}
-          vertexShader={`
-
+    const vertexShader = `
             vec3 adjustSaturation(vec3 color, float saturation) {
               float luminance = dot(color, vec3(0.2126, 0.7152, 0.0722));
               return mix(vec3(luminance), color, saturation);
             }
 
-            // Function to get color based on the value and variable type
-            vec3 getColorForValue(float value, float uVariableIndex) {
-              vec3 color;
-              
-              if (uVariableIndex == 1.0) { // "aqi"
-                if (value == -1.0) {
-                  color = vec3(38, 38, 38); // Default to dark grey for missing values
-                } else if (value >= 1.0 && value < 2.0) {
-                  color = vec3(129.0, 237.0, 229.0);
-                } else if (value >= 2.0 && value < 3.0) {
-                  color = vec3(116.0, 201.0, 172.0);
-                } else if (value >= 3.0 && value < 4.0) {
-                  color = vec3(238.0, 230.0, 97.0);
-                } else if (value >= 4.0 && value < 5.0) {
-                  color = vec3(236.0, 94.00, 87.0);
-                } else if (value >= 5.0 && value < 6.0) {
-                  color = vec3(137.0, 26.0, 52.0);
-                } else if (value >= 6.0 && value < 7.0) {
-                  color = vec3(115.0, 40.0, 125.0);
-                } else {
-                  color = vec3(38, 38, 38); // Default to dark grey
-              }
-              } else if ( (uVariableIndex == 2.0) || (uVariableIndex == 3.0) ){ // "pm25 and pm10"
-                if (value == -1.0) {
-                  color = vec3(38, 38, 38); // Default to dark grey for missing values
-                } else if (value < 30.0) {
-                    color = vec3(255.0, 255.0, 255.0); 
-                } else if (value < 40.0) {
-                    color = vec3(233.0, 249.0, 188.0); // Green
-                } else if (value < 50.0) {
-                    color = vec3(198.0, 255.0, 199.0); // Blue
-                } else if (value < 60.0) {
-                    color = vec3(144.0, 237.0, 169.0); // Yellow
-                } else if (value < 80.0) {
-                    color = vec3(76.0, 180.0, 148.0); // Orange
-                } else if (value < 100.0) {
-                    color = vec3(48.0, 155.0, 138.0); // Purple
-                } else if (value < 150.0) {
-                    color = vec3(47.0, 137.0, 169.0); // Yellow
-                } else if (value < 200.0) {
-                    color = vec3(16.0, 99.0, 164.0); // Orange
-                } else if (value < 300.0) {
-                    color = vec3(13.0, 69.0, 126.0); // Purple
-                } else if (value < 500.0) {
-                    color = vec3(15.0, 26.0, 136.0); // Orange
-                } else if (value < 1000.0) {
-                    color = vec3(38.0, 2.0, 60.0); // Purple
-                } else {
-                    color = vec3(0.0, 0.0, 0.0); // Black for values out of range
-              }
-              } else if (uVariableIndex == 4.0) { // "o3"
-                if (value < 10.0) {
-                    color = vec3(144.0, 190.0, 228.0); // Red
-                } else if (value < 20.0) {
-                    color = vec3(20.0, 145.0, 216.0); // Green
-                } else if (value < 30.0) {
-                    color = vec3(15.0, 109.0, 179.0); // Blue
-                } else if (value < 40.0) {
-                    color = vec3(35.0, 79.0, 146.0); // Yellow
-                } else if (value < 50.0) {
-                    color = vec3(37.0, 133.0, 100.0); // Orange
-                } else if (value < 60.0) {
-                    color = vec3(96.0, 168.0, 83.0); // Purple
-                } else if (value < 70.0) {
-                    color = vec3(157.0, 193.0, 99.0); // Yellow
-                } else if (value < 80.0) {
-                    color = vec3(255.0,242.0, 148.0); // Orange
-                } else if (value < 90.0) {
-                    color = vec3(240.0, 203.0, 62.0); // Purple
-                } else if (value < 100.0) {
-                    color = vec3(229.0, 172.0, 59.0); // Orange
-                } else if (value < 120.0) {
-                    color = vec3(214.0, 124.0, 62.0); // Purple
-                } else if (value < 150.0) {
-                    color = vec3(196.0, 49.0, 50.0); // Purple
-                } else {
-                    color = vec3(142.0, 25.0, 35.0); // Black for values out of range
-                }
-            }
-                
-            color = color / 255.0;
-
-              return color;
-            }
-
-            #define M_PI 3.14159265
-
+            // Declare uniform arrays with fixed size
+            uniform float uContourThresholds[20];
+            uniform vec3 uContourColors[20];
+            uniform int uNumLevels;
+            uniform float uMinValue;
+            uniform float uMaxValue;
             uniform float uVariableIndex;
             uniform float uSphereWrapAmount;
             uniform float uFrame;
@@ -422,88 +321,100 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
 
             varying vec3 vColor;
 
+            #define M_PI 3.14159265359
+
+            vec3 getColorForValue(float value) {
+              vec3 color = vec3(0.15, 0.15, 0.15);
+              
+              if (value > 0.0) {
+                bool colorFound = false;
+                for (int i = 0; i < 20; i++) {
+                  if (i >= uNumLevels) break;
+                  if (value < uContourThresholds[i]) {
+                    color = uContourColors[i];
+                    colorFound = true;
+                    break;
+                  }
+                }
+                
+                // If no threshold matched, use the last color
+                if (!colorFound) {
+                  color = uContourColors[uNumLevels - 1];
+                }
+              }
+              
+              return color / 255.0;
+            }
+
             void main() {
+              vec2 thisTexCoord = vec2(markerIndex / (uMaxMarkers - 1.0), uFrame / uNumTimseSteps);
+              vec2 nextTexCoord = vec2(markerIndex / (uMaxMarkers - 1.0), (uFrame + 1.0 ) / uNumTimseSteps);
 
-            vec2 thisTexCoord = vec2(markerIndex / (uMaxMarkers - 1.0), uFrame / uNumTimseSteps);
-            vec2 nextTexCoord = vec2(markerIndex / (uMaxMarkers - 1.0), (uFrame + 1.0 ) / uNumTimseSteps);
+              float forecastValue = texture2D(forecastTexture, thisTexCoord).r;
+              float measurementValue = texture2D(measurementTexture, thisTexCoord).r;
 
-            float forecastValue = texture2D(forecastTexture, thisTexCoord).r;
-            float measurementValue = texture2D(measurementTexture, thisTexCoord).r;
+              float nextForecastValue = texture2D(forecastTexture, nextTexCoord).r;
+              float nextMeasurementValue = texture2D(measurementTexture, nextTexCoord).r;
 
-            float nextForecastValue = texture2D(forecastTexture, nextTexCoord).r;
-            float nextMeasurementValue = texture2D(measurementTexture, nextTexCoord).r;
+              float forecastValueInterpolated = mix(forecastValue, nextForecastValue, uFrameWeight);
+              float measurementValueInterpolated = mix(measurementValue, nextMeasurementValue, uFrameWeight);
 
-            float forecastValueInterpolated = mix(forecastValue, nextForecastValue, uFrameWeight);
-            float measurementValueInterpolated = mix(measurementValue, nextMeasurementValue, uFrameWeight);
+              float thisDiff; 
+              float nextDiff; 
+              float diff = 1.0;
 
-            float thisDiff; 
-            float nextDiff; 
-            float diff = 1.0;
+              // Clamp values to min/max range
+              forecastValue = clamp(forecastValue, uMinValue, uMaxValue);
+              if (measurementValue > 0.0) {
+                measurementValue = clamp(measurementValue, uMinValue, uMaxValue);
+              }
+              nextForecastValue = clamp(nextForecastValue, uMinValue, uMaxValue);
+              if (nextMeasurementValue > 0.0) {
+                nextMeasurementValue = clamp(nextMeasurementValue, uMinValue, uMaxValue);
+              }
 
-            float minValue;
-            float maxValue;
+              if (measurementValue != -1.0) {
+                thisDiff = abs(measurementValue-forecastValue);
+              } else {
+                thisDiff = 0.0;
+              }
+              if (nextMeasurementValue != -1.0) {
+                nextDiff = abs(nextMeasurementValue-nextForecastValue);
+              } else {
+                nextDiff = 0.0;
+              }
+              diff = mix(thisDiff, nextDiff, uFrameWeight);
 
-            if (uVariableIndex == 1.0) {
-                minValue = 1.0;
-                maxValue = 6.0;
-            } else if ( (uVariableIndex == 2.0) || (uVariableIndex == 3.0) ) {
-                minValue = 1.0;
-                maxValue = 1000.0;
-            } else if (uVariableIndex == 4.0) {
-                minValue = 1.0;
-                maxValue = 500.0;
-          }
-            forecastValue = clamp(forecastValue, minValue, maxValue);
-            // if (measurementValue > 0.0) {
-              // measurementValue = clamp(measurementValue, minValue, maxValue);
-            // }
-            nextForecastValue = clamp(nextForecastValue, minValue, maxValue);
-            nextMeasurementValue = clamp(nextMeasurementValue, minValue, maxValue);
+              // Clamp diff based on variable type
+              if (uVariableIndex == 1.0) { // aqi
+                  diff = clamp(diff * 0.8, 1.0, 6.0);
+              } else if (uVariableIndex == 2.0 || uVariableIndex == 3.0) { // pm2_5 or pm10
+                  diff = clamp(diff/20.0, 1.0, 4.0);
+              } else if (uVariableIndex == 4.0) { // no2
+                  diff = clamp(diff/20.0, 1.0, 4.0);
+              } else if (uVariableIndex == 5.0) { // o3
+                  diff = clamp(diff/30.0, 1.0, 5.0);
+              } else if (uVariableIndex == 6.0) { // so2
+                  diff = clamp(diff/20.0, 1.0, 5.0);
+              }
 
-            if (measurementValue != -1.0) {
-              thisDiff = abs(measurementValue-forecastValue);
-            } else {
-              thisDiff = 0.0;
-            }
-            if (nextMeasurementValue != -1.0) {
-              nextDiff = abs(nextMeasurementValue-nextForecastValue);
-            } else {
-              nextDiff = 0.0;
-            }
-            diff = mix(thisDiff, nextDiff, uFrameWeight);
+              if (measurementValueInterpolated < 0.0) {
+                diff = 0.5;
+              }
 
-            if (uVariableIndex == 1.0) {
-                diff = clamp(diff * 0.8, 1.0, 6.0);
-            } else if ( (uVariableIndex == 2.0) || (uVariableIndex == 3.0) ) {
-                diff = clamp(diff/20.0, 1.0, 4.0);
-            } else if (uVariableIndex == 4.0) {
-                diff = clamp(diff/30.0, 1.0, 5.0);
-            }
+              vec3 color;
+              if (measurementValueInterpolated > 0.0) {
+                color = getColorForValue(measurementValue);
+              } else {
+                color = vec3(0.15, 0.15, 0.15);
+              }
 
-            if ( measurementValueInterpolated < 0.0 ) {
-              diff = 0.5;
-            }
+              vColor = adjustSaturation(color, 2.0);
 
-            vec3 color;
-            // if ( (measurementValueInterpolated > 0.0 ) || (diff > 1.0) ) {
-            if ( (measurementValueInterpolated > 0.0 )  ) {
-                color = getColorForValue(measurementValue, uVariableIndex); 
-            } else {
-                // color = getColorForValue(0.0, uVariableIndex); 
-                color = vec3(0.15, 0.15, 0.15); 
-            }
-            // color = getColorForValue(measurementValue, uVariableIndex); 
-
-            
-            vColor = adjustSaturation(color, 2.0); // Increase saturation  
-
-            // Apply initial scale to the position
-            vec3 posPlane = position * 0.3;
-
-            // Add longitude and latitude to position, normalizing for the spherical projection
+              // Rest of the positioning code remains the same
+              vec3 posPlane = position * 0.3;
               posPlane.x += lon / 180.0 * 2.0;
               posPlane.y += lat / 90.0;
-            
 
               float r = 1.0;
               float theta = 2. * M_PI * (posPlane.x / 4. + 0.5);
@@ -524,25 +435,28 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
                 }
 
                 csm_Position = mix(posPlane, posSphere, uSphereWrapAmount) ;
-
-            //   csm_Position = posPlane;
-
             }
-          `}
-          fragmentShader={`
+          `
 
+    return (
+      <instancedMesh
+        ref={instancedMarkerRef}
+        args={[undefined, undefined, MAX_MARKERS]}
+      >
+        <sphereGeometry args={[markerSize, 16, 16]} />
+        <CustomShaderMaterial
+          baseMaterial={THREE.MeshLambertMaterial}
+          vertexShader={vertexShader}
+          fragmentShader={`
             uniform float uOpacity;
             varying vec3 vColor;
-
             
             void main() {
-
-
-              csm_DiffuseColor = vec4(vColor, uOpacity); // Apply the color to the fragment
-
+              csm_DiffuseColor = vec4(vColor, uOpacity);
             }
           `}
           uniforms={{
+            ...createContourUniforms(selectedVariable),
             uSphereWrapAmount: shaderUniforms.uSphereWrapAmount,
             uFrameWeight: shaderUniforms.uFrameWeight,
             uZoomLevel: { value: 0.11 },
@@ -553,9 +467,7 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
             measurementTexture: { value: measurementDataTexture.current },
             uVariableIndex: { value: variableIndex },
             uMaxMarkers: { value: forecastDataTexture.current?.image.width },
-            uNumTimseSteps: {
-              value: forecastDataTexture.current?.image.height,
-            },
+            uNumTimseSteps: { value: forecastDataTexture.current?.image.height },
           }}
           transparent
         />

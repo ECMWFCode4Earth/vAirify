@@ -20,7 +20,8 @@ in_situ_data = {"London": {"measurements": [], "city": cities[0]}}
 @patch("etl.scripts.run_in_situ_etl.retrieve_dates_requiring_in_situ_data")
 @patch("etl.scripts.run_in_situ_etl.get_locations_by_type")
 def test__run_in_situ_etl__one_date_no_cities_override(
-        mock_locations, mock_dates, mock_fetch, mock_insert):
+    mock_locations, mock_dates, mock_fetch, mock_insert
+):
 
     mock_dates.return_value = [datetime(2024, 6, 5)]
     mock_locations.return_value = cities
@@ -38,12 +39,13 @@ def test__run_in_situ_etl__one_date_no_cities_override(
 @patch("etl.scripts.run_in_situ_etl.retrieve_dates_requiring_in_situ_data")
 @patch("etl.scripts.run_in_situ_etl.get_locations_by_type")
 def test__run_in_situ_etl__multiple_dates_no_cities_override(
-        mock_locations, mock_dates, mock_fetch, mock_insert):
+    mock_locations, mock_dates, mock_fetch, mock_insert
+):
 
     mock_dates.return_value = [
         datetime(2024, 6, 3),
         datetime(2024, 6, 4),
-        datetime(2024, 6, 5)
+        datetime(2024, 6, 5),
     ]
     mock_locations.return_value = cities
     mock_fetch.return_value = in_situ_data

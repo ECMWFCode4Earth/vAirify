@@ -46,3 +46,31 @@ export const getMeasurementSummary = async (
   }
   return queryMeasurements('/measurements/summary', params)
 }
+
+export interface MeasurementCounts {
+  [city: string]: {
+    [pollutant: string]: number;
+    so2_locations: number;
+    no2_locations: number;
+    o3_locations: number;
+    pm10_locations: number;
+    pm2_5_locations: number;
+  }
+}
+
+export const getMeasurementCounts = async (
+  dateFrom: DateTime,
+  dateTo: DateTime,
+  locationType: LocationType = 'city',
+  locations?: string[],
+): Promise<MeasurementCounts> => {
+  const params: Record<string, string | string[]> = {
+    date_from: dateFrom.toJSDate().toISOString(),
+    date_to: dateTo.toJSDate().toISOString(),
+    location_type: locationType,
+  }
+  if (locations) {
+    params['location_names'] = locations
+  }
+  return queryMeasurements('/measurements/counts', params)
+}

@@ -32,6 +32,8 @@ jest.mock('../../../services/summary-comparison-service', () => ({
   }),
 }))
 
+const mockOnCityHover = jest.fn()
+
 const renderGrid = (showAllColoured: boolean) => {
   // The tests are driven by the mocked data returned from Create Summary Row
   return render(
@@ -39,6 +41,7 @@ const renderGrid = (showAllColoured: boolean) => {
       forecast={{}}
       summarizedMeasurements={{}}
       showAllColoured={showAllColoured}
+      onCityHover={mockOnCityHover}
     />,
     {
       wrapper: BrowserRouter,
@@ -47,6 +50,10 @@ const renderGrid = (showAllColoured: boolean) => {
 }
 
 describe('GlobalSummaryTable component', () => {
+  beforeEach(() => {
+    mockOnCityHover.mockClear()
+  })
+
   describe('renders the summary table', () => {
     it('displays message when data is loading', async () => {
       render(
@@ -54,6 +61,7 @@ describe('GlobalSummaryTable component', () => {
           forecast={undefined}
           summarizedMeasurements={undefined}
           showAllColoured={true}
+          onCityHover={mockOnCityHover}
         />,
         {
           wrapper: BrowserRouter,

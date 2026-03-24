@@ -13,15 +13,26 @@ from system_tests.utils.database_utilities import (
 load_dotenv()
 
 
-@mock.patch.dict(os.environ, {
-    "FORECAST_BASE_TIME": "2024-6-4 00",
-    "STORE_GRIB_FILES": "True",
-    "FORECAST_RETRIEVAL_PERIOD": "1"
-})
+@mock.patch.dict(
+    os.environ,
+    {
+        "FORECAST_BASE_TIME": "2024-6-4 00",
+        "STORE_GRIB_FILES": "True",
+        "FORECAST_RETRIEVAL_PERIOD": "1",
+    },
+)
 def test__missing_time_london__add_missing_data():
-    data_query = {"forecast_base_time": {"$lte": datetime.datetime(2024, 6, 4, 00, tzinfo=datetime.timezone.utc),
-                                         "$gte": datetime.datetime(2024, 6, 3, 00, tzinfo=datetime.timezone.utc)}}
-    data_query_to_delete = {"forecast_base_time": datetime.datetime(2024, 6, 3, 12, tzinfo=datetime.timezone.utc)}
+    data_query = {
+        "forecast_base_time": {
+            "$lte": datetime.datetime(2024, 6, 4, 00, tzinfo=datetime.timezone.utc),
+            "$gte": datetime.datetime(2024, 6, 3, 00, tzinfo=datetime.timezone.utc),
+        }
+    }
+    data_query_to_delete = {
+        "forecast_base_time": datetime.datetime(
+            2024, 6, 3, 12, tzinfo=datetime.timezone.utc
+        )
+    }
 
     main()
     delete_database_data("forecast_data", data_query_to_delete)

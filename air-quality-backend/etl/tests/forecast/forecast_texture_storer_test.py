@@ -9,7 +9,8 @@ from etl.src.forecast.forecast_texture_storer import (
     _chunk_data_array,
     _create_output_directory,
     _write_texture_to_disk,
-    save_data_textures, delete_data_textures_before,
+    save_data_textures,
+    delete_data_textures_before,
 )
 from shared.tests.util.mock_forecast_data import default_time
 
@@ -139,9 +140,7 @@ def test__save_data_textures(
     mock_create_output_directory.return_value = "/mock/output/directory"
 
     mock_write_texture_to_disk.side_effect = (
-        lambda chunk, output_directory, forecast_date, variable_name, chunk_num,
-        total_chunks, file_format:
-        f"/mock/output/directory/{forecast_date}_{variable_name}_chunk{chunk_num}."
+        lambda chunk, output_directory, forecast_date, variable_name, chunk_num, total_chunks, file_format: f"/mock/output/directory/{forecast_date}_{variable_name}_chunk{chunk_num}."
         f"{file_format}"
     )
 
@@ -158,7 +157,7 @@ def test__save_data_textures(
 
     assert len(documents) == 3
     for i, doc in enumerate(documents):
-        expected_date = datetime.strptime(forecast_date, '%Y-%m-%d_%H')
+        expected_date = datetime.strptime(forecast_date, "%Y-%m-%d_%H")
         actual_date = doc["forecast_base_time"]
         assert actual_date == expected_date
         assert doc["variable"] == variable_name
@@ -171,12 +170,12 @@ def test__save_data_textures(
             == f"/mock/output/directory/{forecast_date}_{variable_name}_chunk{i+1}.webp"
         )
         time_start_datetime = datetime.fromisoformat(
-            mock_chunk_data_array.return_value[1][i]["time_start"])
-        assert (
-            doc["time_start"] == time_start_datetime
+            mock_chunk_data_array.return_value[1][i]["time_start"]
         )
+        assert doc["time_start"] == time_start_datetime
         time_end_datetime = datetime.fromisoformat(
-            mock_chunk_data_array.return_value[1][i]["time_end"])
+            mock_chunk_data_array.return_value[1][i]["time_end"]
+        )
         assert doc["time_end"] == time_end_datetime
         assert doc["chunk"] == f"{i+1} of 3"
 
