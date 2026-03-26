@@ -1,1 +1,1 @@
-export { PollutantType } from '../models'
+export type { PollutantType } from '../models'
