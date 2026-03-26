@@ -9,7 +9,7 @@ services:
       - database:/data/db
 
   etl-insitu:
-    image: ghcr.io/ecmwfcode4earth/vairify/vairify-etl-insitu
+    image: vairify-etl-insitu
     container_name: etl-insitu
     depends_on:
       - db
@@ -24,7 +24,7 @@ services:
       
   etl-forecast:
     container_name: etl-forecast
-    image: ghcr.io/ecmwfcode4earth/vairify/vairify-etl-forecast
+    image: vairify-etl-forecast
     depends_on:
       - db
     environment:
