@@ -1,4 +1,5 @@
 .summary-grid-wrapper {
     /* 48px (header) + (48px * 10 rows) = 528px */
-    height: 528px;
+    height: 580px;
+    width: 100%;
 }

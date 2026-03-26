@@ -33,10 +33,14 @@ export interface GlobalSummaryTableProps {
   enableHover?: boolean
 }
 
-const maxWidth = 115
-const forecastWidth = 85
-const measurementWidth = 85
-const diffWidth = 60
+const timeFlex = 2
+const timeMinWidth = 90
+const forecastFlex = 1
+const forecastMinWidth = 70
+const measurementFlex = 1
+const measurementMinWidth = 70
+const diffFlex = 1
+const diffMinWidth = 60
 
 function insertEmptyValueDash(value: number | undefined): string {
   if (value === undefined) {
@@ -56,6 +60,8 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
     cellClass: 'cell-format',
     pinned: true,
     filter: true,
+    flex: 2,
+    minWidth: 120,
     cellRenderer: LocationCellRenderer,
   },
   {
@@ -66,7 +72,8 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         field: 'forecast.aqiLevel',
         headerName: 'Forecast',
         headerClass: 'cell-header-format',
-        maxWidth: forecastWidth,
+        flex: forecastFlex,
+        minWidth: forecastMinWidth,
         cellClass: 'cell-format',
         cellClassRules: aqiCellRules(),
         valueFormatter: (params: ValueFormatterParams) =>
@@ -76,7 +83,8 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         field: 'measurements.aqiLevel',
         headerName: 'Measured',
         headerClass: 'cell-header-format',
-        maxWidth: measurementWidth,
+        flex: measurementFlex,
+        minWidth: measurementMinWidth,
         cellClass: 'cell-format',
         cellClassRules: aqiCellRules(),
         valueFormatter: (params: ValueFormatterParams) =>
@@ -87,7 +95,8 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         headerName: 'Diff',
         headerClass: 'cell-header-format',
         sort: 'desc',
-        maxWidth: diffWidth,
+        flex: diffFlex,
+        minWidth: diffMinWidth,
         cellClass: 'cell-format',
         valueFormatter: (params: ValueFormatterParams): string => {
           if (!params.data.measurements) {
@@ -109,7 +118,8 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         headerClass: 'cell-header-format',
         cellClass: 'cell-format',
         cellClassRules: pollutantCellRules(showAllColoured, type),
-        maxWidth: forecastWidth,
+        flex: forecastFlex,
+        minWidth: forecastMinWidth,
         valueFormatter: (params: ValueFormatterParams) =>
           insertEmptyValueDash(params.value),
       },
@@ -119,7 +129,8 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         headerClass: 'cell-header-format',
         cellClass: 'cell-format',
         cellClassRules: pollutantCellRules(showAllColoured, type),
-        maxWidth: measurementWidth,
+        flex: measurementFlex,
+        minWidth: measurementMinWidth,
         valueFormatter: (params: ValueFormatterParams) =>
           insertEmptyValueDash(params.value),
       },
@@ -127,7 +138,8 @@ const createColDefs = (showAllColoured: boolean): (ColDef | ColGroupDef)[] => [
         field: `forecast.${type}.time`,
         headerName: `Time`,
         headerClass: 'cell-header-format',
-        maxWidth: maxWidth,
+        flex: timeFlex,
+        minWidth: timeMinWidth,
         cellClass: 'cell-format',
         valueFormatter: (params: ValueFormatterParams) =>
           DateTime.fromISO(params.data.forecast[type].time, {
@@ -143,7 +155,7 @@ const createGridOptions = (
   onCityHover?: (cityName: string | null, latitude?: number, longitude?: number, columnId?: string) => void
 ): GridOptions => ({
   autoSizeStrategy: {
-    type: 'fitCellContents',
+    type: 'fitGridWidth',
   },
   onCellMouseOver: (event) => {
     const cityName = event.data.locationName

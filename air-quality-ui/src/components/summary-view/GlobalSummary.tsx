@@ -15,7 +15,6 @@ import {
 } from '../../services/types'
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import World from '../globe/World'
-import { VariableType } from '../../models/variable-indices'
 import GlobalSummaryTable from '../summary-grid/table/GlobalSummaryTable'
 import SummaryBarChart from './charts/SummaryBarChart'
 import SummaryScatterChart from './charts/SummaryScatterChart'
@@ -27,7 +26,6 @@ const GlobalSummary = (): JSX.Element => {
   const [enableHover, setEnableHover] = useState<boolean>(true)
   const [measurementCounts, setMeasurementCounts] = useState<MeasurementCounts | null>(null)
   const [hoveredCity, setHoveredCity] = useState<string | null>(null)
-  const [hoveredVar, setHoveredVar] = useState<string | undefined>(undefined)
   const [selectedCityCoords, setSelectedCityCoords] = useState<{
     name: string
     latitude: number
@@ -156,12 +154,11 @@ const GlobalSummary = (): JSX.Element => {
   }, [forecastDetails])
 
   const handleCityHover = useCallback(
-    (cityName: string | null, latitude?: number, longitude?: number, columnId?: string) => {
+    (cityName: string | null, latitude?: number, longitude?: number) => {
       
       if (!enableHoverRef.current) return
       
       setHoveredCity(cityName)
-      setHoveredVar(columnId)
       if (cityName && latitude !== undefined && longitude !== undefined) {
         setSelectedCityCoords({
           name: cityName,
@@ -225,7 +222,6 @@ const GlobalSummary = (): JSX.Element => {
                 forecastData={forecastData || {}}
                 summarizedMeasurementData={summarizedMeasurementData}
                 selectedCity={selectedCityCoords}
-                selectedVariable={hoveredVar === 'aqiLevel' ? 'aqi' : ((hoveredVar || 'aqi') as VariableType)}
                 isFullscreen={isFullscreen}
                 onToggleFullscreen={handleFullscreenToggle}
               />

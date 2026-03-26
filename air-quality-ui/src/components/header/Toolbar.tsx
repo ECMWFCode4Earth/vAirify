@@ -30,6 +30,7 @@ export const Toolbar = () => {
       <div>
         <Breadcrumbs />
       </div>
+      <div id="toolbar-extra" className={classes['toolbar-extra']} />
       <div className={classes['controls']}>
         <div className={classes['forecast-base-date-picker-div']}>
           <ForecastBaseDatePicker

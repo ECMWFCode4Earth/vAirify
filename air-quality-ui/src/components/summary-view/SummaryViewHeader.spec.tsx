@@ -24,6 +24,14 @@ describe('SummaryViewHeader component', () => {
   beforeEach(() => {
     mockSetShowAllColoured.mockClear()
     mockSetEnableHover.mockClear()
+    const portalTarget = document.createElement('div')
+    portalTarget.id = 'toolbar-extra'
+    document.body.appendChild(portalTarget)
+  })
+
+  afterEach(() => {
+    const portalTarget = document.getElementById('toolbar-extra')
+    if (portalTarget) portalTarget.remove()
   })
 
   it('Shows correct message for context dates', async () => {

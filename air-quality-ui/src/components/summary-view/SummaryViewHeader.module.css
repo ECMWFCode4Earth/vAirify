@@ -1,27 +1,26 @@
-.table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0px;
-}
-
 .table-date {
-    flex: 1;
+    color: white;
+    font-size: 14px;
+    white-space: nowrap;
 }
 
 .switches-container {
     display: flex;
     gap: 16px;
     align-items: center;
+    border-left: 1px solid #555;
+    padding-left: 1rem;
+    margin-left: 0.5rem;
 }
 
 .table-switch-container {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
 }
 
 .table-switch-label {
-    font-size: 14px;
+    font-size: 13px;
     white-space: nowrap;
+    color: white;
 }
