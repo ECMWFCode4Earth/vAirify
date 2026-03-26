@@ -17,8 +17,8 @@ jest.mock('../../context', () => ({
   }),
 }))
 
-const mockSetShowAllColoured: (val: boolean) => void = jest.fn()
-const mockSetEnableHover: (val: boolean) => void = jest.fn()
+const mockSetShowAllColoured = jest.fn()
+const mockSetEnableHover = jest.fn()
 
 describe('SummaryViewHeader component', () => {
   beforeEach(() => {
@@ -52,7 +52,8 @@ describe('SummaryViewHeader component', () => {
       />,
     )
     await act(async () => {
-      ;(await screen.getByRole('checkbox')).click()
+      const checkboxes = await screen.getAllByRole('checkbox')
+      checkboxes[checkboxes.length - 1].click()
     })
     await waitFor(() => {
       expect(mockSetShowAllColoured).toHaveBeenCalledWith(true)

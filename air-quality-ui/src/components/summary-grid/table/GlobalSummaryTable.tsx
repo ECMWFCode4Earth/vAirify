@@ -27,9 +27,10 @@ import { LocationCellRenderer } from '../cell/location-cell-renderer/LocationCel
 
 export interface GlobalSummaryTableProps {
   forecast: Record<string, ForecastResponseDto[]> | undefined
-  summarizedMeasurements: Record<string, MeasurementSummaryResponseDto> | undefined
+  summarizedMeasurements: Record<string, MeasurementSummaryResponseDto[]> | undefined
   showAllColoured: boolean
   onCityHover: (cityName: string | null, latitude?: number, longitude?: number, columnId?: string) => void
+  enableHover?: boolean
 }
 
 const maxWidth = 115

@@ -51,6 +51,10 @@ jest.mock(
     mockGridSummaryTable(props),
 )
 
+jest.mock('../globe/World', () => () => <span>mock world</span>)
+jest.mock('./charts/SummaryBarChart', () => () => <span>mock bar chart</span>)
+jest.mock('./charts/SummaryScatterChart', () => () => <span>mock scatter chart</span>)
+
 describe('GlobalSummary component', () => {
   it('shows loading spinner when forecast data is loading', async () => {
     ;(useQuery as jest.Mock).mockReturnValueOnce({
@@ -108,11 +112,13 @@ describe('GlobalSummary component', () => {
   it('showAllColours variable to passed to GridSummaryTable set to true by default', async () => {
     render(<GlobalSummary />)
     await waitFor(() => {
-      expect(mockGridSummaryTable).toHaveBeenCalledWith({
-        forecast: {},
-        summarizedMeasurements: {},
-        showAllColoured: true,
-      })
+      expect(mockGridSummaryTable).toHaveBeenCalledWith(
+        expect.objectContaining({
+          forecast: {},
+          summarizedMeasurements: {},
+          showAllColoured: true,
+        })
+      )
     })
   })
 
@@ -120,11 +126,13 @@ describe('GlobalSummary component', () => {
     render(<GlobalSummary />)
     setShowAllColouredState(false)
     await waitFor(() => {
-      expect(mockGridSummaryTable).toHaveBeenCalledWith({
-        forecast: {},
-        summarizedMeasurements: {},
-        showAllColoured: false,
-      })
+      expect(mockGridSummaryTable).toHaveBeenCalledWith(
+        expect.objectContaining({
+          forecast: {},
+          summarizedMeasurements: {},
+          showAllColoured: false,
+        })
+      )
     })
   })
 })

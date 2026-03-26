@@ -12,7 +12,7 @@ import {
 } from '../../services/types'
 import { ColorBar } from './ColorBar'
 import { PollutantType } from '../../models/types'
-import { pollutantTypeDisplay } from '../../models/pollutant-display'
+import { VariableType } from '../../models/variable-indices'
 
 interface WorldProps {
   forecastData: Record<string, ForecastResponseDto[]>
@@ -22,7 +22,7 @@ interface WorldProps {
     latitude: number
     longitude: number
   } | null
-  selectedVariable?: string
+  selectedVariable?: VariableType
   isFullscreen: boolean
   onToggleFullscreen: () => void
 }
@@ -45,7 +45,7 @@ const World = ({
   const [isLocationMarkerOn, setIsLocationMarkerOn] = useState(true)
   const [isFilterNearest, setGridFilterState] = useState(false)
   const [isTimeInterpolation, setTimeInterpolationState] = useState(true)
-  const [selectedVariable, setSelectedVariable] = useState(externalSelectedVariable || 'aqi')
+  const [selectedVariable, setSelectedVariable] = useState<VariableType>(externalSelectedVariable || 'aqi')
   const [globeState, setGlobeState] = useState(false)
 
   const toggleTimeUpdate = () => setIsTimeRunning((prev) => !prev)
@@ -71,7 +71,7 @@ const World = ({
     surface_layer_ref.current?.changeTimeInterpolation(timeInterpolationState)
   }
 
-  const handleVariableSelect = (variable: string) => {
+  const handleVariableSelect = (variable: VariableType) => {
     setSelectedVariable(variable)
   }
 

@@ -8,7 +8,7 @@ import vertexShader from './shaders/surfaceVert.glsl'
 import { useDataTextures } from './useDataTextures'
 import { useForecastContext } from '../../context'
 import { createContourUniforms } from './utils/shaderUniforms'
-import { getVariableIndex } from '../../models/variable-indices'
+import { getVariableIndex, VariableType } from '../../models/variable-indices'
 
 const shaderUniforms = {
   uSphereWrapAmount: { value: 0.0 },
@@ -21,7 +21,7 @@ type PlaneType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>
 type SurfaceLayerProps = {
   isFilterNearest: boolean
   isTimeInterpolation: boolean
-  selectedVariable: string
+  selectedVariable: VariableType
 }
 
 export type SurfaceLayerRef = {

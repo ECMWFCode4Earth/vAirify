@@ -62,7 +62,7 @@ export const ColorBar: React.FC<ColorBarProps> = ({
     const blockHeight = barHeight / contourInfo.levels.length
 
     // Draw each level as a discrete rectangle (from bottom to top)
-    contourInfo.levels.forEach((level, i) => {
+    contourInfo.levels.forEach((_level, i) => {
       const y = barTop + barHeight - ((i + 1) * blockHeight)
       
       // Draw colored rectangle

@@ -21,6 +21,7 @@ import React, {
 
 import { useForecastContext } from '../../context'
 import { ForecastResponseDto } from '../../services/types'
+import { VariableType } from '../../models/variable-indices'
 
 type ControlsProps = {
   isTimeRunning: boolean
@@ -30,11 +31,11 @@ type ControlsProps = {
   onLocationMarkerClick: (locationMarkerState: boolean) => void
   onGridFilterClick: (filterState: boolean) => void
   onTimeInterpolationClick: (filterState: boolean) => void
-  onVariableSelect: (variable: string) => void
+  onVariableSelect: (variable: VariableType) => void
   forecastData: Record<string, ForecastResponseDto[]>
   isFullscreen: boolean
   onFullscreenToggle: () => void
-  selectedVariable?: string
+  selectedVariable?: VariableType
 }
 
 const Controls: React.FC<ControlsProps> = ({
@@ -133,7 +134,7 @@ const Controls: React.FC<ControlsProps> = ({
   }
 
   const handleVariableSelectChange = (event: SelectChangeEvent<string>) => {
-    const variable = event.target.value
+    const variable = event.target.value as VariableType
     setSelectedVariable(variable)
     onVariableSelect(variable)
   }

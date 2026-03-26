@@ -123,12 +123,6 @@ const SummaryBarChart = ({ selectedCity, measurementCounts, totalCities }: Summa
     }
   }, [selectedCity, measurementCounts, pollutants, pollutantLabels, coverage, maxPercentage])
 
-  const getBarColor = (value: number, maxValue: number, isCount: boolean) => {
-    if (value === 0) return '#e0e0e0'
-    const pollutant = pollutants[Math.floor(value) % pollutants.length]
-    return pollutantColors[pollutant]
-  }
-
   const options = {
     title: [
       {

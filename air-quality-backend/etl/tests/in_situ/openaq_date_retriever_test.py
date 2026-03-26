@@ -26,7 +26,7 @@ def test__retrieve_dates_requiring_in_situ_data__no_extra_dates_required(
         result = retrieve_dates_requiring_in_situ_data()
 
         assert len(result) == 1
-        assert result[0] == datetime(2024, 8, 7, 12, 34, 56)
+        assert result[0] == datetime(2024, 8, 7, 12, 0, 0)
 
 
 @patch.dict(os.environ, {"IN_SITU_RETRIEVAL_PERIOD": "2"})
@@ -42,11 +42,11 @@ def test__retrieve_dates_requiring_in_situ_data__one_extra_date_without_gap(
     result = retrieve_dates_requiring_in_situ_data()
 
     patch_db_get.assert_called_with(
-        datetime(2024, 8, 5, 12, 34, 56), datetime(2024, 8, 6, 12, 34, 56)
+        datetime(2024, 8, 5, 12, 0, 0), datetime(2024, 8, 6, 12, 0, 0)
     )
 
     assert len(result) == 1
-    assert result[0] == datetime(2024, 8, 7, 12, 34, 56)
+    assert result[0] == datetime(2024, 8, 7, 12, 0, 0)
 
 
 @patch.dict(os.environ, {"IN_SITU_RETRIEVAL_PERIOD": "2"})
@@ -60,12 +60,12 @@ def test__retrieve_dates_requiring_in_situ_data__one_extra_date_with_gaps(patch_
     result = retrieve_dates_requiring_in_situ_data()
 
     patch_db_get.assert_called_with(
-        datetime(2024, 8, 5, 12, 34, 56), datetime(2024, 8, 6, 12, 34, 56)
+        datetime(2024, 8, 5, 12, 0, 0), datetime(2024, 8, 6, 12, 0, 0)
     )
 
     assert len(result) == 2
-    assert result[0] == datetime(2024, 8, 6, 12, 34, 56)
-    assert result[1] == datetime(2024, 8, 7, 12, 34, 56)
+    assert result[0] == datetime(2024, 8, 6, 12, 0, 0)
+    assert result[1] == datetime(2024, 8, 7, 12, 0, 0)
 
 
 @patch.dict(os.environ, {"IN_SITU_RETRIEVAL_PERIOD": "3"})
@@ -81,9 +81,9 @@ def test__retrieve_dates_requiring_in_situ_data__two_extra_dates_one_with_gap(
     result = retrieve_dates_requiring_in_situ_data()
 
     patch_db_get.assert_called_with(
-        datetime(2024, 8, 4, 12, 34, 56), datetime(2024, 8, 6, 12, 34, 56)
+        datetime(2024, 8, 4, 12, 0, 0), datetime(2024, 8, 6, 12, 0, 0)
     )
 
     assert len(result) == 2
-    assert result[0] == datetime(2024, 8, 5, 12, 34, 56)
-    assert result[1] == datetime(2024, 8, 7, 12, 34, 56)
+    assert result[0] == datetime(2024, 8, 5, 12, 0, 0)
+    assert result[1] == datetime(2024, 8, 7, 12, 0, 0)

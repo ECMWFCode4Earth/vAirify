@@ -18,12 +18,12 @@ import {
   PollutantDataDto,
 } from '../../services/types'
 import { createContourUniforms } from './utils/shaderUniforms'
-import { getVariableIndex } from '../../models/variable-indices'
+import { getVariableIndex, VariableType } from '../../models/variable-indices'
 
 type LocationMarkerProps = {
   forecastData: Record<string, ForecastResponseDto[]>
   measurementData: Record<string, MeasurementSummaryResponseDto[]>
-  selectedVariable: string
+  selectedVariable: VariableType
   isVisible: boolean
   cameraControlsRef: React.RefObject<CameraControls>
   selectedCityIndex: number

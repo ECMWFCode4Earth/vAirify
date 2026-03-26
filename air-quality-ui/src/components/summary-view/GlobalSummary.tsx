@@ -15,6 +15,7 @@ import {
 } from '../../services/types'
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import World from '../globe/World'
+import { VariableType } from '../../models/variable-indices'
 import GlobalSummaryTable from '../summary-grid/table/GlobalSummaryTable'
 import SummaryBarChart from './charts/SummaryBarChart'
 import SummaryScatterChart from './charts/SummaryScatterChart'
@@ -224,7 +225,7 @@ const GlobalSummary = (): JSX.Element => {
                 forecastData={forecastData || {}}
                 summarizedMeasurementData={summarizedMeasurementData}
                 selectedCity={selectedCityCoords}
-                selectedVariable={hoveredVar === 'aqiLevel' ? 'aqi' : (hoveredVar || 'aqi')}
+                selectedVariable={hoveredVar === 'aqiLevel' ? 'aqi' : ((hoveredVar || 'aqi') as VariableType)}
                 isFullscreen={isFullscreen}
                 onToggleFullscreen={handleFullscreenToggle}
               />

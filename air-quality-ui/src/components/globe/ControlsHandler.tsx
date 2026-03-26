@@ -3,6 +3,7 @@ import React from 'react'
 
 import Controls from './Controls'
 import { ForecastResponseDto } from '../../services/types'
+import { VariableType } from '../../models/variable-indices'
 
 type ControlsHandlerProps = {
   toggleTimeUpdate: () => void
@@ -11,12 +12,12 @@ type ControlsHandlerProps = {
   handleLocationMarkerButtonClick: (locationMarkerState: boolean) => void
   handleGridFilterClick: (filterState: boolean) => void
   handleTimeInterpolationClick: (timeInterpolationState: boolean) => void
-  handleVariableSelect: (variable: string) => void
+  handleVariableSelect: (variable: VariableType) => void
   isTimeRunning: boolean
   forecastData: Record<string, ForecastResponseDto[]>
   isFullscreen: boolean
   onFullscreenToggle: () => void
-  selectedVariable?: string
+  selectedVariable?: VariableType
 }
 
 const ControlsHandler: React.FC<ControlsHandlerProps> = ({
