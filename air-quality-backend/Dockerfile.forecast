@@ -7,7 +7,7 @@ RUN conda env create -f environment.yml
 SHELL ["conda", "run", "-n", "air-quality-backend", "/bin/bash", "-c"]
 
 COPY etl/pyproject.toml etl/poetry.lock ./
-RUN poetry install
+RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
 
 COPY etl/src/ ./etl/src
 COPY etl/scripts/ ./etl/scripts
