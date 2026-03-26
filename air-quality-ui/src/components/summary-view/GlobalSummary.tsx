@@ -22,8 +22,8 @@ import SummaryScatterChart from './charts/SummaryScatterChart'
 const GlobalSummary = (): JSX.Element => {
   const { forecastDetails } = useForecastContext()
   const [showAllColoured, setShowAllColoured] = useState<boolean>(true)
-  const enableHoverRef = useRef(false)
-  const [enableHover, setEnableHover] = useState<boolean>(false)
+  const enableHoverRef = useRef(true)
+  const [enableHover, setEnableHover] = useState<boolean>(true)
   const [measurementCounts, setMeasurementCounts] = useState<MeasurementCounts | null>(null)
   const [hoveredCity, setHoveredCity] = useState<string | null>(null)
   const [hoveredVar, setHoveredVar] = useState<string | undefined>(undefined)

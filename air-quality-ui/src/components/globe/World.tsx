@@ -1,7 +1,6 @@
 import { CameraControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import { CSSProperties, useRef, useState, useEffect } from 'react'
-import * as THREE from 'three'
+import { CSSProperties, useRef, useState, useEffect, useMemo } from 'react'
 
 import CameraSettings from './CameraSettings'
 import ControlsHandler from './ControlsHandler'
@@ -48,13 +47,6 @@ const World = ({
   const [isTimeInterpolation, setTimeInterpolationState] = useState(true)
   const [selectedVariable, setSelectedVariable] = useState(externalSelectedVariable || 'aqi')
   const [globeState, setGlobeState] = useState(false)
-
-  // Default camera position
-  const defaultCameraPosition = {
-    phi: Math.PI / 2, // 90 degrees
-    theta: Math.PI,    // 180 degrees
-    distance: 1.4
-  }
 
   const toggleTimeUpdate = () => setIsTimeRunning((prev) => !prev)
 
@@ -136,58 +128,12 @@ const World = ({
     }
   }, [onToggleFullscreen])
 
-  useEffect(() => {
-    if (selectedCity && cameraControlsRef.current) {
-      const controls = cameraControlsRef.current
-      const { latitude, longitude } = selectedCity
-
-      // Switch to globe view when zooming to a city
-      if (!globeState) {
-        setGlobeState(true)
-        surface_layer_ref.current?.changeProjection(true)
-        markerRef.current?.changeProjection(true)
-
-        const phi = -1.0 * (latitude - 90) * THREE.MathUtils.DEG2RAD
-        const theta = longitude * THREE.MathUtils.DEG2RAD
-
-        // Wait 1 second before camera movement after switching to globe view
-        setTimeout(() => {
-          controls.rotateTo(theta, phi, true)
-          controls.dollyTo(0.3, true)
-          controls.smoothTime = 1.0
-        }, 100)
-      } else {
-        const phi = -1.0 * (latitude - 90) * THREE.MathUtils.DEG2RAD
-        const theta = longitude * THREE.MathUtils.DEG2RAD
-        
-        controls.rotateTo(theta, phi, true)
-        controls.dollyTo(0.3, true)
-        controls.smoothTime = 1.0
-      }
-
-    } else if (cameraControlsRef.current) {
-      // Reset to default position when no city is selected
-      const controls = cameraControlsRef.current
-      
-      // Switch back to map view
-      if (globeState) {
-        setGlobeState(false)
-        surface_layer_ref.current?.changeProjection(false)
-        markerRef.current?.changeProjection(false)
-
-        // Wait 1 second before camera movement after switching to map view
-        setTimeout(() => {
-          controls.rotateTo(defaultCameraPosition.theta, defaultCameraPosition.phi, true)
-          controls.dollyTo(defaultCameraPosition.distance, true)
-          controls.smoothTime = 1.0
-        }, 1000)
-      } else {
-        controls.rotateTo(defaultCameraPosition.theta, defaultCameraPosition.phi, true)
-        controls.dollyTo(defaultCameraPosition.distance, true)
-        controls.smoothTime = 1.0
-      }
-    }
-  }, [selectedCity])
+  // Compute the index of the selected city in forecastData keys for marker highlighting
+  const selectedCityIndex = useMemo(() => {
+    if (!selectedCity) return -1
+    const cities = Object.keys(forecastData)
+    return cities.indexOf(selectedCity.name)
+  }, [selectedCity, forecastData])
 
   // Update selectedVariable when external prop changes
   useEffect(() => {
@@ -237,6 +183,7 @@ const World = ({
               selectedVariable={selectedVariable}
               isVisible={isLocationMarkerOn}
               cameraControlsRef={cameraControlsRef}
+              selectedCityIndex={selectedCityIndex}
             />
           )}
 

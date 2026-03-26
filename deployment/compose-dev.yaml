@@ -38,7 +38,9 @@ services:
 
   api:
     container_name: backend-api
-    image: ghcr.io/ecmwfcode4earth/vairify/vairify-backend-api
+    build:
+      context: ../air-quality-backend/
+      dockerfile: Dockerfile.api
     depends_on:
       - db
     ports:
@@ -46,6 +48,12 @@ services:
     environment:
       - MONGO_DB_URI=mongodb://mongo:27017
       - MONGO_DB_NAME=${MONGO_DB_NAME}
+    entrypoint: 
+      - fastapi
+      - dev
+      - ./api/src/main.py
+      - --host
+      - 0.0.0.0
 
   ui:
     container_name: frontend-ui

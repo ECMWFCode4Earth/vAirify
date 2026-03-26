@@ -26,6 +26,7 @@ type LocationMarkerProps = {
   selectedVariable: string
   isVisible: boolean
   cameraControlsRef: React.RefObject<CameraControls>
+  selectedCityIndex: number
 }
 
 export type LocationMarkerRef = {
@@ -151,6 +152,7 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
       selectedVariable,
       isVisible,
       cameraControlsRef,
+      selectedCityIndex,
     },
     ref,
   ): JSX.Element | null => {
@@ -261,6 +263,12 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
       }
     }, [])
 
+    useEffect(() => {
+      if (instancedMarkerRef.current) {
+        instancedMarkerRef.current.material.uniforms.uSelectedCityIndex.value = selectedCityIndex
+      }
+    }, [selectedCityIndex])
+
     useFrame(() => {
       scaleBasedOnZoom()
     })
@@ -311,6 +319,7 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
             uniform float uMaxMarkers;
             uniform float uNumTimseSteps;
             uniform bool uVariableSize;
+            uniform float uSelectedCityIndex;
 
             uniform sampler2D forecastTexture;
             uniform sampler2D measurementTexture;
@@ -411,6 +420,13 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
 
               vColor = adjustSaturation(color, 2.0);
 
+              // Hide non-selected markers when a city is selected
+              if (uSelectedCityIndex >= 0.0 && abs(markerIndex - uSelectedCityIndex) > 0.5) {
+                vColor = vec3(0.0);
+                csm_Position = vec3(0.0, 0.0, -999.0);
+                return;
+              }
+
               // Rest of the positioning code remains the same
               vec3 posPlane = position * 0.3;
               posPlane.x += lon / 180.0 * 2.0;
@@ -426,7 +442,11 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
               posSphere.y = r * cos(phi);
               posSphere.z = sinPhiRadius * cos(theta);
 
-                if (uVariableSize) {
+                if (uSelectedCityIndex >= 0.0 && abs(markerIndex - uSelectedCityIndex) < 0.5) {
+                    // Selected city: render bigger
+                    posPlane += position * diff * uZoomLevel * 1.6;
+                    posSphere += position * diff * uZoomLevel * 0.6;
+                } else if (uVariableSize) {
                     posPlane += position * diff * uZoomLevel * 0.8;
                     posSphere += position * diff * uZoomLevel * 0.3;
                 } else {
@@ -468,6 +488,7 @@ const LocationMarker = forwardRef<LocationMarkerRef, LocationMarkerProps>(
             uVariableIndex: { value: variableIndex },
             uMaxMarkers: { value: forecastDataTexture.current?.image.width },
             uNumTimseSteps: { value: forecastDataTexture.current?.image.height },
+            uSelectedCityIndex: { value: selectedCityIndex },
           }}
           transparent
         />
