@@ -41,6 +41,7 @@ def measurement_is_valid(measurement):
 
     return (
         valid_unit
+        and measurement["value"] is not None
         and measurement["value"] > MIN_MEASUREMENT_VALUE
         and measurement["value"] != MAX_MEASUREMENT_VALUE
     )

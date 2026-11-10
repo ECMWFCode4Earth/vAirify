@@ -155,6 +155,18 @@ def test__transform_city__negative_value_filtered_out():
     assert result == []
 
 
+def test__transform_city__missing_value_filtered_out():
+    measurement = create_mock_open_aq_response(
+        {
+            "parameter": "so2",
+            "value": None,
+        }
+    )
+
+    result = transform_city({"city": city, "measurements": [measurement]})
+    assert result == []
+
+
 def test__transform_city__large_error_value_filtered_out():
     measurement = create_mock_open_aq_response(
         {
