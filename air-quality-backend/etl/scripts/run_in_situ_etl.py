@@ -14,7 +14,10 @@ config.fileConfig("./logging.ini")
 
 def main():
     load_dotenv()
+    process_in_situ_dates(get_cities(), retrieve_dates_requiring_in_situ_data())
 
+
+def get_cities():
     cities = get_locations_by_type(AirQualityLocationType.CITY)
 
     open_aq_cities = (
@@ -23,14 +26,19 @@ def main():
     if open_aq_cities is not None:
         cities = [city for city in cities if city["name"] in open_aq_cities.split(",")]
     logging.info(f"Finding data for {cities.__len__()} cities")
+    return cities
 
-    in_situ_dates = retrieve_dates_requiring_in_situ_data()
 
+def process_in_situ_dates(cities, in_situ_dates):
     for date in in_situ_dates:
-        logging.info(f"Finding in-situ data for the 24 hour period before {date}")
+        process_in_situ_date(cities, date)
 
-        open_aq_data = retrieve_openaq_in_situ_data(cities, date, 24)
-        insert_data(open_aq_data)
+
+def process_in_situ_date(cities, date):
+    logging.info(f"Finding in-situ data for the 24 hour period before {date}")
+
+    open_aq_data = retrieve_openaq_in_situ_data(cities, date, 24)
+    insert_data(open_aq_data)
 
 
 if __name__ == "__main__":
