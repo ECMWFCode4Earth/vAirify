@@ -61,8 +61,20 @@ class RateLimiter:
 rate_limiter = RateLimiter()
 
 
-def _create_session() -> requests.Session:
-    retry_strategy = Retry(total=2, status_forcelist=[408], raise_on_status=False)
+SERVER_ERROR_STATUSES = [500, 502, 503, 504]
+
+
+def _create_session(retry_server_errors: bool = False) -> requests.Session:
+    if retry_server_errors:
+        # Sleeps of 0, 10, 20, 40, 80 seconds between attempts
+        retry_strategy = Retry(
+            total=5,
+            backoff_factor=5,
+            status_forcelist=[408, *SERVER_ERROR_STATUSES],
+            raise_on_status=False,
+        )
+    else:
+        retry_strategy = Retry(total=2, status_forcelist=[408], raise_on_status=False)
     adapter = HTTPAdapter(max_retries=retry_strategy)
     session = requests.Session()
     session.mount("http://", adapter)

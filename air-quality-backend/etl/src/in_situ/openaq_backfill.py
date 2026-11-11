@@ -17,9 +17,13 @@ import logging
 import os
 from datetime import datetime, timedelta
 
+import requests
+
 from .openaq_dao import (
     OPEN_AQ_DATE_FORMAT,
+    SERVER_ERROR_STATUSES,
     _fetch_locations,
+    _get_measurements_for_sensor,
     _sensors_from_locations,
     cache_file_path,
     fetch_sensor_measurements_between,
@@ -58,6 +62,29 @@ def chunk_windows(
 
 def _sensor_key(sensor_info) -> tuple:
     return sensor_info["id"], sensor_info["location_name"]
+
+
+def _fetch_sensor_range(sensor, windows, session) -> list | None:
+    """
+    Fetch a sensor over the whole range of the windows. Returns None when OpenAQ
+    keeps answering with a server error, so the caller can fall back to the
+    cron's per-window requests. Other failures (e.g. rate limiting) are raised so
+    the run stops and can be resumed without losing data.
+    """
+    try:
+        return fetch_sensor_measurements_between(
+            sensor, windows[0][0], windows[-1][1], session
+        )
+    except requests.exceptions.HTTPError as e:
+        status = e.response.status_code if e.response is not None else None
+        if status not in SERVER_ERROR_STATUSES:
+            raise
+        logging.warning(
+            f"OpenAQ returned {status} for sensor {sensor['id']} at "
+            f"{sensor['location_name']} from {windows[0][0]} to {windows[-1][1]}. "
+            f"Falling back to per-day requests for this sensor."
+        )
+        return None
 
 
 class _WindowCacheWriter:
@@ -126,10 +153,18 @@ def cache_city_windows(
     ]
     try:
         for sensor in sensors:
-            measurements = fetch_sensor_measurements_between(
-                sensor, pending[0][0], pending[-1][1], session
-            )
             key = _sensor_key(sensor)
+            measurements = _fetch_sensor_range(sensor, pending, session)
+            if measurements is None:
+                # Same request and error handling as the cron, window by window
+                for index, window in enumerate(pending):
+                    if key in sensors_per_window[index]:
+                        for measurement in _get_measurements_for_sensor(
+                            sensor, window[0], window[1], session, city
+                        ):
+                            writers[index].write(measurement)
+                continue
+
             for period_from, measurement in measurements:
                 period_start = datetime.strptime(period_from, OPEN_AQ_DATE_FORMAT)
                 period_end = datetime.strptime(

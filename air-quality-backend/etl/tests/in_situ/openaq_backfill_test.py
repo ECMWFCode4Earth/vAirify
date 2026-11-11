@@ -239,3 +239,67 @@ def test__fetch_in_situ_measurements__missing_cache_file_calls_api(fake_api, tmp
 
     assert len(result["London"]["measurements"]) > 0
     assert fake_api.call_count > 0
+
+
+def _http_error(status: int):
+    response = Mock(status_code=status)
+    return openaq_dao.requests.exceptions.HTTPError(
+        f"{status} error", response=response
+    )
+
+
+def _failing_range_requests(status: int, sensor_id: int):
+    def fake(session, url, headers):
+        params = {k: v[0] for k, v in parse_qs(urlparse(url).query).items()}
+        if f"/sensors/{sensor_id}/" in url:
+            span = datetime.strptime(
+                params["datetime_to"], DATE_FORMAT
+            ) - datetime.strptime(params["datetime_from"], DATE_FORMAT)
+            if span > timedelta(hours=24):
+                raise _http_error(status)
+        return _fake_openaq(session, url, headers)
+
+    return fake
+
+
+def test__cache_openaq_chunk__server_error_falls_back_to_cron_requests(tmp_path):
+    windows = to_windows(
+        [datetime(2026, 1, 3, 13), datetime(2026, 1, 4, 13), datetime(2026, 1, 9, 13)]
+    )
+    with patch(
+        "etl.src.in_situ.openaq_dao._make_request",
+        side_effect=_failing_range_requests(500, sensor_id=2),
+    ):
+        cache_openaq_chunk([city], windows, str(tmp_path), Mock(), {})
+
+        for window_start, window_end in windows:
+            expected = _call_openaq_api_v3(city, window_start, window_end, Mock())
+            path = cache_file_path(str(tmp_path), "London", window_start, window_end)
+            with open(path, encoding="utf-8") as f:
+                assert json.load(f) == json.loads(json.dumps(expected))
+                assert any(m["parameter"] == "pm25" for m in expected)
+
+
+def test__cache_openaq_chunk__client_error_is_raised(tmp_path):
+    windows = to_windows([datetime(2026, 1, 3, 13), datetime(2026, 1, 4, 13)])
+    with patch(
+        "etl.src.in_situ.openaq_dao._make_request",
+        side_effect=_failing_range_requests(404, sensor_id=2),
+    ):
+        with pytest.raises(openaq_dao.requests.exceptions.HTTPError):
+            cache_openaq_chunk([city], windows, str(tmp_path), Mock(), {})
+
+    assert os.listdir(tmp_path) == []
+
+
+def test__create_session__retries_server_errors_only_when_requested():
+    default = openaq_dao._create_session().get_adapter("https://x").max_retries
+    backfill = (
+        openaq_dao._create_session(retry_server_errors=True)
+        .get_adapter("https://x")
+        .max_retries
+    )
+
+    assert set(default.status_forcelist) == {408}
+    assert {500, 502, 503, 504} <= set(backfill.status_forcelist)
+    assert 429 not in backfill.status_forcelist

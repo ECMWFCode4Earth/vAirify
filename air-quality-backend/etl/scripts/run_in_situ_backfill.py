@@ -67,7 +67,11 @@ def _remove_window_cache(backfill_dir: str, cities, window):
 
 def _cache_chunk(cities, chunk, backfill_dir, locations_by_city):
     cache_openaq_chunk(
-        cities, chunk, backfill_dir, _create_session(), locations_by_city
+        cities,
+        chunk,
+        backfill_dir,
+        _create_session(retry_server_errors=True),
+        locations_by_city,
     )
 
 
